@@ -1,0 +1,157 @@
+.nmmc_blue_bg {
+    background-color: white;
+}
+
+.orange {
+    color: #dd6101 !important;
+}
+
+.Web_fontsize{
+    font-size: 16px !important;
+}
+
+.main_heading_color{
+    color: #196393 !important;
+}
+
+.shadow_css{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.heading_fontsize{
+    text-align: start;
+    font-size: 24px !important;
+    font-weight: 500 !important;
+
+}
+
+.purpule_color{
+    color: #196393 !important;
+}
+
+.logo_in_circle {
+    width: 40%;
+}
+.logo_in_circle{
+    width: 150px;
+}
+.f7{
+    font-size: 14px !important;
+}
+
+.bg_light_white {
+    /* background-color: #ffffff4f; */
+    background-image: linear-gradient(#ffffff4f, rgba(56, 39, 81, 0.7));
+}
+
+.bordre_round {
+    border-radius: 20px !important;
+    /* filter: blur(1px); */
+}
+
+.geo_tag h6 {
+    font-size: 14px !important;
+}
+
+/* for mobile */
+@media screen and (max-width: 800px) {
+    .mobile_none {
+        display: none !important;
+    }
+}
+
+.wardha_background {
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+
+
+.heading_font_size {
+    font-size: 22px !important;
+}
+
+@media screen and (min-width: 800px) {
+    .heading_font_size {
+        font-size: 32px !important;
+    }
+}
+
+.Center_item {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center;
+    height: 100vh !important;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.btn_submit{
+    background-color: #023f7c;
+    color: white;
+    
+}
+.Center_item_img {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center;
+}
+
+
+/* for pc*/
+@media screen and (min-width: 802px) {
+    .pc_none {
+        display: none !important;
+    }
+}
+
+.header_img {
+    width: 120px !important;
+}
+
+@media (min-width:992px) and (max-width:1200px) {
+    .header_img {
+        width: 5vw !important;
+    }
+}
+
+.center{
+    height: 60vh;
+    width: 55vw !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background-repeat: no-repeat;
+    margin-top: 4%;
+    border-radius: 20px;
+}
+
+@media screen and (max-width: 800px) {
+    .center{
+        height: 70vh;
+        width: 90vw !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        background-repeat: no-repeat;
+        margin-top: 4%;
+    }
+  }
+
+.bg-img{
+    background: url(../../../public/static/assets/img/Login/login_pms.jpg);
+    background-size: 100% 100%;
+    
+}
+.all_bg{
+    background: url(../../../public/static/assets/img/Login/login.jpg);
+    background-size: 100% 100%;
+
+}
+
+.login_text{
+    color: #023f7c !important;
+}
+
+.mail_sent_size{
+    width: 140px;
+}

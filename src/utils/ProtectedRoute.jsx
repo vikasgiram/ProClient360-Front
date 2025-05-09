@@ -1,0 +1,29 @@
+import { Navigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
+import { useContext } from "react";
+
+const ProtectedRoute = ({Component}) => {
+  const { user } = useContext(UserContext);
+  console.log(Component)
+  if(!Component){
+    console.log("Childeren is not defined")
+    return null;
+  }
+  if (!user) {
+    return <Component/>
+  }
+
+  switch (user.user) {
+        case "company":
+        return <Navigate to="/MainDashboard" />;
+        case "admin":
+        return <Navigate to="/AdminMainDashboard" />;
+        case "employee":
+        return <Navigate to="/EmployeeMainDashboard" />;
+        default:
+        return <Component/>
+    };
+
+}
+
+export default ProtectedRoute;

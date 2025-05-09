@@ -1,0 +1,49 @@
+/* NotFound.css */
+
+.not-found-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: #FEFEFE;
+
+  height: 100vh;
+  padding: 1rem;
+
+  gap: 2rem;
+}
+
+.not-found-image {
+  max-width: 700px;
+  width: 100%;
+  height: auto;
+}
+
+.not-found-text {
+  background-color: #FEFEFE;
+  max-width: 600px;
+  max-width: 600px;
+  text-align: left;
+}
+
+.not-found-text h1 {
+  font-size: 6rem;
+  font-weight: 700;
+  color: black; 
+}
+
+.not-found-text h2 {
+  color: #6c757d;
+  margin-top: 1rem;
+
+}
+
+.not-found-text p {
+  color: #6c757d;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.not-found-text .btn {
+  margin-top: 1.5rem;
+}
