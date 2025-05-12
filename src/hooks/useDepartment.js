@@ -1,90 +1,141 @@
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import  toast  from 'react-hot-toast';
 
-const baseUrl= process.env.REACT_APP_API_URL;
-const url=baseUrl+"/api/department";
+const baseUrl = process.env.REACT_APP_API_URL;
+const url = baseUrl + "/api/department";
 
-const getDepartment = async (page, limit) => {
+const getDepartment = async (page = 1, limit = 10) => {
   try {
-    const response = await axios.get(`${url}?page=${page}&limit=${limit}`,{
+    const response = await axios.get(`${url}?page=${page}&limit=${limit}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
-    if(response.statusText !== "OK"){
-      return toast.error("Something went wrong");
+    
+  
+    if (response.status !== 200) {
+      toast.error("Failed to fetch departments");
+      return { success: false, error: "Failed to fetch departments" };
     }
     
-    const data = response?.data;
-
-    if (data?.error) {
-      console.error(data.error);
+    const data = response.data;
+    
+    
+    if (!data) {
+      console.error("Empty response from server");
+      return { success: false, error: "Empty response from server" };
     }
-
-    return data;
+    
+  
+    return { 
+      success: true, 
+      departments: data.departments || [], 
+      pagination: data.pagination || {
+        currentPage: page,
+        totalPages: 0,
+        totalDepartments: 0,
+        limit: limit,
+        hasNextPage: false,
+        hasPrevPage: false
+      }
+    };
+    
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error("Error fetching departments:", error);
+    const errorMessage = error.response?.data?.error || "Failed to connect to server";
+    toast.error(errorMessage);
+    return { success: false, error: errorMessage };
+  }
 };
 
 const createDepartment = async (departmentData) => {
   try {
-    const response = await axios.post(`${url}`, departmentData,{
+    const response = await axios.post(url, departmentData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
+    
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
+    
+    if (response.status !== 201 && response.status !== 200) {
+      const errorMessage = data.error || "Failed to create department";
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
     }
-
-    toast.success("Department Created");
+    
+    toast.success("Department created successfully");
+    return { success: true, department: data.department };
+    
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error("Error creating department:", error);
+    const errorMessage = error.response?.data?.error || "Failed to create department";
+    toast.error(errorMessage);
+    return { success: false, error: errorMessage };
+  }
 };
 
 const updateDepartment = async (updatedDepartmentData) => {
   try {
-    const response = await axios.put(`${url}/${updatedDepartmentData._id}`, updatedDepartmentData,{
+    if (!updatedDepartmentData._id) {
+      toast.error("Department ID is required for update");
+      return { success: false, error: "Department ID is required" };
+    }
+    
+    const response = await axios.put(`${url}/${updatedDepartmentData._id}`, updatedDepartmentData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
+    
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
+    
+    if (response.status !== 200) {
+      const errorMessage = data.error || "Failed to update department";
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
     }
-    toast.success("Department Updated sucessfully...");
-    return data;
+    
+    toast.success("Department updated successfully");
+    return { success: true, department: data.department };
+    
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error("Error updating department:", error);
+    const errorMessage = error.response?.data?.error || "Failed to update department";
+    toast.error(errorMessage);
+    return { success: false, error: errorMessage };
+  }
 };
 
 const deleteDepartment = async (departmentId) => {
   try {
-    const response = await axios.delete(`${url}/${departmentId}`,{
+    if (!departmentId) {
+      toast.error("Department ID is required for deletion");
+      return { success: false, error: "Department ID is required" };
+    }
+    
+    const response = await axios.delete(`${url}/${departmentId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
+    
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return alert(data.error);
+    
+    if (response.status !== 200) {
+      const errorMessage = data.error || "Failed to delete department";
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
     }
-
-    return data;
+    
+    return { success: true, message: "Department deleted successfully" };
+    
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error("Error deleting department:", error);
+    const errorMessage = error.response?.data?.error || "Failed to delete department";
+    toast.error(errorMessage);
+    return { success: false, error: errorMessage };
+  }
 };
 
-  export { getDepartment, deleteDepartment,updateDepartment,createDepartment };
+export { getDepartment, createDepartment, updateDepartment, deleteDepartment };

@@ -1,7 +1,7 @@
 import { useState,useContext, useEffect } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import UpdateServicePopup from "./PopUp/UpdateServicePopUp";
 import { getAllService, deleteService } from "../../../../hooks/useService";

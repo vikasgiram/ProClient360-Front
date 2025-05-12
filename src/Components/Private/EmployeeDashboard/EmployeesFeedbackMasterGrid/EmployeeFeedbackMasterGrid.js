@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "../../MainDashboard/Header/Header";
 import { Sidebar } from "../../MainDashboard/Sidebar/Sidebar";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import EmployeeUpdateFeedbackPopUp from "./PopUp/EmployeeUpdateFeedbackPopUp";
 import ViewFeedbackPopUp from "./PopUp/ViewFeedbackPopUp";
 import { getRemaningFeedback } from "../../../../hooks/useFeedback";
