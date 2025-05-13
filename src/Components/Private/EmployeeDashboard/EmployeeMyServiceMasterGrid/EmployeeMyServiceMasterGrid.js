@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "../../MainDashboard/Header/Header";
 import { Sidebar } from "../../MainDashboard/Sidebar/Sidebar";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import EmployeeEditMyservicePopUp from "./PopUp/EmployeeEditMyservicePopUp";
 import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";

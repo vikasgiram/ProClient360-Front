@@ -1,7 +1,8 @@
 import { useState,useContext, useEffect } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
+
 import { getDepartment, deleteDepartment } from "../../../../hooks/useDepartment";
 import AddDepartmentPopup from "./PopUp/AddDepartmentPopup";
 import UpdateDepartmentPopup from "./PopUp/UpdateDepartmentPopup";
@@ -9,7 +10,6 @@ import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import { UserContext } from "../../../../context/UserContext";
 
 export const DepartmentMasterGrid = () => {
-
 
   const {user} = useContext(UserContext);
 
@@ -164,68 +164,109 @@ export const DepartmentMasterGrid = () => {
                     </div>
                   </div>
                 </div>
-
+      
                 {!loading && pagination.totalPages > 1 && (
-                  <div className="pagination-container text-center my-3 sm">
-                    <button
-                      onClick={() => handlePageChange(1)}
-                      disabled={!pagination.hasPrevPage}
-                      className="btn btn-dark btn-sm me-1"
-                      style={{ borderRadius: "4px" }}
-                      aria-label="First Page"
-                    >
-                      First
-                    </button>
+           <div className="pagination-container text-center my-3">
+      <button
+      onClick={() => handlePageChange(1)}
+      disabled={!pagination.hasPrevPage}
+      className="btn btn-dark btn-sm me-1"
+      style={{ borderRadius: "4px" }}
+      aria-label="First Page"
+      >
+      First
+      </button>
+      <button
+      onClick={() => handlePageChange(pagination.currentPage - 1)}
+      disabled={!pagination.hasPrevPage}
+      className="btn btn-dark btn-sm me-1"
+      style={{ borderRadius: "4px" }}
+      aria-label="Previous Page"
+      >
+      Previous
+      </button>
 
-                    <button
-                      disabled={!pagination.hasPrevPage}
-                      onClick={() => handlePageChange(pagination.currentPage - 1)}
-                      className="btn btn-dark btn-sm me-1"
-                      style={{ borderRadius: "4px" }}
-                      aria-label="Previous Page"
-                    >
-                      Previous
-                    </button>
+      {(() => {
+      const pageButtons = [];
+      const maxPagesToShow = 5;
+      let startPage, endPage;
 
-                    {[...Array(pagination.totalPages)].map((_, index) => {
-                      const pageNumber = index + 1;
-                      return (
-                        <button
-                          key={index}
-                          onClick={() => handlePageChange(pageNumber)}
-                          className={`btn btn-sm me-1 ${
-                            pagination.currentPage === pageNumber ? "btn-primary" : "btn-dark"
-                          }`}
-                          style={{ minWidth: "35px", borderRadius: "4px" }}
-                          aria-label={`Go to page ${pageNumber}`}
-                          aria-current={pagination.currentPage === pageNumber ? "page" : undefined}
-                        >
-                          {pageNumber}
-                        </button>
-                      );
-                    })}
+      if (pagination.totalPages <= maxPagesToShow) {
+        startPage = 1;
+        endPage = pagination.totalPages;
+      } else {
+        if (pagination.currentPage <= 3) {
+          startPage = 1;
+          endPage = maxPagesToShow;
+        } else if (pagination.currentPage >= pagination.totalPages - 2) {
+          startPage = pagination.totalPages - maxPagesToShow + 1;
+          endPage = pagination.totalPages;
+        } else {
+          startPage = pagination.currentPage - 2;
+          endPage = pagination.currentPage + 2;
+        }
 
-                    <button
-                      disabled={!pagination.hasNextPage}
-                      onClick={() => handlePageChange(pagination.currentPage + 1)}
-                      className="btn btn-dark btn-sm me-1"
-                      style={{ borderRadius: "4px" }}
-                      aria-label="Next Page"
-                    >
-                      Next
-                    </button>
+        startPage = Math.max(1, startPage);
+        endPage = Math.min(pagination.totalPages, endPage);
+       }
 
-                    <button
-                      onClick={() => handlePageChange(pagination.totalPages)}
-                      disabled={!pagination.hasNextPage}
-                      className="btn btn-dark btn-sm"
-                      style={{ borderRadius: "4px" }}
-                      aria-label="Last Page"
-                    >
-                      Last
-                    </button>
-                  </div>
-                )}
+      if (startPage > 1) {
+        pageButtons.push(
+          <span key="start-ellipsis" className="mx-2">
+            ...
+          </span>
+        );
+      }
+
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pageButtons.push(
+          <button
+            key={i}
+            onClick={() => handlePageChange(i)}
+            className={`btn btn-sm me-1 ${
+              pagination.currentPage === i ? "btn-primary" : "btn-dark"
+            }`}
+            style={{ minWidth: "35px", borderRadius: "4px" }}
+            aria-label={`Go to page ${i}`}
+            aria-current={pagination.currentPage === i ? "page" : undefined}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      
+      if (endPage < pagination.totalPages) {
+        pageButtons.push(
+          <span key="end-ellipsis" className="mx-2">
+            ...
+          </span>
+        );
+      }
+
+      return pageButtons;
+    })()}
+
+     <button
+      disabled={!pagination.hasNextPage}
+      onClick={() => handlePageChange(pagination.currentPage + 1)}
+      className="btn btn-dark btn-sm me-1"
+      >
+      Next
+    </button>
+    <button
+      onClick={() => handlePageChange(pagination.totalPages)}
+      disabled={!pagination.hasNextPage}
+      className="btn btn-dark btn-sm"
+      style={{ borderRadius: "4px" }}
+      aria-label="Last Page"
+     >
+      Last
+    </button>
+  </div>
+)}
+
               </div>
             </div>
           </div>
