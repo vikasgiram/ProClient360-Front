@@ -3,7 +3,7 @@ import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { createService } from "../../../../../hooks/useService";
 import { getEmployees } from "../../../../../hooks/useEmployees";
 import toast from "react-hot-toast";
-const AddServicePopup = ({ handleAddService, selectedTicketId }) => {
+const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
 
   const [loading, setLoading] = useState(false);
@@ -13,10 +13,9 @@ const AddServicePopup = ({ handleAddService, selectedTicketId }) => {
   const [allotmentDate, setAllotmentDate] = useState();
   const [allotTo, setAllotTo] = useState();
   const [workMode, setWorkMode] = useState();
-  const [ticket, setTicket] = useState(selectedTicketId);
-
-
+  const [ticket, setTicket] = useState(selectedTicket);
   const [employees, setEmployees] = useState([]);
+
   useEffect(() => {
     getEmployees().then((res) => {
       setEmployees(res.employees || []);
@@ -39,6 +38,7 @@ const AddServicePopup = ({ handleAddService, selectedTicketId }) => {
       // completionDate
     };
     if (!serviceType || !ticket || !priority || !allotmentDate || !allotTo || !workMode) {
+      console.log(data);
       return toast.error("Please fill all the fields");
     }
 

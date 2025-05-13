@@ -55,7 +55,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
       setLoading(false);
       return toast.error("Enter valid Email");
     }
-    if(subDate > new Date().toISOString().split("T")[0]){
+    if(subDate > new Date()){
       setLoading(false);
       return toast.error("Subscription date must be in the future");
     }
