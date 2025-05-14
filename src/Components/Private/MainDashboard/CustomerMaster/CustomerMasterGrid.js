@@ -100,6 +100,7 @@ export const CustomerMasterGrid = () => {
   const handleOnSearchSubmit = (event) => {
     event.preventDefault();
     console.log("Search text:", searchText);
+    setSearch(searchText);
   };
 
   const pageButtons = [];

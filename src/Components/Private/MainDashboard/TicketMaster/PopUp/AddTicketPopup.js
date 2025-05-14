@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { createEmployee } from "../../../../../hooks/useEmployees";
 import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import {createTicket} from "../../../../../hooks/useTicket"
 import {getCustomers} from "../../../../../hooks/useCustomer";
+import { getAddress } from "../../../../../hooks/usePincode";
 
 
 
@@ -16,6 +16,7 @@ const AddTicketPopup = ({ handleAdd }) => {
   const [source,setSource]=useState("");
   const [customers,setCustomer]=useState();
   const [loading,setLoading]=useState(false);
+  const [contactPersonEmail,setContactPersonEmail]=useState("");
   const [Address, setAddress] = useState({
     add:"",
     city:"",
@@ -34,9 +35,13 @@ const AddTicketPopup = ({ handleAdd }) => {
       contactNumber,
       source,
       Address,
+      contactPersonEmail
     };
     if (!client || !details || !product || !contactPerson || !contactNumber || !source || !Address) {
       return toast.error("Please fill all fields");
+    }
+    if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contactPersonEmail)){
+      return toast.error("Please Enter Valid Email");
     }
     if(contactNumber.length !== 10){
        return toast.error("Please Enter Valid Contact Number");
@@ -46,14 +51,31 @@ const AddTicketPopup = ({ handleAdd }) => {
     }
     await createTicket(data);
     handleAdd();
-    console.log(data);
   };
   
   
   const fetchCusetomer=async ()=>{
     const data=await getCustomers();
-    setCustomer(data.customers);
+    if(data?.success){
+      setCustomer(data?.customers);
+    }
   }
+useEffect(() => {
+    const fetchData = async () => {
+      const data = await getAddress(Address.pincode);
+
+      if (data !== "Error") {
+        setAddress(prevAddress => ({
+          ...prevAddress, 
+          state: data.state, 
+          city: data.city,   
+          country: data.country 
+        }));
+      }
+    };
+    if(Address.pincode >= 6)
+      fetchData();
+  }, [Address.pincode]);
 
   return (
     <>
@@ -266,6 +288,26 @@ const AddTicketPopup = ({ handleAdd }) => {
                         onChange={(e) => setContactPerson(e.target.value)}
                         className="form-control rounded-0"
                         id="name"
+                        aria-describedby="emailHelp"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                   <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
+                      <label
+                        for="Department"
+                        className="form-label label_text"
+                      >
+                        Contact Person Email <RequiredStar />
+                      </label>
+                      <input
+                        type="email"
+                        value={contactPersonEmail}
+                        onChange={(e) => setContactPersonEmail(e.target.value)}
+                        className="form-control rounded-0"
+                        id="email"
                         aria-describedby="emailHelp"
                         required
                       />
