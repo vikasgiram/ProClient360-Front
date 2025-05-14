@@ -150,7 +150,7 @@ export const CustomerMasterGrid = () => {
                         </div>
                       </div>
                       <div className="col- col-lg-2 ms-auto text-end me-4">
-                      {user?.permissions?.includes("createCustomer") || user.user==='company' ? ( 
+                      {user?.permissions && user?.permissions?.includes("createCustomer") || user.user==='company' ? ( 
                           <div className="col-12 col-lg-12  ms-auto text-end">
                             <button
                               onClick={handleAdd} // Use handleAdd directly
