@@ -182,7 +182,7 @@ export const TicketMasterGrid = () => {
                                               </div>
                                           </div>
                                           <div className="col-12 col-lg-4 ms-auto text-end ">
-                                            {user?.permissions?.includes("createTicket") ?(
+                                            {user?.user==="employee" ?(
                                                 <button
                                                 onClick={handleAdd}
                                                 type="button"
