@@ -68,7 +68,7 @@ const AddProjectPopup = ({ handleAdd }) => {
     const formData = new FormData();
     formData.append('POCopy', POCopy);
 
-    if (!custId || !name || !purchaseOrderDate || !purchaseOrderNo || !purchaseOrderValue || !category || !startDate || !endDate || !advancePay || !payAgainstDelivery || !payAfterCompletion || !remark
+    if (!custId || !name || !purchaseOrderDate || !purchaseOrderNo || !purchaseOrderValue || !category || !startDate || !endDate || !advancePay || !payAgainstDelivery || !payAfterCompletion 
       || !Address.pincode ||
       !Address.state ||
       !Address.city ||
