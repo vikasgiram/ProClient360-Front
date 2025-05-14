@@ -85,7 +85,7 @@ export const TaskSheetMaster = () => {
  }
   const forActionShow = async (id) => {
     const data = await getAllActions(id);
-    setForTask(data.actions);
+    setForTask(data?.actions);
     setShowAction(true);
   }
 
