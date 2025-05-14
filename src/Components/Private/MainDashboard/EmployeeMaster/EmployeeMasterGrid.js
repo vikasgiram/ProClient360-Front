@@ -23,6 +23,7 @@ export const EmployeeMasterGrid = () => {
   const [selectedEmp, setSelectedEmp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
+  const [search, setSearch] = useState("");
 
   const [employees, setEmployees] = useState([]);
   const [pagination, setPagination] = useState({
@@ -67,7 +68,7 @@ export const EmployeeMasterGrid = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getEmployees(pagination.currentPage, itemsPerPage);
+        const data = await getEmployees(pagination.currentPage, itemsPerPage, search);
         if (data) {
           setEmployees(data.employees || []);
           setPagination(data.pagination || {
@@ -86,11 +87,16 @@ export const EmployeeMasterGrid = () => {
       }
     };
     fetchData();
-  }, [pagination.currentPage, deletePopUpShow, updatePopUpShow, AddPopUpShow, searchText]);
+  }, [pagination.currentPage, deletePopUpShow, updatePopUpShow, AddPopUpShow, search]);
 
   useEffect(() => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   }, [searchText]);
+
+  const handleOnSearchSubmit = (e) => {
+    e.preventDefault();
+    setSearch(searchText);
+  }
 
   return (
     <>
@@ -125,13 +131,15 @@ export const EmployeeMasterGrid = () => {
                       <div className="col-8 col-lg-6 ms-auto text-end">
                         <div className="form">
                           <i className="fa fa-search"></i>
-                          <input
-                            type="text"
-                            value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
-                            className="form-control form-input bg-transparant"
-                            placeholder="Search ..."
-                          />
+                          <form onSubmit={handleOnSearchSubmit} >
+                            <input
+                              type="text"
+                              value={searchText}
+                              onChange={(e) => setSearchText(e.target.value)}
+                              className="form-control form-input bg-transparant"
+                              placeholder="Search ..."
+                            />
+                          </form>
                         </div>
                       </div>
                       <div className="col- col-lg-2 ms-auto text-end me-5">

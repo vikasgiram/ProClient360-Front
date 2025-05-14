@@ -4,9 +4,9 @@ import toast from 'react-hot-toast';
 const baseUrl= process.env.REACT_APP_API_URL;
 const url=baseUrl+"/api/ticket";
 
-const getAllTickets = async (page, limit) => {
+const getAllTickets = async (page, limit, search= null) => {
   try {
-    const response = await axios.get(`${url}?page=${page}&limit=${limit}`, {
+    const response = await axios.get(`${url}?q=${search}&page=${page}&limit=${limit}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
