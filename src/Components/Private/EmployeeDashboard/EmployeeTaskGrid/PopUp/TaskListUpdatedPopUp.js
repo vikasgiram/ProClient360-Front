@@ -15,7 +15,7 @@ import { updateAction } from "../../../../../hooks/useAction";
 
 const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [taskLevel, setTaskLevel] = useState(selectedTask.taskLevel);
+  const [taskLevel, setTaskLevel] = useState(selectedTask?.taskLevel);
   const [taskStatus, setTaskStatus] = useState("");
   const [remark, setRemark] = useState("");
   const [action, setAction] = useState("");
@@ -27,7 +27,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   const [editAction, setEditAction] = useState(""); //editAction used for for  update as parameter 
   const [addAction, setAddAction] = useState(true);
 
-  // console.log(selectedTask, "dcdkshbh");
+  console.log(selectedTask, "selected task");
 
   const handleStatusChange = (status) => {
     setTaskStatus(status);
@@ -40,7 +40,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
   const toggleVisibility = async () => {
     const res = await getAllActions(selectedTask._id);
-    setActionHistory(res.actions);
+    setActionHistory(res?.actions);
     // console.log("all actions",res);
     setIsVisible(!isVisible);
   };
@@ -55,18 +55,20 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
       !startTime ||
       !endTime ||
       !taskLevel ||
-      !taskStatus ||
-      !remark
+      !taskStatus
     ) {
       return toast.error("Please fill all fields");
     }
     if (taskLevel > 100) {
       return toast.error("Task level should be less than 100");
-    } else if (taskLevel < selectedTask.taskLevel) {
+    } else if (taskLevel < selectedTask?.taskLevel) {
       return toast.error("Task level must be greater than previous task level");
     }
+    if(!/^[a-zA-Z0-9\s.,;:!?'"()\-]+$/.test(action)){
+      return toast.error("Special characters are not allowed in action");
+    }
     const data = {
-      task: selectedTask._id,
+      task: selectedTask?._id,
       action,
       startTime,
       endTime,
@@ -78,8 +80,6 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
     try {
       // console.log("action Data:",data);
       await createAction(data);
-
-
       handleUpdateTask();
     } catch (error) {
       toast.error(error);
@@ -129,7 +129,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
             >
               <div className="modal-header pt-0">
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-                  {selectedTask.taskName.name}
+                  {selectedTask?.taskName?.name}
                 </h5>
                 <button
                   onClick={() => handleUpdateTask()}
@@ -148,13 +148,13 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         <div
                           class="progress-bar"
                           role="progressbar"
-                          style={{ width: selectedTask.taskLevel + "%" }}
+                          style={{ width: selectedTask?.taskLevel + "%" }}
                           aria-valuenow="50"
                           aria-valuemin="0"
                           aria-valuemax="100"
                         >
-                          {selectedTask.taskLevel &&
-                            selectedTask.taskLevel + "%"}
+                          {selectedTask?.taskLevel &&
+                            selectedTask?.taskLevel + "%"}
                         </div>
                       </div>
                     </div>
@@ -162,11 +162,11 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
                   <Steps current={2}>
                     <Steps.Item
-                      title={formatDate(selectedTask.startDate)}
+                      title={formatDate(selectedTask?.startDate)}
                     />
                     <Steps.Item
                       title={
-                        actionHistory && actionHistory.length > 0
+                        actionHistory && actionHistory?.length > 0
                           ? formatDate(
                             actionHistory[
                               actionHistory.length - 1
@@ -209,7 +209,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                                 {console.log("actionHistory", actionHistory)}
                                   {actionHistory &&
                                     actionHistory.map((action, index) => (
-                                      <tr className="text-center" key={action._id} >
+                                      <tr className="text-center" key={action?._id} >
 
                                         <td>{action?.action}</td>
                                         <td>{action?.actionBy?.name}</td>
@@ -267,7 +267,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             name="action"
                             rows="2"
                             onChange={handleEditTask}
-                            value={editAction.action}
+                            value={editAction?.action}
                           ></textarea>
                         </div>
                       </div>
@@ -284,7 +284,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             type="datetime-local"
                             name="startTime"
                             onChange={handleEditTask}
-                            value={formatDateforEditAction(editAction.startTime)}
+                            value={formatDateforEditAction(editAction?.startTime)}
                             className="form-control rounded-0"
                             // min={new Date().toISOString().slice(0, 16)}
                             id="startTime"
@@ -304,7 +304,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             type="datetime-local"
                             name="endTime"
                             onChange={handleEditTask}
-                            value={formatDateforEditAction(editAction.endTime)}
+                            value={formatDateforEditAction(editAction?.endTime)}
 
                             className="form-control rounded-0"
                             id="endTime"
@@ -325,7 +325,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                           className="form-select"
 
                           onChange={handleEditTask}
-                          value={editAction.taskStatus}
+                          value={editAction?.taskStatus}
 
                         >
                           {/* {console.log("editAction.taskStatus", editAction.taskStatus)}; */}
@@ -350,7 +350,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                               type="text"
                               name="complated"
                               onChange={handleEditTask}
-                              value={editAction.complated}
+                              value={editAction?.complated}
                               className="form-control rounded-0 border-0"
                               id="complated"
                               placeholder="eg. 65 %"
@@ -380,7 +380,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             placeholder="Remark ..."
                             rows="2"
                             onChange={handleEditTask}
-                            value={editAction.remark}
+                            value={editAction?.remark}
                           ></textarea>
                         </div>
                       </div>
@@ -406,7 +406,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                     </div>
                   ) : " "}
 
-                  {selectedTask.taskLevel !== 100 && addAction && (
+                  {selectedTask?.taskLevel !== 100 && addAction && (
 
 
                     <div className="row modal_body_height mt-2">
