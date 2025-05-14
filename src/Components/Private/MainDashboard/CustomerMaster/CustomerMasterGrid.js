@@ -23,6 +23,7 @@ export const CustomerMasterGrid = () => {
   const [customers, setCustomers] = useState([]);
   const [selectedCust, setSelectedCust] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -63,7 +64,7 @@ export const CustomerMasterGrid = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getCustomers(currentPage, itemsPerPage);
+        const data = await getCustomers(currentPage, itemsPerPage, search);
         if (data) {
           setCustomers(data.customers || []);
           setPagination(data.pagination || {
@@ -83,7 +84,7 @@ export const CustomerMasterGrid = () => {
     };
 
     fetchData();
-  }, [currentPage, deletePopUpShow, AddPopUpShow, updatePopUpShow, searchText]);
+  }, [currentPage, deletePopUpShow, AddPopUpShow, updatePopUpShow, search]);
 
   // Pagination button rendering logic
   const maxPageButtons = 5; // Maximum number of page buttons to display
@@ -95,6 +96,12 @@ export const CustomerMasterGrid = () => {
   if (endPage - startPage + 1 < maxPageButtons) {
     startPage = Math.max(1, endPage - maxPageButtons + 1);
   }
+
+  const handleOnSearchSubmit = (event) => {
+    event.preventDefault();
+    console.log("Search text:", searchText);
+    setSearch(searchText);
+  };
 
   const pageButtons = [];
   for (let i = startPage; i <= endPage; i++) {
@@ -131,6 +138,7 @@ export const CustomerMasterGrid = () => {
                       <div className="col-8 col-lg-6 ms-auto text-end">
                         <div className="form">
                           <i className="fa fa-search"></i>
+                          <form onSubmit={handleOnSearchSubmit}>
                           <input
                             type="text"
                             value={searchText}
@@ -138,6 +146,7 @@ export const CustomerMasterGrid = () => {
                             className="form-control form-input bg-transparant"
                             placeholder="Search ..."
                           />
+                          </form>
                         </div>
                       </div>
                       <div className="col- col-lg-2 ms-auto text-end me-4">
