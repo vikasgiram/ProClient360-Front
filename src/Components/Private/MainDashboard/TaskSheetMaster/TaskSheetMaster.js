@@ -254,9 +254,6 @@ export const TaskSheetMaster = () => {
     }
 
     
-    if (new Date(startDate) <= new Date(projectStartDate)) {
-      return toast.error("Start date should be less than project start date");
-    }
     if(startDate>endDate){
       return toast.error("Start date should be less than end date");
     }
