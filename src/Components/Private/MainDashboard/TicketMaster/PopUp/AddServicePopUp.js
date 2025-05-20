@@ -157,7 +157,7 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                         for="Department"
                         className="form-label label_text"
                       >
-                        Allocated to <RequiredStar />
+                        Allocated to  <RequiredStar />
                       </label>
                       <select
                         className="form-select rounded-0"
