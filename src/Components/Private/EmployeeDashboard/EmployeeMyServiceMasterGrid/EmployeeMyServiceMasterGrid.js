@@ -220,7 +220,7 @@ export const EmployeeMyServiceMasterGrid = () => {
                                                     <tr className="th_border">
                                                         <th>Sr. No</th>
                                                         <th className="align_left_td td_width">Complaint</th>
-                                                        <th className="align_left_td">Client</th>
+                                                        <th className="align_left_td td_width">Client</th>
                                                         <th>Product</th>
                                                         <th>Priority</th>
                                                         <th>Allotment Date</th>

@@ -182,9 +182,9 @@ export const ServiceMasterGrid = () => {
                           <tr className="th_border">
                             <th>Sr. No</th>
                             <th className="align_left_td  width_tdd">Complaint</th>
-                            <th>Client</th>
-                            <th>Product</th>
-                            <th>Priority</th>
+                            <th className="align_left_td  width_tdd">Client</th>
+                            <th className="align_left_td  width_tdd">Product</th>
+                            <th className="align_left_td  width_tdd">Priority</th>
                             <th>Allotment Date</th>
                             <th>Allocated to</th>
                             <th>Status</th>
@@ -197,9 +197,9 @@ export const ServiceMasterGrid = () => {
                               <tr className="border my-4" key={service._id}>
                                 <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
                                 <td className="align_left_td  width_tdd">{service?.ticket?.details}</td>
-                                <td>{service?.ticket?.client?.custName}</td>
-                                <td>{service?.ticket?.product}</td>
-                                <td>{service.priority}</td>
+                                <td className="align_left_td  width_tdd">{service?.ticket?.client?.custName}</td>
+                                <td className="align_left_td  width_tdd">{service?.ticket?.product}</td>
+                                <td className="align_left_td  width_tdd">{service.priority}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
                                 {service.allotTo && service.allotTo.map((allotTo) => (
                                   <td key={allotTo._id}>{allotTo.name}</td>

@@ -165,7 +165,7 @@ export const EmployeeMasterGrid = () => {
                         <thead>
                           <tr className="th_border">
                             <th>Sr. No</th>
-                            <th>Name</th>
+                            <th className="align_left_td td_width">Name</th>
                             <th>Email</th>
                             <th>Department</th>
                             <th>Designation</th>
@@ -177,7 +177,7 @@ export const EmployeeMasterGrid = () => {
                             employees.map((employee, index) => (
                               <tr className="border my-4" key={employee._id}>
                                 <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
-                                <td>{employee?.name}</td>
+                                <td className="align_left_td td_width">{employee?.name}</td>
                                 <td>{employee?.email}</td>
                                 <td>{employee?.department && employee?.department?.name}</td>
                                 <td>{employee?.designation && employee?.designation?.name}</td>
