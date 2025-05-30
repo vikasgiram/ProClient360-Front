@@ -170,9 +170,9 @@ export const TaskMasterGrid = () => {
                                         <div className="table-responsive">
                                             <table className="table table-striped table-class" id="table-id">
 
-                                                <tr className=" ">
+                                                <tr className="th_border">
                                                     <th>SR. NO</th>
-                                                    <th>TASK NAME</th>
+                                                    <th className="align_left_td td_width">TASK NAME</th>
                                                     <th>ACTION</th>
                                         
                                                 </tr>
@@ -181,7 +181,7 @@ export const TaskMasterGrid = () => {
                                                     {currentData && currentData.map((task, index) => (
                                                         <tr className="border my-4" key={task._id}>
                                                             <td>{ index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                                                            <td>{task.name}</td>
+                                                            <td className="align_left_td td_width">{task.name}</td>
 
                                                             <td>
                                                                 {user?.permission?.includes('updateTask') || user.user === 'company' ? (

@@ -2548,6 +2548,8 @@ progress {
   letter-spacing: 1px;
   text-transform: uppercase;
   border-bottom: 1px solid #e9ecef;
+  background-color: #000;
+  color: white;
 }
 
 .table th {
@@ -2824,3 +2826,4 @@ width: 65% !important;
   text-wrap: wrap !important;
 
 }
+

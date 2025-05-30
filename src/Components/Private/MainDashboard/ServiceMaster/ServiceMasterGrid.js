@@ -1,4 +1,4 @@
-import { useState,useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import toast from 'react-hot-toast';
@@ -7,7 +7,95 @@ import UpdateServicePopup from "./PopUp/UpdateServicePopUp";
 import { getAllService, deleteService } from "../../../../hooks/useService";
 import { formatDate } from "../../../../utils/formatDate";
 import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
-import { UserContext } from "../../../../context/UserContext"
+import { UserContext } from "../../../../context/UserContext";
+
+
+const ServiceDashboardCards = ({totalServiceCount, inprogressServiceCount, pendingServiceCount, stuckServiceCount }) => {
+  return (
+    <div className="row bg-white p-2 m-1 border rounded">
+      <div className="col-12 py-1">
+        <div className="row pt-3">
+        
+           <div className="col-12 col-md-3 pb-3 cursor-pointer">
+            <div className="p-4 background_style bg_sky">
+              <div className="row">
+                <div className="col-9">
+                  <h6 className="text-dark card_heading">
+                    Total Services
+                  </h6>
+                  <h2 className="pt-2 fw-bold card_count demo_bottom">
+                    {totalServiceCount}
+                  </h2>
+                </div>
+                <div className="col-3 d-flex align-items-center justify-content-center">
+                  <img src="./static/assets/img/planning.png" className="img_opacity all_card_img_size" alt="img not found" />
+                </div>
+              </div>
+            </div>
+          </div> 
+     
+
+          
+          <div className="col-12 col-md-3 pb-3 cursor-pointer">
+            <div className="p-4 background_style pinkcolor">
+              <div className="row">
+                <div className="col-9">
+                  <h6 className="text-dark card_heading">
+                    Inprogress Services
+                  </h6>
+                  <h2 className="pt-2 fw-bold card_count">
+                    {inprogressServiceCount}
+                  </h2>
+                </div>
+                <div className="col-3 d-flex align-items-center justify-content-center">
+                  <img src="./static/assets/img/Inprocess.png" className="img_opacity all_card_img_size" alt="" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+           
+          <div className="col-12 col-md-3 pb-3 cursor-pointer">
+            <div className="p-4 background_style"   style={{backgroundColor:"#FEA2A2"}}>
+              <div className="row">
+                <div className="col-9">
+                  <h6 className="text-dark card_heading">
+                    Stuck Services
+                  </h6>
+                  <h2 className="pt-2 fw-bold card_count">
+                    {stuckServiceCount}
+                  </h2>
+                </div>
+                <div className="col-3 d-flex align-items-center justify-content-center">
+                  <img src="./static/assets/img/stuck.png" className="img_opacity all_card_img_size" alt="" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        
+          <div className="col-12 col-md-3 pb-3 cursor-pointer">
+            <div className="p-4 background_style" style={{backgroundColor: '#f8d7da'}}>
+              <div className="row">
+                <div className="col-9">
+                  <h6 className="text-dark card_heading">
+                    Pending Services
+                  </h6>
+                  <h2 className="pt-2 fw-bold card_count">
+                    {pendingServiceCount}
+                  </h2>
+                </div>
+                <div className="col-3 d-flex align-items-center justify-content-center">
+                  <img src="./static/assets/img/pending.png" className="img_opacity all_card_img_size" alt="" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const ServiceMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -29,6 +117,15 @@ export const ServiceMasterGrid = () => {
 
   const [selectedService, setSelectedService] = useState(null);
   const [loading, setLoading] = useState(true);
+
+
+  const [serviceStatusCounts, setServiceStatusCounts] = useState({
+    Pending:0,
+    Inprogress:0,
+    Completed:0,
+    Stuck:0
+
+  });
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -64,6 +161,8 @@ export const ServiceMasterGrid = () => {
     toast.error(data.error);
   };
 
+  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -71,6 +170,7 @@ export const ServiceMasterGrid = () => {
         const data = await getAllService(pagination.currentPage, itemsPerPage);
         if (data) {
           setService(data.services || []);
+          setServiceStatusCounts(data.statusCounts)
           setPagination(data.pagination || {
             currentPage: 1,
             totalPages: 0,
@@ -122,13 +222,23 @@ export const ServiceMasterGrid = () => {
               }}
             >
               <div className="content-wrapper ps-3 ps-md-0 pt-3">
-                <div className="row px-2 py-1   ">
+                <div className="row px-2 py-1">
                   <div className="col-12 col-lg-4">
                     <h5 className="text-white py-2">Service Master</h5>
                   </div>
 
-                  <div className="col-12 col-lg-6  ms-auto text-end">
-                    <div className="row">
+                </div>
+
+                <ServiceDashboardCards 
+                  totalServiceCount={serviceStatusCounts?.Inprogress+serviceStatusCounts?.Pending+serviceStatusCounts?.Stuck+serviceStatusCounts?.Completed}
+                  inprogressServiceCount={serviceStatusCounts?.Inprogress}
+                  pendingServiceCount={serviceStatusCounts?.Pending}
+                  stuckServiceCount={serviceStatusCounts?.Stuck}
+                />
+                
+
+                <div className="col-12 col-lg-6 ms-auto text-end me-2">
+                <div className="row">
                       <div className="col-4 col-lg-4 ms-auto">
                         <select
                           className="form-select bg_edit"
@@ -170,21 +280,21 @@ export const ServiceMasterGrid = () => {
                           <option value="Low">Low Priority</option>
                         </select>
                       </div>
+
                     </div>
                   </div>
-                </div>
-
-                <div className="row  bg-white p-2 m-1 border rounded">
+              
+                <div className="row bg-white p-2 m-1 border rounded">
                   <div className="col-12 py-2">
                     <div className="table-responsive">
                       <table className="table table-striped table-class" id="table-id">
                         <thead>
                           <tr className="th_border">
                             <th>Sr. No</th>
-                            <th className="align_left_td  width_tdd">Complaint</th>
-                            <th>Client</th>
-                            <th>Product</th>
-                            <th>Priority</th>
+                            <th className="align_left_td width_tdd">Complaint</th>
+                            <th className="align_left_td width_tdd">Client</th>
+                            <th className="align_left_td width_tdd">Product</th>
+                            <th className="align_left_td width_tdd">Priority</th>
                             <th>Allotment Date</th>
                             <th>Allocated to</th>
                             <th>Status</th>
@@ -196,43 +306,43 @@ export const ServiceMasterGrid = () => {
                             service.map((service, index) => (
                               <tr className="border my-4" key={service._id}>
                                 <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
-                                <td className="align_left_td  width_tdd">{service?.ticket?.details}</td>
-                                <td>{service?.ticket?.client?.custName}</td>
-                                <td>{service?.ticket?.product}</td>
-                                <td>{service.priority}</td>
+                                <td className="align_left_td width_tdd">{service?.ticket?.details}</td>
+                                <td className="align_left_td width_tdd">{service?.ticket?.client?.custName}</td>
+                                <td className="align_left_td width_tdd">{service?.ticket?.product}</td>
+                                <td className="align_left_td width_tdd">{service.priority}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
                                 {service.allotTo && service.allotTo.map((allotTo) => (
                                   <td key={allotTo._id}>{allotTo.name}</td>
                                 ))}
                                 <td className={service.status === 'Completed' ? 'text-success' : service.status === 'Inprogress' ? 'text-warning' : 'text-danger'}>{service.status}</td>
                                 <td>
-                                  {user?.permissions?.includes('updateService') || user?.user==='company' ?
-                                  <span
-                                    onClick={() => handleUpdate(service)}
-                                    className="update"
-                                  >
-                                    <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
-                                  </span>:null}
-                                  {user?.permissions?.includes('deleteService') || user?.user==='company' ?
-                                  <span
-                                    onClick={() =>
-                                      handelDeleteClosePopUpClick(service._id)
-                                    }
-                                    className="delete"
-                                  >
-                                    <i className="mx-1 fa-solid fa-trash text-danger cursor-pointer"></i>
-                                  </span>
-                                  :null}
+                                  {user?.permissions?.includes('updateService') || user?.user === 'company' ?
+                                    <span
+                                      onClick={() => handleUpdate(service)}
+                                      className="update"
+                                    >
+                                      <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
+                                    </span> : null}
+                                  {user?.permissions?.includes('deleteService') || user?.user === 'company' ?
+                                    <span
+                                      onClick={() =>
+                                        handelDeleteClosePopUpClick(service._id)
+                                      }
+                                      className="delete"
+                                    >
+                                      <i className="mx-1 fa-solid fa-trash text-danger cursor-pointer"></i>
+                                    </span>
+                                    : null}
 
-                                  {user?.permissions?.includes('viewService') || user?.user==='company' ?
-                                  <span
-                                    onClick={() =>
-                                      handelDetailsPopUpClick(service)
-                                    }
-                                  >
-                                    <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
-                                  </span>
-                                  :null}
+                                  {user?.permissions?.includes('viewService') || user?.user === 'company' ?
+                                    <span
+                                      onClick={() =>
+                                        handelDetailsPopUpClick(service)
+                                      }
+                                    >
+                                      <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
+                                    </span>
+                                    : null}
                                 </td>
                               </tr>
                             ))
@@ -249,6 +359,7 @@ export const ServiceMasterGrid = () => {
                   </div>
                 </div>
 
+                {/* Pagination */}
                 {!loading && pagination.totalPages > 1 && (
                   <div className="pagination-container text-center my-3">
                     <button

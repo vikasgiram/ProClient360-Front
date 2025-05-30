@@ -575,4 +575,3 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 };
 
 export default TaskListUpdatedPopUp;
-

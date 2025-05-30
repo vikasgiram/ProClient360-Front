@@ -276,6 +276,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <option value="Guard Tour System">Guard Tour System</option>
                         <option value="Home Automation">Home Automation</option>
                         <option value="IP PA and Communication System">IP PA and Communication System</option>
+                        <option value="CRM">CRM</option>
                       </select>
                     </div>
                   </div>

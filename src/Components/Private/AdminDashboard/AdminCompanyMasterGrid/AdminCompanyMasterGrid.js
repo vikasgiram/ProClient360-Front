@@ -235,11 +235,18 @@ export const AdminCompanyMasterGrid = () => {
                                                                 <td>{company.admin || 'N/A'}</td>
                                                                 <td>{formatDate(company.createdAt)}</td>
                                                                 <td>{formatDate(company.subDate)}</td>
-                                                                <td>
-                                                                    {new Date(company.subDate).getTime() >= Date.now()
-                                                                        ? "Active"
-                                                                        : "Inactive"}
-                                                                </td>
+                                                                <td className="text-center">
+                                                        <span className={
+                                                         new Date(company.subDate).getTime() >= Date.now()
+                                                        ? "badge bg-success"
+                                                        : "badge bg-danger"
+                                                        }>
+                                                        {new Date(company.subDate).getTime() >= Date.now()
+                                                        ? "Active"
+                                                        : "Inactive"}
+                                                         </span>
+                                                         </td>
+
                                                                 <td>{company.subAmount || 'N/A'}</td>
                                                                 <td>
                                                                     <span
