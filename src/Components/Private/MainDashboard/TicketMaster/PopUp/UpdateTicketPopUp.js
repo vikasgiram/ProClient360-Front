@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateTicket } from "../../../../../hooks/useTicket";
 import { getCustomers } from "../../../../../hooks/useCustomer";
 
@@ -8,7 +8,8 @@ import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
 const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
   const [ticket, setTicket] = useState(selectedTicket);
-  const [customers, setCustomer] = useState();
+  const [customers, setCustomers] = useState();
+  const [searchText, setSearchText] = useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -58,11 +59,26 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
     }
   };
 
-  const fetchCusetomer = async () => {
-    const data = await getCustomers();
-    setCustomer(data.customers);
-  };
-
+  useEffect(() => {
+      const delayDebounce = setTimeout(() => {
+        if (searchText.trim() !== "" && searchText.length > 2) {
+          fetchCustomers(searchText);
+        } else {
+          setCustomers([]); // empty when no input
+        }
+      }, 500); // debounce API call by 500ms
+  
+      return () => clearTimeout(delayDebounce);
+    }, [searchText]);
+  
+    const fetchCustomers = async () => {
+      const data = await getCustomers(1, 15, searchText);
+      // console.log(data);
+      if (data) {
+        setCustomers(data.customers || []);
+        // console.log(employees,"data from useState");
+      }
+    };
   return (
     <>
       <div
@@ -125,13 +141,21 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         id="custName"
                         required
                       /> */}
+                      <input
+                      type="text"
+                      className="form-control mb-2"
+                      id="customerSearch"
+                      placeholder="Type to search customer..."
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                    />
+
                       <select
                         className="form-select rounded-0"
                         id="custName"
                         name="client"
                         aria-label="Default select example"
                         onChange={handleChange}
-                        onClick={fetchCusetomer}
                         required
                       >
                         <option hidden>

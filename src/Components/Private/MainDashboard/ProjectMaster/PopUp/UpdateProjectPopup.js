@@ -15,7 +15,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
     const [customers, setCustomers] = useState([]);
     const [POCopy, setPOCopy] = useState(null);
     const [loading, setLoading] = useState(false);
-
+    const [searchText, setSearchText] = useState("");
 
     const [projects, setProjects] = useState({
         ...selectedProject,
@@ -51,18 +51,25 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
 
     useEffect(() => {
-        const fetchData = async () => {
-            const data = await getCustomers();
-            // console.log(data);
-            if (data) {
-                setCustomers(data.customers || []);
-                // console.log(employees,"data from useState");
-            }
-        };
+    const delayDebounce = setTimeout(() => {
+      if (searchText.trim() !== "" && searchText.length > 2) {
+        fetchCustomers(searchText);
+      } else {
+        setCustomers([]); // empty when no input
+      }
+    }, 500); // debounce API call by 500ms
 
-        fetchData();
-    }, []);
+    return () => clearTimeout(delayDebounce);
+  }, [searchText]);
 
+  const fetchCustomers = async () => {
+    const data = await getCustomers(1, 15, searchText);
+    // console.log(data);
+    if (data) {
+      setCustomers(data.customers || []);
+      // console.log(employees,"data from useState");
+    }
+  };
 
 
     const handleChange = (event) => {
@@ -191,22 +198,34 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                     <div className="col-12" >
 
                                         <div className="mb-3">
-                                            <label htmlFor="CustomerName" className="form-label label_text">Customer Name <RequiredStar /></label>
-                                            <select className="form-select rounded-0" aria-label="Default select example"
-                                                id="CustomerName"
-                                                name="custId"
-                                                onChange={handleChange}
-                                                value={projects?.custId?._id || ''}
-                                            >
-                                                {/* {console.log(projects.custId._id,"projects.custId._id")} */}
+                    <label htmlFor="customerSearch" className="form-label label_text">
+                      Customer Name <RequiredStar />
+                    </label>
 
-                                                {customers && customers.map((cust) => (
-                                                    <option key={cust?._id} value={cust?._id}>{cust?.custName}</option>
-                                                ))}
-                                            </select>
+                    {/* Search input */}
+                    <input
+                      type="text"
+                      className="form-control mb-2"
+                      id="customerSearch"
+                      placeholder="Type to search customer..."
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                    />
 
-
-                                        </div>
+                    {/* Select dropdown */}
+                    <select
+                      className="form-select rounded-0"
+                      name="custId"
+                      value={projects?.custId?._id || ''}
+                      onChange={handleChange}
+                    >
+                      {customers.map((cust) => (
+                        <option key={cust._id} value={cust._id}>
+                          {cust.custName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                                     </div>
 
                                     <div className="mb-3">

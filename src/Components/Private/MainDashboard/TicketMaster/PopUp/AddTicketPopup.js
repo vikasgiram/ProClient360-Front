@@ -14,9 +14,10 @@ const AddTicketPopup = ({ handleAdd }) => {
   const [contactPerson,setContactPerson]=useState("");
   const [contactNumber,setContactNumber]=useState("");
   const [source,setSource]=useState("");
-  const [customers,setCustomer]=useState();
+  const [customers,setCustomers]=useState();
   const [loading,setLoading]=useState(false);
   const [contactPersonEmail,setContactPersonEmail]=useState("");
+  const [searchText, setSearchText] = useState("");
   const [Address, setAddress] = useState({
     add:"",
     city:"",
@@ -54,12 +55,28 @@ const AddTicketPopup = ({ handleAdd }) => {
   };
   
   
-  const fetchCusetomer=async ()=>{
-    const data=await getCustomers();
-    if(data?.success){
-      setCustomer(data?.customers);
+
+useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchText.trim() !== "" && searchText.length > 2) {
+        fetchCustomers(searchText);
+      } else {
+        setCustomers([]); // empty when no input
+      }
+    }, 500); // debounce API call by 500ms
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchText]);
+
+  const fetchCustomers = async () => {
+    const data = await getCustomers(1, 15, searchText);
+    // console.log(data);
+    if (data) {
+      setCustomers(data.customers || []);
+      // console.log(employees,"data from useState");
     }
-  }
+  };
+
 useEffect(() => {
     const fetchData = async () => {
       const data = await getAddress(Address.pincode);
@@ -123,12 +140,20 @@ useEffect(() => {
                         aria-describedby="emailHelp"
                         required
                       /> */}
+                      <input
+                      type="text"
+                      className="form-control mb-2"
+                      id="customerSearch"
+                      placeholder="Type to search customer..."
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                    />
+
                       <select
                         className="form-select rounded-0"
                         id=""
                         aria-label="Default select example"
                         onChange={(e) => setClient(e.target.value)}
-                        onClick={fetchCusetomer}
                         required
                       ><option >Select Client</option>
                         {customers && customers.map((cust)=>

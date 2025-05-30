@@ -21,7 +21,7 @@ const AddProjectPopup = ({ handleAdd }) => {
   const [category, setCategory] = useState('');
   const [POCopy, setPOCopy] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [searchText, setSearchText] = useState("");
 
   const [Address, setAddress] = useState({
     pincode: "",
@@ -48,18 +48,26 @@ const AddProjectPopup = ({ handleAdd }) => {
 
   const [customers, setCustomers] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getCustomers();
-      // console.log(data);
-      if (data) {
-        setCustomers(data.customers || []);
-        // console.log(employees,"data from useState");
+   useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchText.trim() !== "" && searchText.length > 2) {
+        fetchCustomers(searchText);
+      } else {
+        setCustomers([]); // empty when no input
       }
-    };
+    }, 500); // debounce API call by 500ms
 
-    fetchData();
-  }, []);
+    return () => clearTimeout(delayDebounce);
+  }, [searchText]);
+
+  const fetchCustomers = async () => {
+    const data = await getCustomers(1, 15, searchText);
+    // console.log(data);
+    if (data) {
+      setCustomers(data.customers || []);
+      // console.log(employees,"data from useState");
+    }
+  };
 
 
   const handleProjectAdd = async (event) => {
@@ -165,24 +173,34 @@ const AddProjectPopup = ({ handleAdd }) => {
               <div className="modal-body">
                 <div className="row modal_body_height">
                   <div className="col-12" >
-
-
                     <div className="mb-3">
-                      <label htmlFor="exampleInputEmail1" className="form-label label_text">Customer Name <RequiredStar /></label>
-                      <select className="form-select rounded-0" aria-label="Default select example"
-                        value={custId} // this sets the current selected value
-                        onChange={(e) => {
+                    <label htmlFor="customerSearch" className="form-label label_text">
+                      Customer Name <RequiredStar />
+                    </label>
 
-                          setCustId(e.target.value);
-                          // console.log("Selected customer ID:", customerId);
-                        }}
-                      >
-                        <option value="" >-- Select Customer Name --</option>
-                        {customers && customers.map((cust) => (
-                          <option key={cust._id} value={cust._id}>{cust.custName}</option>
-                        ))}
-                      </select>
-                    </div>
+                    {/* Search input */}
+                    <input
+                      type="text"
+                      className="form-control mb-2"
+                      id="customerSearch"
+                      placeholder="Type to search customer..."
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                    />
+
+                    {/* Select dropdown */}
+                    <select
+                      className="form-select rounded-0"
+                      value={custId}
+                      onChange={(e) => setCustId(e.target.value)}
+                    >
+                      {customers.map((cust) => (
+                        <option key={cust._id} value={cust._id}>
+                          {cust.custName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
                   </div>
 
