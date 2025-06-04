@@ -32,6 +32,9 @@ export const ProjectMasterGrid = () => {
   const [project, setProject] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
 
+    const [filters, setFilters] = useState({ status: null});
+  
+
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -71,6 +74,13 @@ export const ProjectMasterGrid = () => {
     setDownloadPopUpShow(!DownloadPopUpShow);
   };
 
+  const handleChange = (filterType, value) => {
+    const updatedFilters = { ...filters, [filterType]: value || null };
+    setFilters(updatedFilters);
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+  };
+
+
   const handelDeleteClick = async () => {
     const data = await deleteProject(selectedId);
     if (data) {
@@ -80,20 +90,11 @@ export const ProjectMasterGrid = () => {
     toast.error(data.error);
   };
 
-  const handleChange = (value) => {
-    if (value) {
-      const filtered = project.filter((project) => project.projectStatus === value);
-      setFilteredProjects(filtered);
-    } else {
-      setFilteredProjects(project);
-    }
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getProjects(pagination.currentPage, itemsPerPage);
+        const data = await getProjects(pagination.currentPage, itemsPerPage, filters);
         if (data) {
           setProject(data.projects || []);
           setFilteredProjects(data.projects || []);
@@ -114,7 +115,7 @@ export const ProjectMasterGrid = () => {
     };
 
     fetchData();
-  }, [pagination.currentPage, AddPopUpShow, UpdatePopUpShow, deletePopUpShow]);
+  }, [pagination.currentPage, AddPopUpShow, UpdatePopUpShow, deletePopUpShow, filters]);
 
   return (
     <>
@@ -149,12 +150,12 @@ export const ProjectMasterGrid = () => {
                           className="form-select bg_edit"
                           aria-label="Default select example"
                           name="projectStatus"
-                          onChange={(e) => handleChange(e.target.value)}
+                          onChange={(e) => handleChange('status',e.target.value)}
                         >
                           <option value="">Select Project Status</option>
-                          <option value="upcoming">Upcoming</option>
-                          <option value="inprocess">Inprocess</option>
-                          <option value="completed">Completed</option>
+                          <option value="Upcoming">Upcoming</option>
+                          <option value="Inprocess">Inprocess</option>
+                          <option value="Completed">Completed</option>
                         </select>
                       </div>
 

@@ -158,7 +158,7 @@ const EmployeeEditMyservicePopUp = ({ selectedService, handleUpdate }) => {
                   {/* Forward */}
                 </h5>
                 <button
-                  onClick={() => handleUpdate()}
+                  onClick={handleUpdate}
                   type="button"
                   className="close px-3"
                   style={{ marginLeft: "auto" }}
@@ -454,7 +454,7 @@ const EmployeeEditMyservicePopUp = ({ selectedService, handleUpdate }) => {
                     </>
                   ) : (
                     <div className="alert alert-warning mt-2" role="alert">
-                      No remarks available.
+                      No Actions Available
                     </div>
                   )}
                 </div>

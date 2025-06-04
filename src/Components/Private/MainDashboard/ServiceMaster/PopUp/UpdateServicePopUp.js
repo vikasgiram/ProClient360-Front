@@ -1,44 +1,49 @@
 import { useState, useEffect } from "react";
 import { formatDateforupdate } from "../../../../../utils/formatDate";
 import { getEmployees } from "../../../../../hooks/useEmployees";
-import { updateService } from "../../../../../hooks/useService";
+import useUpdateService from "../../../../../hooks/service/useUpdateService"; 
 import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
-const UpdateServicePopup = ({ handleUpdate, selectedService }) => {
+const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
   const [loading, setLoading] = useState(false);
-  const [service, setService] = useState(selectedService);
+  const [service, setService] = useState(selectedService || {});
   const [employees, setEmployees] = useState([]);
+  
+  // Use the useUpdateService hook
+  const { updateService, loading: updateLoading, error: updateError } = useUpdateService();
+
+  // Fetch employees
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         const employeesData = await getEmployees();
         setEmployees(employeesData.employees || []);
       } catch (error) {
-        toast.error(error);
+        toast.error(error.message || "Failed to fetch employees");
       }
     };
     fetchEmployees();
   }, []);
-  // console.log(service.allotTo.name);
+
+  // Initialize selectedEmployees
+  const [selectedEmployees, setSelectedEmployees] = useState(
+    selectedService?.allotTo || []
+  );
+
+  // Update selectedEmployees when selectedService changes
+  useEffect(() => {
+    setService(selectedService || {});
+    setSelectedEmployees(selectedService?.allotTo || []);
+  }, [selectedService]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-
     setService((prevService) => ({
       ...prevService,
       [name]: value,
     }));
   };
-
-  const [selectedEmployees, setSelectedEmployees] = useState(
-    service?.allotTo || []
-  );
-
-  // Update selectedEmployees when service.allotTo changes
-  useEffect(() => {
-    setSelectedEmployees(service?.allotTo || []);
-  }, [service]);
 
   const handleSelectChange = (event) => {
     const selectedId = event.target.value;
@@ -50,10 +55,10 @@ const UpdateServicePopup = ({ handleUpdate, selectedService }) => {
           selectedEmployee,
         ];
         setSelectedEmployees(updatedSelectedEmployees);
-        // Update the service variable's allotTo property
-        handleChange({
-          target: { name: "allotTo", value: updatedSelectedEmployees },
-        });
+        setService((prevService) => ({
+          ...prevService,
+          allotTo: updatedSelectedEmployees,
+        }));
       }
     }
   };
@@ -63,219 +68,209 @@ const UpdateServicePopup = ({ handleUpdate, selectedService }) => {
       (emp) => emp._id !== id
     );
     setSelectedEmployees(updatedSelectedEmployees);
-    // Update the service variable's allotTo property
-    handleChange({
-      target: { name: "allotTo", value: updatedSelectedEmployees },
-    });
+    setService((prevService) => ({
+      ...prevService,
+      allotTo: updatedSelectedEmployees,
+    }));
   };
 
   const handleServiceUpdate = async (event) => {
     event.preventDefault();
-    setLoading(!loading);
+    setLoading(true);
     try {
-      await updateService(service._id, service);
-      // console.log(service);
-
-      handleUpdate();
+      const result = await updateService(service._id, service);
+      if (result) {
+        handleUpdate(service._id, service); // Call handleUpdateSubmit
+        closePopUp(); // Close the popup
+      }
     } catch (error) {
-      toast.error(error);
+      toast.error(updateError || "Failed to update service");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // const formattedPurchaseOrderDate = formatDateforupdate(projects?.purchaseOrderDate);
-  // const formattedStartDate = formatDateforupdate(projects?.startDate);
   const formattedDate = formatDateforupdate(service?.allotmentDate);
 
   return (
-    <>
-      <form onSubmit={handleServiceUpdate}>
-        <div
-          className="modal fade show"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            backgroundColor: "#00000090",
-          }}
-        >
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content p-3">
-              <div className="modal-header pt-0">
-                <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-                  Update Service
-                  {/* Forward */}
-                </h5>
-                <button
-                  onClick={() => handleUpdate()}
-                  type="button"
-                  className="close px-3"
-                  style={{ marginLeft: "auto" }}
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                <div className="row modal_body_height">
-                  <div className="col-12 col-lg-6 mt-2">
-                    <div className="mb-3">
-                      <label
-                        for="serviceType"
-                        className="form-label label_text"
-                      >
-                        Service Type <RequiredStar />
-                      </label>
-                      <select
-                        className="form-select rounded-0"
-                        id="serviceType"
-                        name="serviceType"
-                        aria-label="Default select example"
-                        onChange={handleChange}
-                        required
-                      >
-                        <option hidden>{service.serviceType}</option>
-                        <option value={"AMC"}>AMC</option>
-                        <option value={"One Time"}>One time</option>
-                        <option value={"Warranty"}>Warranty</option>
-                      </select>
-                    </div>
+  <>
+    <form onSubmit={handleServiceUpdate}>
+      <div
+        className="modal fade show"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: "#00000090",
+        }}
+      >
+        <div className="modal-dialog modal-lg">
+          <div className="modal-content p-3">
+            <div className="modal-header pt-0">
+              <h5 className="card-title fw-bold" id="exampleModalLongTitle">
+                Update Service
+              </h5>
+              <button
+                onClick={closePopUp}
+                type="button"
+                className="close px-3"
+                style={{ marginLeft: "auto" }}
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="row modal_body_height">
+                <div className="col-12 col-lg-6 mt-2">
+                  <div className="mb-3">
+                    <label htmlFor="serviceType" className="form-label label_text">
+                      Service Type <RequiredStar />
+                    </label>
+                    <select
+                      className="form-select rounded-0"
+                      id="serviceType"
+                      name="serviceType"
+                      value={service.serviceType || ""}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Service Type</option>
+                      <option value="AMC">AMC</option>
+                      <option value="One Time">One Time</option>
+                      <option value="Warranty">Warranty</option>
+                    </select>
                   </div>
+                </div>
 
-                  <div className="col-12 col-lg-6 mt-2">
-                    <div className="mb-3">
-                      <label for="priority" className="form-label label_text">
-                        Priority <RequiredStar />
-                      </label>
-                      <select
-                        className="form-select rounded-0"
-                        id="priority"
-                        name="priority"
-                        aria-label="Default select example"
-                        onChange={handleChange}
-                        required
-                      >
-                        <option hidden>{service.priority}</option>
-                        <option value={"High"}>High</option>
-                        <option value={"Medium"}>Mid</option>
-                        <option value={"Low"}>Low</option>
-                      </select>
-                    </div>
+                <div className="col-12 col-lg-6 mt-2">
+                  <div className="mb-3">
+                    <label htmlFor="priority" className="form-label label_text">
+                      Priority <RequiredStar />
+                    </label>
+                    <select
+                      className="form-select rounded-0"
+                      id="priority"
+                      name="priority"
+                      value={service.priority || ""}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Priority</option>
+                      <option value="High">High</option>
+                      <option value="Medium">Mid</option>
+                      <option value="Low">Low</option>
+                    </select>
                   </div>
+                </div>
 
-                  <div className="col-12 col-lg-6 mt-2">
-                    <div className="mb-3">
-                      <label
-                        htmlFor="allotmentDate"
-                        className="form-label label_text"
-                      >
-                        Allotment Date <RequiredStar />
-                      </label>
-                      <input
-                        onChange={handleChange} // Handles date input change
-                        value={formattedDate} // Prepopulate value from state
-                        type="date"
-                        className="form-control rounded-0"
-                        id="allotmentDate"
-                        name="allotmentDate"
-                        aria-describedby="dateHelp"
-                        min={new Date().toISOString().split("T")[0]}
-                      />
-                    </div>
+                <div className="col-12 col-lg-6 mt-2">
+                  <div className="mb-3">
+                    <label htmlFor="allotmentDate" className="form-label label_text">
+                      Allotment Date <RequiredStar />
+                    </label>
+                    <input
+                      onChange={handleChange}
+                      value={formattedDate || ""}
+                      type="date"
+                      className="form-control rounded-0"
+                      id="allotmentDate"
+                      name="allotmentDate"
+                      min={new Date().toISOString().split("T")[0]}
+                      required
+                    />
                   </div>
+                </div>
 
-                  <div className="col-12 col-lg-6 mt-2">
-                    <div className="mb-3">
-                      <label
-                        htmlFor="Department"
-                        className="form-label label_text"
-                      >
-                        Allocated to <RequiredStar />
-                      </label>
-                      <select
-                        className="form-select rounded-0"
-                        id="employeeSelect"
-                        aria-label="Default select example"
-                        onChange={handleSelectChange}
-                        required
-                      >
-                        <option hidden>Select an employee</option>
-                        {Array.isArray(employees) &&
-                          employees.map((emp) => (
-                            <option
-                              value={emp._id}
-                              key={emp._id}
-                              disabled={selectedEmployees.some(
-                                (selected) => selected._id === emp._id
-                              )}
+                <div className="col-12 col-lg-6 mt-2">
+                  <div className="mb-3">
+                    <label htmlFor="employeeSelect" className="form-label label_text">
+                      Allocated to <RequiredStar />
+                    </label>
+                    <select
+                      className="form-select rounded-0"
+                      id="employeeSelect"
+                      onChange={handleSelectChange}
+                    >
+                      <option value="">Select an employee</option>
+                      {Array.isArray(employees) &&
+                        employees.map((emp) => (
+                          <option
+                            value={emp._id}
+                            key={emp._id}
+                            disabled={selectedEmployees.some(
+                              (selected) => selected._id === emp._id
+                            )}
+                          >
+                            {emp.name}{" "}
+                            {selectedEmployees.some(
+                              (selected) => selected._id === emp._id
+                            ) && "(Selected)"}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                  <div>
+                    {selectedEmployees.length > 0 && (
+                      <ul>
+                        {selectedEmployees.map((emp) => (
+                          <li key={emp._id}>
+                            {emp.name}
+                            <button
+                              className="btn btn-outline-danger btn-sm ms-2"
+                              onClick={() => handleRemoveEmployee(emp._id)}
+                              type="button"
                             >
-                              {emp.name}{" "}
-                              {selectedEmployees.some(
-                                (selected) => selected._id === emp._id
-                              ) && "(Selected)"}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                    <div>
-                      {selectedEmployees.length > 0 && (
-                        <ul>
-                          {selectedEmployees.map((emp) => (
-                            <li key={emp._id}>
-                              {emp.name}
-                              <button className="btn btn-outline-danger btn-sm ms-2" 
-                                onClick={() => handleRemoveEmployee(emp._id)}
-                              >
-                               Remove
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+                              Remove
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
+                </div>
 
-                  <div className="col-12 col-lg-6 mt-2">
-                    <div className="mb-3">
-                      <label for="Department" className="form-label label_text">
-                        Workmode <RequiredStar />
-                      </label>
-                      <select
-                        className="form-select rounded-0"
-                        id=""
-                        name="workMode"
-                        aria-label="Default select example"
-                        onChange={handleChange}
-                        required
-                      >
-                        <option hidden>{service.workMode}</option>
-                        <option value={"Onsite"}>Onsite</option>
-                        <option value={"Remote"}>Remote</option>
-                      </select>
-                    </div>
+                <div className="col-12 col-lg-6 mt-2">
+                  <div className="mb-3">
+                    <label htmlFor="workMode" className="form-label label_text">
+                      Workmode <RequiredStar />
+                    </label>
+                    <select
+                      className="form-select rounded-0"
+                      id="workMode"
+                      name="workMode"
+                      value={service.workMode || ""}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Workmode</option>
+                      <option value="Onsite">Onsite</option>
+                      <option value="Remote">Remote</option>
+                    </select>
                   </div>
+                </div>
 
-                  <div className="row">
-                    <div className="col-12 pt-3 mt-2">
-                      <button
-                        type="submit"
-                        onClick={handleServiceUpdate}
-                        disabled={loading}
-                        className="w-80 btn addbtn rounded-0 add_button   m-2 px-4"
-                      >
-                        {!loading ? "Update" : "Submitting..."}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleUpdate}
-                        className="w-80  btn addbtn rounded-0 Cancel_button m-2 px-4"
-                      >
-                        Cancel
-                      </button>
-                    </div>
+                <div className="row">
+                  <div className="col-12 pt-3 mt-2">
+                    <button
+                      type="submit"
+                      disabled={loading || updateLoading}
+                      className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
+                    >
+                      {loading || updateLoading ? "Submitting..." : "Update"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={closePopUp}
+                      className="w-80 btn addbtn rounded-0 Cancel_button m-2 px-4"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
       </form>
     </>
   );

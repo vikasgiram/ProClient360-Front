@@ -144,7 +144,7 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                 </>
               ) : (
                 <div className="alert alert-warning mt-2" role="alert">
-                  No remarks available.
+                  No Actions Available
                 </div>
               )}
             </div>

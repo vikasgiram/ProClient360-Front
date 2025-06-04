@@ -34,6 +34,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         pincode: selectedProject?.Address?.pincode || "",
     });
 
+    console.log(selectedProject?.Address);
 
     //   console.log(selectedProject?.Address?.city,"address");
     useEffect(() => {
@@ -219,6 +220,8 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                       value={projects?.custId?._id || ''}
                       onChange={handleChange}
                     >
+                        <option value={projects?.custId?._id || ''}>
+                          {projects?.custId?.custName || 'Select Customer'}</option>
                       {customers.map((cust) => (
                         <option key={cust._id} value={cust._id}>
                           {cust.custName}
@@ -254,7 +257,9 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 onChange={handleChange}
                                                 value={projects?.completeLevel}
                                                 name="completeLevel"
-                                                type="number"
+                                                type="text"
+                                                pattern="[0-9]*"
+                                                maxLength="3"
                                                 className="form-control rounded-0"
                                                 id="completeLevel"
                                                 aria-describedby="dateHelp"
@@ -284,7 +289,8 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                             <label for="PurchaseOrderNumber"
                                                 name="purchaseOrderNo"
                                                 className="form-label label_text">Purchase Order Number <RequiredStar /></label>
-                                            <input type="text" className="form-control rounded-0" id="PurchaseOrderNumber"
+                                            <input type="text"
+                                                pattern="[0-9]*" className="form-control rounded-0" id="PurchaseOrderNumber"
                                                 name="purchaseOrderNo"
                                                 value={projects?.purchaseOrderNo} onChange={handleChange} aria-describedby="emailHelp" />
                                         </div>
@@ -293,7 +299,8 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                         <div className="mb-3">
                                             <label for="PurchaseOrderValu" className="form-label label_text">Purchase Order Value (Rs/USD) <RequiredStar />
                                             </label>
-                                            <input type="number" className="form-control rounded-0"
+                                            <input type="text"
+                                                pattern="[0-9]*" className="form-control rounded-0"
                                                 name="purchaseOrderValue"
                                                 id="PurchaseOrderValu" onChange={handleChange} value={projects?.purchaseOrderValue} aria-describedby="emailHelp" />
                                         </div>
@@ -372,7 +379,8 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 <div className="mb-3">
                                                     <label for="advancePay" className="form-label label_text">     Advance Payment <RequiredStar />
                                                     </label>
-                                                    <input type="number" className="form-control rounded-0" id="advancePay"
+                                                    <input type="text"
+                                                        pattern="[0-9]*" maxLength={3} className="form-control rounded-0" id="advancePay"
                                                         name="advancePay"
                                                         onChange={handleChange} value={projects?.advancePay} aria-describedby="mobileNoHelp" />
                                                 </div>
@@ -382,7 +390,8 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                     <label for="payAgainstDelivery" className="form-label label_text">          Pay Against Delivery <RequiredStar />
 
                                                     </label>
-                                                    <input type="number" className="form-control rounded-0" id="payAgainstDelivery"
+                                                    <input type="text"
+                                                pattern="[0-9]*" maxLength={3} className="form-control rounded-0" id="payAgainstDelivery"
                                                         name="payAgainstDelivery"
                                                         onChange={handleChange} value={projects?.payAgainstDelivery} aria-describedby="mobileNoHelp" />
                                                 </div>
@@ -392,9 +401,9 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 <div className="mb-3">
                                                     <label for="payfterCompletion" className="form-label label_text">     Pay After Completion <RequiredStar />
                                                     </label>
-                                                    <input type="text" className="form-control rounded-0" id="payfterCompletion"
+                                                    <input type="text" pattern="[0-9]*" maxLength={3} className="form-control rounded-0" id="payfterCompletion"
                                                         name="payfterCompletion"
-                                                        onChange={handleChange} value={projects?.payfterCompletion} aria-describedby="secemailHelp" />
+                                                        onChange={handleChange} value={projects?.payAfterCompletion} aria-describedby="secemailHelp" />
                                                 </div>
                                             </div>
                                         </div>
@@ -408,7 +417,9 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                             <div className="col-12 col-lg-6 mt-2">
                                                 <div className="mb-3">
                                                     <input
-                                                        type="number"
+                                                        type="text"
+                                                        pattern="[0-9]*"
+                                                        maxLength="6"
                                                         className="form-control rounded-0"
                                                         placeholder="Pincode"
                                                         id="Pincode"
