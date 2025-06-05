@@ -66,16 +66,19 @@ const createCompany = async (companyData) => {
 
 
 const updateCompany = async (updatedData) => {
-  // console.log(updatedData);
-  
+ 
+
   try {
+   
     const response = await axios.put(`${url}/${updatedData._id}`, updatedData, {
+      
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
+    console.log("data",response);
     const data = response.data;
-
+   
     if (data.error) {
       console.error(data.error);
       return toast.error(data.error);

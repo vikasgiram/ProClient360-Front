@@ -111,10 +111,14 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
     try {
       // console.log(updatedCompany);
       await updateCompany(updatedCompany);
+      console.log("update compnay....",updatedCompany);
       handleUpdate();
     } catch (error) {
       toast.error(error.massage);
     }
+ 
+ 
+ 
   };
 
 

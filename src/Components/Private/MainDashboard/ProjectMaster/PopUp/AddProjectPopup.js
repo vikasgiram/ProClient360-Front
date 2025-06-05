@@ -40,7 +40,7 @@ const AddProjectPopup = ({ handleAdd }) => {
         setAddress(data);
       }
     };
-    if(Address.pincode > 0)
+    if (Address.pincode > 0)
       fetchData();
   }, [Address.pincode]);
 
@@ -48,7 +48,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
   const [customers, setCustomers] = useState([]);
 
-   useEffect(() => {
+  useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (searchText.trim() !== "" && searchText.length > 2) {
         fetchCustomers(searchText);
@@ -76,7 +76,7 @@ const AddProjectPopup = ({ handleAdd }) => {
     const formData = new FormData();
     formData.append('POCopy', POCopy);
 
-    if (!custId || !name || !purchaseOrderDate || !purchaseOrderNo || !purchaseOrderValue || !category || !startDate || !endDate || !advancePay || !payAgainstDelivery || !payAfterCompletion 
+    if (!custId || !name || !purchaseOrderDate || !purchaseOrderNo || !purchaseOrderValue || !category || !startDate || !endDate || !advancePay || !payAgainstDelivery || !payAfterCompletion
       || !Address.pincode ||
       !Address.state ||
       !Address.city ||
@@ -91,22 +91,22 @@ const AddProjectPopup = ({ handleAdd }) => {
       setLoading(false);
       return toast.error("Total percentage should be less than 100%");
     }
-    if(purchaseOrderValue <= 0){
+    if (purchaseOrderValue <= 0) {
       setLoading(false);
       return toast.error("Purchase order value should be greater than 0");
     }
-    if(advancePay <= 0 || payAgainstDelivery <= 0 || payAfterCompletion <= 0){
+    if (advancePay <= 0 || payAgainstDelivery <= 0 || payAfterCompletion <= 0) {
       setLoading(false);
       return toast.error("Percentage should be greater than 0");
     }
-    if(Address.pincode.length !== 6 || Address.pincode < 0){
+    if (Address.pincode.length !== 6 || Address.pincode < 0) {
       return toast.error("Enter valid Pincode");
     }
-    if (!POCopy){
+    if (!POCopy) {
       setLoading(false);
       return toast.error("Please upload POCopy");
     }
-    if(startDate>endDate){
+    if (startDate > endDate) {
       setLoading(false);
       return toast.error("Start date should be less than end date");
     }
@@ -128,7 +128,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
     await createProject(formData);
     // console.log(data);
-    
+
 
     handleAdd();
   };
@@ -140,7 +140,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
       if (file.size > 2 * 1024 * 1024) {
         return toast.error("File must be less than 2MB");
-        
+
       }
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -154,7 +154,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
   return (
     <>
-     
+
       <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
         <div className="modal-dialog modal-lg">
           <div className="modal-content p-3">
@@ -174,33 +174,33 @@ const AddProjectPopup = ({ handleAdd }) => {
                 <div className="row modal_body_height">
                   <div className="col-12" >
                     <div className="mb-3">
-                    <label htmlFor="customerSearch" className="form-label label_text">
-                      Customer Name <RequiredStar />
-                    </label>
+                      <label htmlFor="customerSearch" className="form-label label_text">
+                        Customer Name <RequiredStar />
+                      </label>
 
-                    {/* Search input */}
-                    <input
-                      type="text"
-                      className="form-control mb-2"
-                      id="customerSearch"
-                      placeholder="Type to search customer..."
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
-                    />
+                      {/* Search input */}
+                      <input
+                        type="text"
+                        className="form-control mb-2"
+                        id="customerSearch"
+                        placeholder="Type to search customer..."
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                      />
 
-                    {/* Select dropdown */}
-                    <select
-                      className="form-select rounded-0"
-                      value={custId}
-                      onChange={(e) => setCustId(e.target.value)}
-                    >
-                      {customers.map((cust) => (
-                        <option key={cust._id} value={cust._id}>
-                          {cust.custName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                      {/* Select dropdown */}
+                      <select
+                        className="form-select rounded-0"
+                        value={custId}
+                        onChange={(e) => setCustId(e.target.value)}
+                      >
+                        {customers.map((cust) => (
+                          <option key={cust._id} value={cust._id}>
+                            {cust.custName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
                   </div>
 
@@ -236,15 +236,27 @@ const AddProjectPopup = ({ handleAdd }) => {
                     </div>
 
                   </div>
+
                   <div className="col-12 col-lg-6 mt-2" >
                     <div className="mb-3">
-                      <label for="purchaseOrderValue" className="form-label label_text">Purchase Order Value (Rs) <RequiredStar />
+                      <label for="purchaseOrderValue" className="form-label label_text">     Purchase Order Value (Rs) <RequiredStar />
                       </label>
-                      <input type="number" className="form-control rounded-0" id="purchaseOrderValue"
-                        onChange={(e) => setPurchaseOrderValue(e.target.value)}
-                        value={purchaseOrderValue} aria-describedby="emailHelp" />
+                      <input
+                        type="text"
+                        className="form-control rounded-0"
+                        id="purchaseOrderValue"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (/^\d*\.?\d*$/.test(value)) {
+                            setPurchaseOrderValue(value);
+                          }
+                        }}
+                        value={purchaseOrderValue}
+                        aria-describedby="mobileNoHelp"
+                      />
                     </div>
                   </div>
+
 
                   <div className="col-12 col-lg-6 mt-2" >
 
@@ -319,31 +331,73 @@ const AddProjectPopup = ({ handleAdd }) => {
                         </span>
                       </div>
 
-                      <div className="col-12 col-lg-6 mt-2" >
-
-                        <div className="mb-3">
-                          <label for="AdvancePayment" className="form-label label_text">     Advance Payment <RequiredStar />
-                          </label>
-                          <input type="number" className="form-control rounded-0" id="AdvancePayment"
-                            onChange={(e) => setAdvancePayment(e.target.value)} value={advancePay} aria-describedby="mobileNoHelp" />
-                        </div>
-                      </div>
-                      <div className="col-12 col-lg-6 mt-2" >
-                        <div className="mb-3">
-                          <label for="PayAgainstDelivery" className="form-label label_text">          Pay Against Delivery <RequiredStar />
-
-                          </label>
-                          <input type="number" className="form-control rounded-0" id="PayAgainstDelivery" onChange={(e) => setPayAgainstDelivery(e.target.value)} value={payAgainstDelivery} aria-describedby="mobileNoHelp" />
-                        </div>
-                      </div>
 
                       <div className="col-12 col-lg-6 mt-2" >
                         <div className="mb-3">
-                          <label for="PayAfterCompletion" className="form-label label_text">     Pay After Completion <RequiredStar />
+                          <label for="AdvancePayment" className="form-label label_text">     Advance Payment (%) <RequiredStar />
                           </label>
-                          <input type="number" className="form-control rounded-0" id="PayAfterCompletion" onChange={(e) => setPayAfterCompletion(e.target.value)} value={payAfterCompletion} aria-describedby="secemailHelp" />
+                          <input
+                            type="text"
+                            className="form-control rounded-0"
+                            id="AdvancePayment"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^\d*\.?\d*$/.test(value)) {
+                                setAdvancePayment(value);
+                              }
+                            }}
+                            value={advancePay}
+                            aria-describedby="mobileNoHelp"
+                          />
                         </div>
                       </div>
+
+
+                      <div className="col-12 col-lg-6 mt-2">
+                        <div className="mb-3">
+                          <label htmlFor="PayAgainstDelivery" className="form-label label_text">
+                            Pay Against Delivery (%) <RequiredStar />
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control rounded-0"
+                            id="PayAgainstDelivery"
+                            inputMode="decimal"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                setPayAgainstDelivery(value);
+                              }
+                            }}
+                            value={payAgainstDelivery}
+                            aria-describedby="mobileNoHelp"
+                          />
+                        </div>
+                      </div>
+
+
+                      <div className="col-12 col-lg-6 mt-2">
+                        <div className="mb-3">
+                          <label htmlFor="PayAfterCompletion" className="form-label label_text">
+                            Pay After Completion (%) <RequiredStar />
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control rounded-0"
+                            id="PayAfterCompletion"
+                            inputMode="decimal"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                setPayAfterCompletion(value);
+                              }
+                            }}
+                            value={payAfterCompletion}
+                            aria-describedby="secemailHelp"
+                          />
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                   <div className="col-12  mt-2">
@@ -355,20 +409,21 @@ const AddProjectPopup = ({ handleAdd }) => {
                       <div className="col-12 col-lg-6 mt-2">
                         <div className="mb-3">
                           <input
-                            type="number"
+                            type="text"
                             className="form-control rounded-0"
                             placeholder="Pincode"
-                            id="exampleInputEmail1"
+                            id="pincode"
                             name="pincode"
-                            min={0}
-                            onChange={(e) =>
-                              setAddress({
-                                ...Address,
-                                pincode: e.target.value,
-                              })
-                            }
+                            maxLength="6"
+                            pattern="[0-9]*"
+                            inputMode="numeric"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^\d{0,6}$/.test(value)) {
+                                setAddress({ ...Address, pincode: value });
+                              }
+                            }}
                             value={Address.pincode}
-                            aria-describedby="emailHelp"
                           />
                         </div>
                       </div>
@@ -475,7 +530,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         type="submit"
                         onClick={handleProjectAdd}
                         disabled={loading}
-                        
+
                         className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
                       >
                         {!loading ? "Add" : "Submitting..."}

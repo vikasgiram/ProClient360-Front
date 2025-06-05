@@ -41,6 +41,7 @@ export const ForgotPassword = () => {
             <div className="row px-lg-2">
               <h4 className="text-center pb-2 fw-bold login_text">Forgot Password</h4>
 
+
               <div className="col-lg-9 my-lg-4 mx-auto">
                 <form onSubmit={handelEmailSubmit} action="" method="post">
                   <div className="input-group mb-3">
@@ -75,7 +76,7 @@ export const ForgotPassword = () => {
                       className="btn btn-block btn_submit form-control fw-bold"
                     />
                   </span> */}
-
+                   
                   <button
                     type="submit"
                     className="btn btn-block btn_submit form-control fw-bold d-flex align-items-center justify-content-center"
@@ -96,7 +97,12 @@ export const ForgotPassword = () => {
                   </button>
                 </form>
               </div>
-
+               
+              <div className="col-12 col-lg-10 mx-auto mb-4 mb-lg-0 pt-4">
+              <a href="" onClick={() => navigation('/')}>
+              <i class="fa-solid fa-angle-left"></i>  Back to login page</a>
+              </div>
+              
             </div>
           </div>
 
