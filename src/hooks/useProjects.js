@@ -4,9 +4,15 @@ import toast from "react-hot-toast";
 const baseUrl= process.env.REACT_APP_API_URL;
 const url =baseUrl+"/api/project";
 
-const getProjects = async (page, limit) => {
+const getProjects = async (page, limit, filters={}) => {
   try {
-    const response = await axios.get(`${url}?page=${page}&limit=${limit}`,{
+    const params = {
+      page: page,
+      limit: limit,
+      ...(filters.status && { status: filters.status }),
+    };
+    const response = await axios.get(url,{
+      params: params,
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

@@ -4,98 +4,14 @@ import { Sidebar } from "../Sidebar/Sidebar";
 import toast from 'react-hot-toast';
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import UpdateServicePopup from "./PopUp/UpdateServicePopUp";
-import { getAllService, deleteService } from "../../../../hooks/useService";
+import useServices from "../../../../hooks/service/useService";
+import useCreateService from "../../../../hooks/service/useCreateService";
+import useUpdateService from "../../../../hooks/service/useUpdateService";
+import useDeleteService from "../../../../hooks/service/useDeleteService";
 import { formatDate } from "../../../../utils/formatDate";
 import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
 import { UserContext } from "../../../../context/UserContext";
-
-
-const ServiceDashboardCards = ({totalServiceCount, inprogressServiceCount, pendingServiceCount, stuckServiceCount }) => {
-  return (
-    <div className="row bg-white p-2 m-1 border rounded">
-      <div className="col-12 py-1">
-        <div className="row pt-3">
-        
-           <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style bg_sky">
-              <div className="row">
-                <div className="col-9">
-                  <h6 className="text-dark card_heading">
-                    Total Services
-                  </h6>
-                  <h2 className="pt-2 fw-bold card_count demo_bottom">
-                    {totalServiceCount}
-                  </h2>
-                </div>
-                <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img src="./static/assets/img/planning.png" className="img_opacity all_card_img_size" alt="img not found" />
-                </div>
-              </div>
-            </div>
-          </div> 
-     
-
-          
-          <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style pinkcolor">
-              <div className="row">
-                <div className="col-9">
-                  <h6 className="text-dark card_heading">
-                    Inprogress Services
-                  </h6>
-                  <h2 className="pt-2 fw-bold card_count">
-                    {inprogressServiceCount}
-                  </h2>
-                </div>
-                <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img src="./static/assets/img/Inprocess.png" className="img_opacity all_card_img_size" alt="" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-           
-          <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style"   style={{backgroundColor:"#FEA2A2"}}>
-              <div className="row">
-                <div className="col-9">
-                  <h6 className="text-dark card_heading">
-                    Stuck Services
-                  </h6>
-                  <h2 className="pt-2 fw-bold card_count">
-                    {stuckServiceCount}
-                  </h2>
-                </div>
-                <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img src="./static/assets/img/stuck.png" className="img_opacity all_card_img_size" alt="" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-        
-          <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style" style={{backgroundColor: '#f8d7da'}}>
-              <div className="row">
-                <div className="col-9">
-                  <h6 className="text-dark card_heading">
-                    Pending Services
-                  </h6>
-                  <h2 className="pt-2 fw-bold card_count">
-                    {pendingServiceCount}
-                  </h2>
-                </div>
-                <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img src="./static/assets/img/pending.png" className="img_opacity all_card_img_size" alt="" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+import ServiceDashboardCards from './ServiceDashboardCards';
 
 export const ServiceMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -112,20 +28,8 @@ export const ServiceMasterGrid = () => {
   const [filters, setFilters] = useState({ priority: null, status: null, serviceType: null });
 
   const [selectedId, setSelecteId] = useState(null);
-  const [service, setService] = useState([]);
-  const [detailsServicePopUp, setDetailsServicePopUp] = useState(false);
-
   const [selectedService, setSelectedService] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-
-  const [serviceStatusCounts, setServiceStatusCounts] = useState({
-    Pending:0,
-    Inprogress:0,
-    Completed:0,
-    Stuck:0
-
-  });
+  const [detailsServicePopUp, setDetailsServicePopUp] = useState(false);
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -138,13 +42,56 @@ export const ServiceMasterGrid = () => {
 
   const itemsPerPage = 10;
 
+  // Use hooks
+  const { data, loading, error } = useServices(pagination.currentPage, itemsPerPage, filters);
+  const { createService, loading: createLoading } = useCreateService();
+  const { updateService, loading: updateLoading } = useUpdateService();
+  const { deleteService, loading: deleteLoading } = useDeleteService();
+
+  // Update state with fetched data
+  useEffect(() => {
+    if (data) {
+      setPagination(data.pagination || {
+        currentPage: 1,
+        totalPages: 0,
+        totalServices: 0,
+        limit: itemsPerPage,
+        hasNextPage: false,
+        hasPrevPage: false,
+      });
+    }
+    if (error) {
+      toast.error(error);
+    }
+  }, [data, error]);
+
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, currentPage: page }));
   };
 
-  const handleUpdate = (projects = null) => {
-    setSelectedService(projects);
+  const handleCreate = () => {
+    setAddPopUpShow(!AddPopUpShow);
+  };
+
+  const handleCreateSubmit = async (serviceData) => {
+    const result = await createService(serviceData);
+    if (result) {
+      setAddPopUpShow(false);
+      setPagination((prev) => ({ ...prev, currentPage: 1 })); // Refresh list
+    }
+  };
+
+  const handleUpdate = (service = null) => {
+    setSelectedService(service);
     setUpdatePopUpShow(!UpdatePopUpShow);
+  };
+
+  const handleUpdateSubmit = async (id, updatedData) => {
+    const result = await updateService(id, updatedData);
+    if (result) {
+      setUpdatePopUpShow(false);
+      setPagination((prev) => ({ ...prev, currentPage: 1 })); // Refresh list
+    }
   };
 
   const handelDeleteClosePopUpClick = (id) => {
@@ -153,45 +100,15 @@ export const ServiceMasterGrid = () => {
   };
 
   const handelDeleteClick = async () => {
-    const data = await deleteService(selectedId);
-    if (data) {
-      handelDeleteClosePopUpClick();
-      return toast.success("service Deleted successfully...");
+    const result = await deleteService(selectedId);
+    if (result) {
+      setdeletePopUpShow(false);
+      setPagination((prev) => ({ ...prev, currentPage: 1 })); // Refresh list
     }
-    toast.error(data.error);
   };
 
-  
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllService(pagination.currentPage, itemsPerPage);
-        if (data) {
-          setService(data.services || []);
-          setServiceStatusCounts(data.statusCounts)
-          setPagination(data.pagination || {
-            currentPage: 1,
-            totalPages: 0,
-            totalServices: 0,
-            limit: itemsPerPage,
-            hasNextPage: false,
-            hasPrevPage: false,
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching services:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [pagination.currentPage, AddPopUpShow, UpdatePopUpShow, deletePopUpShow, filters]);
-
   const handleChange = (filterType, value) => {
-    const updatedFilters = { ...filters, [filterType]: value };
+    const updatedFilters = { ...filters, [filterType]: value || null };
     setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
@@ -203,7 +120,7 @@ export const ServiceMasterGrid = () => {
 
   return (
     <>
-      {loading && (
+      {(loading || createLoading || updateLoading || deleteLoading) && (
         <div className="overlay">
           <span className="loader"></span>
         </div>
@@ -217,7 +134,7 @@ export const ServiceMasterGrid = () => {
             <div
               className="main-panel"
               style={{
-                width: isopen ? "" : "calc(100%  - 120px )",
+                width: isopen ? "" : "calc(100% - 120px)",
                 marginLeft: isopen ? "" : "125px",
               }}
             >
@@ -229,61 +146,68 @@ export const ServiceMasterGrid = () => {
 
                 </div>
 
-                <ServiceDashboardCards 
-                  totalServiceCount={serviceStatusCounts?.Inprogress+serviceStatusCounts?.Pending+serviceStatusCounts?.Stuck+serviceStatusCounts?.Completed}
-                  inprogressServiceCount={serviceStatusCounts?.Inprogress}
-                  pendingServiceCount={serviceStatusCounts?.Pending}
-                  stuckServiceCount={serviceStatusCounts?.Stuck}
+                <ServiceDashboardCards
+                  totalServiceCount={
+                    data?.statusCounts?.Inprogress +
+                    data?.statusCounts?.Pending +
+                    data?.statusCounts?.Stuck +
+                    data?.statusCounts?.Completed || 0
+                  }
+                  inprogressServiceCount={data?.statusCounts?.Inprogress || 0}
+                  pendingServiceCount={data?.statusCounts?.Pending || 0}
+                  stuckServiceCount={data?.statusCounts?.Stuck || 0}
                 />
-                
 
                 <div className="col-12 col-lg-6 ms-auto text-end me-2">
-                <div className="row">
-                      <div className="col-4 col-lg-4 ms-auto">
-                        <select
-                          className="form-select bg_edit"
-                          aria-label="Default select example"
-                          name="projectStatus"
-                          onChange={(e) => handleChange('serviceType', e.target.value)}
-                        >
-                          <option value="">Select Service Type</option>
-                          <option value="AMC">AMC</option>
-                          <option value="Warranty">Warranty</option>
-                          <option value="One Time">One Time</option>
-                        </select>
-                      </div>
+                  <div className="row">
+                    <div className="col-4 col-lg-4 ms-auto">
+                      <select
+                        className="form-select bg_edit"
+                        aria-label="Default select example"
+                        name="serviceType"
+                        onChange={(e) => handleChange('serviceType', e.target.value)}
+                        value={filters.serviceType || ""}
+                      >
+                        <option value="">Select Service Type</option>
+                        <option value="AMC">AMC</option>
+                        <option value="Warranty">Warranty</option>
+                        <option value="One Time">One Time</option>
+                      </select>
+                    </div>
 
-                      <div className="col-4 col-lg-4 ms-auto">
-                        <select
-                          className="form-select bg_edit"
-                          aria-label="Default select example"
-                          name="projectStatus"
-                          onChange={(e) => handleChange('status', e.target.value)}
-                        >
-                          <option value="">Select Status</option>
-                          <option value="Completed">Completed</option>
-                          <option value="Pending">Pending</option>
-                          <option value="Inprogress">Inprogress</option>
-                        </select>
-                      </div>
+                    <div className="col-4 col-lg-4 ms-auto">
+                      <select
+                        className="form-select bg_edit"
+                        aria-label="Default select example"
+                        name="status"
+                        onChange={(e) => handleChange('status', e.target.value)}
+                        value={filters.status || ""}
+                      >
+                        <option value="">Select Status</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Inprogress">Inprogress</option>
+                        <option value="Stuck">Stuck</option>
+                      </select>
+                    </div>
 
-                      <div className="col-4 col-lg-4 ms-auto">
-                        <select
-                          className="form-select bg_edit"
-                          aria-label="Default select example"
-                          name="projectStatus"
-                          onChange={(e) => handleChange('priority', e.target.value)}
-                        >
-                          <option value="">Select Priority</option>
-                          <option value="High">High Priority</option>
-                          <option value="Medium">Medium Priority</option>
-                          <option value="Low">Low Priority</option>
-                        </select>
-                      </div>
-
+                    <div className="col-4 col-lg-4 ms-auto">
+                      <select
+                        className="form-select bg_edit"
+                        aria-label="Default select example"
+                        name="priority"
+                        onChange={(e) => handleChange('priority', e.target.value)}
+                        value={filters.priority || ""}
+                      >
+                        <option value="">Select Priority</option>
+                        <option value="High">High Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="Low">Low Priority</option>
+                      </select>
                     </div>
                   </div>
-              
+                </div>
+
                 <div className="row bg-white p-2 m-1 border rounded">
                   <div className="col-12 py-2">
                     <div className="table-responsive">
@@ -302,8 +226,8 @@ export const ServiceMasterGrid = () => {
                           </tr>
                         </thead>
                         <tbody className="broder my-4">
-                          {service.length > 0 ? (
-                            service.map((service, index) => (
+                          {data?.services?.length > 0 ? (
+                            data.services.map((service, index) => (
                               <tr className="border my-4" key={service._id}>
                                 <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
                                 <td className="align_left_td width_tdd">{service?.ticket?.details}</td>
@@ -325,24 +249,17 @@ export const ServiceMasterGrid = () => {
                                     </span> : null}
                                   {user?.permissions?.includes('deleteService') || user?.user === 'company' ?
                                     <span
-                                      onClick={() =>
-                                        handelDeleteClosePopUpClick(service._id)
-                                      }
+                                      onClick={() => handelDeleteClosePopUpClick(service._id)}
                                       className="delete"
                                     >
                                       <i className="mx-1 fa-solid fa-trash text-danger cursor-pointer"></i>
-                                    </span>
-                                    : null}
-
+                                    </span> : null}
                                   {user?.permissions?.includes('viewService') || user?.user === 'company' ?
                                     <span
-                                      onClick={() =>
-                                        handelDetailsPopUpClick(service)
-                                      }
+                                      onClick={() => handelDetailsPopUpClick(service)}
                                     >
                                       <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
-                                    </span>
-                                    : null}
+                                    </span> : null}
                                 </td>
                               </tr>
                             ))
@@ -451,28 +368,29 @@ export const ServiceMasterGrid = () => {
         </div>
       </div>
 
-      {deletePopUpShow ? (
+      {deletePopUpShow && (
         <DeletePopUP
           message={"Are you sure! Do you want to Delete ?"}
           cancelBtnCallBack={handelDeleteClosePopUpClick}
           confirmBtnCallBack={handelDeleteClick}
           heading="Delete"
         />
-      ) : null}
+      )}
 
-      {UpdatePopUpShow ? (
+      {UpdatePopUpShow && (
         <UpdateServicePopup
-          handleUpdate={handleUpdate}
+          handleUpdate={handleUpdateSubmit}
           selectedService={selectedService}
+          closePopUp={() => setUpdatePopUpShow(false)}
         />
-      ) : null}
+      )}
 
-      {detailsServicePopUp ? (
+      {detailsServicePopUp && (
         <ViewServicePopUp
           closePopUp={handelDetailsPopUpClick}
           selectedService={selectedService}
         />
-      ) : null}
+      )}
     </>
   );
 };

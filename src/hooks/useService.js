@@ -4,9 +4,19 @@ import toast from 'react-hot-toast';
 const baseUrl= process.env.REACT_APP_API_URL;
 const url=baseUrl+"/api/service";
 
-const getAllService = async (page, limit) => {
+const getAllService = async (page, limit, filters={}) => {
   try {
-    const response = await axios.get(`${url}?page=${page}&limit=${limit}`, {
+
+    const params = {
+      page,
+      limit,
+      ...(filters.serviceType && { serviceType: filters.serviceType }),
+      ...(filters.status && { status: filters.status }),
+      ...(filters.priority && { priority: filters.priority }),
+    };
+
+    const response = await axios.get(`${url}`,{
+      params,
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
