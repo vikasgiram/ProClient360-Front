@@ -3,7 +3,7 @@ import validator from "validator";
 import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { getAddress } from "../../../../../hooks/usePincode";
-import {createCustomer} from "../../../../../hooks/useCustomer";
+import { createCustomer } from "../../../../../hooks/useCustomer";
 
 const AddCustomerPopUp = ({ handleAdd }) => {
   const [custName, setCustName] = useState("");
@@ -16,7 +16,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
   const [customerContactPersonName1, setCustomerContactPersonName1] =
     useState("");
 
-    const [zone, setZone] = useState();
+  const [zone, setZone] = useState();
   const [billingAddress, setBillingAddress] = useState({
     pincode: "",
     state: "",
@@ -31,14 +31,14 @@ const AddCustomerPopUp = ({ handleAdd }) => {
 
       if (data !== "Error") {
         setBillingAddress(prevAddress => ({
-          ...prevAddress, 
-          state: data.state, 
-          city: data.city,   
-          country: data.country 
+          ...prevAddress,
+          state: data.state,
+          city: data.city,
+          country: data.country
         }));
       }
     };
-    if(billingAddress.pincode >= 6)
+    if (billingAddress.pincode >= 6)
       fetchData();
   }, [billingAddress.pincode]);
 
@@ -74,22 +74,67 @@ const AddCustomerPopUp = ({ handleAdd }) => {
     if (!validator.isEmail(email)) {
       return toast.error("Enter valid Email");
     }
-    if(billingAddress.pincode.length !== 6 || billingAddress.pincode < 0){
+    if (billingAddress.pincode.length !== 6 || billingAddress.pincode < 0) {
       return toast.error("Enter valid Pincode");
     }
     if (GSTNo.length !== 15) {
       return toast.error("GST should be 15 characters long");
     }
     if (!validator.isMobilePhone(phoneNumber1, 'any', { strictMode: false }) || phoneNumber2
-        &&!validator.isMobilePhone(phoneNumber2, 'any', { strictMode: false })) {
-        return toast.error("Please enter valid 10-digit phone numbers.");
+      && !validator.isMobilePhone(phoneNumber2, 'any', { strictMode: false })) {
+      return toast.error("Please enter valid 10-digit phone numbers.");
     }
-  
+
     await createCustomer(data);
     // console.log(data);
     handleAdd();
   };
+               
+  // create a seperate function
 
+  const handleCustNameChange = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z0-9\s]*$/.test(value)) {
+      setCustName(value);
+    }
+  };
+
+  const handleContactPersonName1Change = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setCustomerContactPersonName1(value);
+    }
+  };
+
+  const handleContactPersonName2Change = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setCustomerContactPersonName2(value);
+    }
+  };
+
+  const handleStateChange = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setBillingAddress({ ...billingAddress, state: value });
+    }
+  };
+
+  const handleCityChange = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setBillingAddress({ ...billingAddress, city: value });
+    }
+  };
+  
+
+  const handleGSTChange = (e) => {
+    const value = e.target.value.toUpperCase();
+    if (/^[A-Z0-9]*$/.test(value) && value.length <= 15) {
+      setGSTNo(value);
+    }
+  };
+  
   return (
     <>
       <div
@@ -119,6 +164,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
               </div>
               <div className="modal-body">
                 <div className="row modal_body_height">
+
                   <div className="col-12">
                     <div className="">
                       <label htmlFor="FullName" className="form-label label_text">
@@ -128,9 +174,11 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                         type="text"
                         className="form-control rounded-0"
                         id="FullName"
+                        maxLength={30}
                         value={custName}
-                        onChange={(e) => setCustName(e.target.value)}
+                        onChange={handleCustNameChange}
                         aria-describedby="nameHelp"
+                        placeholder="Enter a Full Name"
                         required
                       />
                     </div>
@@ -143,11 +191,13 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                       </label>
                       <input
                         type="email"
+                        maxLength={30}
                         className="form-control rounded-0"
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         aria-describedby="emailHelp"
+                        placeholder="Enter a Email"
                         required
                       />
                     </div>
@@ -169,12 +219,11 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                           </label>
                           <input
                             type="text"
+                            maxLength={30}
                             className="form-control rounded-0"
                             id="SecondaryPersonName"
                             value={customerContactPersonName1}
-                            onChange={(e) =>
-                              setCustomerContactPersonName1(e.target.value)
-                            }
+                            onChange={handleContactPersonName1Change}
                             aria-describedby="emailHelp"
                             required
                           />
@@ -183,25 +232,21 @@ const AddCustomerPopUp = ({ handleAdd }) => {
 
                       <div className="col-12 col-lg-6 mt-2">
                         <div className="mb-3">
-                          <label
-                            htmlFor="SecondaryPersonName2"
-                            className="form-label label_text"
-                          >
-                            Contact Person Name 2 
+                          <label htmlFor="SecondaryPersonName2" className="form-label label_text">
+                            Contact Person Name 2
                           </label>
                           <input
                             type="text"
                             className="form-control rounded-0"
                             id="SecondaryPersonName2"
+                            maxLength={30}
                             value={customerContactPersonName2}
-                            onChange={(e) =>
-                              setCustomerContactPersonName2(e.target.value)
-                            }
+                            onChange={handleContactPersonName2Change}
                             aria-describedby="emailHelp"
-                            required
                           />
                         </div>
                       </div>
+
 
                       <div className="col-12 col-lg-6 mt-2">
                         <div className="mb-3">
@@ -234,7 +279,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                             htmlFor="mobileNo"
                             className="form-label label_text"
                           >
-                            Contact Person No. 2 
+                            Contact Person No. 2
                           </label>
                           <input
                             type="tel"
@@ -264,17 +309,20 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                       <div className="col-12 col-lg-6 mt-2">
                         <div className="mb-3">
                           <input
-                            type="number"
+                            type="text"
                             className="form-control rounded-0"
                             placeholder="Pincode"
                             id="exampleInputEmail1"
-                            min={0}
-                            onChange={(e) =>
-                              setBillingAddress({
-                                ...billingAddress,
-                                pincode: e.target.value,
-                              })
-                            }
+                            maxLength={6}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^\d{0,6}$/.test(value)) {
+                                setBillingAddress({
+                                  ...billingAddress,
+                                  pincode: value,
+                                });
+                              }
+                            }}
                             value={billingAddress.pincode}
                             aria-describedby="emailHelp"
                           />
@@ -287,8 +335,9 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                             type="text"
                             className="form-control rounded-0"
                             placeholder="State"
+                            maxLength={30}
                             id="exampleInputEmail1"
-                            onChange={(e) => setBillingAddress({ ...billingAddress, state: e.target.value })}
+                            onChange={handleStateChange}
                             value={billingAddress.state}
                             aria-describedby="emailHelp"
                           />
@@ -302,8 +351,9 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                             className="form-control rounded-0"
                             placeholder="City"
                             id="exampleInputEmail1"
-                            onChange={(e) => setBillingAddress({ ...billingAddress, city: e.target.value })}
+                            maxLength={20}
                             value={billingAddress.city}
+                            onChange={handleCityChange}
                             aria-describedby="emailHelp"
                           />
                         </div>
@@ -329,6 +379,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                             className="textarea_edit col-12"
                             id=""
                             name=""
+                            maxLength={100}
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={(e) => setBillingAddress({ ...billingAddress, add: e.target.value })}
                             value={billingAddress.add}
@@ -446,22 +497,24 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                   </div>
                 </div> */}
 
-                  <div className="col-12 col-lg-6 mt-2">
-                    <div className="">
-                      <label htmlFor="GSTNumber" className="form-label label_text">
-                        GST Number <RequiredStar />
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control rounded-0"
-                        id="GSTNumber"
-                        onChange={(e) => setGSTNo(e.target.value)}
-                        value={GSTNo}
-                        aria-describedby="emailHelp"
-                        required
-                      />
-                    </div>
-                  </div>
+<div className="col-12 col-lg-6 mt-2">
+  <div className="">
+    <label htmlFor="GSTNumber" className="form-label label_text">
+      GST Number <RequiredStar />
+    </label>
+    <input
+      type="text"
+      className="form-control rounded-0 text-uppercase"
+      id="GSTNumber"
+      maxLength={15}
+      onChange={handleGSTChange}
+      value={GSTNo}
+      aria-describedby="emailHelp"
+      required
+    />
+  </div>
+</div>
+
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">

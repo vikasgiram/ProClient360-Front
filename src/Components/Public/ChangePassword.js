@@ -12,38 +12,38 @@ export const ChangePassword = () => {
 
 
     const [confirmPass, setConfirmPass] = useState('');
-    const [newPass, setNewPass]= useState('');
+    const [newPass, setNewPass] = useState('');
     const [oldPass, setOldPass] = useState("");
     const [oldPassword, setOldPassword] = useState(false);
     const [newPassword, setNewPassword] = useState(false);
-    const[confirmPassword, setConfirmPassword]= useState(false);
-    const[loading, setLoading] = useState(false);
-    
+    const [confirmPassword, setConfirmPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handelChangePasword = async (e) =>{
+
+    const handelChangePasword = async (e) => {
         e.preventDefault();
-        if(newPass ==='' || oldPass ===''){
+        if (newPass === '' || oldPass === '') {
             return toast.error("Required Field")
         }
-        if(newPass !== confirmPass){
+        if (newPass !== confirmPass) {
             return toast.error("New Password and Confirm Password desen't match...");
         }
-        try{
+        try {
             setLoading(true);
-            const data=await changePassword(oldPass, newPass, confirmPass);
-            if(data.error){
+            const data = await changePassword(oldPass, newPass, confirmPass);
+            if (data.error) {
                 return toast.error(data.error);
             }
             navigation('/');
             setLoading(true);
             toast.success(data.message);
-        }catch(error){
+        } catch (error) {
             console.error(error);
         }
-        finally{
+        finally {
             setLoading(false);
         }
-	};
+    };
     return (
         <>
             {loading && (
@@ -61,10 +61,10 @@ export const ChangePassword = () => {
 
                                 <form>
 
-        
+
                                     <div class="input-group mb-3">
-                                    <span class="input-group-text">
-                                        <i class="fa-solid fa-key"></i>
+                                        <span class="input-group-text">
+                                            <i class="fa-solid fa-key"></i>
                                         </span>
                                         <input
                                             placeholder="Old Password"
@@ -84,7 +84,7 @@ export const ChangePassword = () => {
                                             {" "}
 
                                             <i
-                                                 onClick={() => setOldPassword(!oldPassword)}
+                                                onClick={() => setOldPassword(!oldPassword)}
                                                 className={`fas ${oldPassword ? "fa-eye-slash" : "fa-eye"}`} // Change icon based on visibility
                                                 style={{ cursor: "pointer" }}
                                             ></i>
@@ -94,7 +94,7 @@ export const ChangePassword = () => {
 
                                     <div class="input-group mb-3">
                                         <span class="input-group-text">
-                                        <i class="fa-solid fa-key"></i>
+                                            <i class="fa-solid fa-key"></i>
                                         </span>
                                         <input
                                             placeholder="New Password"
@@ -114,7 +114,7 @@ export const ChangePassword = () => {
                                             {" "}
 
                                             <i
-                                                 onClick={() => setNewPassword(!newPassword)}
+                                                onClick={() => setNewPassword(!newPassword)}
                                                 className={`fas ${newPassword ? "fa-eye-slash" : "fa-eye"}`} // Change icon based on visibility
                                                 style={{ cursor: "pointer" }}
                                             ></i>
@@ -147,7 +147,7 @@ export const ChangePassword = () => {
                                             {" "}
 
                                             <i
-                                                 onClick={() => setConfirmPassword(!confirmPassword)}
+                                                onClick={() => setConfirmPassword(!confirmPassword)}
                                                 className={`fas ${confirmPassword ? "fa-eye-slash" : "fa-eye"}`} // Change icon based on visibility
                                                 style={{ cursor: "pointer" }}
                                             ></i>
@@ -166,12 +166,16 @@ export const ChangePassword = () => {
                                             type="submit"
                                             value="Change"
                                             onClick={handelChangePasword}
-                                            
+
                                             className="btn btn-block btn_submit form-control fw-bold"
                                         />
                                     </span>
                                 </form>
 
+                                <div className="col-12 col-lg-10 mx-auto mb-4 mb-lg-0 pt-4">
+                                <a href="" onClick={() => navigation('/')}>
+                                <i class="fa-solid fa-angle-left"></i>  Back to Dashboard</a>
+                                </div>
 
                             </div>
                         </div>

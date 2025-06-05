@@ -34,7 +34,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   // Validation state for each field
   const [errors, setErrors] = useState({
     name: "",
@@ -72,18 +72,22 @@ const AddCompanyPopup = ({ handleAdd }) => {
     return "";
   };
 
+
   const validateAdminName = (value) => {
     if (!value.trim()) {
       return "Admin name is required";
     }
-    if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+
+    if (/^[a-zA-Z\s]*$/.test(value.trim())) {
       return "Admin name should contain only letters and spaces";
     }
+
     if (value.trim().length < 2) {
       return "Admin name must be at least 2 characters";
     }
     return "";
   };
+
 
   const validateMobileNumber = (value) => {
     if (!value) {
@@ -116,7 +120,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
     const selectedDate = new Date(value);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (selectedDate <= today) {
       return "Subscription date must be in the future";
     }
@@ -205,7 +209,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
 
   const handleCompanyAdd = async (event) => {
     event.preventDefault();
-    
+
     // Validate all fields before submission
     const nameError = validateCompanyName(name);
     const adminError = validateAdminName(admin);
@@ -280,7 +284,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
         setErrors(prev => ({ ...prev, logo: "Logo must be less than 2MB" }));
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogo(reader.result);
@@ -318,6 +322,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
               </div>
               <div className="modal-body">
                 <div className="row modal_body_height">
+
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label htmlFor="name" className="form-label label_text">
@@ -325,6 +330,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
+                        maxLength={40}
                         value={name}
                         onChange={handleNameChange}
                         className={`form-control rounded-0 ${errors.name ? 'is-invalid' : ''}`}
@@ -334,7 +340,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                     </div>
                   </div>
-                  
+
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label htmlFor="adminName" className="form-label label_text">
@@ -342,6 +348,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
+                        maxLength={40}
                         value={admin}
                         onChange={handleAdminChange}
                         className={`form-control rounded-0 ${errors.admin ? 'is-invalid' : ''}`}
@@ -378,6 +385,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="email"
+                        maxLength={40}
                         value={email}
                         onChange={handleEmailChange}
                         className={`form-control rounded-0 ${errors.email ? 'is-invalid' : ''}`}
@@ -416,11 +424,16 @@ const AddCompanyPopup = ({ handleAdd }) => {
                           <span>&#8377;</span>
                         </span>
                         <input
-                          type="number"
+                          type="text"
                           id="SubscriptionAmount"
-                          min="0"
+                          maxLength={12}
                           value={subAmount}
-                          onChange={handleSubAmountChange}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (/^\d*\.?\d{0,2}$/.test(value)) {
+                              handleSubAmountChange(e);
+                            }
+                          }}
                           className="form-control rounded-0 border-0"
                           required
                         />
@@ -438,10 +451,10 @@ const AddCompanyPopup = ({ handleAdd }) => {
                         <input
                           type="text"
                           id="gstNo"
+                          maxLength={15}
                           value={GST}
                           onChange={handleGSTChange}
                           className={`form-control rounded-0 border-0 ${errors.GST ? 'is-invalid' : ''}`}
-                          placeholder="22AAAAA0000A1Z5"
                           required
                         />
                       </div>
@@ -474,16 +487,19 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       <div className="col-12 col-lg-6 mt-2">
                         <div className="mb-3">
                           <input
-                            type="number"
+                            type="text"
                             className="form-control rounded-0"
                             placeholder="Pincode"
-                            min="0"
-                            onChange={(e) =>
-                              setAddress({
-                                ...Address,
-                                pincode: e.target.value,
-                              })
-                            }
+                            maxLength={6}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^\d{0,6}$/.test(value)) {
+                                setAddress({
+                                  ...Address,
+                                  pincode: value,
+                                });
+                              }
+                            }}
                             value={Address.pincode}
                           />
                         </div>

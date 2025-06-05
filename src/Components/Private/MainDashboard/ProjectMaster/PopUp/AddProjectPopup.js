@@ -183,6 +183,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         type="text"
                         className="form-control mb-2"
                         id="customerSearch"
+                        maxLength={30}
                         placeholder="Type to search customer..."
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
@@ -206,7 +207,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
                   <div className="mb-3">
                     <label for="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
-                    <input type="text" className="form-control rounded-0" id="ProjectName" onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp" />
+                    <input type="text" className="form-control rounded-0" id="ProjectName" maxLength={30} onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp" />
                   </div>
 
 
@@ -230,7 +231,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
                     <div className="mb-3">
                       <label for="purchaseOrderNo" className="form-label label_text">Purchase Order Number <RequiredStar /></label>
-                      <input type="text" className="form-control rounded-0" id="purchaseOrderNo"
+                      <input type="text" className="form-control rounded-0" maxLength={12} id="purchaseOrderNo"
                         onChange={(e) => setPurchaseOrderNo(e.target.value)}
                         value={purchaseOrderNo} aria-describedby="emailHelp" />
                     </div>
@@ -243,6 +244,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
+                        maxLength={10}
                         className="form-control rounded-0"
                         id="purchaseOrderValue"
                         onChange={(e) => {
@@ -340,6 +342,8 @@ const AddProjectPopup = ({ handleAdd }) => {
                             type="text"
                             className="form-control rounded-0"
                             id="AdvancePayment"
+                            maxLength="3"
+                            pattern="[0-9]*"
                             onChange={(e) => {
                               const value = e.target.value;
                               if (/^\d*\.?\d*$/.test(value)) {
@@ -363,6 +367,8 @@ const AddProjectPopup = ({ handleAdd }) => {
                             className="form-control rounded-0"
                             id="PayAgainstDelivery"
                             inputMode="decimal"
+                            maxLength="3"
+                            pattern="[0-9]*"
                             onChange={(e) => {
                               const value = e.target.value;
                               if (/^\d*\.?\d{0,2}$/.test(value)) {
@@ -383,9 +389,12 @@ const AddProjectPopup = ({ handleAdd }) => {
                           </label>
                           <input
                             type="text"
+
                             className="form-control rounded-0"
                             id="PayAfterCompletion"
                             inputMode="decimal"
+                            maxLength="3"
+                            pattern="[0-9]*"
                             onChange={(e) => {
                               const value = e.target.value;
                               if (/^\d*\.?\d{0,2}$/.test(value)) {
@@ -432,11 +441,17 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
+                            maxLength={40}
                             className="form-control rounded-0"
                             placeholder="State"
                             id="exampleInputEmail1"
                             name="state"
-                            onChange={(e) => setAddress({ ...Address, state: e.target.value })}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^[A-Za-z\s]*$/.test(value)) {
+                                setAddress({ ...Address, state: value });
+                              }
+                            }}
                             value={Address.state}
                             aria-describedby="emailHelp"
                           />
@@ -447,11 +462,17 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
+                            maxLength={40}
                             className="form-control rounded-0"
                             placeholder="City"
                             id="exampleInputEmail1"
                             name="city"
-                            onChange={(e) => setAddress({ ...Address, city: e.target.value })}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^[A-Za-z\s]*$/.test(value)) {
+                                setAddress({ ...Address, city: value });
+                              }
+                            }}
                             value={Address.city}
                             aria-describedby="emailHelp"
                           />
@@ -462,11 +483,17 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
+                            maxLength={40}
                             className="form-control rounded-0"
                             placeholder="Country"
                             id="exampleInputEmail1"
                             name="country"
-                            onChange={(e) => setAddress({ ...Address, country: e.target.value })}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^[A-Za-z\s]*$/.test(value)) {
+                                setAddress({ ...Address, country: value });
+                              }
+                            }}
                             value={Address.country}
                             aria-describedby="emailHelp"
                           />
@@ -478,6 +505,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                           <textarea
                             className="textarea_edit col-12"
                             id=""
+                            maxLength={100}
                             name="add"
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={(e) => setAddress({ ...Address, add: e.target.value })}
@@ -513,7 +541,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                     <div className="mb-3">
                       <label for="remark" className="form-label label_text">     remark
                       </label>
-                      <input type="text" className="form-control rounded-0" id="remark" onChange={(e) => setRemark(e.target.value)} value={remark} aria-describedby="secemailHelp" />
+                      <input type="text" className="form-control rounded-0" id="remark" maxLength={100} onChange={(e) => setRemark(e.target.value)} value={remark} aria-describedby="secemailHelp" />
                     </div>
 
 
