@@ -62,7 +62,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
     formData.append('logo', logo);
 
     try {
-      await createCompany(formData);
+      const data = await createCompany(formData);
       handleAdd();
     } catch (error) {
       setLoading(false);

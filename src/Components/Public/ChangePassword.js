@@ -26,7 +26,7 @@ export const ChangePassword = () => {
             return toast.error("Required Field")
         }
         if (newPass !== confirmPass) {
-            return toast.error("New Password and Confirm Password desen't match...");
+            return toast.error("New Password and Confirm Password doesn't match...");
         }
         try {
             setLoading(true);
