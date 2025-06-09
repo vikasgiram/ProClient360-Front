@@ -76,7 +76,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
     if (!value.trim()) {
       return "Admin name is required";
     }
-    if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+    if (/\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+/.test(value.trim())) {
       return "Admin name should contain only letters and spaces";
     }
     if (value.trim().length < 2) {

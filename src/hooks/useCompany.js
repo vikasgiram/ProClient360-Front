@@ -25,9 +25,9 @@ const getDashboardData = async () => {
     toast.error(error.response.data.error);  }
 };
 
-const getCompany = async (page, limit=10) => {
+const getCompany = async (page, limit=10, search=null) => {
   try {
-    const response = await axios.get(`${url}?page=${page}&limit=${limit}`,{
+    const response = await axios.get(`${url}?q=${search}&page=${page}&limit=${limit}`,{
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
