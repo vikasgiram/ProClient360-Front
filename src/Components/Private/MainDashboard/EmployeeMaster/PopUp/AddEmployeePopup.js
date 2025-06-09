@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import validator from "validator";
 import { getDepartment } from "../../../../../hooks/useDepartment";
 import { createEmployee } from "../../../../../hooks/useEmployees";
@@ -66,21 +66,21 @@ const AddEmployeePopup = ({ handleAdd }) => {
       designation,
       gender
     };
-    if(!name || !mobileNo || !email || !hourlyRate || !password || !confirmPassword|| !department || !designation || !gender){
+    if (!name || !mobileNo || !email || !hourlyRate || !password || !confirmPassword || !department || !designation || !gender) {
       return toast.error("Please fill all fields");
     }
-    if(password!==confirmPassword){
+    if (password !== confirmPassword) {
       return toast.error("Password desen't match");
     }
-    if(!validator.isStrongPassword(password)){
+    if (!validator.isStrongPassword(password)) {
       return toast.error("Password should contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.");
     }
-    if(/[a-zA-Z]/.test(mobileNo)){
+    if (/[a-zA-Z]/.test(mobileNo)) {
       return toast.error("Phone number should not contain alphabets");
     }
     const phoneRegex = /^\d+$/;
     if (!phoneRegex.test(mobileNo)) {
-        return toast.error("Phone number must only contain digits (0-9).");
+      return toast.error("Phone number must only contain digits (0-9).");
     }
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -89,14 +89,30 @@ const AddEmployeePopup = ({ handleAdd }) => {
     }
     if (!/^[A-Za-zÀ-ÿ]+([ '-][A-Za-zÀ-ÿ]+)*$/.test(name)) {
       return toast.error("Name should only contain alphabets and spaces");
-  }
-    if(hourlyRate <= 0){
-      return toast.error("Hourly Rate should be greater than 0");
     }
+    if (!/^\d*\.?\d+$/.test(hourlyRate) || parseFloat(hourlyRate) <= 0) {
+      return toast.error("Hourly Rate should be a number greater than 0");
+    }    
     await createEmployee(data);
     // console.log(data, "data from handleEmployeeAdd");
     handleAdd();
   };
+
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setName(value);
+    }
+  };
+
+  const handleHourlyRateChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*\.?\d{0,2}$/.test(value)) {
+      setHourlyRate(value);
+    }
+  };
+
 
   return (
     <>
@@ -127,20 +143,20 @@ const AddEmployeePopup = ({ handleAdd }) => {
               </div>
               <div className="modal-body">
                 <div className="row modal_body_height">
+
                   <div className="col-12">
                     <div className="mb-3">
-                      <label
-                        for="name"
-                        className="form-label label_text"
-                      >
+                      <label htmlFor="name" className="form-label label_text">
                         Full Name <RequiredStar />
                       </label>
                       <input
                         type="text"
+                        maxLength={30}
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={handleNameChange}
                         className="form-control rounded-0 uppercase-inputs"
                         id="name"
+                        placeholder="Enter a full Name"
                         aria-describedby="emailHelp"
                         required
                       />
@@ -189,7 +205,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
                         <option value="female">Female</option>
                         <option value="other">Other</option>
 
-                      </select>  
+                      </select>
                     </div>
                   </div>
 
@@ -266,10 +282,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label
-                        for="HourlyRate"
-                        className="form-label label_text"
-                      >
+                      <label htmlFor="HourlyRate" className="form-label label_text">
                         Hourly Rate <RequiredStar />
                       </label>
                       <div className="input-group border mb-3">
@@ -277,20 +290,21 @@ const AddEmployeePopup = ({ handleAdd }) => {
                           className="input-group-text rounded-0 bg-white border-0"
                           id="basic-addon1"
                         >
-                          <i class="fa-solid fa-indian-rupee-sign"></i>
+                          <i className="fa-solid fa-indian-rupee-sign"></i>
                         </span>
                         <input
                           type="text"
+                          maxLength={10}
                           id="HourlyRate"
                           value={hourlyRate}
-                          onChange={(e) => setHourlyRate(e.target.value)}
+                          onChange={handleHourlyRateChange}
                           className="form-control rounded-0 border-0"
-                          placeholder="eg. 10,000"
-                          aria-label="Username"
+                          placeholder="eg. 100.0"
+                          aria-label="HourlyRate"
                           aria-describedby="basic-addon1"
                           required
                         />
-                      </div>{" "}
+                      </div>
                     </div>
                   </div>
 

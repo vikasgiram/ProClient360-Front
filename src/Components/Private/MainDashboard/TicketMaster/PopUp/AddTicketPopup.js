@@ -1,29 +1,29 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
-import {createTicket} from "../../../../../hooks/useTicket"
-import {getCustomers} from "../../../../../hooks/useCustomer";
+import { createTicket } from "../../../../../hooks/useTicket"
+import { getCustomers } from "../../../../../hooks/useCustomer";
 import { getAddress } from "../../../../../hooks/usePincode";
 
 
 
 const AddTicketPopup = ({ handleAdd }) => {
   const [client, setClient] = useState("");
-  const [details,setDetails]=useState("");
-  const [product,setProduct]=useState("");
-  const [contactPerson,setContactPerson]=useState("");
-  const [contactNumber,setContactNumber]=useState("");
-  const [source,setSource]=useState("");
-  const [customers,setCustomers]=useState();
-  const [loading,setLoading]=useState(false);
-  const [contactPersonEmail,setContactPersonEmail]=useState("");
+  const [details, setDetails] = useState("");
+  const [product, setProduct] = useState("");
+  const [contactPerson, setContactPerson] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [source, setSource] = useState("");
+  const [customers, setCustomers] = useState();
+  const [loading, setLoading] = useState(false);
+  const [contactPersonEmail, setContactPersonEmail] = useState("");
   const [searchText, setSearchText] = useState("");
   const [Address, setAddress] = useState({
-    add:"",
-    city:"",
-    country:"",
-    pincode:"",
-    state:""
+    add: "",
+    city: "",
+    country: "",
+    pincode: "",
+    state: ""
   })
 
   const handleEmployeeAdd = async (event) => {
@@ -41,22 +41,22 @@ const AddTicketPopup = ({ handleAdd }) => {
     if (!client || !details || !product || !contactPerson || !contactNumber || !source || !Address) {
       return toast.error("Please fill all fields");
     }
-    if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contactPersonEmail)){
+    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contactPersonEmail)) {
       return toast.error("Please Enter Valid Email");
     }
-    if(contactNumber.length !== 10){
-       return toast.error("Please Enter Valid Contact Number");
-      }
-    if(/[a-zA-Z]/.test(contactNumber)){
+    if (contactNumber.length !== 10) {
+      return toast.error("Please Enter Valid Contact Number");
+    }
+    if (/[a-zA-Z]/.test(contactNumber)) {
       return toast.error("Phone number should not contain alphabets");
     }
     await createTicket(data);
     handleAdd();
   };
-  
-  
 
-useEffect(() => {
+
+
+  useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (searchText.trim() !== "" && searchText.length > 2) {
         fetchCustomers(searchText);
@@ -77,22 +77,69 @@ useEffect(() => {
     }
   };
 
-useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       const data = await getAddress(Address.pincode);
 
       if (data !== "Error") {
         setAddress(prevAddress => ({
-          ...prevAddress, 
-          state: data.state, 
-          city: data.city,   
-          country: data.country 
+          ...prevAddress,
+          state: data.state,
+          city: data.city,
+          country: data.country
         }));
       }
     };
-    if(Address.pincode >= 6)
+    if (Address.pincode >= 6)
       fetchData();
   }, [Address.pincode]);
+
+
+  //  create a new seperate validations function
+
+  const handlePincodeChange = (e) => {
+    const value = e.target.value;
+    if (/^\d{0,6}$/.test(value)) {
+      setAddress({ ...Address, pincode: value });
+    }
+  };
+
+
+  const handleStateChange = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setAddress({ ...Address, state: value })
+    }
+  }
+
+  const handleCityChange = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setAddress({ ...Address, city: value });
+    }
+  };
+
+  const handleCountryChange = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setAddress({ ...Address, country: value })
+    }
+  }
+
+  const handleContactPersonName = (e) => {
+    const value = e.target.value;
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setContactPerson(value);
+    }
+  };
+
+  const contactPersonNumber = (e) => {
+    const value = e.target.value;
+    if (/^\d{0,10}$/.test(value)) {
+      setContactNumber(value);
+    }
+  };
+
 
   return (
     <>
@@ -141,13 +188,13 @@ useEffect(() => {
                         required
                       /> */}
                       <input
-                      type="text"
-                      className="form-control mb-2"
-                      id="customerSearch"
-                      placeholder="Type to search customer..."
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
-                    />
+                        type="text"
+                        className="form-control mb-2"
+                        id="customerSearch"
+                        placeholder="Type to search customer..."
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                      />
 
                       <select
                         className="form-select rounded-0"
@@ -156,7 +203,7 @@ useEffect(() => {
                         onChange={(e) => setClient(e.target.value)}
                         required
                       ><option >Select Client</option>
-                        {customers && customers.map((cust)=>
+                        {customers && customers.map((cust) =>
                           <option value={cust._id}>{cust.custName}</option>
                         )}
                       </select>
@@ -171,17 +218,13 @@ useEffect(() => {
                       <div className="col-12 col-lg-6 mt-2">
                         <div className="mb-3">
                           <input
-                            type="number"
+                            type="text"
+                            maxLength={6}
                             className="form-control rounded-0"
                             placeholder="Pincode"
                             id="exampleInputEmail1"
-                            onChange={(e) =>
-                              setAddress({
-                                ...Address,
-                                pincode: e.target.value,
-                              })
-                            }
                             value={Address.pincode}
+                            onChange={handlePincodeChange}
                             aria-describedby="emailHelp"
                           />
                         </div>
@@ -194,7 +237,8 @@ useEffect(() => {
                             className="form-control rounded-0"
                             placeholder="State"
                             id="exampleInputEmail1"
-                            onChange={(e) => setAddress({ ...Address, state: e.target.value })}
+                            maxLength={30}
+                            onChange={handleStateChange}
                             value={Address.state}
                             aria-describedby="emailHelp"
                           />
@@ -205,10 +249,12 @@ useEffect(() => {
                         <div className="mb-3">
                           <input
                             type="text"
+                            maxLength={30}
                             className="form-control rounded-0"
                             placeholder="City"
                             id="exampleInputEmail1"
-                            onChange={(e) => setAddress({ ...Address, city: e.target.value })}
+                            onChange={handleCityChange}
+                            // onChange={(e) => setAddress({ ...Address, city: e.target.value })}
                             value={Address.city}
                             aria-describedby="emailHelp"
                           />
@@ -219,10 +265,11 @@ useEffect(() => {
                         <div className="mb-3">
                           <input
                             type="text"
+                            maxLength={30}
                             className="form-control rounded-0"
                             placeholder="Country"
                             id="exampleInputEmail1"
-                            onChange={(e) => setAddress({ ...Address, country: e.target.value })}
+                            onChange={handleCountryChange}
                             value={Address.country}
                             aria-describedby="emailHelp"
                           />
@@ -235,6 +282,7 @@ useEffect(() => {
                             className="textarea_edit col-12"
                             id=""
                             name=""
+                            maxLength={70}
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={(e) => setAddress({ ...Address, add: e.target.value })}
                             value={Address.add}
@@ -260,7 +308,7 @@ useEffect(() => {
                         id="name"
                         aria-describedby="emailHelp"
                         required
-                        ></textarea>
+                      ></textarea>
                     </div>
                   </div>
 
@@ -294,32 +342,29 @@ useEffect(() => {
                         <option value={"Guard Tour System"}>Guard Tour System</option>
                         <option value={"Home Automation"}>Home Automation</option>
                         <option value={"IP PA and Communication System"}>IP PA and Communication System</option>
+                        <option value={"CRM"}>CRM</option>
                       </select>
                     </div>
                   </div>
 
-
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label
-                        for="Department"
-                        className="form-label label_text"
-                      >
-                        Contact Person name <RequiredStar />
+                      <label htmlFor="ContactPerson" className="form-label label_text">
+                        Contact Person Name <RequiredStar />
                       </label>
                       <input
                         type="text"
+                        maxLength={30}
                         value={contactPerson}
-                        onChange={(e) => setContactPerson(e.target.value)}
+                        onChange={handleContactPersonName}
                         className="form-control rounded-0"
-                        id="name"
-                        aria-describedby="emailHelp"
+                        id="ContactPerson"
                         required
                       />
                     </div>
                   </div>
 
-                   <div className="col-12 col-lg-6 mt-2">
+                  <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label
                         for="Department"
@@ -329,6 +374,7 @@ useEffect(() => {
                       </label>
                       <input
                         type="email"
+                        maxLength={30}
                         value={contactPersonEmail}
                         onChange={(e) => setContactPersonEmail(e.target.value)}
                         className="form-control rounded-0"
@@ -345,12 +391,14 @@ useEffect(() => {
                         for="Designation"
                         className="form-label label_text"
                       >
-                        Contact Person no <RequiredStar />
+                        Contact Person No. <RequiredStar />
                       </label>
                       <input
-                        type="number"
+                        type="text"
+                        maxLength={10}
                         value={contactNumber}
-                        onChange={(e) => setContactNumber(e.target.value)}
+                        // onChange={(e) => setContactNumber(e.target.value)}
+                        onChange={contactPersonNumber}
                         className="form-control rounded-0"
                         id="name"
                         aria-describedby="emailHelp"
