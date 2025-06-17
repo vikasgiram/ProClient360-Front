@@ -2827,3 +2827,18 @@ width: 65% !important;
 
 }
 
+
+.show {
+  overflow-y: auto;
+  height: 300px;
+}
+
+
+.modal_body_height {
+  max-height: 60vh;
+  max-width: 60vh;
+
+  overflow-y: auto; 
+}
+
+

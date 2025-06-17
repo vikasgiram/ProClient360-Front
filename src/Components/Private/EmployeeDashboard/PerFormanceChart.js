@@ -65,7 +65,7 @@ export const PerFormanceChart = () => {
                                 <input type="checkbox"
                                     checked={isYearView}
                                     onChange={() => setIsYearView(!isYearView)}
-
+        
                                 />
                                 <div className="toggler-slider" >
                                     <div className="toggler-knob"></div>

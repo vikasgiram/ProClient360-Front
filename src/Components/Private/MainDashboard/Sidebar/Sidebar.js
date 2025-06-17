@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useContext,useState } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "../../../../context/UserContext";
 
 
@@ -9,7 +9,7 @@ export const Sidebar = ({ isopen, active }) => {
     // const [, set] = useState(false)
     const [Open, setOpen] = useState(false)
 
-	const { user } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
 
     return (
@@ -41,23 +41,62 @@ export const Sidebar = ({ isopen, active }) => {
             >
                 <ul className="nav d-block">
 
-                {user?.user==='company'?(
-                    <li
-                        title="Dashboard"
-                        className={  active === "dashboard" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/MainDashboard' className="nav-link ">
-                            <img src="static/assets/img/nav/dashboard.png" className="menu-icon" />
-                            <span
-                                className="menu-title"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                Dashboard
-                            </span>
-                        </Link>
-                    </li>
-                ): null}
+                    {user?.user === 'company' ? (
+                        <li
+                            title="Dashboard"
+                            className={active === "dashboard" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/MainDashboard' className="nav-link ">
+                                <img src="static/assets/img/nav/dashboard.png" className="menu-icon" />
+                                <span
+                                    className="menu-title"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Dashboard
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
 
-                    {user?.user==='employee'?(
+
+
+{/* new sales sidebar */}
+
+
+                    {user?.permissions?.includes("viewSales") || user?.user === 'company' ? (
+                        <li title="Sales Master"
+                            className={active === "SalesMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/SalesMasterGrid' className="nav-link ">
+                                <i class="fa-solid ps-3 fa-chart-pie side_icon_fs"></i>
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Sales Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
+                    {/* new marketing sidebar */}
+
+
+                    {user?.permissions?.includes("viewMarketing") || user?.user === 'company' ? (
+                        <li title="Marketing Master"
+                            className={active === "MarketingMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/MarketingMasterGrid' className="nav-link ">
+                                <i class="fa-solid ps-3 fa-chart-simple side_icon_fs"></i>
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Marketing Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
+
+                    {user?.user === 'employee' ? (
                         <li
                             title="Dashboard"
                             className={Open || active === "dashboard" ? " nav-item active" : "nav-item sidebar_item"}>
@@ -71,48 +110,48 @@ export const Sidebar = ({ isopen, active }) => {
                                 </span>
                             </Link>
                         </li>
-                    ): null}
+                    ) : null}
 
-                    {user?.user==='employee'?(
+                    {user?.user === 'employee' ? (
                         <>
+                            <li
+                                title="My Projects"
+                                className={Open || active === "EmployeeTaskGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                                <Link to='/EmployeeTaskGrid' className="nav-link ">
+                                    <i class="fa-solid fa-bars-progress ps-3 side_icon_fs"></i>
+
+                                    <span
+                                        className="menu-title_m"
+                                        style={{ display: isopen ? "" : "none" }}
+                                    >
+                                        My Projects
+                                    </span>
+                                </Link>
+                            </li>
+
+
+                            <li
+                                title="My Service"
+                                className={Open || active === "EmployeeMyServiceMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                                <Link to='/EmployeeMyServiceMasterGrid' className="nav-link ">
+                                    {/* <i class="fa-solid fa-people-line ps-3 side_icon_fs"></i> */}
+                                    <i class="fa-solid fa-envelope ps-3 side_icon_fs"></i>
+
+                                    <span
+                                        className="menu-title_m"
+                                        style={{ display: isopen ? "" : "none" }}
+                                    >
+                                        My Service
+                                    </span>
+                                </Link>
+                            </li>
+                        </>
+
+                    ) : null}
+
                     <li
-                        title="My Projects"
-                        className={Open || active === "EmployeeTaskGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/EmployeeTaskGrid' className="nav-link ">
-                            <i class="fa-solid fa-bars-progress ps-3 side_icon_fs"></i>
-
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                My Projects
-                            </span>
-                        </Link>
-                    </li>
-                    
-
-                    <li
-                        title="My Service"
-                        className={Open || active === "EmployeeMyServiceMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/EmployeeMyServiceMasterGrid' className="nav-link ">
-                            {/* <i class="fa-solid fa-people-line ps-3 side_icon_fs"></i> */}
-                            <i class="fa-solid fa-envelope ps-3 side_icon_fs"></i>
-
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                My Service
-                            </span>
-                        </Link>
-                    </li>
-                    </>
-
-                    ): null}
-
-                        <li
                         title="Ticket Master"
-                        className={  active === "TicketMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                        className={active === "TicketMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
                         <Link to='/TicketMasterGrid' className="nav-link ">
                             {/* <i class="fa-solid fa-circle dic_style  "></i>   */}
                             {/* <i className="fa-brands fa-usps ps-3 side_icon_fs"></i> */}
@@ -127,148 +166,146 @@ export const Sidebar = ({ isopen, active }) => {
                         </Link>
                     </li>
 
-                    {user?.permissions?.includes("viewService") || user?.user==='company'?(
-                    <li
-                        title="Service Master"
-                        className={  active === "ServiceMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/ServiceMasterGrid' className="nav-link ">
-                         
-                            <i class="fa fa-address-card ps-3 side_icon_fs"></i>
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                Service Master
-                            </span>
-                        </Link>
-                    </li>
-                    ): null}
-
-                    {user?.permissions?.includes("viewEmployee") || user?.user==='company'?(  
-                    <li
-                        title="Employee Master"
-                        className={  active === "EmployeeMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/EmployeeMasterGrid' className="nav-link ">
-                            <i class="fa-solid fa-user-group ps-3 side_icon_fs"></i>
-
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                Employee Master
-                            </span>
-                        </Link>
-                    </li>
-                    ): null}
-
-                    {user?.permissions?.includes("viewCustomer") || user?.user==='company'?(
-                    <li
-                        title="Customer Master"
-                        className={  active === "CustomerMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/CustomerMasterGrid' className="nav-link ">
-                            <i class="fa-solid fa-people-line ps-3 side_icon_fs"></i>
-
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                Customer Master
-                            </span>
-                        </Link>
-                    </li>
-                    ): null}
-
-                    {user?.permissions?.includes("viewProject") || user?.user==='company'?(
-                    <li
-                        title="Project Master"
-                        className={  active === "ProjectMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/ProjectMasterGrid' className="nav-link ">
-                            <i class="fa-solid fa-list-check ps-3 side_icon_fs"></i>
-
-
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                Project Master
-                            </span>
-                        </Link>
-                    </li>
-                    ): null}
-
-                    {user?.permissions?.includes("viewDepartment") || user?.user==='company'?(
-                    <li title="Department Master"
-                        className={  active === "DepartmentMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/DepartmentMasterGrid' className="nav-link ">
-                            <i class="fa-brands fa-medium  ps-3 side_icon_fs"></i>
-
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                Department Master
-                            </span>
-                        </Link>
-                    </li>
-                    ): null}
-
-                    {user?.permissions?.includes("viewDesignation") || user?.user==='company'?(
-                    <li
-                        title="Designation Master"
-                        className={  active === "DesignationMasterGird" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/DesignationMasterGird' className="nav-link ">
-                            {/* <i className="fa-solid fa-circle dic_style  "></i>   */}
-                            {/* <i className="fa-solid fa-asterisk ps-3 star_fs" ></i> */}
-                            {/* <i className="fa-brands fa-usps ps-3 side_icon_fs"></i> */}
-                            <i class="fa-solid fa-diamond ps-3 side_icon_fs"></i>
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                Designation Master
-                            </span>
-                        </Link>
-                    </li>
-                    ): null}
-
-                    {user?.permissions?.includes("viewTask") || user?.user==='company'?(
-                    <li
-                        title="Task Master"
-                        className={  active === "TaskMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/TaskMasterGrid' className="nav-link ">
-                            {/* <i class="fa-solid fa-circle dic_style  "></i>   */}
-                            {/* <i className="fa-brands fa-usps ps-3 side_icon_fs"></i> */}
-                            <i class="fa-solid fa-bars-progress ps-3 side_icon_fs"></i>
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                Task Master
-                            </span>
-                        </Link>
-                    </li>
-                    ): null}
-
-                    {user?.permissions?.includes('viewFeedback')?(
+                    {user?.permissions?.includes("viewService") || user?.user === 'company' ? (
                         <li
-                        title="Feedback"
-                        className={Open || active === "EmployeeFeedbackMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                        <Link to='/EmployeeFeedbackMasterGrid' className="nav-link ">
-                            {/* <i className="fa-brands fa-usps ps-3 side_icon_fs"></i> */}
-                            {/* <i class="fa-solid fa-user-group ps-3 side_icon_fs"></i> */}
-                            <i class="fa-solid fa-comments ps-3 side_icon_fs"></i>
+                            title="Service Master"
+                            className={active === "ServiceMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/ServiceMasterGrid' className="nav-link ">
 
-                            <span
-                                className="menu-title_m"
-                                style={{ display: isopen ? "" : "none" }}
-                            >
-                                Feedback
-                            </span>
-                        </Link>
-                    </li>
-                        ):('')} 
+                                <i class="fa fa-address-card ps-3 side_icon_fs"></i>
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Service Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
 
-              
+                    {user?.permissions?.includes("viewEmployee") || user?.user === 'company' ? (
+                        <li
+                            title="Employee Master"
+                            className={active === "EmployeeMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/EmployeeMasterGrid' className="nav-link ">
+                                <i class="fa-solid fa-user-group ps-3 side_icon_fs"></i>
+
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Employee Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
+                    {user?.permissions?.includes("viewCustomer") || user?.user === 'company' ? (
+                        <li
+                            title="Customer Master"
+                            className={active === "CustomerMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/CustomerMasterGrid' className="nav-link ">
+                                <i class="fa-solid fa-people-line ps-3 side_icon_fs"></i>
+
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Customer Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
+                    {user?.permissions?.includes("viewProject") || user?.user === 'company' ? (
+                        <li
+                            title="Project Master"
+                            className={active === "ProjectMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/ProjectMasterGrid' className="nav-link ">
+                                <i class="fa-solid fa-list-check ps-3 side_icon_fs"></i>
+
+
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Project Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
+                    {user?.permissions?.includes("viewDepartment") || user?.user === 'company' ? (
+                        <li title="Department Master"
+                            className={active === "DepartmentMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/DepartmentMasterGrid' className="nav-link ">
+                                <i class="fa-brands fa-medium  ps-3 side_icon_fs"></i>
+
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Department Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
+                    {user?.permissions?.includes("viewDesignation") || user?.user === 'company' ? (
+                        <li
+                            title="Designation Master"
+                            className={active === "DesignationMasterGird" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/DesignationMasterGird' className="nav-link ">
+                                {/* <i className="fa-solid fa-circle dic_style  "></i>   */}
+                                {/* <i className="fa-solid fa-asterisk ps-3 star_fs" ></i> */}
+                                {/* <i className="fa-brands fa-usps ps-3 side_icon_fs"></i> */}
+                                <i class="fa-solid fa-diamond ps-3 side_icon_fs"></i>
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Designation Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
+                    {user?.permissions?.includes("viewTask") || user?.user === 'company' ? (
+                        <li
+                            title="Task Master"
+                            className={active === "TaskMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/TaskMasterGrid' className="nav-link ">
+                                {/* <i class="fa-solid fa-circle dic_style  "></i>   */}
+                                {/* <i className="fa-brands fa-usps ps-3 side_icon_fs"></i> */}
+                                <i class="fa-solid fa-bars-progress ps-3 side_icon_fs"></i>
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Task Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
+                    {user?.permissions?.includes('viewFeedback') ? (
+                        <li
+                            title="Feedback"
+                            className={Open || active === "EmployeeFeedbackMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/EmployeeFeedbackMasterGrid' className="nav-link ">
+                                {/* <i className="fa-brands fa-usps ps-3 side_icon_fs"></i> */}
+                                {/* <i class="fa-solid fa-user-group ps-3 side_icon_fs"></i> */}
+                                <i class="fa-solid fa-comments ps-3 side_icon_fs"></i>
+
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Feedback
+                                </span>
+                            </Link>
+                        </li>
+                    ) : ('')}
 
 
 

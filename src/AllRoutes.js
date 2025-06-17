@@ -30,6 +30,13 @@ import NotFound from "./Components/NotFound";
 import { TicketMasterGrid } from "./Components/Private/MainDashboard/TicketMaster/TicketMaserGrid";
 import Feedback  from "./Components/Public/Feedback";
 import { ServiceMasterGrid } from "./Components/Private/MainDashboard/ServiceMaster/ServiceMasterGrid";
+
+
+import { SalesMasterGrid } from "./Components/Private/MainDashboard/SalesMaster/SalesMasterGrid";
+
+import { MarketingMasterGrid } from "./Components/Private/MainDashboard/MarketingMaster/MarketingMasterGrid";
+
+
 import { EmployeeMyServiceMasterGrid } from "./Components/Private/EmployeeDashboard/EmployeeMyServiceMasterGrid/EmployeeMyServiceMasterGrid";
 import { EmployeeFeedbackMasterGrid } from "./Components/Private/EmployeeDashboard/EmployeesFeedbackMasterGrid/EmployeeFeedbackMasterGrid";
 import ProtectedRoute from "./utils/ProtectedRoute";
@@ -67,6 +74,9 @@ const {user} = useContext(UserContext);
                             <Route exact path="/DesignationMasterGird" element={<DesignationMasterGird />} /> 
                             <Route exact path="/project/:id" element={<TaskSheetMaster />} />
 
+                            <Route exact path="/SalesMasterGrid" element={<SalesMasterGrid />} />
+
+                            <Route exact path="/MarketingMasterGrid" element={<MarketingMasterGrid />} />
                         </>
                         
                     ):null}
@@ -97,7 +107,12 @@ const {user} = useContext(UserContext);
                             <Route exact path="/EmployeeMainDashboard" element={<EmployeeMainDashboard />} />
                             <Route exact path="/EmployeeTaskGrid" element={<EmployeeTaskGrid />} />
                             <Route exact path="/EmployeeMyServiceMasterGrid" element={<EmployeeMyServiceMasterGrid />} />
+          
+                            {/* <Route exact path="/EmployeeMySalesMasterGrid" element={<EmployeeMySalesMasterGrid />} /> */}
+
                             <Route exact path="/EmployeeFeedbackMasterGrid" element={<EmployeeFeedbackMasterGrid />} />
+             
+                            
                         </>
                     ):null}
 
