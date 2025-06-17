@@ -1,31 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
-import { RequiredStar } from "../../../RequiredStar/RequiredStar";
+const actionOptions = [
+  'Requirement Understanding',
+  'Site Visit',
+  'Online Demo',
+  'Proof of Concept (POC)',
+  'Documentation & Planning',
+  'Quotation Submission',
+  'Quotation Discussion',
+  'Follow-Up Call',
+  'Negotiation Call',
+  'Negotiation Meetings',
+  'Deal Status'
+];
 
 const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
 
   const [actionData, setActionData] = useState({
-    feasibility: '',
-    manualAction: '',
-    submissionDateTime: '',
-    date: ''
+    actionType: '',
+    date: '',
+    completion: '',
+    status: '',
+    quotationValue: '' 
   });
+
+  useEffect(() => {
+    if (selectedLead) {
+      setActionData({
+        actionType: '',
+        date: '',
+        completion: '',
+        status: selectedLead.status || '',
+        quotationValue: '' 
+      });
+    }
+  }, [selectedLead]);
+
 
   const handleActionChange = (e) => {
     const { name, value } = e.target;
-    setActionData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'completion') {
+      if (/^\d{0,3}(\.\d{0,2})?$/.test(value)) {
+        const num = parseFloat(value);
+        if (value === "" || (num >= 0 && num <= 100)) {
+          setActionData(prev => ({ ...prev, [name]: value }));
+        }
+      }
+    } else {
+      if (name === 'actionType' && value !== 'Quotation Submission') {
+        setActionData(prev => ({ ...prev, [name]: value, quotationValue: '' }));
+      } else {
+        setActionData(prev => ({ ...prev, [name]: value }));
+      }
+    }
   };
 
   const handleActionSubmit = (e) => {
     e.preventDefault();
-    if (!actionData.feasibility || !actionData.manualAction) {
-      toast.error('Please fill in all action fields.');
-      return;
-    }
 
-    if (actionData.feasibility === 'feasible' && !actionData.date) {
-      toast.error('Please select a follow-up date.');
+    const isQuotationRequired = actionData.actionType === 'Quotation Submission';
+    if (!actionData.status || !actionData.actionType || !actionData.date || !actionData.completion || (isQuotationRequired && !actionData.quotationValue)) {
+      toast.error('Please fill in all required fields, including Quotation Amount.');
       return;
     }
 
@@ -40,21 +77,22 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
       timeZone: 'Asia/Kolkata'
     });
 
-    setActionData(prev => ({ ...prev, submissionDateTime: dateTime }));
-
     const updatedFormData = {
       ...selectedLead,
+      status: actionData.status,
       actionDetails: {
-        feasibility: actionData.feasibility,
-        manualAction: actionData.manualAction,
+        manualAction: actionData.actionType,
         submissionDateTime: dateTime,
-        ...(actionData.feasibility === 'feasible' && { followUpDate: actionData.date })
+        followUpDate: actionData.date,
+        completionPercentage: actionData.completion,
+
+        quotationValue: actionData.quotationValue || null
       }
     };
 
     onUpdate(selectedLead._id, updatedFormData);
 
-    toast.success(`Action submitted at ${dateTime}`);
+    toast.success(`Action submitted successfully!`);
     onClose();
   };
 
@@ -63,9 +101,10 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
       display: "flex",
       alignItems: "center",
       backgroundColor: "#00000050",
-      zIndex: 1070
+      zIndex: 1070,
+    
     }}>
-      <div className="modal-dialog modal-md">
+      <div className="modal-dialog" style={{ maxWidth: '680px' }}>
         <div className="modal-content p-3">
           <form onSubmit={handleActionSubmit}>
             <div className="modal-header pt-0">
@@ -75,85 +114,100 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
 
             <div className="modal-body">
               <div className="row g-3">
-                <div className="col-12">
-                  <label className="form-label fw-bold">Feasibility <RequiredStar /></label>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="feasibility"
-                      id="feasible"
-                      value="feasible"
-                      onChange={handleActionChange}
-                      checked={actionData.feasibility === 'feasible'}
-                      required
-                    />
-                    <label className="form-check-label" htmlFor="feasible">
-                      Feasible
-                    </label>
-                  </div>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="radio"
-                      name="feasibility"
-                      id="notFeasible"
-                      value="not-feasible"
-                      onChange={handleActionChange}
-                      checked={actionData.feasibility === 'not-feasible'}
-                      required
-                    />
-                    <label className="form-check-label" htmlFor="notFeasible">
-                      Not Feasible
-                    </label>
-                  </div>
-                </div>
 
-                <div className="col-12">
-                  {actionData.feasibility === 'feasible' && (
-                    <>
-                      <label className="form-label fw-bold">
-                        Next Follow-up Date <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="datetime-local"
-                        className="form-control bg_edit"
-                        name="date"
-                        value={actionData.date || ''}
-                        onChange={handleActionChange}
-                        required
-                      />
-                    </>
-                  )}
+                <div className="col-12" style={{ width: 320 }}>
+                  <label htmlFor="status" className="form-label fw-bold">Status</label>
+                  <select
+                    id="status"
+                    className="form-select bg_edit"
+                    name="status"
+                    onChange={handleActionChange}
+                    value={actionData.status}
+                    required
+                  >
+                    <option value="" disabled>-- Select a status --</option>
+                    <option value="Win">Win</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Lost">Lost</option>
+                  </select>
                 </div>
-
-                <div className="col-12">
-                  <label htmlFor="manualAction" className="form-label fw-bold"> Action :- <RequiredStar /></label>
-                  <textarea
+                 
+                 <div className="col-12" style={{ width: 240 }}>
+                  <label htmlFor="completion" className="form-label fw-bold">Completion (%)</label>
+                  <input
+                    type="text"
                     className="form-control"
-                    id="manualAction"
-                    name="manualAction"
-                    rows="4"
-                    placeholder="Enter action details..."
-                    value={actionData.manualAction}
+                    id="completion"
+                    name="completion"
+                    placeholder="Enter work completion %"
+                    maxLength={6}
+                    value={actionData.completion}
                     onChange={handleActionChange}
                     required
-                  ></textarea>
+                  />
                 </div>
 
-                {actionData.submissionDateTime && (
-                  <div className="col-12">
-                    <div className="alert alert-info">
-                      <strong>Submission Date & Time:</strong> {actionData.submissionDateTime}
-                    </div>
+
+                <div className="col-12" style={{ width: 320 }}>
+                  <label htmlFor="actionType" className="form-label fw-bold">Steps</label>
+                  <select
+                    id="actionType"
+                    name="actionType"
+                    className="form-select"
+                    value={actionData.actionType}
+                    onChange={handleActionChange}
+                    required
+                  >
+                    <option value="" disabled>-- Select an action --</option>
+                    {actionOptions.map((action, index) => (
+                      <option key={index} value={action}>
+                        {index + 1}. {action}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+
+                {actionData.actionType === 'Quotation Submission' && (
+                  <div className="col-12" style={{ width: 250 }}>
+                    <label htmlFor="quotationValue" className="form-label fw-bold">
+                      Quotation Amount (₹)
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="quotationValue"
+                      name="quotationValue"
+                      placeholder="Enter quotation amount"
+                      value={actionData.quotationValue}
+                      onChange={handleActionChange}
+                      required
+                    />
                   </div>
                 )}
+
+                
+
+                <div className="col-12" style={{ width: 320 }}>
+                  <label htmlFor="date" className="form-label fw-bold">Next Follow-up Date</label>
+                  <input
+                    id="date"
+                    type="datetime-local"
+                    className="form-control bg_edit"
+                    name="date"
+                    value={actionData.date || ''}
+                    onChange={handleActionChange}
+                    required
+                  />
+                </div>
+
               </div>
             </div>
 
             <div className="modal-footer border-0 justify-content-start">
-              <button type="submit" className="btn btn-outline-success rounded-0">Submit</button>
-              <button type="button" onClick={onClose} className="btn btn-outline-danger me-2 rounded-0">Cancel</button>
+              <button type="submit" className="btn addbtn rounded-0 add_button px-4 ">Submit</button>
+              <button type="button" onClick={onClose} className="btn addbtn rounded-0 Cancel_button px-4">Cancel</button>
             </div>
           </form>
         </div>
