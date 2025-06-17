@@ -173,23 +173,23 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                     </div>
                   </div>
 
-                  <div className={formData.feasibility === 'not-feasible' ? 'row' : 'd-none'}>
-                    <div className="col-12 mt-3">
-                      <label htmlFor="manualAction" className="form-label fw-bold">Remarks <RequiredStar /></label>
-                      <textarea
-                        className="form-control rounded-0"
-                        id="manualAction"
-                        name="manualAction"
-                        rows="4"
-                        placeholder="Enter the detailed reason for non-feasibility..."
-                        value={formData.manualAction}
-                        onChange={handleChange}
-                      ></textarea>
-                    </div>
+                <div className={formData.feasibility === 'not-feasible' ? 'row' : 'd-none'}>
+                  <div className="col-12 mt-3">
+                    <label htmlFor="manualAction" className="form-label fw-bold">Remarks <RequiredStar /></label>
+                    <textarea
+                      className="form-control rounded-0"
+                      id="manualAction"
+                      name="manualAction"
+                      rows="4"
+                      placeholder="Enter the detailed reason for non-feasibility..."
+                      value={formData.manualAction}
+                      onChange={handleChange}
+                    ></textarea>
                   </div>
                 </div>
               </div>
-            </div>
+            </div>  
+          </div>
 
             <div className="modal-footer border-0 justify-content-start">
               <button type="submit" className="btn addbtn rounded-0 add_button px-4">Submit</button>
