@@ -2,11 +2,11 @@ import { useState, useContext, useEffect } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import toast from 'react-hot-toast';
-import useServices from "../../../../hooks/service/useService";
 import AddLeadMaster from "./PopUp/AddLeadMaster";
-import { formatDate } from "../../../../utils/formatDate";
+import { formatDate, formatDateforTaskUpdate } from "../../../../utils/formatDate";
 import SalesDashboardCards from './SalesDashboardCards';
 import { UserContext } from "../../../../context/UserContext";
+import useLeads from '../../../../hooks/leads/useLeads';
 
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
@@ -19,7 +19,7 @@ export const SalesMasterGrid = () => {
     setIsOpen(!isopen);
   };
 
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [addpop, setIsAddModalVisible] = useState(false);
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
   const [detailsServicePopUp, setDetailsServicePopUp] = useState(false);
   
@@ -30,7 +30,7 @@ export const SalesMasterGrid = () => {
   const [selectedLeadId, setSelectedLeadId] = useState(null);
 
   const { user } = useContext(UserContext);
-  const [filters, setFilters] = useState({ priority: null, status: null, serviceType: null, source: null });
+  const [filters, setFilters] = useState({ status: null, date: null, source: null });
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
@@ -41,7 +41,9 @@ export const SalesMasterGrid = () => {
   });
   const itemsPerPage = 10;
 
-  const { data, loading, error, updateService } = useServices(pagination.currentPage, itemsPerPage, filters);
+  // call the useMyLeads hook to fetch leads data
+
+  const { data, loading, error, updateService } = useLeads(pagination.currentPage, itemsPerPage, filters);
 
   useEffect(() => {
     if (data) {
@@ -109,6 +111,7 @@ export const SalesMasterGrid = () => {
 
   const handleChange = (filterType, value) => {
     setFilters(prevFilters => ({ ...prevFilters, [filterType]: value || null }));
+    console.log("Filters updated:", { ...filters, [filterType]: value || null });
     handlePageChange(1);
   };
 
@@ -116,31 +119,8 @@ export const SalesMasterGrid = () => {
   const handleCloseAddModal = () => setIsAddModalVisible(false);
 
   const handleAddLeadSubmit = async (leadData) => {
-    console.log("New Lead to be created:", leadData);
-    toast.success("Lead added successfully!");
+    
     handleCloseAddModal();
-  };
-
-  // static data 
-  const sampleLead = {
-      _id: 'static-id-123',
-      name: 'Nilkanth p',
-      company: 'Daccess Security Systems Pvt Ltd',
-      product: 'Surveillance System',
-      products: 'Surveillance System',
-      email: 'nilkanth@gmail.com',
-      contact: '+91-9876543210',
-      date: new Date(),
-      sources: 'IndiaMart',
-      status: 'ongoing',
-      value: '50000',
-      address: {
-        pincode: '411001',
-        state: 'Maharashtra',
-        city: 'Pune',
-        country: 'India',
-        add: '123 Tech Park, Hinjewadi'
-      }
   };
 
   return (
@@ -200,17 +180,17 @@ export const SalesMasterGrid = () => {
                         <select
                           className="form-select bg_edit"
                           name="status"
-                          onChange={(e) => handleChange('status', e.target.value)}
-                          value={filters.status || ""}
+                          onChange={(e) => handleChange('source', e.target.value)}
+                          value={filters.source || ""}
                         >
                           <option value="">Sources....</option>
                           <option value="Direct">Direct</option>
-                          <option value="allEnquiries">IndiaMart</option>
-                          <option value="Win">TradeIndia</option>
-                          <option value="notFisible">Facebook</option>
-                          <option value="Ongoing">LinkedIn</option>
-                          <option value="Pending">Email</option>
-                          <option value="Lost">Google</option>
+                          <option value="IndiaMart">IndiaMart</option>
+                          <option value="TradeIndia">TradeIndia</option>
+                          <option value="Facebook">Facebook</option>
+                          <option value="LinkedIn">LinkedIn</option>
+                          <option value="Email">Email</option>
+                          <option value="Google">Google</option>
                         </select>
                       </div>
 
@@ -254,33 +234,42 @@ export const SalesMasterGrid = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="broder my-4">
-                                    <tr>
-                                        <td>1</td>
-                                        <td>{sampleLead.name}</td>
-                                        <td>{sampleLead.company}</td>
-                                        <td>{sampleLead.product}</td>
-                                        <td>{sampleLead.email}</td>
-                                        <td>{formatDate(sampleLead.date)}</td>
-                                        <td>{sampleLead.sources}</td>
+                                  {data?.leads?.length > 0 ? (
+                                    data.leads.map((lead, index) => (
+                                    <tr key={lead._id}>
+                                        <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                        <td>{lead.SENDER_NAME||"Not avaliable."}</td>
+                                        <td>{lead.SENDER_COMPANY||"Not avaliable."}</td>
+                                        <td>{lead.QUERY_PRODUCT||"Not avaliable."}</td>
+                                        <td>{lead.SENDER_EMAIL||"Not avaliable."}</td>
+                                        <td>{formatDateforTaskUpdate(lead.createdAt)}</td>
+                                        <td>{lead.SOURCE}</td>
                                         <td>
-                                            <span className="badge bg-warning text-dark">{sampleLead.status}</span>
+                                            <span className="badge bg-warning text-dark">{lead.STATUS}</span>
                                         </td>
                                         <td>
                                             
                                             {/* Edit Button */}
                                             {(user?.permissions?.includes('updateLeadMaster') || user?.user === 'company') &&
-                                                <span onClick={() => handleUpdate(sampleLead)} title="Edit Lead">
+                                                <span onClick={() => handleUpdate(lead)} title="Edit Lead">
                                                     <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
                                                 </span>
                                             }
 
                                              {/* View Button */}
-                                            <span onClick={() => handleDetailsPopUpClick(sampleLead)} title="View Details">
+                                            <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
                                                 <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
                                             </span>
                                         
                                         </td>
                                     </tr>
+                                    ))) : (
+                                      <tr>
+                                        <td colSpan="9" className="text-center">
+                                          No Leads found
+                                        </td>
+                                      </tr>
+                                    )}
                                 </tbody>
                             </table>
                             </div>
@@ -292,7 +281,7 @@ export const SalesMasterGrid = () => {
         </div>
       </div>
 
-      {isAddModalVisible && (
+      {addpop && (
         <AddLeadMaster onAddLead={handleAddLeadSubmit} onClose={handleCloseAddModal} />
       )}
 

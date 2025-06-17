@@ -10,6 +10,7 @@ import { UserContext } from "../../../../context/UserContext";
 import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
 import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
 import UpdateSalesPopUp from "./PopUp/UpdateMarketingPopUp";
+import useLeads from "../../../../hooks/leads/useLeads";
 
 export const MarketingMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -20,15 +21,15 @@ export const MarketingMasterGrid = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
   const [detailsServicePopUp, setDetailsServicePopUp] = useState(false);
-  
-  const [selectedLead, setSelectedLead] = useState(null); 
+
+  const [selectedLead, setSelectedLead] = useState(null);
   const [activeSource, setActiveSource] = useState(null);
 
   const [deletePopUpShow, setDeletePopUpShow] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
 
   const { user } = useContext(UserContext);
-  const [filters, setFilters] = useState({ priority: null, status: null, serviceType: null, source: null });
+  const [filters, setFilters] = useState({ status: null, source: null });
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
@@ -39,7 +40,9 @@ export const MarketingMasterGrid = () => {
   });
   const itemsPerPage = 10;
 
-  const { data, loading, error, updateService } = useServices(pagination.currentPage, itemsPerPage, filters);
+  const { data, loading, error, updateService } = useLeads(pagination.currentPage, itemsPerPage, filters);
+
+  console.log(data)
 
   useEffect(() => {
     if (data) {
@@ -60,14 +63,14 @@ export const MarketingMasterGrid = () => {
     setSelectedLead(lead);
     setUpdatePopUpShow(true);
   };
-  
+
   const handleDelete = (leadId) => {
     setSelectedLeadId(leadId);
     setDeletePopUpShow(true);
   };
-  
+
   const handleDeleteConfirm = async () => {
-    if(!selectedLeadId) return;
+    if (!selectedLeadId) return;
     try {
       console.log("Deleting lead with ID:", selectedLeadId);
       toast.success("Lead deleted successfully!");
@@ -107,6 +110,7 @@ export const MarketingMasterGrid = () => {
 
   const handleChange = (filterType, value) => {
     setFilters(prevFilters => ({ ...prevFilters, [filterType]: value || null }));
+    console.log(filterType, value)
     handlePageChange(1);
   };
 
@@ -119,27 +123,6 @@ export const MarketingMasterGrid = () => {
     handleCloseAddModal();
   };
 
-  // static data 
-  const sampleLead = {
-      _id: 'static-id-123',
-      name: 'Nilkanth p',
-      company: 'Daccess Security Systems Pvt Ltd',
-      product: 'Surveillance System',
-      products: 'Surveillance System',
-      email: 'nilkanth@gmail.com',
-      contact: '+91-9876543210',
-      date: new Date(),
-      sources: 'IndiaMart',
-      status: 'ongoing',
-      value: '50000',
-      address: {
-        pincode: '411001',
-        state: 'Maharashtra',
-        city: 'Pune',
-        country: 'India',
-        add: '123 Tech Park, Hinjewadi'
-      }
-  };
 
   return (
     <>
@@ -155,26 +138,28 @@ export const MarketingMasterGrid = () => {
                 marginLeft: isopen ? "" : "125px",
               }}
             >
-                <div className="content-wrapper ps-3 ps-md-0 pt-3">
-                     <div className="row px-2 py-1">
-                        <div className="col-12 col-lg-4">
-                            <h5 className="text-white py-2">Marketing Master</h5>
-                        </div>
-                        
-                    </div>
+              <div className="content-wrapper ps-3 ps-md-0 pt-3">
+                <div className="row px-2 py-1">
+                  <div className="col-12 col-lg-4">
+                    <h5 className="text-white py-2">Marketing Master</h5>
+                  </div>
 
-                    <SalesDashboardCards
-                        totalLeadServiceCountCount={(data?.statusCounts?.onGoing || 0)  + (data?.statusCounts?.notFisible || 0)}
-                        allLeadServiceCount={data?.statusCounts?.allEnquiries || 0}
-                        onGoingServiceCount={data?.statusCounts?.onGoing || 0}
-                        notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
-                    />
+                </div>
+
+                <SalesDashboardCards
+                  totalSalesCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.PendingfollowUp || 0) + (data?.statusCounts?.notFisible || 0) + (data?.statusCounts?.Win || 0) + (data?.statusCounts?.Lost || 0)}
+                  allEnquiriesServiceCount={data?.statusCounts?.allEnquiries || 0}
+                  ongoingServiceCount={data?.statusCounts?.ongoing || 0}
+                  pendingFollowUpServiceCount={data?.statusCounts?.PendingfollowUp || 0}
+                  notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
+                  winServiceCount={data?.statusCounts?.Win || 0}
+                  lostServiceCount={data?.statusCounts?.Lost || 0}
+                />
 
                 <div className="row align-items-center p-2 m-1">
-                  <div className="col-12 col-lg-6"></div>
-                  <div className="col-12 col-lg-6 ms-auto text-end">
-                    <div className="row g-2">
-                      <div className="col">
+                  <div className="col-12 col-lg-4  ms-auto text-end">
+                    <div className="row ms-auto">
+                      <div className="col-12 col-lg-6 mt-4">
                         <input
                           type="date"
                           className="form-control bg_edit"
@@ -184,7 +169,7 @@ export const MarketingMasterGrid = () => {
                         />
                       </div>
 
-                      <div className="col">
+                      <div className="col-12 col-lg-6 mt-4">
                         <select
                           className="form-select bg_edit"
                           name="status"
@@ -192,93 +177,91 @@ export const MarketingMasterGrid = () => {
                           value={filters.status || ""}
                         >
                           <option value="">Sources....</option>
-                          <option value="allEnquiries">IndiaMart</option>
-                          <option value="Win">TradeIndia</option>
-                          <option value="notFisible">Facebook</option>
-                          <option value="OnGoing">LinkedIn</option>
-                          <option value="Pending">Email</option>
-                          <option value="Lost">Google</option>
+                          <option value="IndiaMart">IndiaMart</option>
+                          <option value="TradeIndia">TradeIndia</option>
+                          <option value="Facebook">Facebook</option>
+                          <option value="LinkedIn">LinkedIn</option>
+                          <option value="Email">Email</option>
+                          <option value="Google">Google</option>
+                          <option value="Direct">Direct</option>
                         </select>
                       </div>
 
-                      <div className="col">
-                        <select
-                          className="form-select bg_edit"
-                          name="status"
-                          onChange={(e) => handleChange('status', e.target.value)}
-                          value={filters.status || ""}
-                        >
-                          <option value="">Status....</option>
-                          <option value="notFisible">Not Feasible</option>
-                          <option value="Ongoing">Ongoing</option>
-                       
-                        </select>
-                      </div>
+
                     </div>
                   </div>
                 </div>
 
 
-                    <div className="row align-items-center p-2 m-1">
-                    </div>
-
-                    <div className="row bg-white p-2 m-1 border rounded">
-                        <div className="col-12 py-2">
-                            <div className="table-responsive">
-                            <table className="table table-striped table-class" id="table-id">
-                                <thead>
-                                    <tr className="th_border">
-                                        <th>Sr.No</th>
-                                        <th>Contact Name</th>
-                                        <th>Company Name</th>
-                                        <th>Product</th>
-                                        <th>Email</th>
-                                        <th>Date</th>
-                                        <th>Sources</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="broder my-4">
-                                    <tr>
-                                        <td>1</td>
-                                        <td>{sampleLead.name}</td>
-                                        <td>{sampleLead.company}</td>
-                                        <td>{sampleLead.product}</td>
-                                        <td>{sampleLead.email}</td>
-                                        <td>{formatDate(sampleLead.date)}</td>
-                                        <td>{sampleLead.sources}</td>
-                                        <td>
-                                            <span className="badge bg-warning text-dark">{sampleLead.status}</span>
-                                        </td>
-                                        <td>
-                                            
-                                            {/* Edit Button */}
-                                            {(user?.permissions?.includes('updateLeadMaster') || user?.user === 'company') &&
-                                                <span onClick={() => handleUpdate(sampleLead)} title="Edit Lead">
-                                                    <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
-                                                </span>
-                                            }
-
-                                             {/* View Button */}
-                                            <span onClick={() => handleDetailsPopUpClick(sampleLead)} title="View Details">
-                                                <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
-                                            </span>
-                                        
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            </div>
-                        </div>
-                    </div>
+                <div className="row align-items-center p-2 m-1">
                 </div>
+
+                <div className="row bg-white p-2 m-1 border rounded">
+                  <div className="col-12 py-2">
+                    <div className="table-responsive">
+                      <table className="table table-striped table-class" id="table-id">
+                        <thead>
+                          <tr className="th_border">
+                            <th>Sr.No</th>
+                            <th>Contact Name</th>
+                            <th>Company Name</th>
+                            <th>Product</th>
+                            <th>Email</th>
+                            <th>Date</th>
+                            <th>Sources</th>
+                            {/* <th>Status</th> */}
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="broder my-4">
+                          {data?.leads?.length > 0 ? (
+                            data.leads.map((leads, index) => (
+                              <tr >
+                                <td>{index + 1}</td>
+                                <td>{leads.SENDER_NAME}</td>
+                                <td>{leads.SENDER_COMPANY}</td>
+                                <td>{leads.QUERY_PRODUCT_NAME}</td>
+                                <td>{leads.SENDER_EMAIL}</td>
+                                <td>{leads.createdAt}</td>
+                                <td>{leads.SOURCE}</td>
+                                {/* <td>{leads.STATUS}</td> */}
+                                <td>
+
+                                  {/* Edit Button */}
+                                  {(user?.permissions?.includes('updateLeadMaster') || user?.user === 'company') &&
+                                    <span onClick={() => handleUpdate(leads)} title="Edit Lead">
+                                      <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
+                                    </span>
+                                  }
+
+                                  {/* View Button */}
+                                  <span onClick={() => handleDetailsPopUpClick(leads)} title="View Details">
+                                    <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
+                                  </span>
+
+                                </td>
+                              </tr>
+
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="9" className="text-center">
+                                No data found
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-     
+
 
       {UpdatePopUpShow && selectedLead && (
         <UpdateSalesPopUp
@@ -291,17 +274,17 @@ export const MarketingMasterGrid = () => {
         />
       )}
 
-      
+
       {detailsServicePopUp && selectedLead && (
-          <ViewServicePopUp
-              closePopUp={() => {
-                setDetailsServicePopUp(false);
-                setSelectedLead(null);
-              }}
-              selectedService={selectedLead}
-          />
+        <ViewServicePopUp
+          closePopUp={() => {
+            setDetailsServicePopUp(false);
+            setSelectedLead(null);
+          }}
+          selectedService={selectedLead}
+        />
       )}
-    
+
       {loading && (
         <div className="overlay">
           <span className="loader"></span>

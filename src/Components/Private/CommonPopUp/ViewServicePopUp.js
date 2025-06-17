@@ -102,9 +102,9 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                     {formatDateforupdate(service.ticket.date)}
                   </div>
 
-                  {service.status==="Stuck"?<div class="col-12">
+                  {service.status === "Stuck" ? <div class="col-12">
                     <h5>This Service is Stuck due to: <span className="text-danger text-xl-center"> {service.stuckReason}</span></h5>
-                  </div>:""}
+                  </div> : ""}
                 </div>
               </div>
               {previousActions ? (

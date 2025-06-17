@@ -18,6 +18,7 @@ const useLeads = (page = 1, limit = 10, filters = {}) => {
           limit,
           ...(filters.source && { source: filters.source }),
           ...(filters.date && { date: filters.date }),
+          ...(filters.status && { status: filters.status }),
         };
 
         const response = await axios.get(url, {
@@ -44,7 +45,7 @@ const useLeads = (page = 1, limit = 10, filters = {}) => {
     };
 
     fetchLeads();
-  }, [page, limit, filters.source, filters.date]);
+  }, [page, limit, filters.source, filters.date, filters.status]);
 
   return { data, loading, error };
 };
