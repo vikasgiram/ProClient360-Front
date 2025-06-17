@@ -175,6 +175,7 @@ export const SalesMasterGrid = () => {
                         totalSalesCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.PendingfollowUp || 0) + (data?.statusCounts?.notFisible || 0) + (data?.statusCounts?.Win || 0) + (data?.statusCounts?.Lost || 0)}
                         allEnquiriesServiceCount={data?.statusCounts?.allEnquiries || 0}
                         ongoingServiceCount={data?.statusCounts?.ongoing || 0}
+                        todayServiceCount={data?.statusCounts?.today || 0}
                         pendingFollowUpServiceCount={data?.statusCounts?.PendingfollowUp || 0}
                         notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
                         winServiceCount={data?.statusCounts?.Win || 0}

@@ -164,13 +164,10 @@ export const MarketingMasterGrid = () => {
                     </div>
 
                     <SalesDashboardCards
-                        totalSalesCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.PendingfollowUp || 0) + (data?.statusCounts?.notFisible || 0) + (data?.statusCounts?.Win || 0) + (data?.statusCounts?.Lost || 0)}
-                        allEnquiriesServiceCount={data?.statusCounts?.allEnquiries || 0}
-                        ongoingServiceCount={data?.statusCounts?.ongoing || 0}
-                        pendingFollowUpServiceCount={data?.statusCounts?.PendingfollowUp || 0}
+                        totalLeadServiceCountCount={(data?.statusCounts?.onGoing || 0)  + (data?.statusCounts?.notFisible || 0)}
+                        allLeadServiceCount={data?.statusCounts?.allEnquiries || 0}
+                        onGoingServiceCount={data?.statusCounts?.onGoing || 0}
                         notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
-                        winServiceCount={data?.statusCounts?.Win || 0}
-                        lostServiceCount={data?.statusCounts?.Lost || 0}
                     />
 
                 <div className="row align-items-center p-2 m-1">
@@ -198,7 +195,7 @@ export const MarketingMasterGrid = () => {
                           <option value="allEnquiries">IndiaMart</option>
                           <option value="Win">TradeIndia</option>
                           <option value="notFisible">Facebook</option>
-                          <option value="Ongoing">LinkedIn</option>
+                          <option value="OnGoing">LinkedIn</option>
                           <option value="Pending">Email</option>
                           <option value="Lost">Google</option>
                         </select>
