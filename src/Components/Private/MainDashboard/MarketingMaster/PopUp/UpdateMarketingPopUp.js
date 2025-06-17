@@ -187,7 +187,7 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div>  
           </div>
 
           <div className="modal-footer border-0 justify-content-start">
