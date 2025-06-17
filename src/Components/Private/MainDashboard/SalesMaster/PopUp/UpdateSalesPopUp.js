@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { RequiredStar } from '../../../RequiredStar/RequiredStar';
 
 const actionOptions = [
   'Requirement Understanding',
@@ -116,7 +117,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
               <div className="row g-3">
 
                 <div className="col-12" style={{ width: 320 }}>
-                  <label htmlFor="status" className="form-label fw-bold">Status</label>
+                  <label htmlFor="status" className="form-label fw-bold">Status<RequiredStar/></label>
                   <select
                     id="status"
                     className="form-select bg_edit"
@@ -134,7 +135,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
                 </div>
                  
                  <div className="col-12" style={{ width: 240 }}>
-                  <label htmlFor="completion" className="form-label fw-bold">Completion (%)</label>
+                  <label htmlFor="completion" className="form-label fw-bold">Completion (%)<RequiredStar/></label>
                   <input
                     type="text"
                     className="form-control"
@@ -150,7 +151,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
 
 
                 <div className="col-12" style={{ width: 320 }}>
-                  <label htmlFor="actionType" className="form-label fw-bold">Steps</label>
+                  <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar/></label>
                   <select
                     id="actionType"
                     name="actionType"
