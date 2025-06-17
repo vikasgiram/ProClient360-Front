@@ -134,7 +134,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
                   </select>
                 </div>
                  
-                 <div className="col-12" style={{ width: 240 }}>
+                 <div className="col-12" style={{ width: 300 }}>
                   <label htmlFor="completion" className="form-label fw-bold">Completion (%)<RequiredStar/></label>
                   <input
                     type="text"
