@@ -13,7 +13,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
 
     const [customers, setCustomers] = useState([]);
-    const [POCopy, setPOCopy] = useState(null);
+    const [POCopy, setPOCopy] = useState(selectedProject?.POCopy || "");
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
 
@@ -77,7 +77,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         const { name, value,type,files } = event.target;
         setProjects((prevProjects) => ({ ...prevProjects, [name]: value }));
      
-      
+        if(name === '' &&'/^\d+$/')
         
         if (name === 'custId') {
             setProjects((prevProjects) => ({
@@ -125,8 +125,9 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                 ...address 
             },POCopy
         }
-        if(!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payfterCompletion || !updatedProject.remark){
+        if(!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion || !updatedProject.remark){
             setLoading(false);
+            console.log(updatedProject,"updateProject");
             return toast.error("Please fill all fields");
         }
         if(Number(updatedProject.advancePay) + Number(updatedProject.payAgainstDelivery) + Number(updatedProject.payfterCompletion) > 100){
@@ -314,7 +315,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 onChange={handleChange}
                                                 value={projects?.category}
                                             >
-                                                <option selected>-- Select Category Name --</option>
+                                                <option selected>{projects?.category}</option>
                                                 <option value="Surveillance System">Surveillance System</option>
                                                 <option value="Access Control System">Access Control System</option>
                                                 <option value="Turnkey Project">Turnkey Project</option>
@@ -330,6 +331,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 <option value="Guard Tour System">Guard Tour System</option>
                                                 <option value="Home Automation">Home Automation</option>
                                                 <option value="IP PA and Communication System">IP PA and Communication System</option>
+                                                <option value="CRMS">CRMS</option>
                                             </select>
                                         </div>
                                     </div>
@@ -380,9 +382,14 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                     <label for="advancePay" className="form-label label_text">     Advance Payment <RequiredStar />
                                                     </label>
                                                     <input type="text"
-                                                        pattern="[0-9]*" maxLength={3} className="form-control rounded-0" id="advancePay"
+                                                        pattern="^\d+$" 
+                                                        maxLength={3} 
+                                                        className="form-control rounded-0" 
+                                                        id="advancePay"
                                                         name="advancePay"
-                                                        onChange={handleChange} value={projects?.advancePay} aria-describedby="mobileNoHelp" />
+                                                        onChange={handleChange} 
+                                                        value={projects?.advancePay} 
+                                                        aria-describedby="mobileNoHelp" />
                                                 </div>
                                             </div>
                                             <div className="col-12 col-lg-6 mt-2" >

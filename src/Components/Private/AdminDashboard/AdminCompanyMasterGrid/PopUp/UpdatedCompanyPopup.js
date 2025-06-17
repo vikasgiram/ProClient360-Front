@@ -13,11 +13,11 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
   // console.log(selectedCompany.subDate,"subDate");
 
   const [Address, setAddress] = useState(company.Address || {
+    add: "",
     pincode: "",
     state: "",
     city: "",
     country: "",
-    add: "",
   });
   
   const [subDate, setSubDate] = useState(formatDateforupdateSubcription(company.subDate));
@@ -39,7 +39,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
         setAddress(data);
       }
     };
-    if(Address.pincode > 0)
+    if(Address.pincode.length === 6)
       fetchData();
   }, [Address.pincode]);
 
@@ -71,14 +71,10 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
       setLoading(false);
       return toast.error("Admin Name can't be empty or Invalid");
     }
-    if(updatedCompany.subDate === ""|| notPastDate(updatedCompany.subDate)===false) {
+    if(updatedCompany.subDate === "") {
       setLoading(false);
-      return toast.error("Subscription End Date can't be empty or in past date");
+      return toast.error("Subscription End Date can't be empty");
     }
-    if(updatedCompany.subDate < new Date().toISOString().split("T")[0]) {
-      setLoading(false);
-      return toast.error("Subscription End Date can't be past date");
-      }
     if(updatedCompany?.Address?.add === "") {
       setLoading(false);
       return toast.error("Address can't be empty or Invalid");
