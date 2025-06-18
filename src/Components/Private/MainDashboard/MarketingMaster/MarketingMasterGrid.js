@@ -2,14 +2,10 @@ import { useState, useContext, useEffect } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import toast from 'react-hot-toast';
-import useServices from "../../../../hooks/service/useService";
-import { formatDate } from "../../../../utils/formatDate";
-import SalesDashboardCards from './MarketingDashboardCards';
+import MarketingDashboardCards from './MarketingDashboardCards';
 import { UserContext } from "../../../../context/UserContext";
-
 import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
-import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
-import UpdateSalesPopUp from "./PopUp/UpdateMarketingPopUp";
+import UpdateMarketingPopUp from "./PopUp/UpdateMarketingPopUp";
 import useLeads from "../../../../hooks/leads/useLeads";
 
 export const MarketingMasterGrid = () => {
@@ -18,24 +14,24 @@ export const MarketingMasterGrid = () => {
     setIsOpen(!isopen);
   };
 
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  // const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
+
   const [detailsServicePopUp, setDetailsServicePopUp] = useState(false);
 
   const [selectedLead, setSelectedLead] = useState(null);
-  const [activeSource, setActiveSource] = useState(null);
-
-  const [deletePopUpShow, setDeletePopUpShow] = useState(false);
-  const [selectedLeadId, setSelectedLeadId] = useState(null);
 
   const { user } = useContext(UserContext);
+
   const [filters, setFilters] = useState({ status: null, source: null });
+
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
     totalServices: 0,
     limit: 10,
-    hasNextPage: false,
+    hasNextPage: true,
     hasPrevPage: false,
   });
   const itemsPerPage = 10;
@@ -64,23 +60,7 @@ export const MarketingMasterGrid = () => {
     setUpdatePopUpShow(true);
   };
 
-  const handleDelete = (leadId) => {
-    setSelectedLeadId(leadId);
-    setDeletePopUpShow(true);
-  };
 
-  const handleDeleteConfirm = async () => {
-    if (!selectedLeadId) return;
-    try {
-      console.log("Deleting lead with ID:", selectedLeadId);
-      toast.success("Lead deleted successfully!");
-      setDeletePopUpShow(false);
-      setSelectedLeadId(null);
-
-    } catch (error) {
-      toast.error("Failed to delete lead");
-    }
-  };
 
   const handleUpdateSubmit = async (id, updatedData) => {
     try {
@@ -114,14 +94,15 @@ export const MarketingMasterGrid = () => {
     handlePageChange(1);
   };
 
-  const handleOpenAddModal = () => setIsAddModalVisible(true);
-  const handleCloseAddModal = () => setIsAddModalVisible(false);
+  // const handleOpenAddModal = () => setIsAddModalVisible(true);
 
-  const handleAddLeadSubmit = async (leadData) => {
-    console.log("New Lead to be created:", leadData);
-    toast.success("Lead added successfully!");
-    handleCloseAddModal();
-  };
+  // const handleCloseAddModal = () => setIsAddModalVisible(false);
+
+  // const handleAddLeadSubmit = async (leadData) => {
+  //   console.log("New Lead to be created:", leadData);
+  //   toast.success("Lead added successfully!");
+  //   handleCloseAddModal();
+  // };
 
 
   return (
@@ -146,14 +127,11 @@ export const MarketingMasterGrid = () => {
 
                 </div>
 
-                <SalesDashboardCards
-                  totalSalesCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.PendingfollowUp || 0) + (data?.statusCounts?.notFisible || 0) + (data?.statusCounts?.Win || 0) + (data?.statusCounts?.Lost || 0)}
+                <MarketingDashboardCards
+                  allLeadServiceCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.notFisible || 0)}
                   allEnquiriesServiceCount={data?.statusCounts?.allEnquiries || 0}
-                  ongoingServiceCount={data?.statusCounts?.ongoing || 0}
-                  pendingFollowUpServiceCount={data?.statusCounts?.PendingfollowUp || 0}
+                  onGoingServiceCount={data?.statusCounts?.ongoing || 0}
                   notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
-                  winServiceCount={data?.statusCounts?.Win || 0}
-                  lostServiceCount={data?.statusCounts?.Lost || 0}
                 />
 
                 <div className="row align-items-center p-2 m-1">
@@ -217,7 +195,7 @@ export const MarketingMasterGrid = () => {
                           {data?.leads?.length > 0 ? (
                             data.leads.map((leads, index) => (
                               <tr >
-                                <td>{index + 1}</td>
+                                <td>{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
                                 <td>{leads.SENDER_NAME}</td>
                                 <td>{leads.SENDER_COMPANY}</td>
                                 <td>{leads.QUERY_PRODUCT_NAME}</td>
@@ -255,6 +233,95 @@ export const MarketingMasterGrid = () => {
                     </div>
                   </div>
                 </div>
+
+
+               {/* add pagination Pagination */}
+
+                {!loading && pagination.totalPages > 1 && (
+                  <div className="pagination-container text-center my-3">
+                    <button
+                      onClick={() => handlePageChange(1)}
+                      disabled={!pagination.hasPrevPage}
+                      className="btn btn-dark btn-sm me-1"
+                      style={{ borderRadius: "4px" }}
+                      aria-label="First Page"
+                    >
+                      First
+                    </button>
+
+                    <button
+                      onClick={() => handlePageChange(pagination.currentPage - 1)}
+                      disabled={!pagination.hasPrevPage}
+                      className="btn btn-dark btn-sm me-1"
+                      style={{ borderRadius: "4px" }}
+                      aria-label="Previous Page"
+                    >
+                      Previous
+                    </button>
+
+                    {(() => {
+                      const pageNumbers = [];
+                      const maxPagesToShow = 5;
+
+                      if (pagination.totalPages <= maxPagesToShow) {
+                        for (let i = 1; i <= pagination.totalPages; i++) {
+                          pageNumbers.push(i);
+                        }
+                      } else {
+                        let startPage, endPage;
+                        if (pagination.currentPage <= 3) {
+                          startPage = 1;
+                          endPage = maxPagesToShow;
+                        } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                          startPage = pagination.totalPages - maxPagesToShow + 1;
+                          endPage = pagination.totalPages;
+                        } else {
+                          startPage = pagination.currentPage - 2;
+                          endPage = pagination.currentPage + 2;
+                        }
+                        startPage = Math.max(1, startPage);
+                        endPage = Math.min(pagination.totalPages, endPage);
+
+                        for (let i = startPage; i <= endPage; i++) {
+                          pageNumbers.push(i);
+                        }
+                      }
+
+                      return pageNumbers.map((number) => (
+                        <button
+                          key={number}
+                          onClick={() => handlePageChange(number)}
+                          className={`btn btn-sm me-1 ${
+                            pagination.currentPage === number ? "btn-primary" : "btn-dark"
+                          }`}
+                          style={{ minWidth: "35px", borderRadius: "4px" }}
+                          aria-label={`Go to page ${number}`}
+                          aria-current={pagination.currentPage === number ? "page" : undefined}
+                        >
+                          {number}
+                        </button>
+                      ));
+                    })()}
+
+                    <button
+                      disabled={!pagination.hasNextPage}
+                      onClick={() => handlePageChange(pagination.currentPage + 1)}
+                      className="btn btn-dark btn-sm me-1"
+                    >
+                      Next
+                    </button>
+
+                    <button
+                      onClick={() => handlePageChange(pagination.totalPages)}
+                      disabled={!pagination.hasNextPage}
+                      className="btn btn-dark btn-sm"
+                      style={{ borderRadius: "4px" }}
+                      aria-label="Last Page"
+                    >
+                      Last
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -264,7 +331,7 @@ export const MarketingMasterGrid = () => {
 
 
       {UpdatePopUpShow && selectedLead && (
-        <UpdateSalesPopUp
+        <UpdateMarketingPopUp
           selectedLead={selectedLead}
           onUpdate={handleUpdateSubmit}
           onClose={() => {

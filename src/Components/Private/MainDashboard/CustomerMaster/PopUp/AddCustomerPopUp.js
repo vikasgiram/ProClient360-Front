@@ -267,7 +267,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                               setPhoneNumber1(value);
                             }}
                             aria-describedby="mobileNoHelp"
-                            maxLength={11}
+                            maxLength={10}
                             required
                           />
                         </div>

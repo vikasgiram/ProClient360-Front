@@ -36,12 +36,11 @@ export const SalesMasterGrid = () => {
     totalPages: 0,
     totalServices: 0,
     limit: 10,
-    hasNextPage: false,
+    hasNextPage: true,
     hasPrevPage: false,
   });
   const itemsPerPage = 10;
 
-  // call the useMyLeads hook to fetch leads data
 
   const { data, loading, error, updateService } = useLeads(pagination.currentPage, itemsPerPage, filters);
 
@@ -275,6 +274,93 @@ export const SalesMasterGrid = () => {
                             </div>
                         </div>
                     </div>
+
+                  {/* add Pagination button */}
+                {!loading && pagination.totalPages > 1 && (
+                  <div className="pagination-container text-center my-3">
+                    <button
+                      onClick={() => handlePageChange(1)}
+                      disabled={!pagination.hasPrevPage}
+                      className="btn btn-dark btn-sm me-1"
+                      style={{ borderRadius: "4px" }}
+                      aria-label="First Page"
+                    >
+                      First
+                    </button>
+
+                    <button
+                      onClick={() => handlePageChange(pagination.currentPage - 1)}
+                      disabled={!pagination.hasPrevPage}
+                      className="btn btn-dark btn-sm me-1"
+                      style={{ borderRadius: "4px" }}
+                      aria-label="Previous Page"
+                    >
+                      Previous
+                    </button>
+
+                    {(() => {
+                      const pageNumbers = [];
+                      const maxPagesToShow = 5;
+
+                      if (pagination.totalPages <= maxPagesToShow) {
+                        for (let i = 1; i <= pagination.totalPages; i++) {
+                          pageNumbers.push(i);
+                        }
+                      } else {
+                        let startPage, endPage;
+                        if (pagination.currentPage <= 3) {
+                          startPage = 1;
+                          endPage = maxPagesToShow;
+                        } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                          startPage = pagination.totalPages - maxPagesToShow + 1;
+                          endPage = pagination.totalPages;
+                        } else {
+                          startPage = pagination.currentPage - 2;
+                          endPage = pagination.currentPage + 2;
+                        }
+                        startPage = Math.max(1, startPage);
+                        endPage = Math.min(pagination.totalPages, endPage);
+
+                        for (let i = startPage; i <= endPage; i++) {
+                          pageNumbers.push(i);
+                        }
+                      }
+
+                      return pageNumbers.map((number) => (
+                        <button
+                          key={number}
+                          onClick={() => handlePageChange(number)}
+                          className={`btn btn-sm me-1 ${
+                            pagination.currentPage === number ? "btn-primary" : "btn-dark"
+                          }`}
+                          style={{ minWidth: "35px", borderRadius: "4px" }}
+                          aria-label={`Go to page ${number}`}
+                          aria-current={pagination.currentPage === number ? "page" : undefined}
+                        >
+                          {number}
+                        </button>
+                      ));
+                    })()}
+
+                    <button
+                      disabled={!pagination.hasNextPage}
+                      onClick={() => handlePageChange(pagination.currentPage + 1)}
+                      className="btn btn-dark btn-sm me-1"
+                    >
+                      Next
+                    </button>
+
+                    <button
+                      onClick={() => handlePageChange(pagination.totalPages)}
+                      disabled={!pagination.hasNextPage}
+                      className="btn btn-dark btn-sm"
+                      style={{ borderRadius: "4px" }}
+                      aria-label="Last Page"
+                    >
+                      Last
+                    </button>
+                  </div>
+                )}
                 </div>
             </div>
           </div>

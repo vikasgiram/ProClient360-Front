@@ -13,7 +13,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     company: '',
     subject: '',
     products: '',
-    message: '', 
+    message: '',
     status: 'enquiry',
     value: '',
     address: {
@@ -41,7 +41,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     if (['state', 'city', 'country'].includes(name)) {
       if (!/^[A-Za-z\s]*$/.test(value)) return;
     }
-    
+
     setFormData(prev => ({
       ...prev,
       address: {
@@ -54,9 +54,9 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
 
   const handlePincodeChange = async (e) => {
     const pincode = e.target.value;
-    
+
     if (/^\d{0,6}$/.test(pincode)) {
-      
+
       handleAddressChange(e);
 
       if (pincode.length === 6) {
@@ -102,7 +102,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
       address
     } = formData;
 
-    
+
     if (!name || !company || !contact || !products || !address.pincode || !address.add) {
       toast.error('Please fill in all required fields, including Pincode and full address.');
       return;
@@ -143,23 +143,42 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label htmlFor="name" className="form-label">Contact Name <RequiredStar /></label>
-                    <input type="text" className="form-control" id="name" name="name" placeholder="Enter a Contact Name" value={formData.name} onChange={handleInputChange} required />
+                    <input type="text" className="form-control" id="name" name="name" placeholder="Enter a Contact Name" maxLength={25} value={formData.name} onChange={handleInputChange} required />
                   </div>
                   <div className="col-md-6">
-                    <label htmlFor="email" className="form-label">Contact Email</label>
-                    <input type="email" className="form-control" id="email" name="email" placeholder="Enter Email ID" value={formData.email} onChange={handleInputChange} />
+                    <label htmlFor="email" className="form-label">Contact Email <RequiredStar/></label>
+                    <input type="email" className="form-control" id="email" name="email" placeholder="Enter Email ID" maxLength={30} value={formData.email} onChange={handleInputChange} />
                   </div>
+
                   <div className="col-md-6">
-                    <label htmlFor="contact" className="form-label">Contact Number <RequiredStar /></label>
-                    <input type="tel" className="form-control" id="contact" name="contact" placeholder="Enter Contact Number" value={formData.contact} onChange={handleInputChange} required />
+                    <label htmlFor="contact" className="form-label">
+                      Contact Number <RequiredStar />
+                    </label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      id="contact"
+                      name="contact"
+                      placeholder="Enter Contact Number"
+                      inputMode="numeric"
+                      maxLength={10}
+                      pattern="\d{10}"
+                      value={formData.contact}
+                      onChange={handleInputChange}
+                      onInput={(e) => {
+                        e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                      }}
+                      required
+                    />
                   </div>
+
                   <div className="col-md-6">
                     <label htmlFor="subject" className="form-label">Subject <RequiredStar /></label>
-                    <input type="text" className="form-control" id="subject" name="subject" placeholder="Enter a Subject" value={formData.subject} onChange={handleInputChange} required />
+                    <input type="text" className="form-control" id="subject" name="subject" placeholder="Enter a Subject" maxLength={50} value={formData.subject} onChange={handleInputChange} required />
                   </div>
                   <div className="col-md-6">
                     <label htmlFor="company" className="form-label">Company Name<RequiredStar /></label>
-                    <input type="text" className="form-control" id="company" name="company" placeholder="Enter a Company Name" value={formData.company} onChange={handleInputChange} required />
+                    <input type="text" className="form-control" id="company" name="company" placeholder="Enter a Company Name" maxLength={30} value={formData.company} onChange={handleInputChange} required />
                   </div>
 
                   <div className='col-md-6'>
@@ -181,11 +200,9 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       value={formData.message}
                       onChange={handleInputChange}
                       style={{ width: '201%', height: '100px' }}
-
+                      maxLength={200}
                     />
                   </div>
-
-
 
 
                   <div className="col-12">
@@ -268,8 +285,8 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                 </div>
               </div>
               <div className="modal-footer border-0 justify-content-start">
-                <button type="submit" className=" btn btn-outline-success rounded-0">Add</button>
-                <button type="button" className=" btn btn-outline-danger rounded-0" onClick={onClose}>Cancel</button>
+                <button type="submit" className=" btn addbtn rounded-0 add_button px-4">Add</button>
+                <button type="button" className=" btn addbtn rounded-0 Cancel_button px-4" onClick={onClose}>Cancel</button>
               </div>
             </form>
           </div>
