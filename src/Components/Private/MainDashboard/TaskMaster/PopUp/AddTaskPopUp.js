@@ -67,15 +67,16 @@ const AddTaskPopUp = ({ cancelBtnCallBack, handleAdd }) => {
                                             </label>
                                             <input
                                                 type="text"
+                                                maxLength={50}
                                                 value={taskname}
                                                 onChange={(e) => setTaskname(e.target.value)}
                                                 className="form-control rounded-0"
                                                 id="taskname"
+                                                placeholder="Enter a Task Name...."
                                                 aria-describedby="emailHelp"
                                                 required
                                             />
                                         </div>
-                                    
                                 </div>
 
 

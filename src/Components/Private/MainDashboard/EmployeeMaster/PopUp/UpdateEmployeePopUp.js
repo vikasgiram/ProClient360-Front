@@ -113,6 +113,8 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedEmp }) => {
                       <input
                         name="name"
                         type="text"
+                        maxLength={40}
+                        placeholder="Update a Full Name...."
                         value={employee.name}
                         onChange={handleChange}
                         className="form-control rounded-0"
@@ -130,6 +132,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedEmp }) => {
                       <input
                         type="tel"
                         name="mobileNo"
+                        placeholder="Update a Mobile Number...."
                         pattern="[0-9]{10}"
                         maxLength={10}
                         value={employee.mobileNo}
@@ -172,6 +175,8 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedEmp }) => {
                       <input
                         type="email"
                         name="email"
+                        maxLength={40}
+                        placeholder="Update a Email...."
                         value={employee.email}
                         onChange={handleChange}
                         className="form-control rounded-0"

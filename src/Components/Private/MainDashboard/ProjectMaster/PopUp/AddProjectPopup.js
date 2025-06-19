@@ -207,7 +207,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
                   <div className="mb-3">
                     <label for="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
-                    <input type="text" className="form-control rounded-0" id="ProjectName" maxLength={30} onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp" />
+                    <input type="text" className="form-control rounded-0" id="ProjectName" maxLength={30} placeholder="Enter a Project Name...." onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp" />
                   </div>
 
 
@@ -541,7 +541,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                     <div className="mb-3">
                       <label for="remark" className="form-label label_text">     remark
                       </label>
-                      <input type="text" className="form-control rounded-0" id="remark" maxLength={100} onChange={(e) => setRemark(e.target.value)} value={remark} aria-describedby="secemailHelp" />
+                      <input type="text" className="form-control rounded-0" id="remark" placeholder="Enter a Remark...." maxLength={80} onChange={(e) => setRemark(e.target.value)} value={remark} aria-describedby="secemailHelp" />
                     </div>
 
 

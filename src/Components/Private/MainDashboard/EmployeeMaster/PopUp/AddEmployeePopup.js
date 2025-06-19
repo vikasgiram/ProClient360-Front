@@ -6,9 +6,20 @@ import toast from "react-hot-toast";
 import { getDesignation } from "../../../../../hooks/useDesignation";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
-
+const EyeIcon = ({ isOpen }) => (
+  <span style={{ cursor: 'pointer', userSelect: 'none', padding: '0 5px' }}>
+    {isOpen ? '👁️' : '👁️‍🗨️'}
+  </span>
+);
 
 const AddEmployeePopup = ({ handleAdd }) => {
+
+
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   const [getDepartments, setGetDepartments] = useState([]);
   const [department, setDepartment] = useState(null);
@@ -17,8 +28,8 @@ const AddEmployeePopup = ({ handleAdd }) => {
   const [name, setName] = useState("");
   const [mobileNo, setMobileNo] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  // const [password, setPassword] = useState("");
+  // const [confirmPassword, setConfirmPassword] = useState("");
   const [hourlyRate, setHourlyRate] = useState();
   const [designation, setDesignation] = useState('');
   const [gender, setGender] = useState('');
@@ -92,7 +103,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
     }
     if (!/^\d*\.?\d+$/.test(hourlyRate) || parseFloat(hourlyRate) <= 0) {
       return toast.error("Hourly Rate should be a number greater than 0");
-    }    
+    }
     await createEmployee(data);
     // console.log(data, "data from handleEmployeeAdd");
     handleAdd();
@@ -156,7 +167,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
                         onChange={handleNameChange}
                         className="form-control rounded-0 uppercase-inputs"
                         id="name"
-                        placeholder="Enter a full Name"
+                        placeholder="Enter a Full Name...."
                         aria-describedby="emailHelp"
                         required
                       />
@@ -174,6 +185,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
                       <input
                         type="tel"
                         pattern="[0-9]{10}"
+                        placeholder="Enter a Mobile Number...."
                         value={mobileNo}
                         onChange={(e) => setMobileNo(e.target.value)}
                         className="form-control rounded-0"
@@ -220,6 +232,8 @@ const AddEmployeePopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="email"
+                        maxLength={40}
+                        placeholder="Enter a Email...."
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="form-control rounded-0"
@@ -308,7 +322,69 @@ const AddEmployeePopup = ({ handleAdd }) => {
                     </div>
                   </div>
 
+
+
                   <div className="row">
+                    <div className="col-12 col-lg-6 mt-3">
+                      <div className="mb-3">
+                        <label htmlFor="password" className="form-label label_text">
+                          Password <RequiredStar />
+                        </label>
+                        <div className="input-group">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="form-control rounded-0"
+                            id="password"
+                            placeholder="Password...."
+                            maxLength={40}
+                            required
+                          />
+                          <button
+                            className="btn btn-outline-secondary rounded-0"
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                          >
+                            <EyeIcon isOpen={showPassword} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-12 col-lg-6 mt-3">
+                      <div className="mb-3">
+                        <label htmlFor="ConfirmPassword" className="form-label label_text">
+                          Confirm Password <RequiredStar />
+                        </label>
+                        <div className="input-group">
+                          <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="form-control rounded-0"
+                            id="ConfirmPassword"
+                            placeholder="Confirm Password...."
+                            maxLength={40}
+                            required
+                          />
+                          <button
+                            className="btn btn-outline-secondary rounded-0"
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                          >
+                            <EyeIcon isOpen={showConfirmPassword} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+
+                  {/* <div className="row">
                     <div className="col-12 col-lg-6 mt-2">
                       <div className="mb-3">
                         <label
@@ -323,6 +399,8 @@ const AddEmployeePopup = ({ handleAdd }) => {
                           onChange={(e) => setPassword(e.target.value)}
                           className="form-control rounded-0"
                           id="password"
+                          maxLength={40}
+                          placeholder="Password...."
                           aria-describedby="emailHelp"
                           required
                         />
@@ -343,12 +421,14 @@ const AddEmployeePopup = ({ handleAdd }) => {
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           className="form-control rounded-0"
                           id="ConfirmPassword"
+                          maxLength={40}
+                          placeholder="Confirm Password...."
                           aria-describedby="emailHelp"
                           required
                         />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="row">
                     <div className="col-12 pt-3 mt-2">

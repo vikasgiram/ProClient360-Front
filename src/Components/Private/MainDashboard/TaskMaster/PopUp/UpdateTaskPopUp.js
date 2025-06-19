@@ -65,6 +65,8 @@ const[task,setTask]=useState(selectedTask);
                       <input
                         name="name"
                         type="text"
+                        max={50}
+                        placeholder="Update Task Name...."
                         value={task.name}
                         onChange={handleChange}
                         className="form-control rounded-0"

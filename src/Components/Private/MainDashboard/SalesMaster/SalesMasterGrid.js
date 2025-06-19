@@ -188,7 +188,6 @@ export const SalesMasterGrid = () => {
                           <option value="TradeIndia">TradeIndia</option>
                           <option value="Facebook">Facebook</option>
                           <option value="LinkedIn">LinkedIn</option>
-                          <option value="Email">Email</option>
                           <option value="Google">Google</option>
                         </select>
                       </div>
