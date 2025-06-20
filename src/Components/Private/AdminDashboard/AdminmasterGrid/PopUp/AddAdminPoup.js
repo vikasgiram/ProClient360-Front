@@ -43,6 +43,10 @@ const AddAdminPoup = ({ handleAdd }) => {
     handleAdd();
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+
   return (
     <>
       <div
@@ -117,63 +121,64 @@ const AddAdminPoup = ({ handleAdd }) => {
                 </div>
 
 
-                  <div className="row">
-                    <div className="col-12 col-lg-6 mt-3">
-                      <div className="mb-3">
-                        <label htmlFor="password" className="form-label label_text">
-                          Password <RequiredStar />
-                        </label>
-                        <div className="input-group">
-                          <input
-                            type={password ? "text" : "password"}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="form-control rounded-0"
-                            id="password"
-                            placeholder="Password...."
-                            maxLength={40}
-                            required
-                          />
-                          <button
-                            className="btn btn-outline-secondary rounded-0"
-                            type="button"
-                            onClick={() => setPassword(!password)}
-                            aria-label={password ? "Hide password" : "Show password"}
-                          >
-                            <EyeIcon isOpen={password} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-12 col-lg-6 mt-3">
-                      <div className="mb-3">
-                        <label htmlFor="ConfirmPassword" className="form-label label_text">
-                          Confirm Password <RequiredStar />
-                        </label>
-                        <div className="input-group">
-                          <input
-                            type={password ? "text" : "password"}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="form-control rounded-0"
-                            id="ConfirmPassword"
-                            placeholder="Confirm Password...."
-                            maxLength={40}
-                            required
-                          />
-                          <button
-                            className="btn btn-outline-secondary rounded-0"
-                            type="button"
-                            onClick={() => setPassword(!password)}
-                            aria-label={password ? "Hide confirm password" : "Show confirm password"}
-                          >
-                            <EyeIcon isOpen={password} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div className="row">
+                                    <div className="col-12 col-lg-6 mt-3">
+                                      <div className="mb-3">
+                                        <label htmlFor="password" className="form-label label_text">
+                                          Password <RequiredStar />
+                                        </label>
+                                        <div className="input-group">
+                                          <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="form-control rounded-0"
+                                            id="password"
+                                            placeholder="Password...."
+                                            maxLength={40}
+                                            required
+                                          />
+                                          <button
+                                            className="btn btn-outline-secondary rounded-0"
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                          >
+                                            <EyeIcon isOpen={showPassword} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                
+                                    <div className="col-12 col-lg-6 mt-3">
+                                      <div className="mb-3">
+                                        <label htmlFor="ConfirmPassword" className="form-label label_text">
+                                          Confirm Password <RequiredStar />
+                                        </label>
+                                        <div className="input-group">
+                                          <input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="form-control rounded-0"
+                                            id="ConfirmPassword"
+                                            placeholder="Confirm Password...."
+                                            maxLength={40}
+                                            required
+                                          />
+                                          <button
+                                            className="btn btn-outline-secondary rounded-0"
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                                          >
+                                            <EyeIcon isOpen={showConfirmPassword} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                
 
 
                
