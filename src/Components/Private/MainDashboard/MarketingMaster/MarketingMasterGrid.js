@@ -1,20 +1,12 @@
 import { useState, useContext, useEffect, act } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
-<<<<<<< HEAD
 import toast from 'react-hot-toast'
 
 import MarketingDashboardCards from './MarketingDashboardCards';
 import { UserContext } from "../../../../context/UserContext";
 
 import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
-=======
-import toast from 'react-hot-toast';
-import MarketingDashboardCards from './MarketingDashboardCards';
-import { UserContext } from "../../../../context/UserContext";
-import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
-import UpdateMarketingPopUp from "./PopUp/UpdateMarketingPopUp";
->>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
 import useLeads from "../../../../hooks/leads/useLeads";
 import AssignMarketingLeadPopUp from "./PopUp/AssignLeadPopUp";
 import useAssignLead from "../../../../hooks/leads/useAssignLead";
@@ -35,13 +27,7 @@ export const MarketingMasterGrid = () => {
   const [selectedLead, setSelectedLead] = useState(null);
 
   const { user } = useContext(UserContext);
-<<<<<<< HEAD
   const [filters, setFilters] = useState({ date: null, source: null });
-=======
-
-  const [filters, setFilters] = useState({ status: null, source: null });
-
->>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
@@ -135,16 +121,9 @@ export const MarketingMasterGrid = () => {
                 </div>
 
                 <MarketingDashboardCards
-<<<<<<< HEAD
                   allLeads={data?.allLeadsCount || 0}
                   feasibleLeads={data?.feasibleCount || 0}
                   notFeasibleLeads={data?.notFeasibleCount || 0}
-=======
-                  allLeadServiceCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.notFisible || 0)}
-                  allEnquiriesServiceCount={data?.statusCounts?.allEnquiries || 0}
-                  onGoingServiceCount={data?.statusCounts?.ongoing || 0}
-                  notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
->>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
                 />
 
                 <div className="row align-items-center p-2 m-1">
@@ -207,24 +186,14 @@ export const MarketingMasterGrid = () => {
                           {data?.leads?.length > 0 ? (
                             data.leads.map((lead, index) => (
                               <tr >
-<<<<<<< HEAD
-                                <td>{index + (pagination.currentPage - 1) * itemsPerPage}</td>
-                                <td>{lead.SENDER_NAME||'Not avaliable'}</td>
-                                <td>{lead.SENDER_COMPANY||'Not avaliable'}</td>
-                                <td>{lead.QUERY_PRODUCT_NAME ||'Not avaliable'}</td>
-                                <td>{lead.SENDER_EMAIL||'Not avaliable'}</td>
-                                <td>{lead.createdAt||'Not avaliable'}</td>
-                                <td>{lead.SOURCE||'Not avaliable'}</td> 
-=======
                                 <td>{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
-                                <td>{leads.SENDER_NAME}</td>
-                                <td>{leads.SENDER_COMPANY}</td>
-                                <td>{leads.QUERY_PRODUCT_NAME}</td>
-                                <td>{leads.SENDER_EMAIL}</td>
-                                <td>{leads.createdAt}</td>
-                                <td>{leads.SOURCE}</td>
+                                <td>{lead?.SENDER_NAME}</td>
+                                <td>{lead?.SENDER_COMPANY}</td>
+                                <td>{lead?.QUERY_PRODUCT_NAME}</td>
+                                <td>{lead?.SENDER_EMAIL}</td>
+                                <td>{lead?.createdAt}</td>
+                                <td>{lead?.SOURCE}</td>
                                 {/* <td>{leads.STATUS}</td> */}
->>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
                                 <td>
 
                                   {/* Edit Button */}
@@ -233,11 +202,11 @@ export const MarketingMasterGrid = () => {
                                       <i className="mx-1 fa-solid fa-share cursor-pointer"></i>
                                     </span>
                                   }
-                                  {(user?.permissions?.includes('deleteLead') || user?.user === 'company' && lead.SOURCE==='Direct' ) &&
+                                  {/* {(user?.permissions?.includes('deleteLead') || user?.user === 'company' && lead.SOURCE==='Direct' ) &&
                                               <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
                                                   <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
                                               </span>
-                                            }
+                                            } */}
 
                                   {/* View Button */}
                                   <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
@@ -358,11 +327,7 @@ export const MarketingMasterGrid = () => {
 
 
       {UpdatePopUpShow && selectedLead && (
-<<<<<<< HEAD
         <AssignMarketingLeadPopUp
-=======
-        <UpdateMarketingPopUp
->>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
           selectedLead={selectedLead}
           onUpdate={handleUpdateSubmit}
           onClose={() => {
