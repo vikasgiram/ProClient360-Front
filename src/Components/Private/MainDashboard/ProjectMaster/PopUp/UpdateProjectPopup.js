@@ -234,7 +234,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
                                     <div className="mb-3">
                                         <label for="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
-                                        <input type="text" className="form-control rounded-0" id="ProjectName" name="name" onChange={handleChange} value={projects.name} aria-describedby="emailHelp" />
+                                        <input type="text" className="form-control rounded-0" id="ProjectName" name="name" onChange={handleChange} maxLength={40} placeholder="Update Project Name...." value={projects.name} aria-describedby="emailHelp" />
                                     </div>
                                     <div className="col-12 col-lg-6 mt-2">
                                         <label for="ProjectName" className="form-label label_text">Project Status <RequiredStar /></label>

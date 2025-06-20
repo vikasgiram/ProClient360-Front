@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { updateTicket } from "../../../../../hooks/useTicket";
 import { getCustomers } from "../../../../../hooks/useCustomer";
+import { getAddress } from "../../../../../hooks/usePincode";
 
 import toast from "react-hot-toast";
 
@@ -13,7 +14,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-  
+
     if (name === "client") {
       // Set the client object with only the _id
       setTicket((prevTicket) => ({
@@ -60,25 +61,25 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
   };
 
   useEffect(() => {
-      const delayDebounce = setTimeout(() => {
-        if (searchText.trim() !== "" && searchText.length > 2) {
-          fetchCustomers(searchText);
-        } else {
-          setCustomers([]); // empty when no input
-        }
-      }, 500); // debounce API call by 500ms
-  
-      return () => clearTimeout(delayDebounce);
-    }, [searchText]);
-  
-    const fetchCustomers = async () => {
-      const data = await getCustomers(1, 15, searchText);
-      // console.log(data);
-      if (data) {
-        setCustomers(data.customers || []);
-        // console.log(employees,"data from useState");
+    const delayDebounce = setTimeout(() => {
+      if (searchText.trim() !== "" && searchText.length > 2) {
+        fetchCustomers(searchText);
+      } else {
+        setCustomers([]); // empty when no input
       }
-    };
+    }, 500); // debounce API call by 500ms
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchText]);
+
+  const fetchCustomers = async () => {
+    const data = await getCustomers(1, 15, searchText);
+    // console.log(data);
+    if (data) {
+      setCustomers(data.customers || []);
+      // console.log(employees,"data from useState");
+    }
+  };
   return (
     <>
       <div
@@ -142,13 +143,13 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         required
                       /> */}
                       <input
-                      type="text"
-                      className="form-control mb-2"
-                      id="customerSearch"
-                      placeholder="Type to search customer..."
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
-                    />
+                        type="text"
+                        className="form-control mb-2"
+                        id="customerSearch"
+                        placeholder="Type to search customer..."
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                      />
 
                       <select
                         className="form-select rounded-0"
@@ -183,15 +184,24 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                       <div className="col-12 col-lg-6 mt-2">
                         <div className="mb-3">
                           <input
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
+                            pattern="\d{6}"
+                            maxLength={6}
                             className="form-control rounded-0"
                             placeholder="Pincode"
                             id="pincode"
                             name="pincode"
-                            onChange={handleChange}
-                            value={ticket?.Address?.pincode}
+                            value={ticket?.Address?.pincode || ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^\d{0,6}$/.test(value)) {
+                                handleChange(e);
+                              }
+                            }}
                             aria-describedby="emailHelp"
                           />
+
                         </div>
                       </div>
 
@@ -264,6 +274,8 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                       <input
                         type="text"
                         name="details"
+                        maxLength={70}
+                        placeholder="Update a Complaint Details...."
                         value={ticket?.details}
                         onChange={handleChange}
                         className="form-control rounded-0"

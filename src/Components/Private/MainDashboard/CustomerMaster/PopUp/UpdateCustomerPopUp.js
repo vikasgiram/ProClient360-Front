@@ -137,6 +137,8 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                         type="text"
                         className="form-control rounded-0"
                         id="FullName"
+                        maxLength={40}
+                        placeholder="Update a Full Name.... "
                         name="custName"
                         value={customer.custName}
                         onChange={handleChange}
@@ -154,6 +156,8 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                       <input
                         type="email"
                         name="email"
+                        maxLength={40}
+                        placeholder="Update a Email...."
                         className="form-control rounded-0"
                         id="Email"
                         value={customer.email}
@@ -465,6 +469,8 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                         type="text"
                         className="form-control rounded-0"
                         id="GSTNo"
+                        placeholder="Update GST Number...."
+                        maxLength={15}
                         name="GSTNo"
                         onChange={handleChange}
                         value={customer.GSTNo}

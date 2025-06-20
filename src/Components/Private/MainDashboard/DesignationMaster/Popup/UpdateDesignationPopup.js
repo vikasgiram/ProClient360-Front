@@ -206,6 +206,8 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
                     </label>
                     <input
                       type="text"
+                      placeholder="Update Designation Name...."
+                      maxLength={40}
                       value={designation.name}
                       onChange={handleInputChange}
                       className="form-control rounded-0"

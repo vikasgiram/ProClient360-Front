@@ -118,6 +118,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       <input
                         type="text"
                         maxLength={40}
+                        placeholder="Enter Company Name...."
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         className="form-control rounded-0"
@@ -135,6 +136,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       <input
                         type="text"
                         maxLength={40}
+                        placeholder="Enter Admin Name...."
                         value={admin}
                         onChange={(e) => {
                           const onlyLettersAndSpaces = e.target.value.replace(/[^A-Za-z\s]/g, '');
@@ -155,6 +157,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       <input
                         type="tel"
                         id="MobileNumber"
+                        placeholder="Enter Mobile Number...."
                         className="form-control rounded-0"
                         maxLength={10}
                         value={mobileNo}
@@ -174,6 +177,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       <input
                         type="email"
                         maxLength={40}
+                        placeholder="Enter Email...."
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="form-control rounded-0"
@@ -212,6 +216,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                         <input
                           type="text"
                           id="SubscriptionAmount"
+                          placeholder="eg. 1000"
                           maxLength={12}
                           value={subAmount}
                           onChange={(e) => {
@@ -235,6 +240,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                           type="text"
                           id="gstNo"
                           maxLength={15}
+                          placeholder="Ente GST Number...."
                           value={GST}
                           onChange={(e) => setGST(e.target.value.toUpperCase())}
                           className="form-control rounded-0 border-0"
@@ -360,6 +366,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                             onChange={(e) => setPassword(e.target.value)}
                             className="form-control rounded-0"
                             id="password"
+                            placeholder="Password...."
                             maxLength={40}
                             required
                           />
@@ -387,6 +394,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className="form-control rounded-0"
                             id="ConfirmPassword"
+                            placeholder="Confirm Password...."
                             maxLength={40}
                             required
                           />

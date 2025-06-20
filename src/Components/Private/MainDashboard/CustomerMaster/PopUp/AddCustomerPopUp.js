@@ -89,7 +89,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
     // console.log(data);
     handleAdd();
   };
-               
+
   // create a seperate function
 
   const handleCustNameChange = (e) => {
@@ -126,7 +126,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
       setBillingAddress({ ...billingAddress, city: value });
     }
   };
-  
+
 
   const handleGSTChange = (e) => {
     const value = e.target.value.toUpperCase();
@@ -134,7 +134,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
       setGSTNo(value);
     }
   };
-  
+
   return (
     <>
       <div
@@ -178,7 +178,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                         value={custName}
                         onChange={handleCustNameChange}
                         aria-describedby="nameHelp"
-                        placeholder="Enter a Full Name"
+                        placeholder="Enter a Full Name...."
                         required
                       />
                     </div>
@@ -197,7 +197,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         aria-describedby="emailHelp"
-                        placeholder="Enter a Email"
+                        placeholder="Enter a Email...."
                         required
                       />
                     </div>
@@ -267,7 +267,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                               setPhoneNumber1(value);
                             }}
                             aria-describedby="mobileNoHelp"
-                            maxLength={11}
+                            maxLength={10}
                             required
                           />
                         </div>
@@ -497,23 +497,23 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                   </div>
                 </div> */}
 
-<div className="col-12 col-lg-6 mt-2">
-  <div className="">
-    <label htmlFor="GSTNumber" className="form-label label_text">
-      GST Number <RequiredStar />
-    </label>
-    <input
-      type="text"
-      className="form-control rounded-0 text-uppercase"
-      id="GSTNumber"
-      maxLength={15}
-      onChange={handleGSTChange}
-      value={GSTNo}
-      aria-describedby="emailHelp"
-      required
-    />
-  </div>
-</div>
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="">
+                      <label htmlFor="GSTNumber" className="form-label label_text">
+                        GST Number <RequiredStar />
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control rounded-0 text-uppercase"
+                        id="GSTNumber"
+                        maxLength={15}
+                        onChange={handleGSTChange}
+                        value={GSTNo}
+                        aria-describedby="emailHelp"
+                        required
+                      />
+                    </div>
+                  </div>
 
 
                   <div className="col-12 col-lg-6 mt-2">

@@ -6,6 +6,11 @@ import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import validator from "validator";
 import { isValidPassword } from "../../../../../utils/validations";
 
+const EyeIcon = ({ isOpen }) => (
+  <span style={{ cursor: 'pointer', userSelect: 'none', padding: '0 5px' }}>
+    {isOpen ? '👁️' : '👁️‍🗨️'}
+  </span>
+);
 
 const AddAdminPoup = ({ handleAdd }) => {
   const [name, setName] = useState("");
@@ -37,6 +42,10 @@ const AddAdminPoup = ({ handleAdd }) => {
     
     handleAdd();
   };
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   return (
     <>
@@ -77,6 +86,8 @@ const AddAdminPoup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
+                        maxLength={40}
+                        placeholder="Enter a Full Name...."
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         className="form-control rounded-0"
@@ -102,13 +113,76 @@ const AddAdminPoup = ({ handleAdd }) => {
                         onChange={(e) => setEmail(e.target.value)}
                         className="form-control rounded-0"
                         id="Email"
+                        maxLength={40}
+                        placeholder="Enter a Email...."
                         aria-describedby="emailHelp"
                       />
                     </div>
                 </div>
 
-               
+
                 <div className="row">
+                                    <div className="col-12 col-lg-6 mt-3">
+                                      <div className="mb-3">
+                                        <label htmlFor="password" className="form-label label_text">
+                                          Password <RequiredStar />
+                                        </label>
+                                        <div className="input-group">
+                                          <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="form-control rounded-0"
+                                            id="password"
+                                            placeholder="Password...."
+                                            maxLength={40}
+                                            required
+                                          />
+                                          <button
+                                            className="btn btn-outline-secondary rounded-0"
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
+                                          >
+                                            <EyeIcon isOpen={showPassword} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                
+                                    <div className="col-12 col-lg-6 mt-3">
+                                      <div className="mb-3">
+                                        <label htmlFor="ConfirmPassword" className="form-label label_text">
+                                          Confirm Password <RequiredStar />
+                                        </label>
+                                        <div className="input-group">
+                                          <input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="form-control rounded-0"
+                                            id="ConfirmPassword"
+                                            placeholder="Confirm Password...."
+                                            maxLength={40}
+                                            required
+                                          />
+                                          <button
+                                            className="btn btn-outline-secondary rounded-0"
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                                          >
+                                            <EyeIcon isOpen={showConfirmPassword} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                
+
+
+               
+                {/* <div className="row">
                   <div className="col-12 col-lg-6 mt-2">
                       <div className="mb-3">
                         <label
@@ -123,6 +197,8 @@ const AddAdminPoup = ({ handleAdd }) => {
                           onChange={(e) => setPassword(e.target.value)}
                           className="form-control rounded-0"
                           id="password"
+                          maxLength={40}
+                          placeholder="Password...."
                           aria-describedby="emailHelp"
                         />
                       </div>
@@ -142,11 +218,13 @@ const AddAdminPoup = ({ handleAdd }) => {
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           className="form-control rounded-0"
                           id="ConfirmPassword"
+                          maxLength={40}
+                          placeholder="Confirm Password...."
                           aria-describedby="emailHelp"
                         />
                       </div>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="row">
                   <div className="col-12 pt-3 mt-2">
@@ -157,6 +235,7 @@ const AddAdminPoup = ({ handleAdd }) => {
                     >
                       Add
                     </button>
+                    
                     <button
                       type="button"
                       onClick={handleAdd}

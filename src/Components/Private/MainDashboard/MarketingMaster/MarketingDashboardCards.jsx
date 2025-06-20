@@ -24,7 +24,7 @@ const MarketingDashboardCards = ({allLeads, feasibleLeads, notFeasibleLeads }) =
 
           
           <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style" style={{backgroundColor:"#FFEB3B"}}>
+            <div className="p-4 background_style" style={{backgroundColor:"#F8EFDE"}}>
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">
@@ -43,7 +43,7 @@ const MarketingDashboardCards = ({allLeads, feasibleLeads, notFeasibleLeads }) =
 
            
           <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style"   style={{backgroundColor:"#FEA2A2"}}>
+            <div className="p-4 background_style"   style={{backgroundColor:"#F6C6CA"}}>
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">

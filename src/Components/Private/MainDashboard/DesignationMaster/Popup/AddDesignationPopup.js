@@ -185,6 +185,8 @@ const AddDesignationPopup = ({ handleAdd }) => {
                       <input
                         type="text"
                         value={name}
+                        maxLength={50}
+                        placeholder="Enter a Designation Name...."
                         onChange={(e) => setName(e.target.value)}
                         className="form-control rounded-0"
                         id="name"

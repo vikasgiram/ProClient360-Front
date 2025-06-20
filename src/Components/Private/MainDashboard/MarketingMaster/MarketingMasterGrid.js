@@ -1,12 +1,20 @@
 import { useState, useContext, useEffect, act } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
+<<<<<<< HEAD
 import toast from 'react-hot-toast'
 
 import MarketingDashboardCards from './MarketingDashboardCards';
 import { UserContext } from "../../../../context/UserContext";
 
 import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
+=======
+import toast from 'react-hot-toast';
+import MarketingDashboardCards from './MarketingDashboardCards';
+import { UserContext } from "../../../../context/UserContext";
+import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
+import UpdateMarketingPopUp from "./PopUp/UpdateMarketingPopUp";
+>>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
 import useLeads from "../../../../hooks/leads/useLeads";
 import AssignMarketingLeadPopUp from "./PopUp/AssignLeadPopUp";
 import useAssignLead from "../../../../hooks/leads/useAssignLead";
@@ -18,24 +26,28 @@ export const MarketingMasterGrid = () => {
     setIsOpen(!isopen);
   };
 
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  // const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
+
   const [detailsServicePopUp, setDetailsServicePopUp] = useState(false);
 
   const [selectedLead, setSelectedLead] = useState(null);
-  const [activeSource, setActiveSource] = useState(null);
-
-  const [deletePopUpShow, setDeletePopUpShow] = useState(false);
-  const [selectedLeadId, setSelectedLeadId] = useState(null);
 
   const { user } = useContext(UserContext);
+<<<<<<< HEAD
   const [filters, setFilters] = useState({ date: null, source: null });
+=======
+
+  const [filters, setFilters] = useState({ status: null, source: null });
+
+>>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
     totalServices: 0,
     limit: 10,
-    hasNextPage: false,
+    hasNextPage: true,
     hasPrevPage: false,
   });
   const itemsPerPage = 10;
@@ -64,23 +76,7 @@ export const MarketingMasterGrid = () => {
     setUpdatePopUpShow(true);
   };
 
-  const handleDelete = (leadId) => {
-    setSelectedLeadId(leadId);
-    setDeletePopUpShow(true);
-  };
 
-  const handleDeleteConfirm = async () => {
-    if (!selectedLeadId) return;
-    try {
-      console.log("Deleting lead with ID:", selectedLeadId);
-      toast.success("Lead deleted successfully!");
-      setDeletePopUpShow(false);
-      setSelectedLeadId(null);
-
-    } catch (error) {
-      toast.error("Failed to delete lead");
-    }
-  };
 
   const handleUpdateSubmit = async (id, actionData) => {
     try {
@@ -105,14 +101,15 @@ export const MarketingMasterGrid = () => {
     handlePageChange(1);
   };
 
-  const handleOpenAddModal = () => setIsAddModalVisible(true);
-  const handleCloseAddModal = () => setIsAddModalVisible(false);
+  // const handleOpenAddModal = () => setIsAddModalVisible(true);
 
-  const handleAddLeadSubmit = async (leadData) => {
-    console.log("New Lead to be created:", leadData);
-    toast.success("Lead added successfully!");
-    handleCloseAddModal();
-  };
+  // const handleCloseAddModal = () => setIsAddModalVisible(false);
+
+  // const handleAddLeadSubmit = async (leadData) => {
+  //   console.log("New Lead to be created:", leadData);
+  //   toast.success("Lead added successfully!");
+  //   handleCloseAddModal();
+  // };
 
 
   return (
@@ -138,9 +135,16 @@ export const MarketingMasterGrid = () => {
                 </div>
 
                 <MarketingDashboardCards
+<<<<<<< HEAD
                   allLeads={data?.allLeadsCount || 0}
                   feasibleLeads={data?.feasibleCount || 0}
                   notFeasibleLeads={data?.notFeasibleCount || 0}
+=======
+                  allLeadServiceCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.notFisible || 0)}
+                  allEnquiriesServiceCount={data?.statusCounts?.allEnquiries || 0}
+                  onGoingServiceCount={data?.statusCounts?.ongoing || 0}
+                  notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
+>>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
                 />
 
                 <div className="row align-items-center p-2 m-1">
@@ -203,6 +207,7 @@ export const MarketingMasterGrid = () => {
                           {data?.leads?.length > 0 ? (
                             data.leads.map((lead, index) => (
                               <tr >
+<<<<<<< HEAD
                                 <td>{index + (pagination.currentPage - 1) * itemsPerPage}</td>
                                 <td>{lead.SENDER_NAME||'Not avaliable'}</td>
                                 <td>{lead.SENDER_COMPANY||'Not avaliable'}</td>
@@ -210,6 +215,16 @@ export const MarketingMasterGrid = () => {
                                 <td>{lead.SENDER_EMAIL||'Not avaliable'}</td>
                                 <td>{lead.createdAt||'Not avaliable'}</td>
                                 <td>{lead.SOURCE||'Not avaliable'}</td> 
+=======
+                                <td>{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
+                                <td>{leads.SENDER_NAME}</td>
+                                <td>{leads.SENDER_COMPANY}</td>
+                                <td>{leads.QUERY_PRODUCT_NAME}</td>
+                                <td>{leads.SENDER_EMAIL}</td>
+                                <td>{leads.createdAt}</td>
+                                <td>{leads.SOURCE}</td>
+                                {/* <td>{leads.STATUS}</td> */}
+>>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
                                 <td>
 
                                   {/* Edit Button */}
@@ -245,6 +260,95 @@ export const MarketingMasterGrid = () => {
                     </div>
                   </div>
                 </div>
+
+
+               {/* add pagination Pagination */}
+
+                {!loading && pagination.totalPages > 1 && (
+                  <div className="pagination-container text-center my-3">
+                    <button
+                      onClick={() => handlePageChange(1)}
+                      disabled={!pagination.hasPrevPage}
+                      className="btn btn-dark btn-sm me-1"
+                      style={{ borderRadius: "4px" }}
+                      aria-label="First Page"
+                    >
+                      First
+                    </button>
+
+                    <button
+                      onClick={() => handlePageChange(pagination.currentPage - 1)}
+                      disabled={!pagination.hasPrevPage}
+                      className="btn btn-dark btn-sm me-1"
+                      style={{ borderRadius: "4px" }}
+                      aria-label="Previous Page"
+                    >
+                      Previous
+                    </button>
+
+                    {(() => {
+                      const pageNumbers = [];
+                      const maxPagesToShow = 5;
+
+                      if (pagination.totalPages <= maxPagesToShow) {
+                        for (let i = 1; i <= pagination.totalPages; i++) {
+                          pageNumbers.push(i);
+                        }
+                      } else {
+                        let startPage, endPage;
+                        if (pagination.currentPage <= 3) {
+                          startPage = 1;
+                          endPage = maxPagesToShow;
+                        } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                          startPage = pagination.totalPages - maxPagesToShow + 1;
+                          endPage = pagination.totalPages;
+                        } else {
+                          startPage = pagination.currentPage - 2;
+                          endPage = pagination.currentPage + 2;
+                        }
+                        startPage = Math.max(1, startPage);
+                        endPage = Math.min(pagination.totalPages, endPage);
+
+                        for (let i = startPage; i <= endPage; i++) {
+                          pageNumbers.push(i);
+                        }
+                      }
+
+                      return pageNumbers.map((number) => (
+                        <button
+                          key={number}
+                          onClick={() => handlePageChange(number)}
+                          className={`btn btn-sm me-1 ${
+                            pagination.currentPage === number ? "btn-primary" : "btn-dark"
+                          }`}
+                          style={{ minWidth: "35px", borderRadius: "4px" }}
+                          aria-label={`Go to page ${number}`}
+                          aria-current={pagination.currentPage === number ? "page" : undefined}
+                        >
+                          {number}
+                        </button>
+                      ));
+                    })()}
+
+                    <button
+                      disabled={!pagination.hasNextPage}
+                      onClick={() => handlePageChange(pagination.currentPage + 1)}
+                      className="btn btn-dark btn-sm me-1"
+                    >
+                      Next
+                    </button>
+
+                    <button
+                      onClick={() => handlePageChange(pagination.totalPages)}
+                      disabled={!pagination.hasNextPage}
+                      className="btn btn-dark btn-sm"
+                      style={{ borderRadius: "4px" }}
+                      aria-label="Last Page"
+                    >
+                      Last
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -254,7 +358,11 @@ export const MarketingMasterGrid = () => {
 
 
       {UpdatePopUpShow && selectedLead && (
+<<<<<<< HEAD
         <AssignMarketingLeadPopUp
+=======
+        <UpdateMarketingPopUp
+>>>>>>> c7ecb1a9a0a4139675bfe85814c655dfb6f162b7
           selectedLead={selectedLead}
           onUpdate={handleUpdateSubmit}
           onClose={() => {

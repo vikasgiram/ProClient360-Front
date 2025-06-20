@@ -1,4 +1,4 @@
-import {  useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { updateCompany } from "../../../../../hooks/useCompany";
 import { formatDateforupdateSubcription } from "../../../../../utils/formatDate";
@@ -19,7 +19,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
     city: "",
     country: "",
   });
-  
+
   const [subDate, setSubDate] = useState(formatDateforupdateSubcription(company.subDate));
   const [loading, setLoading] = useState(false);
 
@@ -39,7 +39,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
         setAddress(data);
       }
     };
-    if(Address.pincode.length === 6)
+    if (Address.pincode.length === 6)
       fetchData();
   }, [Address.pincode]);
 
@@ -52,7 +52,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
       setSubDate(value);
     }
   };
-  
+
 
   const handleCompanyUpdate = async (event) => {
     event.preventDefault();
@@ -63,58 +63,58 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
       subDate
     }
 
-    if(updatedCompany.name === "") {
+    if (updatedCompany.name === "") {
       setLoading(false);
       return toast.error("Company Name can't be empty or Invalid");
     }
-    if(updatedCompany.admin === "") {
+    if (updatedCompany.admin === "") {
       setLoading(false);
       return toast.error("Admin Name can't be empty or Invalid");
     }
-    if(updatedCompany.subDate === "") {
+    if (updatedCompany.subDate === "") {
       setLoading(false);
       return toast.error("Subscription End Date can't be empty");
     }
-    if(updatedCompany?.Address?.add === "") {
+    if (updatedCompany?.Address?.add === "") {
       setLoading(false);
       return toast.error("Address can't be empty or Invalid");
     }
-    if(updatedCompany?.pincode?.length == 6) {
+    if (updatedCompany?.pincode?.length == 6) {
       setLoading(false);
       return toast.error("Invalid Pincode");
     }
-    if(updatedCompany.Address.state === "") {
+    if (updatedCompany.Address.state === "") {
       setLoading(false);
       return toast.error("State can't be empty");
     }
-    if(updatedCompany.city === "") {
+    if (updatedCompany.city === "") {
       setLoading(false);
       return toast.error("City can't be empty");
     }
-    if(updatedCompany.country === "") {
+    if (updatedCompany.country === "") {
       setLoading(false);
       return toast.error("Country can't be empty");
     }
-    if(!  isValidGSTINumber(updatedCompany.GST)) {
-      console.log("GST No",updatedCompany.GST);
+    if (!isValidGSTINumber(updatedCompany.GST)) {
+      console.log("GST No", updatedCompany.GST);
       setLoading(false);
       return toast.error("GST No can't be empty or Invalid");
-      }
-    if(updatedCompany.subAmount < 0){
+    }
+    if (updatedCompany.subAmount < 0) {
       setLoading(false);
       return toast.error("Subscription Amount can't be negative");
     }
     try {
       // console.log(updatedCompany);
       await updateCompany(updatedCompany);
-      console.log("update compnay....",updatedCompany);
+      console.log("update compnay....", updatedCompany);
       handleUpdate();
     } catch (error) {
       toast.error(error.massage);
     }
- 
- 
- 
+
+
+
   };
 
 
@@ -155,6 +155,8 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                       <input
                         name="name"
                         type="text"
+                        placeholder="Update Full Name...."
+                        maxLength={40}
                         value={company.name}
                         onChange={handleChange}
                         className="form-control rounded-0"
@@ -173,6 +175,8 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                       <input
                         type="text"
                         name="admin"
+                        placeholder="Update Admin Name...."
+                        maxLength={40}
                         value={company.admin}
                         onChange={handleChange}
                         className="form-control rounded-0"
@@ -228,6 +232,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                           type="number"
                           id="subAmount"
                           name="subAmount"
+                          placeholder="eg.1000"
                           value={company.subAmount}
                           onChange={handleChange}
                           className="form-control rounded-0 border-0"
@@ -250,6 +255,8 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                           type="text"
                           id="GST"
                           name="GST"
+                          maxLength={15}
+                          placeholder="Update GST Number...."
                           value={company.GST}
                           onChange={handleChange}
                           className="form-control rounded-0 border-0"
@@ -270,14 +277,14 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      
-                      {company.logo&& 
-                      <img 
-                      src={company.logo} 
-                      alt="Company Logo" 
-                      className="img-fluid rounded" // Bootstrap classes for styling
-                      style={{ maxWidth: '200px', maxHeight: '100px' }} // Optional: restrict size
-                    />
+
+                      {company.logo &&
+                        <img
+                          src={company.logo}
+                          alt="Company Logo"
+                          className="img-fluid rounded" // Bootstrap classes for styling
+                          style={{ maxWidth: '200px', maxHeight: '100px' }} // Optional: restrict size
+                        />
                       }
                     </div>
                   </div>
@@ -294,22 +301,24 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                       <div className="col-12 col-lg-6 mt-2">
                         <div className="mb-3" for="pincode">
                           <input
-                            type="number"
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            maxLength={6}
                             className="form-control rounded-0"
                             placeholder="Pincode"
                             name="pincode"
                             id="pincode"
-                            onChange={
-                              handleAddressChange
-                              //     (e) =>
-                              //   setAddress({
-                              //     ...Address,
-                              //     pincode: e.target.value,
-                              //   })
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^\d{0,6}$/.test(value)) {
+                                handleAddressChange(e);
+                              }
+                            }}
                             value={Address.pincode}
-                            aria-describedby="emailHelp"
+                            aria-describedby="pincodeHelp"
                           />
+
                         </div>
                       </div>
 
@@ -382,7 +391,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                         disabled={loading}
                         className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
                       >
-                         {!loading ? "Update" : "Submitting..."}
+                        {!loading ? "Update" : "Submitting..."}
                       </button>
                       <button
                         type="button"
