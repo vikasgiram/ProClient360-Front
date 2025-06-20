@@ -4,9 +4,9 @@ import toast from 'react-hot-toast';
 const baseUrl= process.env.REACT_APP_API_URL;
 const url=baseUrl+"/api/company/lead-config";
 
-const sendTradeIndiaApiKey = async (apiKey) => {
+const sendTradeIndiaApiKey = async (tradeIndiaConfig) => {
     try {
-        const response = await axios.put(url, apiKey, {
+        const response = await axios.put(url, tradeIndiaConfig, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }});
