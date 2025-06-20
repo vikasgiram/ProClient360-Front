@@ -41,6 +41,7 @@ import { EmployeeMyServiceMasterGrid } from "./Components/Private/EmployeeDashbo
 import { EmployeeFeedbackMasterGrid } from "./Components/Private/EmployeeDashboard/EmployeesFeedbackMasterGrid/EmployeeFeedbackMasterGrid";
 import ProtectedRoute from "./utils/ProtectedRoute";
 
+import LeadApis from "./Components/Private/MainDashboard/LeadApisMaster/LeadApis";
 const AllRoutes = () => {
 
 const {user} = useContext(UserContext);
@@ -86,7 +87,7 @@ const {user} = useContext(UserContext);
                     {user && user?.user==='company'?(
                         <>
                             <Route exact path="/MainDashboard" element={<MainDashboard />} />
-
+                            <Route exact path="/leadApis" element={<LeadApis />} />
                         </>
                     ):null}
 

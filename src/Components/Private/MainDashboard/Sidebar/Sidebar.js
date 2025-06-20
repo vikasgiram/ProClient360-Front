@@ -12,6 +12,7 @@ export const Sidebar = ({ isopen, active }) => {
     const { user } = useContext(UserContext);
 
 
+
     return (
         <div
             className={
@@ -59,41 +60,6 @@ export const Sidebar = ({ isopen, active }) => {
 
 
 
-{/* new sales sidebar */}
-
-
-                    {user?.permissions?.includes("viewSales") || user?.user === 'company' ? (
-                        <li title="Sales Master"
-                            className={active === "SalesMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                            <Link to='/SalesMasterGrid' className="nav-link ">
-                                <i class="fa-solid ps-3 fa-chart-pie side_icon_fs"></i>
-                                <span
-                                    className="menu-title_m"
-                                    style={{ display: isopen ? "" : "none" }}
-                                >
-                                    Sales Master
-                                </span>
-                            </Link>
-                        </li>
-                    ) : null}
-
-                    {/* new marketing sidebar */}
-
-
-                    {user?.permissions?.includes("viewMarketing") || user?.user === 'company' ? (
-                        <li title="Marketing Master"
-                            className={active === "MarketingMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                            <Link to='/MarketingMasterGrid' className="nav-link ">
-                                <i class="fa-solid ps-3 fa-chart-simple side_icon_fs"></i>
-                                <span
-                                    className="menu-title_m"
-                                    style={{ display: isopen ? "" : "none" }}
-                                >
-                                    Marketing Master
-                                </span>
-                            </Link>
-                        </li>
-                    ) : null}
 
 
                     {user?.user === 'employee' ? (
@@ -128,9 +94,10 @@ export const Sidebar = ({ isopen, active }) => {
                                     </span>
                                 </Link>
                             </li>
+                        
+                  
 
-
-                            <li
+                    <li
                                 title="My Service"
                                 className={Open || active === "EmployeeMyServiceMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
                                 <Link to='/EmployeeMyServiceMasterGrid' className="nav-link ">
@@ -147,7 +114,49 @@ export const Sidebar = ({ isopen, active }) => {
                             </li>
                         </>
 
+                     ): null}
+
+                            
+{/* new sales sidebar */}
+
+
+                    {(user?.permissions?.includes("viewLead") && 
+                    !user?.permissions?.includes("viewMarketingDashboard") || user?.user === 'company')  ? (
+                        <li title="Sales Master"
+                            className={active === "SalesMasterGrid" ? "nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/SalesMasterGrid' className="nav-link ">
+                                <i className="fa-solid ps-3 fa-chart-pie side_icon_fs"></i>
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Sales Master
+                                </span>
+                            </Link>
+                        </li>
                     ) : null}
+
+
+                    {/* new marketing sidebar */}
+
+
+                    {user?.permissions?.includes("viewMarketingDashboard") || user?.user === 'company' ? (
+                        <li title="Marketing Master"
+                            className={active === "MarketingMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/MarketingMasterGrid' className="nav-link ">
+                                <i class="fa-solid ps-3 fa-chart-simple side_icon_fs"></i>
+                                <span
+                                    className="menu-title_m"
+                                    style={{ display: isopen ? "" : "none" }}
+                                >
+                                    Marketing Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
+
+                            
 
                     <li
                         title="Ticket Master"

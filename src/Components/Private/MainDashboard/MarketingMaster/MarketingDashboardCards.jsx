@@ -1,4 +1,4 @@
-const MarketingDashboardCards = ({allLeadServiceCount, onGoingServiceCount, notFisibleServiceCount }) => {
+const MarketingDashboardCards = ({allLeads, feasibleLeads, notFeasibleLeads }) => {
   return (
     <div className="row bg-white p-2 m-1 border rounded">
       <div className="col-12 py-1">
@@ -12,7 +12,7 @@ const MarketingDashboardCards = ({allLeadServiceCount, onGoingServiceCount, notF
                     All Lead
                   </h6>
                   <h2 className="pt-2 fw-bold card_count demo_bottom">
-                    {allLeadServiceCount}
+                    {allLeads}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
@@ -28,10 +28,10 @@ const MarketingDashboardCards = ({allLeadServiceCount, onGoingServiceCount, notF
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">
-                    Ongoing
+                    Feasible
                   </h6> 
                   <h2 className="pt-2 fw-bold card_count">
-                    {onGoingServiceCount}
+                    {feasibleLeads}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
@@ -47,10 +47,10 @@ const MarketingDashboardCards = ({allLeadServiceCount, onGoingServiceCount, notF
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">
-                    Not Fisible
+                    Not Feasible
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {notFisibleServiceCount}
+                    {notFeasibleLeads}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">

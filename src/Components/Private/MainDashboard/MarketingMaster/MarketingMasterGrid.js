@@ -1,16 +1,16 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, act } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
-import toast from 'react-hot-toast';
-import useServices from "../../../../hooks/service/useService";
-import { formatDate } from "../../../../utils/formatDate";
-import SalesDashboardCards from './MarketingDashboardCards';
+import toast from 'react-hot-toast'
+
+import MarketingDashboardCards from './MarketingDashboardCards';
 import { UserContext } from "../../../../context/UserContext";
 
-import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
 import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
-import UpdateSalesPopUp from "./PopUp/UpdateMarketingPopUp";
 import useLeads from "../../../../hooks/leads/useLeads";
+import AssignMarketingLeadPopUp from "./PopUp/AssignLeadPopUp";
+import useAssignLead from "../../../../hooks/leads/useAssignLead";
+
 
 export const MarketingMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -29,7 +29,7 @@ export const MarketingMasterGrid = () => {
   const [selectedLeadId, setSelectedLeadId] = useState(null);
 
   const { user } = useContext(UserContext);
-  const [filters, setFilters] = useState({ status: null, source: null });
+  const [filters, setFilters] = useState({ date: null, source: null });
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
@@ -40,9 +40,9 @@ export const MarketingMasterGrid = () => {
   });
   const itemsPerPage = 10;
 
-  const { data, loading, error, updateService } = useLeads(pagination.currentPage, itemsPerPage, filters);
-
-  console.log(data)
+  const { data, loading, error } = useLeads(pagination.currentPage, itemsPerPage, filters);
+  const {assignLead } = useAssignLead();
+  
 
   useEffect(() => {
     if (data) {
@@ -82,21 +82,12 @@ export const MarketingMasterGrid = () => {
     }
   };
 
-  const handleUpdateSubmit = async (id, updatedData) => {
+  const handleUpdateSubmit = async (id, actionData) => {
     try {
-      if (updateService) {
-        const result = await updateService(id, updatedData);
-        if (result) {
-          toast.success("Lead updated successfully!");
-          setUpdatePopUpShow(false);
-          setSelectedLead(null);
-        }
-      } else {
-        console.log("Updating lead:", id, updatedData);
-        toast.success("Lead updated successfully!");
-        setUpdatePopUpShow(false);
-        setSelectedLead(null);
-      }
+      if (actionData) {
+        console.log("Updating lead with ID:", id, "and data:", actionData);
+        await assignLead(id, actionData);
+      } 
     } catch (error) {
       console.error("Update error:", error);
       toast.error("Failed to update lead");
@@ -146,14 +137,10 @@ export const MarketingMasterGrid = () => {
 
                 </div>
 
-                <SalesDashboardCards
-                  totalSalesCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.PendingfollowUp || 0) + (data?.statusCounts?.notFisible || 0) + (data?.statusCounts?.Win || 0) + (data?.statusCounts?.Lost || 0)}
-                  allEnquiriesServiceCount={data?.statusCounts?.allEnquiries || 0}
-                  ongoingServiceCount={data?.statusCounts?.ongoing || 0}
-                  pendingFollowUpServiceCount={data?.statusCounts?.PendingfollowUp || 0}
-                  notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
-                  winServiceCount={data?.statusCounts?.Win || 0}
-                  lostServiceCount={data?.statusCounts?.Lost || 0}
+                <MarketingDashboardCards
+                  allLeads={data?.allLeadsCount || 0}
+                  feasibleLeads={data?.feasibleCount || 0}
+                  notFeasibleLeads={data?.notFeasibleCount || 0}
                 />
 
                 <div className="row align-items-center p-2 m-1">
@@ -173,7 +160,7 @@ export const MarketingMasterGrid = () => {
                         <select
                           className="form-select bg_edit"
                           name="status"
-                          onChange={(e) => handleChange('status', e.target.value)}
+                          onChange={(e) => handleChange('source', e.target.value)}
                           value={filters.status || ""}
                         >
                           <option value="">Sources....</option>
@@ -209,33 +196,36 @@ export const MarketingMasterGrid = () => {
                             <th>Email</th>
                             <th>Date</th>
                             <th>Sources</th>
-                            {/* <th>Status</th> */}
                             <th>Action</th>
                           </tr>
                         </thead>
                         <tbody className="broder my-4">
                           {data?.leads?.length > 0 ? (
-                            data.leads.map((leads, index) => (
+                            data.leads.map((lead, index) => (
                               <tr >
-                                <td>{index + 1}</td>
-                                <td>{leads.SENDER_NAME}</td>
-                                <td>{leads.SENDER_COMPANY}</td>
-                                <td>{leads.QUERY_PRODUCT_NAME}</td>
-                                <td>{leads.SENDER_EMAIL}</td>
-                                <td>{leads.createdAt}</td>
-                                <td>{leads.SOURCE}</td>
-                                {/* <td>{leads.STATUS}</td> */}
+                                <td>{index + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                <td>{lead.SENDER_NAME||'Not avaliable'}</td>
+                                <td>{lead.SENDER_COMPANY||'Not avaliable'}</td>
+                                <td>{lead.QUERY_PRODUCT_NAME ||'Not avaliable'}</td>
+                                <td>{lead.SENDER_EMAIL||'Not avaliable'}</td>
+                                <td>{lead.createdAt||'Not avaliable'}</td>
+                                <td>{lead.SOURCE||'Not avaliable'}</td> 
                                 <td>
 
                                   {/* Edit Button */}
-                                  {(user?.permissions?.includes('updateLeadMaster') || user?.user === 'company') &&
-                                    <span onClick={() => handleUpdate(leads)} title="Edit Lead">
-                                      <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
+                                  {(user?.permissions?.includes('assignLead')) &&
+                                    <span onClick={() => handleUpdate(lead)} title="Edit Lead">
+                                      <i className="mx-1 fa-solid fa-share cursor-pointer"></i>
                                     </span>
                                   }
+                                  {(user?.permissions?.includes('deleteLead') || user?.user === 'company' && lead.SOURCE==='Direct' ) &&
+                                              <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
+                                                  <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
+                                              </span>
+                                            }
 
                                   {/* View Button */}
-                                  <span onClick={() => handleDetailsPopUpClick(leads)} title="View Details">
+                                  <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
                                     <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
                                   </span>
 
@@ -264,7 +254,7 @@ export const MarketingMasterGrid = () => {
 
 
       {UpdatePopUpShow && selectedLead && (
-        <UpdateSalesPopUp
+        <AssignMarketingLeadPopUp
           selectedLead={selectedLead}
           onUpdate={handleUpdateSubmit}
           onClose={() => {
@@ -276,12 +266,12 @@ export const MarketingMasterGrid = () => {
 
 
       {detailsServicePopUp && selectedLead && (
-        <ViewServicePopUp
+        <ViewSalesLeadPopUp
           closePopUp={() => {
             setDetailsServicePopUp(false);
             setSelectedLead(null);
           }}
-          selectedService={selectedLead}
+          selectedLead={selectedLead}
         />
       )}
 

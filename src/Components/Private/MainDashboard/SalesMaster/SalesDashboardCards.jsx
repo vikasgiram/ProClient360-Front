@@ -1,4 +1,4 @@
-const SalesDashboardCards = ({allEnquiriesServiceCount, winServiceCount, ongoingServiceCount, lostServiceCount, pendingFollowUpServiceCount, todayServiceCount }) => {
+const SalesDashboardCards = ({allLeadsCount, ongogingCount, winCount, pendingCount, lostCount }) => {
   return (
     <div className="row bg-white p-2 m-1 border rounded">
       <div className="col-12 py-1">
@@ -12,7 +12,7 @@ const SalesDashboardCards = ({allEnquiriesServiceCount, winServiceCount, ongoing
                     All Enquiries
                   </h6>
                   <h2 className="pt-2 fw-bold card_count demo_bottom">
-                    {allEnquiriesServiceCount}
+                    {allLeadsCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
@@ -31,30 +31,11 @@ const SalesDashboardCards = ({allEnquiriesServiceCount, winServiceCount, ongoing
                     Ongoing
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {ongoingServiceCount}
+                    {ongogingCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
                   <img src="./static/assets/img/process.png" className="img_opacity all_card_img_size" alt="" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-           
-          <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style"   style={{backgroundColor:"#FEA2A2"}}>
-              <div className="row">
-                <div className="col-9">
-                  <h6 className="text-dark card_heading">
-                    Not Fisible
-                  </h6>
-                  <h2 className="pt-2 fw-bold card_count">
-                    {todayServiceCount}
-                  </h2>
-                </div>
-                <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img src="./static/assets/img/stuck.png" className="img_opacity all_card_img_size" alt="" />
                 </div>
               </div>
             </div>
@@ -66,10 +47,10 @@ const SalesDashboardCards = ({allEnquiriesServiceCount, winServiceCount, ongoing
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">
-                    Win
+                    Won
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {winServiceCount}
+                    {winCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
@@ -88,7 +69,7 @@ const SalesDashboardCards = ({allEnquiriesServiceCount, winServiceCount, ongoing
                     Lost
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {lostServiceCount}
+                    {lostCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
@@ -98,24 +79,6 @@ const SalesDashboardCards = ({allEnquiriesServiceCount, winServiceCount, ongoing
             </div>
           </div>
            
-
-           <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style"   style={{backgroundColor:"#FFF9C4"}}>
-              <div className="row">
-                <div className="col-9">
-                  <h6 className="text-dark card_heading">
-                    Today
-                  </h6>
-                  <h2 className="pt-2 fw-bold card_count">
-                    {todayServiceCount}
-                  </h2>
-                </div>
-                <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img src="./static/assets/img/only-today.png" className="img_opacity all_card_img_size" alt="" />
-                </div>
-              </div>
-            </div>
-          </div>
         
           <div className="col-12 col-md-3 pb-3 cursor-pointer">
             <div className="p-4 background_style" style={{backgroundColor: '#f8d7da'}}>
@@ -125,7 +88,7 @@ const SalesDashboardCards = ({allEnquiriesServiceCount, winServiceCount, ongoing
                     Pending followUp
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {pendingFollowUpServiceCount}
+                    {pendingCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
