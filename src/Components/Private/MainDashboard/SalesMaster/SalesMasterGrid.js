@@ -43,7 +43,7 @@ export const SalesMasterGrid = () => {
   const itemsPerPage = 10;
 
 
-  const { data, loading, error, } = useMyLeads(pagination.currentPage, itemsPerPage, filters);
+  const { data, loading, error, refetch } = useMyLeads(pagination.currentPage, itemsPerPage, filters);
   const {submitEnquiry} = useSubmitEnquiry();
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export const SalesMasterGrid = () => {
     try {
       if (enquiryData) {
         await submitEnquiry(id, enquiryData);
-        handlePageChange(1);
+        refetch();
       }
     } catch (error) {
       console.error("Update error:", error);
@@ -188,7 +188,7 @@ export const SalesMasterGrid = () => {
                       <div className="col">
                         <select
                           className="form-select bg_edit"
-                          name="status"
+                          name="source"
                           onChange={(e) => handleChange('source', e.target.value)}
                           value={filters.source || ""}
                         >

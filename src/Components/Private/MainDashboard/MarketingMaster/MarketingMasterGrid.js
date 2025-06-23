@@ -10,6 +10,7 @@ import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
 import useLeads from "../../../../hooks/leads/useLeads";
 import AssignMarketingLeadPopUp from "./PopUp/AssignLeadPopUp";
 import useAssignLead from "../../../../hooks/leads/useAssignLead";
+import { formatDate } from "../../../../utils/formatDate";
 
 
 export const MarketingMasterGrid = () => {
@@ -38,7 +39,7 @@ export const MarketingMasterGrid = () => {
   });
   const itemsPerPage = 10;
 
-  const { data, loading, error } = useLeads(pagination.currentPage, itemsPerPage, filters);
+  const { data, loading, error, refetch } = useLeads(pagination.currentPage, itemsPerPage, filters);
   const {assignLead } = useAssignLead();
   
 
@@ -69,6 +70,7 @@ export const MarketingMasterGrid = () => {
       if (actionData) {
         console.log("Updating lead with ID:", id, "and data:", actionData);
         await assignLead(id, actionData);
+        refetch();
       } 
     } catch (error) {
       console.error("Update error:", error);
@@ -142,9 +144,9 @@ export const MarketingMasterGrid = () => {
                       <div className="col-12 col-lg-6 mt-4">
                         <select
                           className="form-select bg_edit"
-                          name="status"
+                          name="source"
                           onChange={(e) => handleChange('source', e.target.value)}
-                          value={filters.status || ""}
+                          value={filters.source || ""}
                         >
                           <option value="">Sources....</option>
                           <option value="IndiaMart">IndiaMart</option>
@@ -191,7 +193,7 @@ export const MarketingMasterGrid = () => {
                                 <td>{lead?.SENDER_COMPANY}</td>
                                 <td>{lead?.QUERY_PRODUCT_NAME}</td>
                                 <td>{lead?.SENDER_EMAIL}</td>
-                                <td>{lead?.createdAt}</td>
+                                <td>{formatDate(lead?.createdAt)}</td>
                                 <td>{lead?.SOURCE}</td>
                                 {/* <td>{leads.STATUS}</td> */}
                                 <td>

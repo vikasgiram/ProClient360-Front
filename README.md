@@ -68,3 +68,12 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+
+#Task 
+
+- call the tradeIndia apis in continuce manner - done
+- check create lead and delete lead works or not
+- check update lead form show and update the direct source lead
+- take apis from google, linkdin, facebook and integrate them also
