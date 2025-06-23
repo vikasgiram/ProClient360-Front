@@ -169,12 +169,11 @@ export const TaskMasterGrid = () => {
 
                                         <div className="table-responsive">
                                             <table className="table table-striped table-class" id="table-id">
-                                              <thead>
+                                               <thead>
                                                 <tr className="th_border my-4">
                                                     <th>SR. NO</th>
                                                     <th className="align_left_td td_width">TASK NAME</th>
                                                     <th>ACTION</th>
-                                        
                                                 </tr>
                                                </thead>
                                                 <tbody className="broder my-4">
