@@ -16,6 +16,7 @@ export const MarketingMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
   const toggle = () => {
     setIsOpen(!isopen);
+    
   };
 
   // const [isAddModalVisible, setIsAddModalVisible] = useState(false);
