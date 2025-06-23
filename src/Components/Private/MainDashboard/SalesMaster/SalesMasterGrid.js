@@ -221,12 +221,12 @@ export const SalesMasterGrid = () => {
                                 <thead>
                                     <tr className="th_border">
                                         <th>Sr.No</th>
+                                        <th>Sources</th>
                                         <th>Contact Name</th>
                                         <th>Company Name</th>
                                         <th>Product</th>
                                         <th>Email</th>
                                         <th>Date</th>
-                                        <th>Sources</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -236,12 +236,12 @@ export const SalesMasterGrid = () => {
                                     data.leads.map((lead, index) => (
                                     <tr key={lead._id}>
                                         <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                        <td>{lead.SOURCE}</td>
                                         <td>{lead.SENDER_NAME||"Not avaliable."}</td>
                                         <td>{lead.SENDER_COMPANY||"Not avaliable."}</td>
                                         <td>{lead.QUERY_PRODUCT||"Not avaliable."}</td>
                                         <td>{lead.SENDER_EMAIL||"Not avaliable."}</td>
                                         <td>{formatDateforTaskUpdate(lead.createdAt)}</td>
-                                        <td>{lead.SOURCE}</td>
                                         <td>
                                             <span className="badge bg-warning text-dark">{lead.STATUS}</span>
                                         </td>

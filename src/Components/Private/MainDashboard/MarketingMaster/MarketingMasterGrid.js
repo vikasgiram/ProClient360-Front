@@ -181,12 +181,12 @@ export const MarketingMasterGrid = () => {
                         <thead>
                           <tr className="th_border">
                             <th>Sr.No</th>
+                            <th>Sources</th>
                             <th>Contact Name</th>
                             <th>Company Name</th>
                             <th>Product</th>
                             <th>Email</th>
                             <th>Date</th>
-                            <th>Sources</th>
                             {/* <th>Status</th> */}
                             <th>Action</th>
                           </tr>
@@ -196,12 +196,12 @@ export const MarketingMasterGrid = () => {
                             data.leads.map((leads, index) => (
                               <tr >
                                 <td>{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
+                                <td>{leads.SOURCE}</td>
                                 <td>{leads.SENDER_NAME}</td>
                                 <td>{leads.SENDER_COMPANY}</td>
                                 <td>{leads.QUERY_PRODUCT_NAME}</td>
                                 <td>{leads.SENDER_EMAIL}</td>
                                 <td>{leads.createdAt}</td>
-                                <td>{leads.SOURCE}</td>
                                 {/* <td>{leads.STATUS}</td> */}
                                 <td>
 
