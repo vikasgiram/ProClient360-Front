@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatDateforTaskUpdate } from '../../../utils/formatDate';
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -21,6 +22,8 @@ const ViewSalesLeadPopUp = ({ closePopUp, selectedLead }) => {
   if (!selectedLead) {
     return null;
   }
+
+  console.log("Selected Lead Data:", selectedLead);
 
   const fullAddress = [
     selectedLead.SENDER_ADDRESS,
@@ -61,19 +64,19 @@ const ViewSalesLeadPopUp = ({ closePopUp, selectedLead }) => {
                   <h6 className="text-muted border-bottom pb-2 mb-3">Sender Information</h6>
                   <h6>
                     <p className="fw-bold d-inline">Name: </p>
-                    {selectedLead.SENDER_NAME || "-"}
+                    {selectedLead?.SENDER_NAME || "-"}
                   </h6>
                   <h6 className="mt-3">
                     <p className="fw-bold d-inline">Company: </p>
-                    {selectedLead.SENDER_COMPANY || "-"}
+                    {selectedLead?.SENDER_COMPANY || "-"}
                   </h6>
                   <h6 className="mt-3">
                     <p className="fw-bold d-inline">Email: </p>
-                    {selectedLead.SENDER_EMAIL || "-"}
+                    {selectedLead?.SENDER_EMAIL || "-"}
                   </h6>
                   <h6 className="mt-3">
                     <p className="fw-bold d-inline">Mobile: </p>
-                    {selectedLead.SENDER_MOBILE || "-"}
+                    {selectedLead?.SENDER_MOBILE || "-"}
                   </h6>
                   <h6 className="mt-3">
                     <p className="fw-bold d-inline">Address: </p>
@@ -85,30 +88,42 @@ const ViewSalesLeadPopUp = ({ closePopUp, selectedLead }) => {
                   <h6 className="text-muted border-bottom pb-2 mb-3">Query Information</h6>
                   <h6>
                     <p className="fw-bold d-inline">Product: </p>
-                    {selectedLead.QUERY_PRODUCT_NAME || "-"}
+                    {selectedLead?.QUERY_PRODUCT_NAME || "-"}
                   </h6>
                   <h6 className="mt-3">
                     <p className="fw-bold d-inline">Subject: </p>
-                    {selectedLead.SUBJECT || "-"}
+                    {selectedLead?.SUBJECT || "-"}
                   </h6>
                   <h6 className="mt-3">
                     <p className="fw-bold d-inline">Query Time: </p>
-                    {formatDate(selectedLead.QUERY_TIME)}
+                    {formatDate(selectedLead?.createdAt) || "-"}
                   </h6>
-                   <h6 className="mt-3">
-                    <p className="fw-bold d-inline">Query Type: </p>
-                    {selectedLead.QUERY_TYPE || "-"}
-                  </h6>
+
                   <h6 className="mt-3">
-                    <p className="fw-bold d-inline">Unique ID: </p>
-                    {selectedLead.UNIQUE_QUERY_ID || "-"}
+                    <p className="fw-bold d-inline">Assigned By: </p>
+                    {selectedLead?.assignedBy?.name || "Unknown"}
+                  </h6>
+
+                  <h6 className="mt-3">
+                    <p className="fw-bold d-inline">Status: </p>
+                    {selectedLead?.STATUS || "-"}
+                  </h6>
+
+                  <h6 className="mt-3">
+                    <p className="fw-bold d-inline">Current Stage: </p>
+                    {selectedLead?.step || "-"}
+                  </h6>
+
+                  <h6 className="mt-3">
+                    <p className="fw-bold d-inline">Complated: </p>
+                    {selectedLead?.complated || "-"}
                   </h6>
                 </div>
 
                 <div className="col-12 mt-2">
                   <h6 className="text-muted border-bottom pb-2 mb-2">Message</h6>
                   <p className="text-wrap" style={{ whiteSpace: "pre-wrap" }}>
-                    {selectedLead.QUERY_MESSAGE || "No message provided."}
+                    {selectedLead?.QUERY_MESSAGE || "No message provided."}
                   </p>
                 </div>
               </div>

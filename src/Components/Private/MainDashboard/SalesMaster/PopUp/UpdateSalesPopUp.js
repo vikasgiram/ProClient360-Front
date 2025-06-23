@@ -92,8 +92,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
     };
 
     onUpdate(selectedLead._id, updatedFormData);
-
-    toast.success(`Action submitted successfully!`);
     onClose();
   };
 
@@ -127,9 +125,9 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
                     required
                   >
                     <option value="" disabled>-- Select a status --</option>
-                    <option value="Win">Win</option>
-                    <option value="Ongoing">Ongoing</option>
                     <option value="Pending">Pending</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Won">Won</option>
                     <option value="Lost">Lost</option>
                   </select>
                 </div>

@@ -1,12 +1,16 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, act } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
-import toast from 'react-hot-toast';
+import toast from 'react-hot-toast'
+
 import MarketingDashboardCards from './MarketingDashboardCards';
 import { UserContext } from "../../../../context/UserContext";
-import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
-import UpdateMarketingPopUp from "./PopUp/UpdateMarketingPopUp";
+
+import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
 import useLeads from "../../../../hooks/leads/useLeads";
+import AssignMarketingLeadPopUp from "./PopUp/AssignLeadPopUp";
+import useAssignLead from "../../../../hooks/leads/useAssignLead";
+
 
 export const MarketingMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -23,9 +27,7 @@ export const MarketingMasterGrid = () => {
   const [selectedLead, setSelectedLead] = useState(null);
 
   const { user } = useContext(UserContext);
-
-  const [filters, setFilters] = useState({ status: null, source: null });
-
+  const [filters, setFilters] = useState({ date: null, source: null });
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
@@ -36,9 +38,9 @@ export const MarketingMasterGrid = () => {
   });
   const itemsPerPage = 10;
 
-  const { data, loading, error, updateService } = useLeads(pagination.currentPage, itemsPerPage, filters);
-
-  console.log(data)
+  const { data, loading, error } = useLeads(pagination.currentPage, itemsPerPage, filters);
+  const {assignLead } = useAssignLead();
+  
 
   useEffect(() => {
     if (data) {
@@ -62,21 +64,12 @@ export const MarketingMasterGrid = () => {
 
 
 
-  const handleUpdateSubmit = async (id, updatedData) => {
+  const handleUpdateSubmit = async (id, actionData) => {
     try {
-      if (updateService) {
-        const result = await updateService(id, updatedData);
-        if (result) {
-          toast.success("Lead updated successfully!");
-          setUpdatePopUpShow(false);
-          setSelectedLead(null);
-        }
-      } else {
-        console.log("Updating lead:", id, updatedData);
-        toast.success("Lead updated successfully!");
-        setUpdatePopUpShow(false);
-        setSelectedLead(null);
-      }
+      if (actionData) {
+        console.log("Updating lead with ID:", id, "and data:", actionData);
+        await assignLead(id, actionData);
+      } 
     } catch (error) {
       console.error("Update error:", error);
       toast.error("Failed to update lead");
@@ -128,10 +121,9 @@ export const MarketingMasterGrid = () => {
                 </div>
 
                 <MarketingDashboardCards
-                  allLeadServiceCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.notFisible || 0)}
-                  allEnquiriesServiceCount={data?.statusCounts?.allEnquiries || 0}
-                  onGoingServiceCount={data?.statusCounts?.ongoing || 0}
-                  notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
+                  allLeads={data?.allLeadsCount || 0}
+                  feasibleLeads={data?.feasibleCount || 0}
+                  notFeasibleLeads={data?.notFeasibleCount || 0}
                 />
 
                 <div className="row align-items-center p-2 m-1">
@@ -151,7 +143,7 @@ export const MarketingMasterGrid = () => {
                         <select
                           className="form-select bg_edit"
                           name="status"
-                          onChange={(e) => handleChange('status', e.target.value)}
+                          onChange={(e) => handleChange('source', e.target.value)}
                           value={filters.status || ""}
                         >
                           <option value="">Sources....</option>
@@ -181,39 +173,43 @@ export const MarketingMasterGrid = () => {
                         <thead>
                           <tr className="th_border">
                             <th>Sr.No</th>
-                            <th>Sources</th>
                             <th>Contact Name</th>
                             <th>Company Name</th>
                             <th>Product</th>
                             <th>Email</th>
                             <th>Date</th>
-                            {/* <th>Status</th> */}
+                            <th>Sources</th>
                             <th>Action</th>
                           </tr>
                         </thead>
                         <tbody className="broder my-4">
                           {data?.leads?.length > 0 ? (
-                            data.leads.map((leads, index) => (
+                            data.leads.map((lead, index) => (
                               <tr >
                                 <td>{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
-                                <td>{leads.SOURCE}</td>
-                                <td>{leads.SENDER_NAME}</td>
-                                <td>{leads.SENDER_COMPANY}</td>
-                                <td>{leads.QUERY_PRODUCT_NAME}</td>
-                                <td>{leads.SENDER_EMAIL}</td>
-                                <td>{leads.createdAt}</td>
+                                <td>{lead?.SENDER_NAME}</td>
+                                <td>{lead?.SENDER_COMPANY}</td>
+                                <td>{lead?.QUERY_PRODUCT_NAME}</td>
+                                <td>{lead?.SENDER_EMAIL}</td>
+                                <td>{lead?.createdAt}</td>
+                                <td>{lead?.SOURCE}</td>
                                 {/* <td>{leads.STATUS}</td> */}
                                 <td>
 
                                   {/* Edit Button */}
-                                  {(user?.permissions?.includes('updateLeadMaster') || user?.user === 'company') &&
-                                    <span onClick={() => handleUpdate(leads)} title="Edit Lead">
-                                      <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
+                                  {(user?.permissions?.includes('assignLead')) &&
+                                    <span onClick={() => handleUpdate(lead)} title="Edit Lead">
+                                      <i className="mx-1 fa-solid fa-share cursor-pointer"></i>
                                     </span>
                                   }
+                                  {/* {(user?.permissions?.includes('deleteLead') || user?.user === 'company' && lead.SOURCE==='Direct' ) &&
+                                              <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
+                                                  <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
+                                              </span>
+                                            } */}
 
                                   {/* View Button */}
-                                  <span onClick={() => handleDetailsPopUpClick(leads)} title="View Details">
+                                  <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
                                     <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
                                   </span>
 
@@ -331,7 +327,7 @@ export const MarketingMasterGrid = () => {
 
 
       {UpdatePopUpShow && selectedLead && (
-        <UpdateMarketingPopUp
+        <AssignMarketingLeadPopUp
           selectedLead={selectedLead}
           onUpdate={handleUpdateSubmit}
           onClose={() => {
@@ -343,12 +339,12 @@ export const MarketingMasterGrid = () => {
 
 
       {detailsServicePopUp && selectedLead && (
-        <ViewServicePopUp
+        <ViewSalesLeadPopUp
           closePopUp={() => {
             setDetailsServicePopUp(false);
             setSelectedLead(null);
           }}
-          selectedService={selectedLead}
+          selectedLead={selectedLead}
         />
       )}
 

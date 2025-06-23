@@ -141,6 +141,14 @@ export const Header = (props) => {
 									</div>
 								</Link>
 
+								{user.user === 'company'?
+									<Link to="/LeadApis" className="dropdown-item">
+										<div className="drop_item_one my-1">
+											Lead APIs
+										</div>
+									</Link>
+								: null}
+
 								<Link to="/" className="dropdown-item" onClick={handleLogout}>
 
 									<div className="drop_item_two my-1">

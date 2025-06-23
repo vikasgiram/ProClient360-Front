@@ -9,9 +9,10 @@ import { UserContext } from "../../../../context/UserContext";
 import useLeads from '../../../../hooks/leads/useLeads';
 
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
-import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
 import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
 import UpdateSalesPopUp from "./PopUp/UpdateSalesPopUp";
+import useMyLeads from "../../../../hooks/leads/useMyLeads";
+import useSubmitEnquiry from "../../../../hooks/leads/useSubmitEnquiry";
 
 export const SalesMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -21,7 +22,7 @@ export const SalesMasterGrid = () => {
 
   const [addpop, setIsAddModalVisible] = useState(false);
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
-  const [detailsServicePopUp, setDetailsServicePopUp] = useState(false);
+  const [showLeadPopUp, setShowLeadPopUp] = useState(false);
   
   const [selectedLead, setSelectedLead] = useState(null); 
   const [activeSource, setActiveSource] = useState(null);
@@ -42,7 +43,8 @@ export const SalesMasterGrid = () => {
   const itemsPerPage = 10;
 
 
-  const { data, loading, error, updateService } = useLeads(pagination.currentPage, itemsPerPage, filters);
+  const { data, loading, error, } = useMyLeads(pagination.currentPage, itemsPerPage, filters);
+  const {submitEnquiry} = useSubmitEnquiry();
 
   useEffect(() => {
     if (data) {
@@ -81,31 +83,36 @@ export const SalesMasterGrid = () => {
       toast.error("Failed to delete lead");
     }
   };
+  const handleBgColor = (status) => {
+    switch (status) {
+      case "Won":
+        return "badge bg-success text-white";
+      case "Ongoing":
+        return "badge bg-primary text-white";
+      case "Pending":
+        return "badge bg-warning text-dark";
+      case "Lost":
+        return "badge bg-danger text-white";
+      default:
+        return "badge bg-secondary";
+    }
+  }
 
-  const handleUpdateSubmit = async (id, updatedData) => {
+  const handleUpdateSubmit = async (id, enquiryData) => {
     try {
-      if (updateService) {
-        const result = await updateService(id, updatedData);
-        if (result) {
-          toast.success("Lead updated successfully!");
-          setUpdatePopUpShow(false);
-          setSelectedLead(null);
-        }
-      } else {
-        console.log("Updating lead:", id, updatedData);
-        toast.success("Lead updated successfully!");
-        setUpdatePopUpShow(false);
-        setSelectedLead(null);
+      if (enquiryData) {
+        await submitEnquiry(id, enquiryData);
+        handlePageChange(1);
       }
     } catch (error) {
       console.error("Update error:", error);
-      toast.error("Failed to update lead");
+      toast.error("Failed to Submit Enqury");
     }
   };
 
   const handleDetailsPopUpClick = (lead) => {
     setSelectedLead(lead);
-    setDetailsServicePopUp(true);
+    setShowLeadPopUp(true);
   };
 
   const handleChange = (filterType, value) => {
@@ -124,6 +131,12 @@ export const SalesMasterGrid = () => {
 
   return (
     <>
+    {loading && (
+        <div className="overlay">
+          <span className="loader"></span>
+        </div>
+      )}   
+
       <div className="container-scroller">
         <div className="row background_main_all">
           <Header toggle={toggle} isopen={isopen} />
@@ -151,15 +164,12 @@ export const SalesMasterGrid = () => {
                     </div>
 
                     <SalesDashboardCards
-                        totalSalesCount={(data?.statusCounts?.ongoing || 0) + (data?.statusCounts?.PendingfollowUp || 0) + (data?.statusCounts?.notFisible || 0) + (data?.statusCounts?.Win || 0) + (data?.statusCounts?.Lost || 0)}
-                        allEnquiriesServiceCount={data?.statusCounts?.allEnquiries || 0}
-                        ongoingServiceCount={data?.statusCounts?.ongoing || 0}
-                        todayServiceCount={data?.statusCounts?.today || 0}
-                        pendingFollowUpServiceCount={data?.statusCounts?.PendingfollowUp || 0}
-                        notFisibleServiceCount={data?.statusCounts?.notFisible || 0}
-                        winServiceCount={data?.statusCounts?.Win || 0}
-                        lostServiceCount={data?.statusCounts?.Lost || 0}
-                    />
+                        allLeadsCount={data?.leadCounts?.allLeadsCount || 0}
+                        ongogingCount={data?.leadCounts?.ongogingCount || 0}
+                        winCount={data?.leadCounts?.winCount || 0}
+                        pendingCount={data?.leadCounts?.pendingCount || 0}
+                        lostCount={data?.leadCounts?.lostCount || 0}
+                    /> 
 
                 <div className="row align-items-center p-2 m-1">
                   <div className="col-12 col-lg-6"></div>
@@ -200,7 +210,7 @@ export const SalesMasterGrid = () => {
                           value={filters.status || ""}
                         >
                           <option value="">Status....</option>
-                          <option value="Win">Win</option>
+                          <option value="Won">Won</option>
                           <option value="Ongoing">Ongoing</option>
                           <option value="Pending">Pending</option>
                           <option value="Lost">Lost</option>
@@ -239,20 +249,27 @@ export const SalesMasterGrid = () => {
                                         <td>{lead.SOURCE}</td>
                                         <td>{lead.SENDER_NAME||"Not avaliable."}</td>
                                         <td>{lead.SENDER_COMPANY||"Not avaliable."}</td>
-                                        <td>{lead.QUERY_PRODUCT||"Not avaliable."}</td>
+                                        <td>{lead.QUERY_PRODUCT_NAME||"Not avaliable."}</td>
                                         <td>{lead.SENDER_EMAIL||"Not avaliable."}</td>
                                         <td>{formatDateforTaskUpdate(lead.createdAt)}</td>
                                         <td>
-                                            <span className="badge bg-warning text-dark">{lead.STATUS}</span>
+                                            <span className={handleBgColor(lead.STATUS)}>{lead.STATUS}</span>
                                         </td>
                                         <td>
                                             
                                             {/* Edit Button */}
-                                            {(user?.permissions?.includes('updateLeadMaster') || user?.user === 'company') &&
+                                            {(user?.permissions?.includes('updateLead') || user?.user === 'company')  &&
                                                 <span onClick={() => handleUpdate(lead)} title="Edit Lead">
                                                     <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
                                                 </span>
                                             }
+
+                                            {(user?.permissions?.includes('deleteLead') && lead.SOURCE==='Direct' || user?.user === 'company') &&
+                                              <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
+                                                  <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
+                                              </span>
+                                            }
+ 
 
                                              {/* View Button */}
                                             <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
@@ -264,7 +281,7 @@ export const SalesMasterGrid = () => {
                                     ))) : (
                                       <tr>
                                         <td colSpan="9" className="text-center">
-                                          No Leads found
+                                          No More Leads.
                                         </td>
                                       </tr>
                                     )}
@@ -392,13 +409,13 @@ export const SalesMasterGrid = () => {
       )}
 
 
-      {detailsServicePopUp && selectedLead && (
-          <ViewServicePopUp
+      {showLeadPopUp && selectedLead && (
+          <ViewSalesLeadPopUp
               closePopUp={() => {
-                setDetailsServicePopUp(false);
+                setShowLeadPopUp(false);
                 setSelectedLead(null);
               }}
-              selectedService={selectedLead}
+              selectedLead={selectedLead}
           />
       )}
     

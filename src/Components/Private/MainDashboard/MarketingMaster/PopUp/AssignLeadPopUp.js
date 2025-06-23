@@ -9,7 +9,7 @@ import { sendNotification } from "../../../../../hooks/useNotification";
 const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
   const [formData, setFormData] = useState({
     feasibility: '',
-    manualAction: '',
+    notFeasibleReason: '',
   });
 
   const [departments, setDepartments] = useState([]);
@@ -57,25 +57,14 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
 
     if (name === 'feasibility') {
-      setFormData(prev => ({ ...prev, manualAction: '' }));
+      setFormData(prev => ({ ...prev, notFeasibleReason: '' }));
       setSelectedDepartment("");
       setAssignedEmployee(null);
     }
   };
 
-  const handleAssignmentNotification = async () => {
-    if (!assignedEmployee) return;
-    const notificationData = {
-      message: `You have been assigned a new lead: ${selectedLead?.leadId || 'N/A'}`,
-      userIds: [assignedEmployee],
-    };
-    await sendNotification(notificationData);
-    toast.success("Assignment notification sent!");
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-
 
     if (!formData.feasibility) return toast.error('Please select a Feasibility option.');
 
@@ -85,35 +74,21 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
     }
 
     if (formData.feasibility === 'not-feasible') {
-      if (!formData.manualAction) return toast.error('Please enter the reason in Remarks.');
+      if (!formData.notFeasibleReason) return toast.error('Please enter the reason in Remarks.');
     }
 
-    if (formData.feasibility === 'feasible') {
-      handleAssignmentNotification();
+    const actionData = {};
+
+    actionData.feasibility=formData.feasibility;
+
+    if(actionData.feasibility === 'feasible') {
+      actionData.assignedTo = assignedEmployee;
+    }else if(actionData.feasibility === 'not-feasible') {
+      actionData.notFeasibleReason = formData.notFeasibleReason;
     }
 
-    const employeeObject = employeeOptions.find(opt => opt.value === assignedEmployee)?.employeeData;
 
-    const newAction = {
-      feasibility: formData.feasibility,
-      manualAction: formData.manualAction,
-      submissionDateTime: new Date().toISOString(),
-      assignedDepartmentId: formData.feasibility === 'feasible' ? selectedDepartment : undefined,
-      assignedEmployeeId: formData.feasibility === 'feasible' ? assignedEmployee : undefined,
-      assignedEmployeeName: formData.feasibility === 'feasible' ? employeeObject?.name : undefined,
-    };
-
-    const updatedActionHistory = [...(selectedLead.actionHistory || []), newAction];
-
-    const updatedLeadData = {
-      ...selectedLead,
-      actionDetails: newAction,
-      actionHistory: updatedActionHistory,
-      status: formData.feasibility === 'feasible' ? 'Assigned' : 'Not Feasible'
-    };
-
-    onUpdate(selectedLead._id, updatedLeadData);
-    toast.success(`Action submitted successfully!`);
+    onUpdate(selectedLead._id, actionData);
     onClose();
   };
 
@@ -175,14 +150,14 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
 
                 <div className={formData.feasibility === 'not-feasible' ? 'row' : 'd-none'}>
                   <div className="col-12 mt-3">
-                    <label htmlFor="manualAction" className="form-label fw-bold">Remarks <RequiredStar /></label>
+                    <label htmlFor="notFeasibleReason" className="form-label fw-bold">Remarks <RequiredStar /></label>
                     <textarea
                       className="form-control rounded-0"
-                      id="manualAction"
-                      name="manualAction"
+                      id="notFeasibleReason"
+                      name="notFeasibleReason"
                       rows="4"
                       placeholder="Enter the detailed reason for non-feasibility..."
-                      value={formData.manualAction}
+                      value={formData.notFeasibleReason}
                       onChange={handleChange}
                     ></textarea>
                   </div>
