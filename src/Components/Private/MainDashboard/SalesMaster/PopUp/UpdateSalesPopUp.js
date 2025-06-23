@@ -2,46 +2,84 @@ import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { RequiredStar } from '../../../RequiredStar/RequiredStar';
 
+const LeadInfoView = ({ selectedLead }) => {
+  if (!selectedLead) {
+    return null;
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      return new Date(dateString).toLocaleDateString('en-IN', options);
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  const fullAddress = [
+    selectedLead.SENDER_ADDRESS,
+    selectedLead.SENDER_CITY,
+    selectedLead.SENDER_STATE,
+    selectedLead.SENDER_PINCODE,
+    selectedLead.SENDER_COUNTRY_ISO,
+  ].filter(Boolean).join(", ");
+
+  // Removed the 'modal-body' wrapper class to allow for better embedding
+  return (
+    <div className="row">
+      <div className="col-md-6 mb-3">
+        <h6 className="text-muted border-bottom pb-2 mb-3">Sender Information</h6>
+        <h6><p className="fw-bold d-inline">Name: </p>{selectedLead?.SENDER_NAME || "-"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Company: </p>{selectedLead?.SENDER_COMPANY || "-"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Email: </p>{selectedLead?.SENDER_EMAIL || "-"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Mobile: </p>{selectedLead?.SENDER_MOBILE || "-"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Address: </p>{fullAddress || "-"}</h6>
+      </div>
+
+      <div className="col-md-6 mb-3">
+        <h6 className="text-muted border-bottom pb-2 mb-3">Query Information</h6>
+        <h6><p className="fw-bold d-inline">Product: </p>{selectedLead?.QUERY_PRODUCT_NAME || "-"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Subject: </p>{selectedLead?.SUBJECT || "-"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Query Time: </p>{formatDate(selectedLead?.createdAt) || "-"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Assigned By: </p>{selectedLead?.assignedBy?.name || "Unknown"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Status: </p>{selectedLead?.status || selectedLead?.STATUS || "-"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Current Stage: </p>{selectedLead?.actionDetails?.manualAction || selectedLead?.step || "-"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Completed: </p>{selectedLead?.actionDetails ? `${selectedLead.actionDetails.completionPercentage}%` : (selectedLead?.complated || "-")}</h6>
+      </div>
+
+      <div className="col-12 mt-2">
+        <h6 className="text-muted bg-white border-bottom pb-2 mb-2 rounded-4 px-4">Message</h6>
+        <p className="text-wrap" style={{ whiteSpace: "pre-wrap" }}>{selectedLead?.QUERY_MESSAGE || "No message provided."}</p>
+      </div>
+    </div>
+  );
+};
+
+
 const actionOptions = [
-  'Requirement Understanding',
-  'Site Visit',
-  'Online Demo',
-  'Proof of Concept (POC)',
-  'Documentation & Planning',
-  'Quotation Submission',
-  'Quotation Discussion',
-  'Follow-Up Call',
-  'Negotiation Call',
-  'Negotiation Meetings',
-  'Deal Status'
+  'Requirement Understanding', 'Site Visit', 'Online Demo', 'Proof of Concept (POC)',
+  'Documentation & Planning', 'Quotation Submission', 'Quotation Discussion',
+  'Follow-Up Call', 'Negotiation Call', 'Negotiation Meetings', 'Deal Status'
 ];
 
 const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
-
+  const [showInfo, setShowInfo] = useState(false);
   const [actionData, setActionData] = useState({
-    actionType: '',
-    date: '',
-    completion: '',
-    status: '',
-    quotationValue: '' 
+    actionType: '', date: '', completion: '', status: '', quotationValue: ''
   });
 
   useEffect(() => {
     if (selectedLead) {
       setActionData({
-        actionType: '',
-        date: '',
-        completion: '',
-        status: selectedLead.status || '',
-        quotationValue: '' 
+        actionType: '', date: '', completion: '',
+        status: selectedLead.status || '', quotationValue: ''
       });
     }
   }, [selectedLead]);
 
-
   const handleActionChange = (e) => {
     const { name, value } = e.target;
-
     if (name === 'completion') {
       if (/^\d{0,3}(\.\d{0,2})?$/.test(value)) {
         const num = parseFloat(value);
@@ -60,24 +98,16 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
 
   const handleActionSubmit = (e) => {
     e.preventDefault();
-
     const isQuotationRequired = actionData.actionType === 'Quotation Submission';
     if (!actionData.status || !actionData.actionType || !actionData.date || !actionData.completion || (isQuotationRequired && !actionData.quotationValue)) {
-      toast.error('Please fill in all required fields, including Quotation Amount.');
+      toast.error('Please fill in all required fields.');
       return;
     }
-
     const now = new Date();
     const dateTime = now.toLocaleString('en-IN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      timeZone: 'Asia/Kolkata'
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit',
+      minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata'
     });
-
     const updatedFormData = {
       ...selectedLead,
       status: actionData.status,
@@ -86,44 +116,61 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
         submissionDateTime: dateTime,
         followUpDate: actionData.date,
         completionPercentage: actionData.completion,
-
         quotationValue: actionData.quotationValue || null
       }
     };
-
     onUpdate(selectedLead._id, updatedFormData);
     onClose();
   };
 
   return (
     <div className="modal fade show" style={{
-      display: "flex",
-      alignItems: "center",
-      backgroundColor: "#00000050",
-      zIndex: 1070,
-    
+      display: "flex", alignItems: "center", backgroundColor: "#00000050", zIndex: 1070,
     }}>
-      <div className="modal-dialog" style={{ maxWidth: '680px' }}>
+      <div className="modal-dialog modal-lg" style={{ maxWidth: '680px' }}>
         <div className="modal-content p-3">
           <form onSubmit={handleActionSubmit}>
-            <div className="modal-header pt-0">
-              <h5 className="card-title fw-bold">Task Bar</h5>
-              <button onClick={onClose} type="button" className="btn-close" aria-label="Close"></button>
+            <div className="modal-header">
+              <h5 className="card-title fw-bold mb-0">Submit Work</h5>
+
+              <div className="d-flex align-items-center ms-auto">
+                {/* <button
+                  type="button"
+                  className="btn btn-sm rounded-0 btn-outline-success"
+                  onClick={() => setShowInfo(!showInfo)}
+                >
+                  {showInfo ? "Hide Info" : "Show Info"}
+                </button> */}
+                <button
+                  onClick={onClose}
+                  type="button"
+                  className="btn-close"
+                  aria-label="Close"
+                ></button>
+              </div>
+
             </div>
 
-            <div className="modal-body">
-              <div className="row g-3">
 
-                <div className="col-12" style={{ width: 320 }}>
-                  <label htmlFor="status" className="form-label fw-bold">Status<RequiredStar/></label>
-                  <select
-                    id="status"
-                    className="form-select bg_edit"
-                    name="status"
-                    onChange={handleActionChange}
-                    value={actionData.status}
-                    required
-                  >
+            <button
+              type="button"
+              className="btn btn-sm rounded-0 btn-outline-success d-flex align-items-center ms-auto me-4 justify-content-end"
+              onClick={() => setShowInfo(!showInfo)}
+            >
+              {showInfo ? "Hide Info" : "Show Info"}
+            </button>
+
+            <div className="modal-body" style={{ maxHeight: '45vh', overflowY: 'auto' }}>
+              {showInfo && <LeadInfoView selectedLead={selectedLead} />}
+
+
+              <h5 className={`text-muted border-top pb-2 mb-3 ${showInfo ? 'pt-3 mt-4' : 'pt-0 mt-0'}`}>
+                Work Data
+              </h5>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label htmlFor="status" className="form-label fw-bold">Status<RequiredStar /></label>
+                  <select id="status" className="form-select bg_edit" name="status" onChange={handleActionChange} value={actionData.status} required>
                     <option value="" disabled>-- Select a status --</option>
                     <option value="Pending">Pending</option>
                     <option value="Ongoing">Ongoing</option>
@@ -131,81 +178,39 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
                     <option value="Lost">Lost</option>
                   </select>
                 </div>
-                 
-                 <div className="col-12" style={{ width: 300 }}>
-                  <label htmlFor="completion" className="form-label fw-bold">Completion (%)<RequiredStar/></label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="completion"
-                    name="completion"
-                    placeholder="Enter work completion %"
-                    maxLength={6}
-                    value={actionData.completion}
-                    onChange={handleActionChange}
-                    required
-                  />
+
+                <div className="col-md-6">
+                  <label htmlFor="completion" className="form-label fw-bold">Completion (%)<RequiredStar /></label>
+                  <input type="text" className="form-control" id="completion" name="completion" placeholder="Enter work completion %" maxLength={6} value={actionData.completion} onChange={handleActionChange} required />
                 </div>
 
-
-                <div className="col-12" style={{ width: 320 }}>
-                  <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar/></label>
-                  <select
-                    id="actionType"
-                    name="actionType"
-                    className="form-select"
-                    value={actionData.actionType}
-                    onChange={handleActionChange}
-                    required
-                  >
+                <div className="col-md-6">
+                  <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar /></label>
+                  <select id="actionType" name="actionType" className="form-select" value={actionData.actionType} onChange={handleActionChange} required>
                     <option value="" disabled>-- Select an action --</option>
                     {actionOptions.map((action, index) => (
-                      <option key={index} value={action}>
-                        {index + 1}. {action}
-                      </option>
+                      <option key={index} value={action}>{index + 1}. {action}</option>
                     ))}
                   </select>
                 </div>
 
-
                 {actionData.actionType === 'Quotation Submission' && (
-                  <div className="col-12" style={{ width: 250 }}>
-                    <label htmlFor="quotationValue" className="form-label fw-bold">
-                      Quotation Amount (₹)
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="quotationValue"
-                      name="quotationValue"
-                      placeholder="Enter quotation amount"
-                      value={actionData.quotationValue}
-                      onChange={handleActionChange}
-                      required
-                    />
+                  <div className="col-md-6">
+                    <label htmlFor="quotationValue" className="form-label fw-bold">Quotation Amount (₹)<RequiredStar /></label>
+                    <input type="text" className="form-control" id="quotationValue" name="quotationValue" placeholder="Enter quotation amount" value={actionData.quotationValue} onChange={handleActionChange} required />
                   </div>
                 )}
 
-                
 
-                <div className="col-12" style={{ width: 320 }}>
-                  <label htmlFor="date" className="form-label fw-bold">Next Follow-up Date</label>
-                  <input
-                    id="date"
-                    type="datetime-local"
-                    className="form-control bg_edit"
-                    name="date"
-                    value={actionData.date || ''}
-                    onChange={handleActionChange}
-                    required
-                  />
+                <div className="col-md-6">
+                  <label htmlFor="date" className="form-label fw-bold">Next Follow-up Date<RequiredStar /></label>
+                  <input id="date" type="datetime-local" className="form-control bg_edit" name="date" value={actionData.date || ''} onChange={handleActionChange} required />
                 </div>
-
               </div>
             </div>
 
-            <div className="modal-footer border-0 justify-content-start">
-              <button type="submit" className="btn addbtn rounded-0 add_button px-4 ">Submit</button>
+            <div className="modal-footer border-0 justify-content-start mt-3">
+              <button type="submit" className="btn addbtn rounded-0 add_button px-4">Submit</button>
               <button type="button" onClick={onClose} className="btn addbtn rounded-0 Cancel_button px-4">Cancel</button>
             </div>
           </form>
