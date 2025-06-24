@@ -264,9 +264,9 @@ export const SalesMasterGrid = () => {
                                                 </span>
                                             }
 
-                                            {(user?.permissions?.includes('deleteLead') && lead.SOURCE==='Direct' || user?.user === 'company') &&
+                                            {( lead.SOURCE==='Direct' &&( user?.permissions?.includes('deleteLead') || user?.user === 'company')) &&
                                               <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
-                                                  <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
+                                                   <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
                                               </span>
                                             }
  
