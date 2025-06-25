@@ -30,7 +30,61 @@ const LeadInfoView = ({ selectedLead }) => {
     <div className="row">
       <div className="col-md-6 mb-3">
         <h6 className="text-muted border-bottom pb-2 mb-3">Sender Information</h6>
-        <h6><p className="fw-bold d-inline">Name: </p>{selectedLead?.SENDER_NAME || "-"}</h6>
+
+        <h6 className="mt-3 d-flex align-items-center">
+          <span className="fw-bold me-2">Source:</span>
+
+          {selectedLead?.SOURCE?.toLowerCase() === "indiamart" && (
+            <span>
+               {/* IndiaMart{" "}
+              <img src="/static/assets/img/indiamart.png" alt="Indiamart" style={{ height: "24px", marginLeft: "6px" }} />  */}
+              IndiaMart
+            </span>
+          )}
+
+          {selectedLead?.SOURCE?.toLowerCase() === "tradeindia" && (
+            <span>
+              TradeIndia{" "}
+              <img src="/static/assets/img/tradeindia.png" alt="TradeIndia" style={{ height: "24px", marginLeft: "6px" }} />
+            </span>
+          )}
+
+          {selectedLead?.SOURCE?.toLowerCase() === "facebook" && (
+            <span>
+              Facebook{" "}
+              <img src="/static/assets/img/facebook.png" alt="Facebook" style={{ height: "24px", marginLeft: "6px" }}/>
+            </span>
+          )}
+
+          {selectedLead?.SOURCE?.toLowerCase() === "google" && (
+            <span>
+              Google{" "}
+              <img src="/static/assets/img/google.png" alt="Google" style={{ height: "24px", marginLeft: "6px" }} />
+            </span>
+          )}
+
+          {selectedLead?.SOURCE?.toLowerCase() === "linkedin" && (
+            <span>
+              LinkedIn{" "}
+              <img src="/static/assets/img/linkedin.png" alt="LinkedIn" style={{ height: "24px", marginLeft: "6px" }}
+              />
+            </span>
+          )}
+
+          {selectedLead?.SOURCE?.toLowerCase() === "direct" && (
+            <span>
+              direct{" "}
+              <img src="/static/assets/img/nav/DACCESS.png" alt="direct" style={{ height: "24px", marginLeft: "6px" }}
+              />
+            </span>
+          )}
+
+          {!["indiamart", "tradeindia", "facebook", "google", "linkedin", "direct"].includes(
+            selectedLead?.SOURCE?.toLowerCase()
+          ) && <span>{selectedLead?.SOURCE || "-"}</span>}
+        </h6>
+
+        <h6 className='mt-3'><p className="fw-bold d-inline">Name: </p>{selectedLead?.SENDER_NAME || "-"}</h6>
         <h6 className="mt-3"><p className="fw-bold d-inline">Company: </p>{selectedLead?.SENDER_COMPANY || "-"}</h6>
         <h6 className="mt-3"><p className="fw-bold d-inline">Email: </p>{selectedLead?.SENDER_EMAIL || "-"}</h6>
         <h6 className="mt-3"><p className="fw-bold d-inline">Mobile: </p>{selectedLead?.SENDER_MOBILE || "-"}</h6>
@@ -134,13 +188,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
               <h5 className="card-title fw-bold mb-0">Submit Work</h5>
 
               <div className="d-flex align-items-center ms-auto">
-                {/* <button
-                  type="button"
-                  className="btn btn-sm rounded-0 btn-outline-success"
-                  onClick={() => setShowInfo(!showInfo)}
-                >
-                  {showInfo ? "Hide Info" : "Show Info"}
-                </button> */}
                 <button
                   onClick={onClose}
                   type="button"

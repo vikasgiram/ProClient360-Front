@@ -20,7 +20,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
       pincode: '',
       state: '',
       city: '',
-      country: 'India',
+      country: '',
       add: ''
     }
   });
@@ -133,9 +133,9 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
         <div className="modal-dialog modal-lg">
           <div className="modal-content p-3">
             <form onSubmit={handleSubmit}>
+
               <div className="modal-header pt-0">
-                <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-                  Add Lead          </h5>
+                <h5 className="card-title fw-bold" id="exampleModalLongTitle"> Add Lead</h5>
                 <button onClick={onClose} type="button" className="btn-close" aria-label="Close" style={{ backgroundColor: 'red' }}></button>
               </div>
 
@@ -143,11 +143,26 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label htmlFor="name" className="form-label">Contact Name <RequiredStar /></label>
-                    <input type="text" className="form-control" id="name" name="name" placeholder="Enter a Contact Name" maxLength={25} value={formData.name} onChange={handleInputChange} required />
+                    <input type="text" className="form-control" id="name" name="name" placeholder="Enter a Contact Name...." maxLength={25} value={formData.name} onChange={handleInputChange} required />
                   </div>
+
                   <div className="col-md-6">
-                    <label htmlFor="email" className="form-label">Contact Email <RequiredStar/></label>
-                    <input type="email" className="form-control" id="email" name="email" placeholder="Enter Email ID" maxLength={30} value={formData.email} onChange={handleInputChange} />
+                    <label htmlFor="email" className="form-label">
+                      Contact Email <RequiredStar />
+                    </label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="email"
+                      name="email"
+                      placeholder="Enter Email ID...."
+                      maxLength={40}
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                      title="Please enter a valid email address (e.g., example@domain.com)"
+                    />
                   </div>
 
                   <div className="col-md-6">
@@ -159,7 +174,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       className="form-control"
                       id="contact"
                       name="contact"
-                      placeholder="Enter Contact Number"
+                      placeholder="Enter Contact Number...."
                       inputMode="numeric"
                       maxLength={10}
                       pattern="\d{10}"
@@ -174,17 +189,18 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
 
                   <div className="col-md-6">
                     <label htmlFor="subject" className="form-label">Subject <RequiredStar /></label>
-                    <input type="text" className="form-control" id="subject" name="subject" placeholder="Enter a Subject" maxLength={50} value={formData.subject} onChange={handleInputChange} required />
+                    <input type="text" className="form-control" id="subject" name="subject" placeholder="Enter a Subject...." maxLength={50} value={formData.subject} onChange={handleInputChange} required />
                   </div>
+
                   <div className="col-md-6">
                     <label htmlFor="company" className="form-label">Company Name<RequiredStar /></label>
-                    <input type="text" className="form-control" id="company" name="company" placeholder="Enter a Company Name" maxLength={30} value={formData.company} onChange={handleInputChange} required />
+                    <input type="text" className="form-control" id="company" name="company" placeholder="Enter a Company Name...." maxLength={30} value={formData.company} onChange={handleInputChange} required />
                   </div>
 
                   <div className='col-md-6'>
                     <label htmlFor="products" className="form-label">Products<RequiredStar /></label>
                     <select id="products" className="form-select" name="products" value={formData.products} onChange={handleInputChange} required>
-                      <option value="">Select Products...</option>
+                      <option value="">Select Products....</option>
                       {products.map(product => <option key={product} value={product}>{product}</option>)}
                     </select>
                   </div>
@@ -196,7 +212,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       className="form-control"
                       id="message"
                       name="message"
-                      placeholder="Enter a Message"
+                      placeholder="Enter a Message...."
                       value={formData.message}
                       onChange={handleInputChange}
                       style={{ width: '201%', height: '100px' }}

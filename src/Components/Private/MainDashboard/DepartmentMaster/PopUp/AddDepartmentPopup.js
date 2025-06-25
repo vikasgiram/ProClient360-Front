@@ -15,7 +15,7 @@ const AddDepartmentPopup = ({ handleAdd }) => {
             name,
         };
         if (!name) {
-            return toast.error("Please Enter Valid Name");
+            return toast.error("Please Enter Department Name");
         }
         await createDepartment(data);
         handleAdd();

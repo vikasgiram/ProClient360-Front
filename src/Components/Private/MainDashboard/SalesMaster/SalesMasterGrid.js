@@ -272,9 +272,9 @@ export const SalesMasterGrid = () => {
  
 
                                              {/* View Button */}
-                                            <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
+                                            {/* <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
                                                 <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
-                                            </span>
+                                            </span> */}
                                         
                                         </td>
                                     </tr>

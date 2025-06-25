@@ -17,7 +17,7 @@ const AddTaskPopUp = ({ handleAdd }) => {
             name:taskname,
         };
         if (!taskname) {
-            return toast.error("Please fill all fields");
+            return toast.error("Please Enter Task Name");
         }
         await createTask(data);
         handleAdd();

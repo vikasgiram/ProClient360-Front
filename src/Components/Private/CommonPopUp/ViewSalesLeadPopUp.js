@@ -49,8 +49,28 @@ const ViewSalesLeadPopUp = ({ closePopUp, selectedLead }) => {
           <div className="modal-content p-3">
             <div className="modal-header pt-0 border-0">
               <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-                Sales Lead Details
+                Sales Lead Details{" "}
+                {selectedLead?.SOURCE?.toLowerCase().includes("indiamart") && (
+                  <img src="/static/assets/img/indiamart.png" alt="Indiamart" style={{ height: "30px", marginLeft:"23px" }} />
+                )}
+                {selectedLead?.SOURCE?.toLowerCase().includes("tradeindia") && (
+                  <img src="/static/assets/img/tradeindia.png" alt="TradeIndia" style={{ width: "60px", marginLeft:"23px"}} />
+                )}
+                {selectedLead?.SOURCE?.toLowerCase().includes("facebook") && (
+                  <img src="/static/assets/img/facebook.png" alt="facebook" style={{ height: "40px", marginLeft:"23px" }} />
+                )}
+                {selectedLead?.SOURCE?.toLowerCase().includes("google") && (
+                  <img src="/static/assets/img/google.png" alt="google" style={{ height: "40px", marginLeft:"23px" }} />
+                )}
+                {selectedLead?.SOURCE?.toLowerCase().includes("linkedin") && (
+                  <img src="/static/assets/img/linkedin.png" alt="linkedin" style={{ height: "40px",marginLeft:"23px" }} />
+                )}
+                {selectedLead?.SOURCE?.toLowerCase().includes("direct") && (
+                  <img src="/static/assets/img/nav/DACCESS.png" alt="direct" style={{ height: "40px",marginLeft:"23px" }} />
+                )}
+
               </h5>
+
               <button
                 onClick={closePopUp}
                 type="button"
@@ -62,7 +82,54 @@ const ViewSalesLeadPopUp = ({ closePopUp, selectedLead }) => {
               <div className="row">
                 <div className="col-md-6 mb-3">
                   <h6 className="text-muted border-bottom pb-2 mb-3">Sender Information</h6>
-                  <h6>
+
+
+                  <h6 className="mt-3 d-flex align-items-center gap-2">
+                    <span className="fw-bold">Source:</span>
+
+                    {selectedLead?.SOURCE?.toLowerCase() === "indiamart" && (
+                      <>
+                        <span>IndiaMart</span>
+                      </>
+                    )}
+
+                    {selectedLead?.SOURCE?.toLowerCase() === "tradeindia" && (
+                      <>
+                        <span>TradeIndia</span>
+                      </>
+                    )}
+
+                    {selectedLead?.SOURCE?.toLowerCase() === "facebook" && (
+                      <>
+                        <span>Facebook</span>
+                      </>
+                    )}
+
+                    {selectedLead?.SOURCE?.toLowerCase() === "google" && (
+                      <>
+                        <span>Google</span>
+                      </>
+                    )}
+
+                    {selectedLead?.SOURCE?.toLowerCase() === "linkedin" && (
+                      <>
+                        <span>LinkedIn</span>
+                      </>
+                    )}
+
+                    { selectedLead?.SOURCE.toLowerCase() === "direct" && (
+                      <>
+                      <span>direct</span>
+                      </>
+                    )}
+
+                    {!["indiamart", "tradeindia", "facebook", "google", "linkedin", "direct"].includes(selectedLead?.SOURCE?.toLowerCase()) && (
+                      <span>{selectedLead?.SOURCE || "-"}</span>
+                    )}
+
+                  </h6>
+
+                  <h6 className='mt-3'>
                     <p className="fw-bold d-inline">Name: </p>
                     {selectedLead?.SENDER_NAME || "-"}
                   </h6>
