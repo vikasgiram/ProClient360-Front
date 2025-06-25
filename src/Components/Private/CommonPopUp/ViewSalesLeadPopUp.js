@@ -51,7 +51,7 @@ const ViewSalesLeadPopUp = ({ closePopUp, selectedLead }) => {
               <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                 Sales Lead Details{" "}
                 {selectedLead?.SOURCE?.toLowerCase().includes("indiamart") && (
-                  <img src="/static/assets/img/indiamart.png" alt="Indiamart" style={{ height: "60px", marginLeft:"23px" }} />
+                  <img src="/static/assets/img/Indiamart.png" alt="Indiamart" style={{ height: "40px", marginLeft:"23px" }} />
                 )}
                 {selectedLead?.SOURCE?.toLowerCase().includes("tradeindia") && (
                   <img src="/static/assets/img/tradeindia.png" alt="TradeIndia" style={{ width: "60px", marginLeft:"23px"}} />
