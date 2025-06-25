@@ -11,14 +11,19 @@ const AddDepartmentPopup = ({ handleAdd }) => {
 
     const handleProjectAdd = async (event) => {
         event.preventDefault();
-        const data = {
+        const depData = {
             name,
         };
         if (!name) {
             return toast.error("Please Enter Department Name");
         }
-        await createDepartment(data);
-        handleAdd();
+        const data = await createDepartment(depData);
+        if(data.success){
+            toast.success(data.message);
+            handleAdd();
+        }else{
+            toast.error(data.error || "Failed to create department");
+        }
     };
 
     return (

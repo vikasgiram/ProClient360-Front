@@ -92,8 +92,13 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
       return toast.error("Enter a valid phone number");
     }
     try{
-    await updateCustomer(updatedCustomer);
-    handleUpdate();
+    const data = await updateCustomer(updatedCustomer);
+    if(data.success){
+      toast.success(data.message);
+      handleUpdate();
+    }else{
+      toast.error(data.error);
+    }
     }catch(error){
       toast.error("Error updating customer");
     }

@@ -52,9 +52,14 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
       return toast.error("Phone number should not contain alphabets");
     }
     try {
-      console.log(selectedTicket, "selectedTicket");
-      await updateTicket(ticket._id, ticket);
-      handleUpdate();
+  
+      const data = await updateTicket(ticket._id, ticket);
+      if(data.success){
+        toast.success(data.message);
+        handleUpdate();
+      }else{
+        toast.error(data.error);
+      }
     } catch (error) {
       toast.error(error);
     }

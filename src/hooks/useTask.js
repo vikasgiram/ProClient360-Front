@@ -33,15 +33,11 @@ const createTask = async (taskData) => {
     });
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("New Task Created");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data);
+    return error.response.data;
+  }
 };
 
 const updateTask = async (Id, updatedData) => {
@@ -53,15 +49,11 @@ const updateTask = async (Id, updatedData) => {
     });
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Task Updated Successfuly...");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error); }
+    console.error(error.response.data);
+    return error.response.data;
+  }
 };
 
 const deleteTask = async (Id) => {

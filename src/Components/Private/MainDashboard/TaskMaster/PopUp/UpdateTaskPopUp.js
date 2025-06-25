@@ -20,8 +20,14 @@ const[task,setTask]=useState(selectedTask);
       return
     }
     try {
-      await updateTask(task._id,task);
-      handleUpdate();
+      const data = await updateTask(task._id,task);
+      if(data.success){
+        toast.success(data.message);
+        handleUpdate();
+      }else{
+        toast.error(data.error || "Failed to update task");
+      }
+        
     } catch (error) {
       toast.error(error);
     }

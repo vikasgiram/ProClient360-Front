@@ -46,7 +46,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
   const handleCustomerAdd = async (event) => {
     event.preventDefault();
 
-    const data = {
+    const customerData = {
       custName,
       phoneNumber1,
       email,
@@ -85,9 +85,13 @@ const AddCustomerPopUp = ({ handleAdd }) => {
       return toast.error("Please enter valid 10-digit phone numbers.");
     }
 
-    await createCustomer(data);
-    // console.log(data);
-    handleAdd();
+    const data = await createCustomer(customerData);
+    if(data.success){
+      toast.success(data.message);
+      handleAdd();
+    }else{
+      toast.error(data.error || "Failed to create customer");
+    }
   };
 
   // create a seperate function

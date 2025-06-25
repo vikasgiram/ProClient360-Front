@@ -126,11 +126,16 @@ const AddProjectPopup = ({ handleAdd }) => {
     formData.append('Address', JSON.stringify(Address));
     formData.append('POCopy', POCopy);
 
-    await createProject(formData);
-    // console.log(data);
-
-
-    handleAdd();
+    const data = await createProject(formData);
+    if(data){
+      setLoading(false);
+      toast.success(data.message); 
+      handleAdd();
+    }
+    else{
+      setLoading(false);
+      toast.error(data.error);
+    }
   };
 
 

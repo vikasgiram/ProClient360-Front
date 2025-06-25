@@ -26,16 +26,11 @@ const createCustomer = async (customerData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("New Customer Created...");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error); }
+    console.error(error.response.data);
+    return error.response.data;
+  }
 };
 
 
@@ -47,16 +42,11 @@ const updateCustomer = async (updatedData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Customer Updated successfully");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data);
+    return error.response.data;
+  }
 };
 
 const deleteCustomer = async (Id) => {

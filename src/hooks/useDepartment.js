@@ -58,20 +58,11 @@ const createDepartment = async (departmentData) => {
     
     const data = response.data;
     
-    if (response.status !== 201 && response.status !== 200) {
-      const errorMessage = data.error || "Failed to create department";
-      toast.error(errorMessage);
-      return { success: false, error: errorMessage };
-    }
-    
-    toast.success("Department created successfully");
-    return { success: true, department: data.department };
+    return data;
     
   } catch (error) {
-    console.error("Error creating department:", error);
-    const errorMessage = error.response?.data?.error || "Failed to create department";
-    toast.error(errorMessage);
-    return { success: false, error: errorMessage };
+    console.error("Error creating department:", error.response?.data);
+    return error.response.data;
   }
 };
 
@@ -90,20 +81,11 @@ const updateDepartment = async (updatedDepartmentData) => {
     
     const data = response.data;
     
-    if (response.status !== 200) {
-      const errorMessage = data.error || "Failed to update department";
-      toast.error(errorMessage);
-      return { success: false, error: errorMessage };
-    }
-    
-    toast.success("Department updated successfully");
-    return { success: true, department: data.department };
+    return data;
     
   } catch (error) {
-    console.error("Error updating department:", error);
-    const errorMessage = error.response?.data?.error || "Failed to update department";
-    toast.error(errorMessage);
-    return { success: false, error: errorMessage };
+    console.error("Error updating department:", error.response?.data);
+    return error.response.data;
   }
 };
 

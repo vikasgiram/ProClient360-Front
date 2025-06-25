@@ -66,7 +66,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
 
   const handleEmployeeAdd = async (event) => {
     event.preventDefault();
-    const data = {
+    const employeeData = {
       name,
       mobileNo,
       email,
@@ -104,9 +104,13 @@ const AddEmployeePopup = ({ handleAdd }) => {
     if (!/^\d*\.?\d+$/.test(hourlyRate) || parseFloat(hourlyRate) <= 0) {
       return toast.error("Hourly Rate should be a number greater than 0");
     }
-    await createEmployee(data);
-    // console.log(data, "data from handleEmployeeAdd");
-    handleAdd();
+    const data = await createEmployee(employeeData);
+    if(data.sucess){
+      toast.success(data.message);
+      handleAdd();
+    }else {
+      toast.error(data.message || "Failed to create employee");
+    }
   };
 
 

@@ -138,7 +138,7 @@ const AddDesignationPopup = ({ handleAdd }) => {
   // Handle role addition
   const handleDesignationAdd = async (e) => {
     e.preventDefault();
-    const data = {
+    const designationData = {
       name,
       department,
       permissions
@@ -149,8 +149,13 @@ const AddDesignationPopup = ({ handleAdd }) => {
     }
     // console.log(data);
     
-    await createDesignation(data);
-    handleAdd();
+    const data = await createDesignation(designationData);
+    if(data.success){
+      toast.success(data.message);
+      handleAdd();
+    }else{
+      toast.error(data.error);
+    }
   };
 
 

@@ -205,8 +205,13 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         try {
             // console.log(updatedProject,"updatedProject");
 
-            await updateProject(updatedProject);
-            handleUpdate();
+            const data = await updateProject(updatedProject);
+            if(data.success){
+                toast.success(data.message);
+                handleUpdate();
+            }else{
+                toast.error(data.error);
+            }
         } catch (error) {
             toast.error(error);
         }

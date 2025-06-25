@@ -52,16 +52,11 @@ const createDesignation = async (designationData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-
-    toast.success("Designations Created");
+    return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data);
+    return error.response.data;
+  }
 };
 
 const updateDesignation = async (updatedDesignationData) => {
@@ -73,15 +68,11 @@ const updateDesignation = async (updatedDesignationData) => {
     });
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Designation Updated sucessfully...");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data);
+    return error.response.data;
+  }
 };
 
 const deleteDesignation = async (Id) => {

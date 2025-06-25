@@ -61,17 +61,10 @@ const createProject = async (projectData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-
-    toast.success("New Project Created successfully");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);
+    console.error(error.response.data);
+    return null;
   }
 };
 
@@ -113,16 +106,10 @@ const updateProject = async (updatedProjectData) => {
     );
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Project Updated Successfully...");
-
     return data;
   } catch (error) {
     console.error(error);
-    toast.error(error.response.data.error);
+    return error.response.data;
   }
 };
 

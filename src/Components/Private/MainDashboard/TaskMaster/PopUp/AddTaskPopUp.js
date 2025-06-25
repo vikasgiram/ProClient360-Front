@@ -13,14 +13,20 @@ const AddTaskPopUp = ({ handleAdd, cancelBtnCallBack }) => {
     const handleTaskAdd = async (event) => {
         event.preventDefault();
         
-        const data = {
+        const taskData = {
             name:taskname,
         };
         if (!taskname) {
             return toast.error("Please Enter Task Name");
         }
-        await createTask(data);
-        handleAdd();
+        const data = await createTask(taskData);
+
+        if(data.success){
+            toast.success(data.message);
+            handleAdd();
+        }else{
+            toast.error(data.error || "Failed to create task");
+        }
     };
 
 

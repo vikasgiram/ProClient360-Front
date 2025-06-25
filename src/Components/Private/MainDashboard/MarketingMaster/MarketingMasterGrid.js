@@ -196,7 +196,6 @@ export const MarketingMasterGrid = () => {
                                 <td>{lead?.QUERY_PRODUCT_NAME}</td>
                                 <td>{lead?.SENDER_EMAIL}</td>
                                 <td>{formatDate(lead?.createdAt)}</td>
-                                <td>{lead?.SOURCE}</td>
                                 {/* <td>{leads.STATUS}</td> */}
                                 <td>
 

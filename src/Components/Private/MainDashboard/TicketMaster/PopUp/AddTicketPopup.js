@@ -28,7 +28,7 @@ const AddTicketPopup = ({ handleAdd }) => {
 
   const handleEmployeeAdd = async (event) => {
     event.preventDefault();
-    const data = {
+    const ticketData = {
       client,
       details,
       product,
@@ -50,8 +50,13 @@ const AddTicketPopup = ({ handleAdd }) => {
     if (/[a-zA-Z]/.test(contactNumber)) {
       return toast.error("Phone number should not contain alphabets");
     }
-    await createTicket(data);
-    handleAdd();
+    const data = await createTicket(ticketData);
+    if (data.success){
+      handleAdd();
+      toast.success(data?.message);
+    }else{
+      toast.error(data?.error || "Failed to create ticket");
+    }
   };
 
 

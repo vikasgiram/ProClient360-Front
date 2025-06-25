@@ -20,8 +20,14 @@ const UpdateDepartmentPopup = ({ handleUpdate, selectedDep }) => {
             return toast.error("Please Enter department Name");
         }
         try {
-            await updateDepartment(department);
-            handleUpdate();
+            const data = await updateDepartment(department);
+            if(data.success){
+                toast.success(data.message);
+                handleUpdate();
+            }else{
+                toast.error(data.error || "Failed to update department");
+            }
+            
         } catch (error) {
             toast.error(error);
         }

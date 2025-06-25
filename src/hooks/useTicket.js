@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { error } from 'jquery';
 import toast from 'react-hot-toast';
 
 const baseUrl= process.env.REACT_APP_API_URL;
@@ -30,16 +31,11 @@ const createTicket = async (ticketData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Ticket submitted..");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data);
+    return error.response.data;
+  }
 };
 
 const updateTicket = async (id, updatedData) => {
@@ -53,16 +49,11 @@ const updateTicket = async (id, updatedData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return alert(data.error);
-    }
-    toast.success("Ticket Updated Successfuly");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data);
+    return error.response.data;
+  }
 };
 
 const deleteTicket = async (Id) => {
