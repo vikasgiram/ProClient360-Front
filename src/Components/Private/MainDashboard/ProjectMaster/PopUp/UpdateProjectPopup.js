@@ -9,7 +9,7 @@ import { getAddress } from "../../../../../hooks/usePincode";
 
 const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
-// console.log(selectedProject,"selectedProject");
+    // console.log(selectedProject,"selectedProject");
 
 
     const [customers, setCustomers] = useState([]);
@@ -39,113 +39,172 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
     //   console.log(selectedProject?.Address?.city,"address");
     useEffect(() => {
         const fetchData = async () => {
-          const data = await getAddress(address.pincode);
-    
-          if (data !== "Error") {
-            // console.log(data);
-            setAddress(data);
-          }
+            const data = await getAddress(address.pincode);
+
+            if (data !== "Error") {
+                // console.log(data);
+                setAddress(data);
+            }
         };
-        if(address.pincode > 0)
-          fetchData();
-      }, [address.pincode]);
+        if (address.pincode > 0)
+            fetchData();
+    }, [address.pincode]);
 
 
     useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (searchText.trim() !== "" && searchText.length > 2) {
-        fetchCustomers(searchText);
-      } else {
-        setCustomers([]); // empty when no input
-      }
-    }, 500); // debounce API call by 500ms
+        const delayDebounce = setTimeout(() => {
+            if (searchText.trim() !== "" && searchText.length > 2) {
+                fetchCustomers(searchText);
+            } else {
+                setCustomers([]); // empty when no input
+            }
+        }, 500); // debounce API call by 500ms
 
-    return () => clearTimeout(delayDebounce);
-  }, [searchText]);
+        return () => clearTimeout(delayDebounce);
+    }, [searchText]);
 
-  const fetchCustomers = async () => {
-    const data = await getCustomers(1, 15, searchText);
-    // console.log(data);
-    if (data) {
-      setCustomers(data.customers || []);
-      // console.log(employees,"data from useState");
-    }
-  };
+    const fetchCustomers = async () => {
+        const data = await getCustomers(1, 15, searchText);
+        // console.log(data);
+        if (data) {
+            setCustomers(data.customers || []);
+            // console.log(employees,"data from useState");
+        }
+    };
+
 
 
     const handleChange = (event) => {
-        const { name, value,type,files } = event.target;
-        setProjects((prevProjects) => ({ ...prevProjects, [name]: value }));
-     
-        if(name === '' &&'/^\d+$/')
-        
-        if (name === 'custId') {
-            setProjects((prevProjects) => ({
-                ...prevProjects,
-                custId: { _id: value }, // Ensure you're setting an object with _id
-            }));
-        } else {
-            setProjects((prevProjects) => ({
-                ...prevProjects,
-                [name]: value,
-            }));
+        const { name, value } = event.target;
+
+        if (name === "purchaseOrderValue") {
+            const numericValue = value.replace(/\D/g, "");
+            if (numericValue.length > 12) return;
+            setProjects((prev) => ({ ...prev, [name]: numericValue }));
+            return;
         }
 
-        if (name === "projectStatus" && value === "completed") {
-            setProjects((prevProjects) => ({
-                ...prevProjects,
-                completeLevel: 100, // Set completion level to 100
-            }));
-        } else if (name === "projectStatus") {
-            setProjects((prevProjects) => ({
-                ...prevProjects,
-                completeLevel: prevProjects.completeLevel < 100 ? prevProjects.completeLevel : '', // Clear if needed
-            }));
+        if (name === "completeLevel") {
+            const numericValue = value.replace(/\D/g, "");
+            if (numericValue.length > 10) return;
+            setProjects((prev) => ({ ...prev, [name]: numericValue }));
+            return;
         }
+
+        if (name === "purchaseOrderNo") {
+            const numericValue = value.replace(/\D/g, "");
+            if (numericValue.length > 10) return;
+            setProjects((prev) => ({ ...prev, [name]: numericValue }));
+            return;
+        }
+
+        if (name === "advancePay") {
+            const numericValue = value.replace(/\D/g, "");
+            if (numericValue.length > 3) return;
+            setProjects((prev) => ({ ...prev, [name]: numericValue }));
+            return;
+        }
+
+        if (name === "payAgainstDelivery") {
+            const numericValue = value.replace(/\D/g, "");
+            if (numericValue.length > 3) return;
+            setProjects((prev) => ({ ...prev, [name]: numericValue }));
+            return;
+        }
+
+        // ✅ NEW: payAfterCompletion - only numbers, max 3 digits
+        if (name === "payAfterCompletion") {
+            const numericValue = value.replace(/\D/g, "");
+            if (numericValue.length > 3) return;
+            setProjects((prev) => ({ ...prev, [name]: numericValue }));
+            return;
+        }
+
+        if (name === "custId") {
+            setProjects((prev) => ({
+                ...prev,
+                custId: { _id: value },
+            }));
+            return;
+        }
+
+        if (name === "projectStatus") {
+            setProjects((prev) => ({
+                ...prev,
+                projectStatus: value,
+                completeLevel:
+                    value === "completed"
+                        ? 100
+                        : prev.completeLevel < 100
+                            ? prev.completeLevel
+                            : "",
+            }));
+            return;
+        }
+
+        setProjects((prev) => ({ ...prev, [name]: value }));
     };
 
 
 
-    // Function to handle changes in billing address fields
+
     const handleAddressChange = (e) => {
         const { name, value } = e.target;
-        setAddress({ ...address, [name]: value });
+
+        if (name === "city") {
+            const cleanValue = value.replace(/[^a-zA-Z\s]/g, "");
+            setAddress({ ...address, [name]: cleanValue });
+        }
+        else if (name === "state" || name === "country") {
+            const cleanValue = value.replace(/[^a-zA-Z\s]/g, "");
+            setAddress({ ...address, [name]: cleanValue });
+        }
+        else if (name === "pincode") {
+            const numericValue = value.replace(/\D/g, "");
+            if (numericValue.length > 6) return;
+            setAddress({ ...address, [name]: numericValue });
+        }
+        else {
+            setAddress({ ...address, [name]: value });
+        }
     };
+
+
 
 
 
     const handleProjectUpdate = async (event) => {
-       
+
         event.preventDefault();
         setLoading(!loading);
-       
+
         const updatedProject = {
             ...projects,
-            Address: { 
-                ...address 
-            },POCopy
+            Address: {
+                ...address
+            }, POCopy
         }
-        if(!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion || !updatedProject.remark){
+        if (!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion || !updatedProject.remark) {
             setLoading(false);
-            console.log(updatedProject,"updateProject");
+            console.log(updatedProject, "updateProject");
             return toast.error("Please fill all fields");
         }
-        if(Number(updatedProject.advancePay) + Number(updatedProject.payAgainstDelivery) + Number(updatedProject.payfterCompletion) > 100){
+        if (Number(updatedProject.advancePay) + Number(updatedProject.payAgainstDelivery) + Number(updatedProject.payfterCompletion) > 100) {
             setLoading(false);
             return toast.error("Sum of  Advance Payment,Pay Against Delivery,and Pay After Completion cannot exceed 100%");
         }
-        if(updatedProject.purchaseOrderValue <= 0 || updatedProject.advancePay <= 0 || updatedProject.payAgainstDelivery <= 0 || updatedProject.payfterCompletion <= 0 || updatedProject.purchaseOrderNo <= 0){
+        if (updatedProject.purchaseOrderValue <= 0 || updatedProject.advancePay <= 0 || updatedProject.payAgainstDelivery <= 0 || updatedProject.payfterCompletion <= 0 || updatedProject.purchaseOrderNo <= 0) {
             setLoading(false);
             return toast.error("Value must be greater than 0");
         }
-        if(updatedProject.startDate > updatedProject.endDate){
+        if (updatedProject.startDate > updatedProject.endDate) {
             setLoading(false);
             return toast.error("Start Date cannot be greater than End Date");
         }
-       
-        try {     
+
+        try {
             // console.log(updatedProject,"updatedProject");
-            
+
             await updateProject(updatedProject);
             handleUpdate();
         } catch (error) {
@@ -154,7 +213,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
     };
     const viewFile = () => {
         window.open(projects.POCopy);
-      };
+    };
 
     //   const handleFileChange = (e) => {
     //     const file = e.target.files[0];
@@ -162,14 +221,14 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
     //       const reader = new FileReader();
     //       reader.onloadend = () => {
     //         setPOCopy(reader.result);
-            
+
     //       };
     //       reader.readAsDataURL(file);
     //     }
-        
+
     //   };
     //   console.log(POCopy,"POCopy");
-      
+
 
     //   const formatDate = (date) => date ? format(new Date(date), 'yyyy-MM-dd') : '';
 
@@ -200,36 +259,37 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                     <div className="col-12" >
 
                                         <div className="mb-3">
-                    <label htmlFor="customerSearch" className="form-label label_text">
-                      Customer Name <RequiredStar />
-                    </label>
+                                            <label htmlFor="customerSearch" className="form-label label_text">
+                                                Customer Name <RequiredStar />
+                                            </label>
 
-                    {/* Search input */}
-                    <input
-                      type="text"
-                      className="form-control mb-2"
-                      id="customerSearch"
-                      placeholder="Type to search customer..."
-                      value={searchText}
-                      onChange={(e) => setSearchText(e.target.value)}
-                    />
+                                            {/* Search input */}
+                                            <input
+                                                type="text"
+                                                className="form-control mb-2"
+                                                id="customerSearch"
+                                                maxLength={40}
+                                                placeholder="Type to search customer..."
+                                                value={searchText}
+                                                onChange={(e) => setSearchText(e.target.value)}
+                                            />
 
-                    {/* Select dropdown */}
-                    <select
-                      className="form-select rounded-0"
-                      name="custId"
-                      value={projects?.custId?._id || ''}
-                      onChange={handleChange}
-                    >
-                        <option value={projects?.custId?._id || ''}>
-                          {projects?.custId?.custName || 'Select Customer'}</option>
-                      {customers.map((cust) => (
-                        <option key={cust._id} value={cust._id}>
-                          {cust.custName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                                            {/* Select dropdown */}
+                                            <select
+                                                className="form-select rounded-0"
+                                                name="custId"
+                                                value={projects?.custId?._id || ''}
+                                                onChange={handleChange}
+                                            >
+                                                <option value={projects?.custId?._id || ''}>
+                                                    {projects?.custId?.custName || 'Select Customer'}</option>
+                                                {customers.map((cust) => (
+                                                    <option key={cust._id} value={cust._id}>
+                                                        {cust.custName}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div className="mb-3">
@@ -259,13 +319,16 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 value={projects?.completeLevel}
                                                 name="completeLevel"
                                                 type="text"
-                                                pattern="[0-9]*"
-                                                maxLength="3"
+                                                placeholder="Update Completion level...."
+                                                inputMode="numeric"
+                                                pattern="^\d{1,10}$"
+                                                maxLength="10"
                                                 className="form-control rounded-0"
                                                 id="completeLevel"
                                                 aria-describedby="dateHelp"
+                                                required
                                             />
-                                            {/* {console.log(projects.purchaseOrderDate,"projects")} */}
+
                                         </div>
                                     </div>
 
@@ -282,7 +345,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 id="purchaseOrderDate"
                                                 aria-describedby="dateHelp"
                                             />
-                                            {/* {console.log(projects.purchaseOrderDate,"projects")} */}
                                         </div>
                                     </div>
                                     <div className="col-12 col-lg-6 mt-2" >
@@ -290,20 +352,42 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                             <label for="PurchaseOrderNumber"
                                                 name="purchaseOrderNo"
                                                 className="form-label label_text">Purchase Order Number <RequiredStar /></label>
-                                            <input type="text"
-                                                pattern="[0-9]*" className="form-control rounded-0" id="PurchaseOrderNumber"
+                                            <input
+                                                type="text"
+                                                inputMode="numeric"
+                                                pattern="^\d{1,10}$"
+                                                className="form-control rounded-0"
+                                                id="PurchaseOrderNumber"
                                                 name="purchaseOrderNo"
-                                                value={projects?.purchaseOrderNo} onChange={handleChange} aria-describedby="emailHelp" />
+                                                placeholder="Purchase Order Number...."
+                                                maxLength={10}
+                                                value={projects?.purchaseOrderNo}
+                                                onChange={handleChange}
+                                                aria-describedby="emailHelp"
+                                                required
+                                            />
+
+
                                         </div>
                                     </div>
                                     <div className="col-12 col-lg-6 mt-2" >
                                         <div className="mb-3">
                                             <label for="PurchaseOrderValu" className="form-label label_text">Purchase Order Value (Rs/USD) <RequiredStar />
                                             </label>
-                                            <input type="text"
-                                                pattern="[0-9]*" className="form-control rounded-0"
+                                            <input
+                                                type="text"
+                                                inputMode="numeric"
+                                                maxLength="12"
+                                                pattern="^\d{1,12}$"
+                                                className="form-control rounded-0"
                                                 name="purchaseOrderValue"
-                                                id="PurchaseOrderValu" onChange={handleChange} value={projects?.purchaseOrderValue} aria-describedby="emailHelp" />
+                                                id="PurchaseOrderValu"
+                                                placeholder="Update Order Value...."
+                                                onChange={handleChange}
+                                                value={projects?.purchaseOrderValue}
+                                                required
+                                            />
+
                                         </div>
                                     </div>
                                     <div className="col-12 col-lg-6 mt-2" >
@@ -381,15 +465,20 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 <div className="mb-3">
                                                     <label for="advancePay" className="form-label label_text">     Advance Payment <RequiredStar />
                                                     </label>
-                                                    <input type="text"
-                                                        pattern="^\d+$" 
-                                                        maxLength={3} 
-                                                        className="form-control rounded-0" 
+                                                    <input
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        pattern="^\d{1,3}$"
+                                                        maxLength={3}
+                                                        className="form-control rounded-0"
                                                         id="advancePay"
                                                         name="advancePay"
-                                                        onChange={handleChange} 
-                                                        value={projects?.advancePay} 
-                                                        aria-describedby="mobileNoHelp" />
+                                                        onChange={handleChange}
+                                                        value={projects?.advancePay}
+                                                        aria-describedby="mobileNoHelp"
+                                                        required
+                                                    />
+
                                                 </div>
                                             </div>
                                             <div className="col-12 col-lg-6 mt-2" >
@@ -397,10 +486,19 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                     <label for="payAgainstDelivery" className="form-label label_text">          Pay Against Delivery <RequiredStar />
 
                                                     </label>
-                                                    <input type="text"
-                                                pattern="[0-9]*" maxLength={3} className="form-control rounded-0" id="payAgainstDelivery"
+                                                    <input
+                                                        type="text"
+                                                        pattern="[0-9]*"
+                                                        maxLength={3}
+                                                        inputMode="numeric"
+                                                        className="form-control rounded-0"
+                                                        id="payAgainstDelivery"
                                                         name="payAgainstDelivery"
-                                                        onChange={handleChange} value={projects?.payAgainstDelivery} aria-describedby="mobileNoHelp" />
+                                                        onChange={handleChange}
+                                                        value={projects?.payAgainstDelivery}
+                                                        aria-describedby="mobileNoHelp"
+                                                    />
+
                                                 </div>
                                             </div>
 
@@ -408,9 +506,19 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 <div className="mb-3">
                                                     <label for="payfterCompletion" className="form-label label_text">     Pay After Completion <RequiredStar />
                                                     </label>
-                                                    <input type="text" pattern="[0-9]*" maxLength={3} className="form-control rounded-0" id="payfterCompletion"
-                                                        name="payfterCompletion"
-                                                        onChange={handleChange} value={projects?.payAfterCompletion} aria-describedby="secemailHelp" />
+                                                    <input
+                                                        type="text"
+                                                        pattern="[0-9]*"
+                                                        maxLength={3}
+                                                        inputMode="numeric"
+                                                        className="form-control rounded-0"
+                                                        id="payAfterCompletion"
+                                                        name="payAfterCompletion"
+                                                        onChange={handleChange}
+                                                        value={projects?.payAfterCompletion}
+                                                        aria-describedby="secemailHelp"
+                                                    />
+
                                                 </div>
                                             </div>
                                         </div>
@@ -425,7 +533,8 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 <div className="mb-3">
                                                     <input
                                                         type="text"
-                                                        pattern="[0-9]*"
+                                                        inputMode="numeric"
+                                                        pattern="^[1-9][0-9]{5}$"
                                                         maxLength="6"
                                                         className="form-control rounded-0"
                                                         placeholder="Pincode"
@@ -433,7 +542,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         name="pincode"
                                                         onChange={handleAddressChange}
                                                         value={address.pincode}
-                                                        aria-describedby="emailHelp"
+                                                        required
                                                     />
 
                                                 </div>
@@ -446,10 +555,12 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         className="form-control rounded-0"
                                                         placeholder="State"
                                                         id="State"
-                                                        onChange={handleAddressChange}
                                                         name="state"
+                                                        onChange={handleAddressChange}
                                                         value={address.state}
-                                                        aria-describedby="emailHelp"
+                                                        maxLength="30"
+                                                        pattern="^[a-zA-Z\s]*$"
+                                                        required
                                                     />
                                                 </div>
                                             </div>
@@ -461,11 +572,14 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         className="form-control rounded-0"
                                                         placeholder="City"
                                                         id="city"
-                                                        onChange={handleAddressChange}
                                                         name="city"
+                                                        maxLength={40}
+                                                        pattern="^[a-zA-Z\s]{2,40}$"
+                                                        onChange={handleAddressChange}
                                                         value={address.city}
-                                                        aria-describedby="emailHelp"
+                                                        required
                                                     />
+
                                                 </div>
                                             </div>
 
@@ -477,10 +591,13 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         placeholder="Country"
                                                         id="country"
                                                         name="country"
+                                                        maxLength={40}
                                                         onChange={handleAddressChange}
                                                         value={address.country}
-                                                        aria-describedby="emailHelp"
+                                                        pattern="^[a-zA-Z\s]{2,40}$"
+                                                        required
                                                     />
+
                                                 </div>
                                             </div>
 
@@ -490,6 +607,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         className="textarea_edit col-12"
                                                         id="add"
                                                         name="add"
+                                                        maxLength={50}
                                                         placeholder="House NO., Building Name, Road Name, Area, Colony"
                                                         onChange={handleAddressChange}
                                                         value={address.add}
@@ -510,12 +628,12 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                     <div className="col-12 col-lg-6 mt-2" >
 
                                         <div className="mb-3">
-                                        <label for="PurchaseOrderCopy" className="form-label label_text">     Purchase Order Copy <RequiredStar />
+                                            <label for="PurchaseOrderCopy" className="form-label label_text">     Purchase Order Copy <RequiredStar />
 
-</label>
+                                            </label>
 
                                         </div>
-                                    <button type="button" onClick={viewFile}  >View</button>
+                                        <button type="button" onClick={viewFile}  >View</button>
                                     </div>
                                     <div className="col-12 col-lg-6 mt-2" >
 
@@ -524,7 +642,10 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                             </label>
                                             <input type="email" className="form-control rounded-0" id="remark"
                                                 name="remark"
-                                                onChange={handleChange} value={projects?.remark} aria-describedby="secemailHelp" />
+                                                onChange={handleChange}
+                                                maxLength={50}
+                                                value={projects?.remark}
+                                                aria-describedby="secemailHelp" />
                                         </div>
                                     </div>
 

@@ -195,6 +195,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         value={custId}
                         onChange={(e) => setCustId(e.target.value)}
                       >
+                        <option value =''>Select Client</option>
                         {customers.map((cust) => (
                           <option key={cust._id} value={cust._id}>
                             {cust.custName}

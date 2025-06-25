@@ -17,6 +17,7 @@ export const MarketingMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
   const toggle = () => {
     setIsOpen(!isopen);
+    
   };
 
   // const [isAddModalVisible, setIsAddModalVisible] = useState(false);
@@ -175,12 +176,12 @@ export const MarketingMasterGrid = () => {
                         <thead>
                           <tr className="th_border">
                             <th>Sr.No</th>
+                            <th>Sources</th>
                             <th>Contact Name</th>
                             <th>Company Name</th>
                             <th>Product</th>
                             <th>Email</th>
                             <th>Date</th>
-                            <th>Sources</th>
                             <th>Action</th>
                           </tr>
                         </thead>
@@ -189,6 +190,7 @@ export const MarketingMasterGrid = () => {
                             data.leads.map((lead, index) => (
                               <tr >
                                 <td>{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
+                                <td>{lead?.SOURCE}</td>
                                 <td>{lead?.SENDER_NAME}</td>
                                 <td>{lead?.SENDER_COMPANY}</td>
                                 <td>{lead?.QUERY_PRODUCT_NAME}</td>
@@ -233,7 +235,7 @@ export const MarketingMasterGrid = () => {
                 </div>
 
 
-               {/* add pagination Pagination */}
+                {/* add pagination Pagination */}
 
                 {!loading && pagination.totalPages > 1 && (
                   <div className="pagination-container text-center my-3">
@@ -289,9 +291,8 @@ export const MarketingMasterGrid = () => {
                         <button
                           key={number}
                           onClick={() => handlePageChange(number)}
-                          className={`btn btn-sm me-1 ${
-                            pagination.currentPage === number ? "btn-primary" : "btn-dark"
-                          }`}
+                          className={`btn btn-sm me-1 ${pagination.currentPage === number ? "btn-primary" : "btn-dark"
+                            }`}
                           style={{ minWidth: "35px", borderRadius: "4px" }}
                           aria-label={`Go to page ${number}`}
                           aria-current={pagination.currentPage === number ? "page" : undefined}

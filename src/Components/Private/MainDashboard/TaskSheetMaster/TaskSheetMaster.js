@@ -17,6 +17,8 @@ import { getDepartment } from "../../../../hooks/useDepartment";
 import AddTaskPopUp from "../TaskMaster/PopUp/AddTaskPopUp";
 import { getAllActions } from "../../../../hooks/useAction";
 import { formatDateforEditAction } from "../../../../utils/formatDate";
+import { RequiredStar } from "../../RequiredStar/RequiredStar";
+
 
 export const TaskSheetMaster = () => {
   /**
@@ -310,13 +312,14 @@ export const TaskSheetMaster = () => {
                           htmlFor="taskName"
                           className="form-label label_text"
                         >
-                          Task Name
+                          Task Name <RequiredStar/>
                         </label>
                         <select
                           className="form-select rounded-0"
                           aria-label="Default select example"
                           onChange={(e) => handleTaskSelection(e.target.value)}
                           value={taskName}
+                          required
                         >
                           <option value="">-- Select Task Name --</option>
                           {taskDropDown &&
@@ -346,7 +349,7 @@ export const TaskSheetMaster = () => {
                           for="startDate"
                           className="form-label label_text"
                         >
-                          Start Date
+                          Start Date <RequiredStar/>
                         </label>
                         <input
                           type="date"
@@ -362,7 +365,7 @@ export const TaskSheetMaster = () => {
                     <div className="col-12 col-md-6 col-lg-3">
                       <div className="mb-3">
                         <label for="endDate" className="form-label label_text">
-                          End Date
+                          End Date <RequiredStar/>
                         </label>
                         <input
                           type="date"
@@ -381,13 +384,14 @@ export const TaskSheetMaster = () => {
                           htmlFor="taskName"
                           className="form-label label_text"
                         >
-                          Department
+                          Department <RequiredStar/>
                         </label>
                         <select
                           className="form-select rounded-0"
                           aria-label="Default select example"
                           onChange={(e) => setDepartment(e.target.value)}
                           value={department}
+                          required
                         >
                           <option value="">-- Select Department Name --</option>
 
@@ -402,19 +406,6 @@ export const TaskSheetMaster = () => {
                       </div>
                     </div>
 
-                    {/* <div className="col-12 col-md-6 col-lg-3">
-                                        <form>
-                                            <div className="mb-3">
-                                                <label for="company" className="form-label label_text">Department</label>
-                                                <input type="text" className="form-control rounded-0" id="company" 
-                                                onChange={(e) => setCompany(e.target.value)}
-                                                value={company}
-                                                aria-describedby="emailHelp" />
-                                            </div>
-
-                                        </form>
-
-                                    </div> */}
 
                     <div className="col-12 col-md-6 col-lg-3">
                       <div className="mb-3">
@@ -422,25 +413,25 @@ export const TaskSheetMaster = () => {
                           for="ProjectName"
                           className="form-label label_text"
                         >
-                          Employee Name
+                          Employee Name <RequiredStar/>
                         </label>
                         <ReactSelect
-                          options={employeeOptions} // Employee options (e.g., from API)
-                          isMulti // Allows selecting multiple employees
-                          closeMenuOnSelect={false} // Keeps menu open after selecting an item
-                          hideSelectedOptions={false} // Show selected options in the dropdown
+                          options={employeeOptions} 
+                          isMulti 
+                          closeMenuOnSelect={false} 
+                          hideSelectedOptions={false} 
                           onChange={(selectedOption) => {
-                            // Map over the selected options to extract only the IDs
                             const employeeIds = selectedOption
                               ? selectedOption.map((option) => option.value)
                               : [];
-                            setEmployees(employeeIds); // Set employees state to array of IDs
+                            setEmployees(employeeIds);
                           }}
                           value={employees.map((id) =>
                             employeeOptions.find(
                               (option) => option.value === id
                             )
-                          )} // Keep selected values synced
+                          )}
+                          required
                         />
                       </div>
                     </div>

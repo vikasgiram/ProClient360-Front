@@ -6,7 +6,7 @@ import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
 
 
-const AddTaskPopUp = ({ handleAdd }) => {
+const AddTaskPopUp = ({ handleAdd, cancelBtnCallBack }) => {
 
     const [taskname, setTaskname] = useState("");
 
@@ -17,7 +17,7 @@ const AddTaskPopUp = ({ handleAdd }) => {
             name:taskname,
         };
         if (!taskname) {
-            return toast.error("Please fill all fields");
+            return toast.error("Please Enter Task Name");
         }
         await createTask(data);
         handleAdd();
@@ -42,7 +42,7 @@ const AddTaskPopUp = ({ handleAdd }) => {
                                 {/* Forward */}
                             </h5>
                             <button
-                                onClick={() => handleAdd()}
+                                onClick={cancelBtnCallBack}
                                 type="button"
                                 className="close px-3"
                                 style={{ marginLeft: "auto" }}
@@ -64,6 +64,7 @@ const AddTaskPopUp = ({ handleAdd }) => {
                                             >
                                                 Task Name <RequiredStar />
                                             </label>
+                                            
                                             <input
                                                 type="text"
                                                 maxLength={50}
@@ -92,7 +93,7 @@ const AddTaskPopUp = ({ handleAdd }) => {
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={handleAdd}
+                                            onClick={cancelBtnCallBack}
                                             className="w-80  btn addbtn rounded-0 Cancel_button m-2 px-4"
                                         >
                                             Cancel
