@@ -9,8 +9,7 @@ const useMyLeads = (page = 1, limit = 10, filters = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchLeads = async () => {
+  const fetchLeads = async () => {
       setLoading(true);
       try {
         const params = {
@@ -44,10 +43,11 @@ const useMyLeads = (page = 1, limit = 10, filters = {}) => {
       }
     };
 
+  useEffect(() => {
     fetchLeads();
   }, [page, limit, filters.source, filters.date, filters.status]);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch: () => fetchLeads()};
 };
 
 export default useMyLeads;

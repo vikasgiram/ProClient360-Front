@@ -6,6 +6,7 @@ import AddCompanyPopup from "./PopUp/AddCompanyPopup";
 import UpdatedCompanyPopup from "./PopUp/UpdatedCompanyPopup";
 import { getCompany, deleteCompany } from "../../../../hooks/useCompany";
 import { formatDate } from "../../../../utils/formatDate";
+import toast from "react-hot-toast";
 
 export const AdminCompanyMasterGrid = () => {
     const [isopen, setIsOpen] = useState(false);
@@ -19,6 +20,7 @@ export const AdminCompanyMasterGrid = () => {
     const [loading, setLoading] = useState(true);
     const [selectedId, setSelecteId] = useState(null);
     const [searchText, setSearchText] = useState("");
+    const [search, setSearch] = useState("");
 
     const [companies, setCompanies] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -91,13 +93,25 @@ export const AdminCompanyMasterGrid = () => {
     };
 
     useEffect(() => {
-        if(searchText.length >2 || searchText.length === 0) 
-            fetchData(currentPage);
+         
+        fetchData(currentPage);
     }, [currentPage, AddPopUpShow, deletePopUpShow, updatePopUpShow, searchText]);
 
     const handleAdd = () => {
         setAddPopUpShow(!AddPopUpShow);
     };
+
+    const handleSearchSubmit = (event) => {
+        event.preventDefault();
+        if (search.trim() !== "") {
+            if( search.length < 3 ){
+                toast.error("Please enter at least 3 characters for search.");
+                return;
+            }
+             setSearchText(search);
+        }
+    }
+
 
     const handleUpdate = (company = null) => {
         setSelectedCompany(company);
@@ -183,19 +197,16 @@ export const AdminCompanyMasterGrid = () => {
                                     <div className="col-12 col-lg-6">
                                         <div className="row g-2 align-items-center justify-content-end">
                                             <div className="col-sm-8 col-md-6">
-                                                <div className="form position-relative">
+                                                <form onSubmit={handleSearchSubmit} className="position-relative">
                                                     <i className="fa fa-search position-absolute" style={{ top: '10px', left: '10px', color: '#aaa' }}></i>
                                                     <input
                                                         type="text"
-                                                        value={searchText}
-                                                        onChange={(e) => {
-                                                            setSearchText(e.target.value);
-                                                            setCurrentPage(1);
-                                                        }}
+                                                        value={search}
+                                                        onChange={(e) => setSearch(e.target.value)}
                                                         className="form-control form-input bg-transparant ps-4"
                                                         placeholder="Search Companies..."
                                                     />
-                                                </div>
+                                                </form>
                                             </div>
                                             <div className="col-sm-4 col-md-auto text-end me-4">
                                                 <button

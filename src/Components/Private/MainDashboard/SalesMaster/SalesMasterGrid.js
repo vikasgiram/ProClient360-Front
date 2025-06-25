@@ -13,6 +13,7 @@ import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
 import UpdateSalesPopUp from "./PopUp/UpdateSalesPopUp";
 import useMyLeads from "../../../../hooks/leads/useMyLeads";
 import useSubmitEnquiry from "../../../../hooks/leads/useSubmitEnquiry";
+import useCreateLead from "../../../../hooks/leads/useCreateLead";
 
 export const SalesMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -43,7 +44,7 @@ export const SalesMasterGrid = () => {
   const itemsPerPage = 10;
 
 
-  const { data, loading, error, } = useMyLeads(pagination.currentPage, itemsPerPage, filters);
+  const { data, loading, error, refetch } = useMyLeads(pagination.currentPage, itemsPerPage, filters);
   const {submitEnquiry} = useSubmitEnquiry();
 
   useEffect(() => {
@@ -102,7 +103,7 @@ export const SalesMasterGrid = () => {
     try {
       if (enquiryData) {
         await submitEnquiry(id, enquiryData);
-        handlePageChange(1);
+        refetch();
       }
     } catch (error) {
       console.error("Update error:", error);
@@ -188,7 +189,7 @@ export const SalesMasterGrid = () => {
                       <div className="col">
                         <select
                           className="form-select bg_edit"
-                          name="status"
+                          name="source"
                           onChange={(e) => handleChange('source', e.target.value)}
                           value={filters.source || ""}
                         >
@@ -264,9 +265,9 @@ export const SalesMasterGrid = () => {
                                                 </span>
                                             }
 
-                                            {(user?.permissions?.includes('deleteLead') && lead.SOURCE==='Direct' || user?.user === 'company') &&
+                                            {( lead.SOURCE==='Direct' &&( user?.permissions?.includes('deleteLead') || user?.user === 'company')) &&
                                               <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
-                                                  <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
+                                                   <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
                                               </span>
                                             }
  

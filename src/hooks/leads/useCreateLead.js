@@ -23,19 +23,16 @@ const useCreateLead = () => {
       if (responseData.error) {
         setError(responseData.error);
         setData(null);
-        toast.error(responseData.error);
         return null;
       }
 
       setData(responseData);
       setError(null);
-      toast.success('Lead Created Successfully');
       return responseData;
     } catch (err) {
       const errorMessage = err.response?.data?.error || 'Failed to create lead';
       setError(errorMessage);
       setData(null);
-      toast.error(errorMessage);
       return null;
     } finally {
       setLoading(false);

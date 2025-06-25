@@ -67,10 +67,9 @@ export const TaskSheetMaster = () => {
     columnWidth = 250;
   }
 
-  const handleAdd = (event) => {
+  const handleAdd = async (event) => {
     event.preventDefault();
-    setRenderPage(!renderPage);
-    handleTaskAdd();
+    await handleTaskAdd();
   };
   const handleTaskSelection = (value) => {
     if (value === "AddNewTask") {
@@ -261,6 +260,7 @@ export const TaskSheetMaster = () => {
     }
 
     await createTaskSheet(data);
+    setRenderPage(!renderPage);
     toast.success("Task added successfully");
     clearForm();
   };
