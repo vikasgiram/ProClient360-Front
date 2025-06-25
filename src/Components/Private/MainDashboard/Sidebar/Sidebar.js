@@ -26,7 +26,7 @@ export const Sidebar = ({ isopen, active }) => {
                 <span className="navbar-brand brand-logo">
                     <img
                         style={{ width: isopen ? "100%" : "100%" }}
-                        src={user.logo || "static/assets/img/nav/DACCESS.png"}
+                        src={user.logo || "/static/assets/img/nav/DACCESS.png"}
                         className="logo"
                         alt="logo"
                     />
@@ -47,7 +47,7 @@ export const Sidebar = ({ isopen, active }) => {
                             title="Dashboard"
                             className={active === "dashboard" ? " nav-item active" : "nav-item sidebar_item"}>
                             <Link to='/MainDashboard' className="nav-link ">
-                                <img src="static/assets/img/nav/dashboard.png" className="menu-icon" />
+                                <i class="fa-solid fa-house ps-3 side_icon_fs"></i>
                                 <span
                                     className="menu-title"
                                     style={{ display: isopen ? "" : "none" }}
@@ -67,7 +67,8 @@ export const Sidebar = ({ isopen, active }) => {
                             title="Dashboard"
                             className={Open || active === "dashboard" ? " nav-item active" : "nav-item sidebar_item"}>
                             <Link to='/EmployeeMainDashboard' className="nav-link ">
-                                <img src="static/assets/img/nav/dashboard.png" className="menu-icon" />
+                                {/* <img src="static/assets/img/nav/dashboard.png" className="menu-icon" /> */}
+                                <i class="fa-solid fa-house ps-3 side_icon_fs"></i>
                                 <span
                                     className="menu-title"
                                     style={{ display: isopen ? "" : "none" }}
