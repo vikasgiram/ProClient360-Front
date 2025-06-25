@@ -6,7 +6,7 @@ import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
 
 
-const AddTaskPopUp = ({ handleAdd }) => {
+const AddTaskPopUp = ({ handleAdd, cancelBtnCallBack }) => {
 
     const [taskname, setTaskname] = useState("");
 
@@ -42,7 +42,7 @@ const AddTaskPopUp = ({ handleAdd }) => {
                                 {/* Forward */}
                             </h5>
                             <button
-                                onClick={() => handleAdd()}
+                                onClick={cancelBtnCallBack}
                                 type="button"
                                 className="close px-3"
                                 style={{ marginLeft: "auto" }}
@@ -93,7 +93,7 @@ const AddTaskPopUp = ({ handleAdd }) => {
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={handleAdd}
+                                            onClick={cancelBtnCallBack}
                                             className="w-80  btn addbtn rounded-0 Cancel_button m-2 px-4"
                                         >
                                             Cancel
