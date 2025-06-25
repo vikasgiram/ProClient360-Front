@@ -152,7 +152,7 @@ export const ProjectMasterGrid = () => {
                           name="projectStatus"
                           onChange={(e) => handleChange('status',e.target.value)}
                         >
-                          <option value="">Select Project Status</option>
+                          <option value=""> Project Status</option>
                           <option value="Upcoming">Upcoming</option>
                           <option value="Inprocess">Inprocess</option>
                           <option value="Completed">Completed</option>
