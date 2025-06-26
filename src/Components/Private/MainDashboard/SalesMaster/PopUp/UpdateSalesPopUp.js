@@ -28,18 +28,18 @@ const LeadInfoView = ({ selectedLead }) => {
   return (
     
     <div className="row">
+     
       <div className="col-md-6 mb-3">  
         <h6 className="text-muted border-bottom pb-2 mb-3">Sender Information</h6>
-        <h6 className="mt-3 d-flex align-items-center">
 
+        <h6 className="mt-3 d-flex align-items-center">
           <span className="fw-bold me-2">Source:</span>
 
            {selectedLead?.SOURCE?.toLowerCase() === "indiamart" && (
-            <span> 
+            <span>
               <img src="/static/assets/img/indiamart.png" alt="Indiamart" style={{ height: "40px", marginLeft: "10px" }} />
             </span>
-          )} 
-          
+          )}
 
           {selectedLead?.SOURCE?.toLowerCase() === "tradeindia" && (
             <span>
@@ -68,11 +68,14 @@ const LeadInfoView = ({ selectedLead }) => {
 
           {selectedLead?.SOURCE?.toLowerCase() === "direct" && (
             <span>
-              direct{" "}
               <img src="/static/assets/img/nav/DACCESS.png" alt="direct" style={{ height: "40px", marginLeft: "10px" }}
               />
             </span>
           )}
+
+          {/* {!["indiamart", "tradeindia", "facebook", "google", "linkedin", "direct"].includes(
+            selectedLead?.SOURCE?.toLowerCase()
+          ) && <span>{selectedLead?.SOURCE || "-"}</span>} */}
 
           {!["indiamart", "tradeindia", "facebook", "google", "linkedin", "direct"].includes(selectedLead?.SOURCE?.toLowerCase()) && (
             <span>{selectedLead?.SOURCE || "-"}</span>
@@ -202,7 +205,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
               {showInfo ? "Hide Info" : "Show Info"}
             </button>
 
-            <div className="modal-body" style={{ maxHeight: '40vh', overflowY: 'auto' }}>
+            <div className="modal-body" style={{ maxHeight: '45vh', overflowY: 'auto' }}>
               {showInfo && <LeadInfoView selectedLead={selectedLead} />}
 
 
@@ -239,7 +242,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
                 {actionData.actionType === 'Quotation Submission' && (
                   <div className="col-md-6">
                     <label htmlFor="quotationValue" className="form-label fw-bold">Quotation Amount (₹)<RequiredStar /></label>
-                    <input type="text" className="form-control" id="quotationValue" maxLength={12} name="quotationValue" placeholder="Enter quotation amount" value={actionData.quotationValue} onChange={handleActionChange} required />
+                    <input type="text" className="form-control" id="quotationValue" name="quotationValue" placeholder="Enter quotation amount" value={actionData.quotationValue} onChange={handleActionChange} required />
                   </div>
                 )}
 

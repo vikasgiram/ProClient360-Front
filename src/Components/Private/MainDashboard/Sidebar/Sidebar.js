@@ -72,7 +72,7 @@ export const Sidebar = ({ isopen, active }) => {
                                     className="menu-title"
                                     style={{ display: isopen ? "" : "none" }}
                                 >
-                                    Dashboard
+                                    Dashboard 
                                 </span>
                             </Link>
                         </li>
