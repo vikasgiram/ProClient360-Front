@@ -14,7 +14,7 @@ import { getEmployee } from "../../../../../hooks/useEmployees";
 import { getDepartment } from "../../../../../hooks/useDepartment";
 import { sendNotification } from "../../../../../hooks/useNotification";
 
-const EmployeeEditMyservicePopUp = ({ selectedService, handleUpdate }) => {
+const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
   const [status, setStatus] = useState("");
   const [action, setAction] = useState("");
   const [stuckReason, setStuckReason] = useState("");
@@ -30,16 +30,18 @@ const EmployeeEditMyservicePopUp = ({ selectedService, handleUpdate }) => {
 
   const [showInfo, setShowInfo] = useState(false);
 
+  const FetchPreviousActions = async () => {
+    try {
+      const data = await getAllServiceActions(selectedService._id);
+      if(data.success)
+        setPreviousActions(data.serviceActions);
+      else 
+        toast(data.error);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
   useEffect(() => {
-    const FetchPreviousActions = async () => {
-      try {
-        const data = await getAllServiceActions(selectedService._id);
-        setPreviousActions(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     FetchPreviousActions();
   }, [selectedService._id]);
 
@@ -124,7 +126,7 @@ const EmployeeEditMyservicePopUp = ({ selectedService, handleUpdate }) => {
       return toast.error("Please enter Action");
     }
 
-    const data = {
+    const actionData = {
       service: selectedService._id,
       status,
       startTime,
@@ -134,9 +136,15 @@ const EmployeeEditMyservicePopUp = ({ selectedService, handleUpdate }) => {
     };
 
     // console.log(employees);
-    await createServiceAction(data);
+    const data = await createServiceAction(actionData);
     // console.log(selectedService._id,data);
-    handleUpdate();
+    if(data.success) {
+      toast.success(data.message);
+      handleUpdate();
+      FetchPreviousActions();
+    }else{
+      toast.error(data.error);
+    }
   };
 
   return (
@@ -467,4 +475,4 @@ const EmployeeEditMyservicePopUp = ({ selectedService, handleUpdate }) => {
   );
 };
 
-export default EmployeeEditMyservicePopUp;
+export default SubmitServiceWorkPopUp;

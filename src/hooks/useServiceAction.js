@@ -15,8 +15,9 @@ const getAllServiceActions = async (serviceId) => {
     // console.log("api actions",data);
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error?.response?.data?.message);  }
+    console.error(error.response?.data);
+    return error?.response?.data;
+  }
 };
 
 
@@ -30,16 +31,11 @@ const createServiceAction = async (serviceData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Work submitted..");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error?.response?.data?.error);  }
+    console.error(error.response?.data);
+    return error?.response?.data;
+  }
 };
 
 const updateServiceAction = async (id, updatedData) => {
@@ -51,16 +47,11 @@ const updateServiceAction = async (id, updatedData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return alert(data.error);
-    }
-    toast.success("Service Action Updated Successfuly");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error?.response?.data?.error);  }
+    console.error(error.response?.data);
+    return error?.response?.data;
+  }
 };
 
 const deleteServiceAction = async (Id) => {
@@ -72,15 +63,11 @@ const deleteServiceAction = async (Id) => {
     });
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return alert(data.error);
-    }
-
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error?.response?.data?.error);}
+    console.error(error.response?.data);
+    return error?.response?.data;
+  }
 };
 
 export { getAllServiceActions, createServiceAction, updateServiceAction, deleteServiceAction };

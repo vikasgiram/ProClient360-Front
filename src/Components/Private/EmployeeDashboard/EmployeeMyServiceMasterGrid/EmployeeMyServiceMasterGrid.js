@@ -3,7 +3,7 @@ import { Header } from "../../MainDashboard/Header/Header";
 import { Sidebar } from "../../MainDashboard/Sidebar/Sidebar";
 import toast from 'react-hot-toast';
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
-import EmployeeEditMyservicePopUp from "./PopUp/EmployeeEditMyservicePopUp";
+import SubmitServiceWorkPopUp from "./PopUp/SubmitServiceWorkPopUp";
 import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
 import useMyServices from "../../../../hooks/service/useMyService";
 import useDeleteService from "../../../../hooks/service/useDeleteService";
@@ -364,7 +364,7 @@ export const EmployeeMyServiceMasterGrid = () => {
         />
       )}
       {updatePopUpShow && selectedService && (
-        <EmployeeEditMyservicePopUp
+        <SubmitServiceWorkPopUp
           selectedService={selectedService}
           handleUpdate={handleUpdate}
           onSuccess={() => setPagination((prev) => ({ ...prev }))}

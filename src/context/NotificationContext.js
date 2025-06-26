@@ -9,11 +9,15 @@ const NotificationProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchNotifications = async () => {
-    const notifications = await getNotifications();
-    console.log("notifications",notifications);
-    setNotifications(notifications);
-    setLoading(false);
-    };
+    const data = await getNotifications();
+    if(data.success){
+      setNotifications(notifications);
+      setLoading(false);
+    }else{
+      console.error(data.error);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Fetch notifications on mount

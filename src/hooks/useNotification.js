@@ -12,18 +12,13 @@ const getNotifications = async () => {
       }
     });
     const data = response?.data;
-    // console.log("api data",data);
-    
 
-    if (data?.error) {
-      console.error(data?.error);
-      return toast.error(data?.error);
-    }
     return data;
     
   } catch (error) {
-    console.error(error);
-    toast.error(error?.response?.data?.error);  }
+    console.error(error.response?.data?.error);
+    return error?.response?.data?.error;
+  }
 };
 
 

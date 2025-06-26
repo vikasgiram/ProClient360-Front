@@ -266,6 +266,7 @@ export const TicketMasterGrid = () => {
                             </th>
                             <th>Product</th>
                             <th>Registered by</th>
+                          
                             <th>Assign</th>
                             <th>Action</th>
                           </tr>
@@ -288,12 +289,14 @@ export const TicketMasterGrid = () => {
                                 <td>{ticket?.product}</td>
                                 <td>{ticket?.registerBy?.name || "N/A"}</td>
                                 <td>
+                                  {user?.permission?.includes("createService") &&
                                   <span
                                     onClick={() => handleAddService(ticket._id)}
                                     title="Assign Service"
                                   >
                                     <i className="fa-solid fa-share cursor-pointer"></i>
                                   </span>
+                                  }
                                 </td>
                                 <td>
                                   <span

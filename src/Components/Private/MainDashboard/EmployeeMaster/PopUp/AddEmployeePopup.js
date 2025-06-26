@@ -105,11 +105,11 @@ const AddEmployeePopup = ({ handleAdd }) => {
       return toast.error("Hourly Rate should be a number greater than 0");
     }
     const data = await createEmployee(employeeData);
-    if(data.sucess){
+    if(data.success){
       toast.success(data.message);
       handleAdd();
     }else {
-      toast.error(data.message || "Failed to create employee");
+      toast.error(data.error||'Employee not created.');
     }
   };
 
