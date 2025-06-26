@@ -358,6 +358,7 @@ export const TaskSheetMaster = () => {
                           onChange={(e) => setStartDate(e.target.value)}
                           value={startDate}
                           aria-describedby="emailHelp"
+                          required
                         />
                       </div>
                     </div>
@@ -374,6 +375,7 @@ export const TaskSheetMaster = () => {
                           onChange={(e) => setEndDate(e.target.value)}
                           value={endDate}
                           aria-describedby="emailHelp"
+                          required
                         />
                       </div>
                     </div>

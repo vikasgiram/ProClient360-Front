@@ -64,7 +64,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
     } else if (taskLevel < selectedTask?.taskLevel) {
       return toast.error("Task level must be greater than previous task level");
     }
-    if(!/^[a-zA-Z0-9\s.,;:!?'"()\-]+$/.test(action)){
+    if (!/^[a-zA-Z0-9\s.,;:!?'"()\-]+$/.test(action)) {
       return toast.error("Special characters are not allowed in action");
     }
     const data = {
@@ -178,67 +178,67 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                   </Steps>
                 </span>
 
-                <div className="row modal_body_height mt-2">
-                  <div className="col-12 col-lg-12">
-                    <button
-                      type="button"
-                      className="w-80 btn btn-sm addbtn rounded-0 add_button m-2 px-4 float-end"
-                      onClick={toggleVisibility}
-                    >
-                      {isVisible ? "x" : "Show More..."}
-                    </button>
+                <div className="row modal_body_height mt-2" style={{ maxWidth: '60vw', width: '60vw' }}>                 
+                   <div className="col-20 col-lg-20">
+                  <button
+                    type="button"
+                    className="w-80 btn btn-sm addbtn rounded-0 add_button m-2 px-4 d-block mx-auto"
+                    onClick={toggleVisibility}
+                  >
+                    {isVisible ? "x" : "Show More..."}
+                  </button>
 
-                    {isVisible && (
+                  {isVisible && (
 
-                      <div className="  bg-white ms-1 rounded p-lg-3">
-                        <div className="col-12">
-                          <div className="shadow_custom ">
-                            <div className="table-responsive">
-                              <table className="table align-items-center table-flush">
-                                <thead className="thead-light">
-                                  <tr >
-                                    <th className="text-center">Action</th>
-                                    <th className="text-center">Action By</th>
-                                    <th className="text-center">Start Date</th>
-                                    <th className="text-center">End Time</th>
-                                    <th className="text-center">Complated</th>
-                                    <th className="text-center">Edit</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
+                    <div className="  bg-white ms-1 rounded p-lg-3">
+                      <div className="col-12" style={{ maxWidth: '55vw', width: '55vw' }}>
+                        <div className="shadow_custom ">
+                          <div className="table-responsive">
+                            <table className="table align-items-center table-flush" >
+                              <thead className="thead-light" >
+                                <tr >
+                                  <th className="text-center">Action</th>
+                                  <th className="text-center">Action By</th>
+                                  <th className="text-center">Start Date</th>
+                                  <th className="text-center">End Time</th>
+                                  <th className="text-center">Complated</th>
+                                  <th className="text-center">Edit</th>
+                                </tr>
+                              </thead>
+                              <tbody>
                                 {console.log("actionHistory", actionHistory)}
-                                  {actionHistory &&
-                                    actionHistory.map((action, index) => (
-                                      <tr className="text-center" key={action?._id} >
+                                {actionHistory &&
+                                  actionHistory.map((action, index) => (
+                                    <tr className="text-center" key={action?._id} >
 
-                                        <td>{action?.action}</td>
-                                        <td>{action?.actionBy?.name}</td>
-                                        <td>{formatDateforTaskUpdate(action?.startTime)}</td>
-                                        <td>{formatDateforTaskUpdate(action?.endTime)}</td>
-                                        <td>{action?.complated}%</td>
-                                        <td>  {index ===
-                                          actionHistory.length - 1 && (
-                                            <button
-                                              type="button"
-                                              onClick={() =>
-                                                editTask(action)
-                                                // console.log(action._id,"action id")
+                                      <td>{action?.action}</td>
+                                      <td>{action?.actionBy?.name}</td>
+                                      <td>{formatDateforTaskUpdate(action?.startTime)}</td>
+                                      <td>{formatDateforTaskUpdate(action?.endTime)}</td>
+                                      <td>{action?.complated}%</td>
+                                      <td>  {index ===
+                                        actionHistory.length - 1 && (
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              editTask(action)
+                                              // console.log(action._id,"action id")
 
-                                              }
-                                            >
-                                              <i class="fa-solid fa-pen-to-square"></i>
-                                            </button>
-                                          )}</td>
-                                      </tr>
-                                    ))}
+                                            }
+                                          >
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                          </button>
+                                        )}</td>
+                                    </tr>
+                                  ))}
 
-                                </tbody>
+                              </tbody>
 
-                              </table>
-                            </div>
+                            </table>
                           </div>
                         </div>
                       </div>
+                    </div>
 
 
 
@@ -247,8 +247,8 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
 
 
-                    )}
-                  </div>
+                  )}
+                </div>
 
                   {/* //for edit the actions */}
                   {forEdit ? (

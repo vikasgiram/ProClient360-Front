@@ -281,7 +281,7 @@ export const EmployeeTaskGrid = () => {
                                               name="projectStatus"
                                               onChange={(e) => handleChange(e.target.value)}
                                             >
-                                              <option value="">All Statuses</option>
+                                              <option value="">All Status</option>
                                               <option value="upcoming">Upcoming</option>
                                               <option value="inprocess">Inprocess</option>
                                               <option value="completed">Completed</option>

@@ -58,7 +58,8 @@ const ViewTaskPopUp = ({ handleViewTask, selectedId }) => {
 
 
 
-                <div className="row bg-white p-2 m-1 border rounded modal_body_height">
+                {/* <div className="row bg-white p-2 m-1 border rounded modal_body_height"> */}
+                <div className=" row bg-white p-2 m-1 border rounded modal_body_height" style={{ maxWidth: '60vw', width: '60vw' }}>
                   <div className="col-12 py-2">
                     <div className="table-responsive">
                       <table
