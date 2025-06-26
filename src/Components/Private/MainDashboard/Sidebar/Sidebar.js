@@ -49,7 +49,7 @@ export const Sidebar = ({ isopen, active }) => {
                             <Link to='/MainDashboard' className="nav-link ">
                                 <i class="fa-solid fa-house ps-3 side_icon_fs"></i>
                                 <span
-                                    className="menu-title"
+                                    className="menu-title_m"
                                     style={{ display: isopen ? "" : "none" }}
                                 >
                                     Dashboard
@@ -70,7 +70,7 @@ export const Sidebar = ({ isopen, active }) => {
                                 {/* <img src="static/assets/img/nav/dashboard.png" className="menu-icon" /> */}
                                 <i class="fa-solid fa-house ps-3 side_icon_fs"></i>
                                 <span
-                                    className="menu-title"
+                                    className="menu-title_m"
                                     style={{ display: isopen ? "" : "none" }}
                                 >
                                     Dashboard 
