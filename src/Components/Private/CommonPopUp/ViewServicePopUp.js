@@ -4,6 +4,7 @@ import {
   formatDateforupdate,
 } from "../../../utils/formatDate";
 import { getAllServiceActions } from "../../../hooks/useServiceAction";
+import toast from "react-hot-toast";
 
 const ViewServicePopUp = ({ closePopUp, selectedService }) => {
   const [service, setService] = useState(selectedService);
@@ -15,8 +16,16 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
   useEffect(() => {
     const FetchPreviousActions = async () => {
       try {
+        toast.loading("Loading Previous Actions...");
         const data = await getAllServiceActions(selectedService._id);
-        setPreviousActions(data);
+        if(data.success){
+          toast.dismiss();
+          setPreviousActions(data);
+        } else {
+          toast.dismiss();
+          setPreviousActions([]);
+          toast(data.error)
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
