@@ -27,6 +27,8 @@ export const DesignationMasterGird = () => {
   const [designations, setDesignation] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
@@ -37,8 +39,43 @@ export const DesignationMasterGird = () => {
   });
   const itemsPerPage = 10;
 
+  const calculatePagination = (data, page = 1) => {
+    const totalItems = data.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = data.slice(startIndex, endIndex);
+    
+    return {
+      data: paginatedData,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      }
+    };
+  };
+
+  const [paginatedFilteredData, setPaginatedFilteredData] = useState([]);
+  const [filterPagination, setFilterPagination] = useState({
+    currentPage: 1,
+    totalPages: 0,
+    totalItems: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+
   const handlePageChange = (page) => {
-    setPagination((prev) => ({ ...prev, currentPage: page }));
+    if (selectedDepartment) {
+      setCurrentPage(page);
+      const result = calculatePagination(filteredData, page);
+      setPaginatedFilteredData(result.data);
+      setFilterPagination(result.pagination);
+    } else {
+      setPagination((prev) => ({ ...prev, currentPage: page }));
+    }
   };
 
   const toggle = () => {
@@ -69,11 +106,26 @@ export const DesignationMasterGird = () => {
   };
 
   const handleChange = (value) => {
+    setSelectedDepartment(value);
+    setCurrentPage(1);
+    
     if (value) {
       const filtered = designations.filter((designation) => designation.department._id === value);
       setFilteredData(filtered);
+      
+      const result = calculatePagination(filtered, 1);
+      setPaginatedFilteredData(result.data);
+      setFilterPagination(result.pagination);
     } else {
       setFilteredData(designations);
+      setPaginatedFilteredData([]);
+      setFilterPagination({
+        currentPage: 1,
+        totalPages: 0,
+        totalItems: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      });
     }
   };
 
@@ -85,6 +137,12 @@ export const DesignationMasterGird = () => {
     return acc;
   }, []);
 
+  const displayData = selectedDepartment ? paginatedFilteredData : filteredData;
+  const displayPagination = selectedDepartment ? filterPagination : pagination;
+  const shouldShowPagination = selectedDepartment ? 
+    (filteredData.length > itemsPerPage && displayPagination.totalPages > 1) : 
+    (!loading && pagination.totalPages > 1);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -92,7 +150,9 @@ export const DesignationMasterGird = () => {
         const data = await getAllDesignations(pagination.currentPage, itemsPerPage);
         if (data) {
           setDesignation(data.designations || []);
-          setFilteredData(data.designations || []);
+          if (!selectedDepartment) {
+            setFilteredData(data.designations || []);
+          }
           setPagination(data.pagination || {
             currentPage: 1,
             totalPages: 0,
@@ -135,7 +195,7 @@ export const DesignationMasterGird = () => {
                   <div className="col-12 col-lg-5 ms-auto text-end">
                     <div className="row">
                       <div className="col-4 col-lg-6 ms-auto">
-                        <select className="form-select bg_edit" onChange={(e) => handleChange(e.target.value)}>
+                        <select className="form-select bg_edit" onChange={(e) => handleChange(e.target.value)} value={selectedDepartment}>
                           <option value="">Select Department</option>
                           {uniqueDepartments.map((department) => (
                             <option key={department._id} value={department._id}>
@@ -168,10 +228,10 @@ export const DesignationMasterGird = () => {
                           </tr>
                         </thead>
                         <tbody className="broder my-4">
-                          {filteredData.length > 0 ? (
-                            filteredData.map((designation, index) => (
+                          {displayData.length > 0 ? (
+                            displayData.map((designation, index) => (
                               <tr className="border my-4" key={designation._id}>
-                                <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                <td>{index + 1 + (displayPagination.currentPage - 1) * itemsPerPage}</td>
                                 <td>{designation.department.name}</td>
                                 <td>{designation.name}</td>
                                 <td>
@@ -201,11 +261,14 @@ export const DesignationMasterGird = () => {
                   </div>
                 </div>
 
-                {!loading && pagination.totalPages > 1 && (
-                  <div className="pagination-container text-center my-3 sm">
+
+                 {/* pagination logic */}
+
+                {shouldShowPagination && (
+                  <div className="pagination-container text-center my-3">
                     <button
                       onClick={() => handlePageChange(1)}
-                      disabled={!pagination.hasPrevPage}
+                      disabled={!displayPagination.hasPrevPage}
                       className="btn btn-dark btn-sm me-1"
                       style={{ borderRadius: "4px" }}
                       aria-label="First Page"
@@ -214,8 +277,8 @@ export const DesignationMasterGird = () => {
                     </button>
 
                     <button
-                      disabled={!pagination.hasPrevPage}
-                      onClick={() => handlePageChange(pagination.currentPage - 1)}
+                      onClick={() => handlePageChange(displayPagination.currentPage - 1)}
+                      disabled={!displayPagination.hasPrevPage}
                       className="btn btn-dark btn-sm me-1"
                       style={{ borderRadius: "4px" }}
                       aria-label="Previous Page"
@@ -223,37 +286,61 @@ export const DesignationMasterGird = () => {
                       Previous
                     </button>
 
-                    {[...Array(pagination.totalPages)].map((_, index) => {
-                      const pageNumber = index + 1;
-                      return (
+                    {(() => {
+                      const pageNumbers = [];
+                      const maxPagesToShow = 5;
+                      const totalPages = displayPagination.totalPages;
+
+                      if (totalPages <= maxPagesToShow) {
+                        for (let i = 1; i <= totalPages; i++) {
+                          pageNumbers.push(i);
+                        }
+                      } else {
+                        let startPage, endPage;
+                        if (displayPagination.currentPage <= 3) {
+                          startPage = 1;
+                          endPage = maxPagesToShow;
+                        } else if (displayPagination.currentPage >= totalPages - 2) {
+                          startPage = totalPages - maxPagesToShow + 1;
+                          endPage = totalPages;
+                        } else {
+                          startPage = displayPagination.currentPage - 2;
+                          endPage = displayPagination.currentPage + 2;
+                        }
+                        startPage = Math.max(1, startPage);
+                        endPage = Math.min(totalPages, endPage);
+
+                        for (let i = startPage; i <= endPage; i++) {
+                          pageNumbers.push(i);
+                        }
+                      }
+
+                      return pageNumbers.map((number) => (
                         <button
-                          key={index}
-                          onClick={() => handlePageChange(pageNumber)}
-                          className={`btn btn-sm me-1 ${
-                            pagination.currentPage === pageNumber ? "btn-primary" : "btn-dark"
-                          }`}
+                          key={number}
+                          onClick={() => handlePageChange(number)}
+                          className={`btn btn-sm me-1 ${displayPagination.currentPage === number ? "btn-primary" : "btn-dark"
+                            }`}
                           style={{ minWidth: "35px", borderRadius: "4px" }}
-                          aria-label={`Go to page ${pageNumber}`}
-                          aria-current={pagination.currentPage === pageNumber ? "page" : undefined}
+                          aria-label={`Go to page ${number}`}
+                          aria-current={displayPagination.currentPage === number ? "page" : undefined}
                         >
-                          {pageNumber}
+                          {number}
                         </button>
-                      );
-                    })}
+                      ));
+                    })()}
 
                     <button
-                      disabled={!pagination.hasNextPage}
-                      onClick={() => handlePageChange(pagination.currentPage + 1)}
+                      disabled={!displayPagination.hasNextPage}
+                      onClick={() => handlePageChange(displayPagination.currentPage + 1)}
                       className="btn btn-dark btn-sm me-1"
-                      style={{ borderRadius: "4px" }}
-                      aria-label="Next Page"
                     >
                       Next
                     </button>
 
-                    <button
-                      onClick={() => handlePageChange(pagination.totalPages)}
-                      disabled={!pagination.hasNextPage}
+                    <button 
+                      onClick={() => handlePageChange(displayPagination.totalPages)}
+                      disabled={!displayPagination.hasNextPage}
                       className="btn btn-dark btn-sm"
                       style={{ borderRadius: "4px" }}
                       aria-label="Last Page"
@@ -262,6 +349,7 @@ export const DesignationMasterGird = () => {
                     </button>
                   </div>
                 )}
+
               </div>
             </div>
           </div>

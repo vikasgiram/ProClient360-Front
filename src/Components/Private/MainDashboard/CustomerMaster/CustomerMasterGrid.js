@@ -131,7 +131,7 @@ export const CustomerMasterGrid = () => {
               <div className="content-wrapper ps-3 ps-md-0 pt-3">
                 <div className="row px-2 py-1">
                   <div className="col-12 col-lg-6">
-                    <h5 className="text-white py-2">Customer Master Company</h5>
+                    <h5 className="text-white py-2">Customer Master</h5>
                   </div>
                   <div className="col-12 col-lg-5 ms-auto">
                     <div className="row">

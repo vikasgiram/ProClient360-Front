@@ -90,15 +90,6 @@ export const MarketingMasterGrid = () => {
     handlePageChange(1);
   };
 
-  // const handleOpenAddModal = () => setIsAddModalVisible(true);
-
-  // const handleCloseAddModal = () => setIsAddModalVisible(false);
-
-  // const handleAddLeadSubmit = async (leadData) => {
-  //   console.log("New Lead to be created:", leadData);
-  //   toast.success("Lead added successfully!");
-  //   handleCloseAddModal();
-  // };
 
 
   return (

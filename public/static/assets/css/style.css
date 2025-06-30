@@ -2842,3 +2842,16 @@ width: 65% !important;
 }
 
 
+.addemp {
+  max-width: 600px !important;
+}
+
+
+.inprogress {
+  display: inline;
+}
+
+.inprogress-field {
+  display: inline-block;
+}
+

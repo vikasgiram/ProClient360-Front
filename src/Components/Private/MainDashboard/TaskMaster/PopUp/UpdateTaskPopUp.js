@@ -77,6 +77,7 @@ const[task,setTask]=useState(selectedTask);
                         onChange={handleChange}
                         className="form-control rounded-0"
                         id="name"
+                        required
                       />
                     </div>
                 </div>

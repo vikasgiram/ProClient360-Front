@@ -105,11 +105,11 @@ const AddEmployeePopup = ({ handleAdd }) => {
       return toast.error("Hourly Rate should be a number greater than 0");
     }
     const data = await createEmployee(employeeData);
-    if(data.success){
+    if (data.success) {
       toast.success(data.message);
       handleAdd();
-    }else {
-      toast.error(data.error||'Employee not created.');
+    } else {
+      toast.error(data.error || 'Employee not created.');
     }
   };
 
@@ -139,7 +139,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
           backgroundColor: "#00000090",
         }}
       >
-        <div className="modal-dialog modal-lg">
+        <div className="modal-dialog addemp" style={{maxWidth:"1000px"}}>
           <div className="modal-content p-3">
             <form onSubmit={handleEmployeeAdd}>
               <div className="modal-header pt-0">

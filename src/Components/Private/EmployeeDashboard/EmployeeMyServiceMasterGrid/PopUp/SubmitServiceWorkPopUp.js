@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { default as ReactSelect } from "react-select";
 
+
 import {
   formatDate,
   formatDateforupdate,
@@ -13,6 +14,8 @@ import {
 import { getEmployee } from "../../../../../hooks/useEmployees";
 import { getDepartment } from "../../../../../hooks/useDepartment";
 import { sendNotification } from "../../../../../hooks/useNotification";
+import { RequiredStar } from "../../../RequiredStar/RequiredStar";
+
 
 const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
   const [status, setStatus] = useState("");
@@ -30,12 +33,15 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
 
   const [showInfo, setShowInfo] = useState(false);
 
+  const [workComplete, setWorkComplete] = useState('');
+
+
   const FetchPreviousActions = async () => {
     try {
       const data = await getAllServiceActions(selectedService._id);
-      if(data.success)
+      if (data.success)
         setPreviousActions(data.serviceActions);
-      else 
+      else
         toast(data.error);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -138,11 +144,11 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
     // console.log(employees);
     const data = await createServiceAction(actionData);
     // console.log(selectedService._id,data);
-    if(data.success) {
+    if (data.success) {
       toast.success(data.message);
       handleUpdate();
       FetchPreviousActions();
-    }else{
+    } else {
       toast.error(data.error);
     }
   };
@@ -174,67 +180,71 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div className="modal-body">
-                <div className="row modal_body_height">
-                  <div className="col-12 mt-2">
-                    <div className="text-end">
-                      <div
-                        className="btn btn-sm btn-light"
-                        onClick={(e) => setShowInfo(!showInfo)}
-                      >
-                        {showInfo ? "Hide Info" : "Show Info"}
+              {/* <div className="modal-body"> */}
+              <div className="row modal_body_height">
+                <div className="col-12 mt-2">
+                  <div className="text-end">
+                    <div
+                      className="btn btn-sm btn-light"
+                      onClick={(e) => setShowInfo(!showInfo)}
+                    >
+                      {showInfo ? "Hide Info" : "Show Info"}
+                    </div>
+                  </div>
+                  {showInfo && (
+                    <div class="row">
+                      <div class="col-sm- col-md col-lg">
+                        <h6>
+                          <p className="fw-bold ">Complaint:</p>{" "}
+                          {selectedService?.ticket?.details || "-"}
+                        </h6>
+                        <h6>
+                          <p className="fw-bold mt-3 ">Client:</p>{" "}
+                          {selectedService?.ticket?.client?.custName}
+                        </h6>
+                        <h6>
+                          <p className="fw-bold mt-3">Product:</p>{" "}
+                          {selectedService.ticket.product}
+                        </h6>
+                        <h6>
+                          <p className="fw-bold mt-3">Zone:</p>{" "}
+                          {selectedService.zone}
+                        </h6>
+                        <h6>
+                          <p className="fw-bold mt-3">Service Type:</p>{" "}
+                          {selectedService.serviceType}
+                        </h6>
+                      </div>
+                      <div class="col-sm- col-md col-lg">
+                        <p className="fw-bold"> Allotment Date: </p>
+                        {formatDateforupdate(selectedService.allotmentDate)}
+                        <p className="fw-bold mt-3"> Allocated to: </p>
+                        {selectedService.allotTo[0].name}
+                        <p className="fw-bold mt-3"> Status: </p>
+                        {selectedService.status}
+                        <p className="fw-bold mt-3"> Priority: </p>
+                        {selectedService.priority}
+                        <p className="fw-bold mt-3"> Work Mode: </p>
+                        {selectedService.workMode}
+                        <p className="fw-bold mt-3"> Created At: </p>
+                        {formatDateforupdate(selectedService.ticket.date)}
                       </div>
                     </div>
-                    {showInfo && (
-                      <div class="row">
-                        <div class="col-sm- col-md col-lg">
-                          <h6>
-                            <p className="fw-bold ">Complaint:</p>{" "}
-                            {selectedService?.ticket?.details || "-"}
-                          </h6>
-                          <h6>
-                            <p className="fw-bold mt-3 ">Client:</p>{" "}
-                            {selectedService?.ticket?.client?.custName}
-                          </h6>
-                          <h6>
-                            <p className="fw-bold mt-3">Product:</p>{" "}
-                            {selectedService.ticket.product}
-                          </h6>
-                          <h6>
-                            <p className="fw-bold mt-3">Zone:</p>{" "}
-                            {selectedService.zone}
-                          </h6>
-                          <h6>
-                            <p className="fw-bold mt-3">Service Type:</p>{" "}
-                            {selectedService.serviceType}
-                          </h6>
-                        </div>
-                        <div class="col-sm- col-md col-lg">
-                          <p className="fw-bold"> Allotment Date: </p>
-                          {formatDateforupdate(selectedService.allotmentDate)}
-                          <p className="fw-bold mt-3"> Allocated to: </p>
-                          {selectedService.allotTo[0].name}
-                          <p className="fw-bold mt-3"> Status: </p>
-                          {selectedService.status}
-                          <p className="fw-bold mt-3"> Priority: </p>
-                          {selectedService.priority}
-                          <p className="fw-bold mt-3"> Work Mode: </p>
-                          {selectedService.workMode}
-                          <p className="fw-bold mt-3"> Created At: </p>
-                          {formatDateforupdate(selectedService.ticket.date)}
-                        </div>
-                      </div>
-                    )}
-                    <div className="col-12 col-lg-6 mt-2">
-                      <label for="GSTNumber" className="form-label label_text">
-                        Status
+                  )}
+
+
+                  <div className="row">
+                    <div className="col-12 col-md-6 mt-2">
+                      <label htmlFor="status" className="form-label label_text">
+                        Status <RequiredStar />
                       </label>
                       <select
                         className="form-control rounded-0"
-                        id="GSTNumber"
+                        id="status"
                         onChange={(e) => setStatus(e.target.value)}
                         value={status}
                         aria-describedby="statusHelp"
+                        required
                       >
                         <option value="">Select Status</option>
                         <option value="Pending">Pending</option>
@@ -243,22 +253,50 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                         <option value="Stuck">Stuck</option>
                       </select>
                     </div>
+
+                    {status === "Inprogress" && (
+                      <div className="col-12 col-md-6 mt-2">
+                        <label htmlFor="workComplete" className="form-label label_text">
+                          Work Complete (%) <RequiredStar />
+                        </label>
+                        <input
+                          type="number"
+                          className="form-control rounded-0"
+                          id="workComplete"
+                          name="workComplete"
+                          placeholder="eg. 50"
+                          min="0"
+                          max="100"
+                          maxLength={3}
+                          value={workComplete}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || (value.length <= 3 && Number(value) >= 0 && Number(value) <= 100)) {
+                              setWorkComplete(value);
+                            }
+                          }} required
+                        />
+                      </div>
+                    )}
                   </div>
 
+
+
                   {status === "Stuck" && (
-                    <div className="col-12 col-lg-6 mt-2">
+                    <div className="col-12 mt-2 inprocess">
                       <div className="">
                         <label
                           for="stuckResion"
                           className="form-label label_text"
                         >
-                          Responsible Party
+                          Responsible Party <RequiredStar />
                         </label>
                         <select
                           className="form-control rounded-0"
                           onChange={(e) => setResponsibleParty(e.target.value)}
                           value={responsibleParty}
                           aria-describedby="statusHelp"
+                          required
                         >
                           <option value="">Select Responsible Party</option>
                           <option value="Company">Company</option>
@@ -271,13 +309,13 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
 
                   {responsibleParty === "Company" && (
                     <div className="row">
-                      <div className="col-12 col-lg-6 mt-2">
+                      <div className="col-6 col-lg-6 mt-2 inprogress-field">
                         <div className="mb-3">
                           <label
                             htmlFor="taskName"
                             className="form-label label_text"
                           >
-                            Department
+                            Department  <RequiredStar />
                           </label>
                           <select
                             className="form-select rounded-0"
@@ -286,6 +324,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                               setSelectedDepartment(e.target.value)
                             }
                             value={selectedDepartment}
+                            required
                           >
                             <option value="">
                               -- Select Department Name --
@@ -300,13 +339,13 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                         </div>
                       </div>
 
-                      <div className="col-12 col-lg-6">
+                      <div className="col-6 col-lg-6 mt-2">
                         <div className="mb-3">
                           <label
                             for="ProjectName"
                             className="form-label label_text"
                           >
-                            Employee Name
+                            Employee Name  <RequiredStar />
                           </label>
                           <ReactSelect
                             options={employeeOptions} // Employee options (e.g., from API)
@@ -316,11 +355,13 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                               const employeeId = selectedOption
                                 ? selectedOption.value
                                 : null;
-                              setEmployees(employeeId); 
+                              setEmployees(employeeId);
+
                             }}
                             value={employeeOptions.find(
                               (option) => option.value === employees
                             )} // Keep selected value synced
+                            required
                           />
                         </div>
                       </div>
@@ -334,15 +375,17 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                           for="stuckResion"
                           className="form-label label_text"
                         >
-                          Stuck Reason
+                          Stuck Reason <RequiredStar />
                         </label>
                         <input
                           type="textarea"
                           className="form-control rounded-0"
                           id="stuckResion"
+                          placeholder="Enter Stuck Reason...."
                           onChange={(e) => setStuckReason(e.target.value)}
                           value={stuckReason}
                           aria-describedby="emailHelp"
+                          required
                         />
                       </div>
                     </div>
@@ -352,12 +395,13 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                     <div className="col-12 mt-2">
                       <div className="">
                         <label for="action" className="form-label label_text">
-                          Action
+                          Action <RequiredStar />
                         </label>
                         <input
                           type="textarea"
                           className="form-control rounded-0"
                           id="action"
+                          placeholder="Enter Action...."
                           value={action}
                           onChange={(e) => setAction(e.target.value)}
                           aria-describedby="nameHelp"
@@ -369,14 +413,14 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                     ""
                   )}
 
-                  {status !== "Stuck" ? (
+                  {/* {status !== "Stuck" ? (
                     <>
-                      <div className="col-12 col-lg-6 mt-2">
+                      <div className="col-9 col-lg-6 mt-2">
                         <label
                           for="StartTime"
                           className="form-label label_text"
                         >
-                          Start Time
+                          Start Time  <RequiredStar />
                         </label>
                         <input
                           className="form-control rounded-0"
@@ -385,12 +429,13 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                           onChange={(e) => setStartTime(e.target.value)}
                           value={startTime}
                           aria-describedby="statusHelp"
+                          required
                         />
                       </div>
 
-                      <div className="col-12 col-lg-6 mt-2">
+                      <div className="col-9 col-lg-6 mt-2">
                         <label for="EndTime" className="form-label label_text">
-                          End Time
+                          End Time <RequiredStar />
                         </label>
                         <input
                           className="form-control rounded-0"
@@ -399,13 +444,47 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                           onChange={(e) => setEndTime(e.target.value)}
                           value={endTime}
                           aria-describedby="statusHelp"
+                          required
                         />
                       </div>
                     </>
                   ) : (
                     ""
-                  )}
+                  )} */}
 
+                  {status !== "Stuck" ? (
+                    <div className="row g-3 mt-2">
+                      <div className="col">
+                        <label htmlFor="StartTime" className="form-label label_text">
+                          Start Time <RequiredStar />
+                        </label>
+                        <input
+                          className="form-control rounded-0"
+                          id="StartTime"
+                          type="datetime-local"
+                          onChange={(e) => setStartTime(e.target.value)}
+                          value={startTime}
+                          aria-describedby="statusHelp"
+                          required
+                        />
+                      </div>
+
+                      <div className="col">
+                        <label htmlFor="EndTime" className="form-label label_text">
+                          End Time <RequiredStar />
+                        </label>
+                        <input
+                          className="form-control rounded-0"
+                          id="EndTime"
+                          type="datetime-local"
+                          onChange={(e) => setEndTime(e.target.value)}
+                          value={endTime}
+                          aria-describedby="statusHelp"
+                          required
+                        />
+                      </div>
+                    </div>
+                  ) : null}
                   <div className="row">
                     <div className="col-12 pt-3 mt-2">
                       <button

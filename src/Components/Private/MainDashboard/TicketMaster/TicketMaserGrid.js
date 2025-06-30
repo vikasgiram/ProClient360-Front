@@ -17,6 +17,7 @@ export const TicketMasterGrid = () => {
 
   const { user } = useContext(UserContext);
 
+
   const [addServicePopUpShow, setAddServicePopUpShow] = useState(false);
   const [AddPopUpShow, setAddPopUpShow] = useState(false);
   const [deletePopUpShow, setdeletePopUpShow] = useState(false);
@@ -288,15 +289,15 @@ export const TicketMasterGrid = () => {
                                 </td>
                                 <td>{ticket?.product}</td>
                                 <td>{ticket?.registerBy?.name || "N/A"}</td>
-                                <td>
-                                  {user?.permission?.includes("createService") &&
+                                <td>                        
+                                  {user?.permissions?.includes("createService")?(
                                   <span
                                     onClick={() => handleAddService(ticket._id)}
                                     title="Assign Service"
                                   >
                                     <i className="fa-solid fa-share cursor-pointer"></i>
                                   </span>
-                                  }
+                                  ):""}
                                 </td>
                                 <td>
                                   <span

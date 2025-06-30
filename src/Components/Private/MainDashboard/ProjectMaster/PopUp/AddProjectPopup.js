@@ -192,6 +192,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         placeholder="Type to search customer..."
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
+                        required
                       />
 
                       {/* Select dropdown */}
@@ -213,7 +214,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
                   <div className="mb-3">
                     <label for="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
-                    <input type="text" className="form-control rounded-0" id="ProjectName" maxLength={30} placeholder="Enter a Project Name...." onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp" />
+                    <input type="text" className="form-control rounded-0" id="ProjectName" maxLength={30} placeholder="Enter a Project Name...." onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp"  required/>
                   </div>
 
 
@@ -229,6 +230,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         className="form-control rounded-0"
                         id="purchaseOrderDate"
                         aria-describedby="dateHelp"
+                        required
                       />
                     </div>
                   </div>
@@ -239,7 +241,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                       <label for="purchaseOrderNo" className="form-label label_text">Purchase Order Number <RequiredStar /></label>
                       <input type="text" className="form-control rounded-0" maxLength={12} id="purchaseOrderNo"
                         onChange={(e) => setPurchaseOrderNo(e.target.value)}
-                        value={purchaseOrderNo} aria-describedby="emailHelp" />
+                        value={purchaseOrderNo} aria-describedby="emailHelp"  required/>
                     </div>
 
                   </div>
@@ -261,6 +263,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         }}
                         value={purchaseOrderValue}
                         aria-describedby="mobileNoHelp"
+                        required
                       />
                     </div>
                   </div>
@@ -311,6 +314,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         className="form-control rounded-0"
                         id="ProjectStartDate"
                         aria-describedby="dateHelp"
+                        required
                       />
                     </div>
                   </div>
@@ -326,6 +330,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         className="form-control rounded-0"
                         id="ProjectEndDate"
                         aria-describedby="dateHelp"
+                        required
                       />
                     </div>
                   </div>
@@ -358,6 +363,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                             }}
                             value={advancePay}
                             aria-describedby="mobileNoHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -383,6 +389,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                             }}
                             value={payAgainstDelivery}
                             aria-describedby="mobileNoHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -409,6 +416,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                             }}
                             value={payAfterCompletion}
                             aria-describedby="secemailHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -439,6 +447,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                               }
                             }}
                             value={Address.pincode}
+                            required
                           />
                         </div>
                       </div>
@@ -460,6 +469,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                             }}
                             value={Address.state}
                             aria-describedby="emailHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -481,6 +491,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                             }}
                             value={Address.city}
                             aria-describedby="emailHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -502,6 +513,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                             }}
                             value={Address.country}
                             aria-describedby="emailHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -517,6 +529,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                             onChange={(e) => setAddress({ ...Address, add: e.target.value })}
                             value={Address.add}
                             rows="2"
+                            required
                           ></textarea>
                         </div>
                       </div>
@@ -535,6 +548,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                       <input type="file" className="form-control rounded-0" id="PurchaseOrderCopy" aria-describedby="secemailHelp"
                         accept=".pdf"
                         onChange={handleFileChange} files={POCopy}
+                        required
                       />
                     </div>
 
@@ -547,7 +561,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                     <div className="mb-3">
                       <label for="remark" className="form-label label_text">     remark
                       </label>
-                      <input type="text" className="form-control rounded-0" id="remark" placeholder="Enter a Remark...." maxLength={80} onChange={(e) => setRemark(e.target.value)} value={remark} aria-describedby="secemailHelp" />
+                      <input type="text" className="form-control rounded-0" id="remark" placeholder="Enter a Remark...." maxLength={80} onChange={(e) => setRemark(e.target.value)} value={remark} aria-describedby="secemailHelp" required/>
                     </div>
 
 

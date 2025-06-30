@@ -195,8 +195,8 @@ const AddDesignationPopup = ({ handleAdd }) => {
                         onChange={(e) => setName(e.target.value)}
                         className="form-control rounded-0"
                         id="name"
-                        required
                         aria-describedby="roleNameHelp"
+                        required
                       />
                     </div>
                   </div>
@@ -210,6 +210,7 @@ const AddDesignationPopup = ({ handleAdd }) => {
                       <select
                         className="form-select rounded-0"
                         onChange={(e) => setDepartment(e.target.value)}
+                        required
                       >
                         <option value="">Select Department</option>
                         {getDepartments.map((department) => (

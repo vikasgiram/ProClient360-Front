@@ -4,6 +4,7 @@ import { formatDate, formatDateforTaskUpdate, formatDateforEditAction } from "..
 import { Steps } from "rsuite";
 import { createAction, getAllActions } from "../../../../../hooks/useAction";
 import { updateAction } from "../../../../../hooks/useAction";
+import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
 
 
@@ -259,7 +260,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="action"
                             className="form-label label_text "
                           >
-                            Action
+                            Action <RequiredStar/>
                           </label>
                           <textarea
                             className="textarea_edit col-12"
@@ -268,6 +269,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             rows="2"
                             onChange={handleEditTask}
                             value={editAction?.action}
+                            required
                           ></textarea>
                         </div>
                       </div>
@@ -278,7 +280,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="startTime"
                             className="form-label label_text"
                           >
-                            Process Start Date
+                            Process Start Date <RequiredStar/>
                           </label>
                           <input
                             type="datetime-local"
@@ -288,6 +290,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             className="form-control rounded-0"
                             // min={new Date().toISOString().slice(0, 16)}
                             id="startTime"
+                            required
                           />
                         </div>
                       </div>
@@ -298,7 +301,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="endTime"
                             className="form-label label_text"
                           >
-                            Proccess End Date
+                            Proccess End Date  <RequiredStar/>
                           </label>
                           <input
                             type="datetime-local"
@@ -308,6 +311,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
                             className="form-control rounded-0"
                             id="endTime"
+                            required
                           />
                         </div>
                       </div>
@@ -317,7 +321,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                           htmlFor="taskStatus"
                           className="form-label label_text"
                         >
-                          Status
+                          Status <RequiredStar/>
                         </label>
                         <select
                           id="taskStatus"
@@ -326,7 +330,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
                           onChange={handleEditTask}
                           value={editAction?.taskStatus}
-
+                          required
                         >
                           {/* {console.log("editAction.taskStatus", editAction.taskStatus)}; */}
 
@@ -343,7 +347,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="complated"
                             className="form-label label_text"
                           >
-                            Complete Level
+                            Complete Level  <RequiredStar/>
                           </label>
                           <div className="input-group border mb-3">
                             <input
@@ -356,6 +360,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                               placeholder="eg. 65 %"
 
                               readOnly={taskStatus === "completed"}
+                              required
                             />
 
                             <span

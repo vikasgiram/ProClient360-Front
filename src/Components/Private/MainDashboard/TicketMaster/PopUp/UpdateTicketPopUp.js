@@ -154,6 +154,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         placeholder="Type to search customer..."
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
+                        required
                       />
 
                       <select
@@ -205,6 +206,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                               }
                             }}
                             aria-describedby="emailHelp"
+                            required
                           />
 
                         </div>
@@ -221,6 +223,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                             onChange={handleChange}
                             value={ticket?.Address?.state}
                             aria-describedby="emailHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -236,6 +239,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                             onChange={handleChange}
                             value={ticket?.Address?.city}
                             aria-describedby="emailHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -251,6 +255,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                             onChange={handleChange}
                             value={ticket?.Address?.country}
                             aria-describedby="emailHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -265,6 +270,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                             onChange={handleChange}
                             value={ticket?.Address?.add}
                             rows="2"
+                            required
                           ></textarea>
                         </div>
                       </div>

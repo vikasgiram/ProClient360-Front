@@ -502,6 +502,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         onChange={handleChange}
                                                         value={projects?.payAgainstDelivery}
                                                         aria-describedby="mobileNoHelp"
+                                                        required
                                                     />
 
                                                 </div>
@@ -522,6 +523,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         onChange={handleChange}
                                                         value={projects?.payAfterCompletion}
                                                         aria-describedby="secemailHelp"
+                                                        required
                                                     />
 
                                                 </div>

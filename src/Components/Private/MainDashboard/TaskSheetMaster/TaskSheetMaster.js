@@ -395,7 +395,7 @@ export const TaskSheetMaster = () => {
                           value={department}
                           required
                         >
-                          <option value="">-- Select Department Name --</option>
+                          <option value="">-- Select Department Names --</option>
 
                           {departmentName &&
                             departmentName.map((department) => (
