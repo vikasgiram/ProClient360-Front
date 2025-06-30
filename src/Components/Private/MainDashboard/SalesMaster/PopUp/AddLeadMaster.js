@@ -160,7 +160,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                      pattern='[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
                       title="Please enter a valid email address (e.g., example@domain.com)"
                     />
                   </div>

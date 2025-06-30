@@ -192,13 +192,15 @@ export const TaskSheetMaster = () => {
           return;
         }
         const data = await getEmployee(department);
-        if (data) {
-          const formattedData = data.map((employee) => ({
+        if (data.success) {
+          const formattedData = data.employee.map((employee) => ({
             value: employee._id,
             label: employee.name,
           }));
 
           setEmployeeOptions(formattedData);
+        }else{
+          toast.error(data.error);  
         }
       } catch (error) {
         console.log(error);

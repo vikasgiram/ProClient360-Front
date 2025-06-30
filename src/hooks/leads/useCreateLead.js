@@ -20,6 +20,7 @@ const useCreateLead = () => {
       });
 
       const responseData = response.data;
+      console.log("Response Data:", responseData);
       if (responseData.error) {
         setError(responseData.error);
         setData(null);
@@ -33,7 +34,7 @@ const useCreateLead = () => {
       const errorMessage = err.response?.data?.error || 'Failed to create lead';
       setError(errorMessage);
       setData(null);
-      return null;
+      return err.response.data;
     } finally {
       setLoading(false);
     }

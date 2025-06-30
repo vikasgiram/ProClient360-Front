@@ -47,6 +47,8 @@ export const SalesMasterGrid = () => {
   const { data, loading, error, refetch } = useMyLeads(pagination.currentPage, itemsPerPage, filters);
   const {submitEnquiry} = useSubmitEnquiry();
 
+  const { createLead } = useCreateLead();
+
   useEffect(() => {
     if (data) {
       setPagination(prev => ({ ...prev, ...data.pagination }));
@@ -126,8 +128,17 @@ export const SalesMasterGrid = () => {
   const handleCloseAddModal = () => setIsAddModalVisible(false);
 
   const handleAddLeadSubmit = async (leadData) => {
-    
-    handleCloseAddModal();
+    toast.loading("Adding lead...");
+    const data = await createLead(leadData);
+    console.log("Lead Data:", data);
+    if (data?.success) {
+      toast.dismiss();
+      toast.success(data?.message || "Lead added successfully!");
+      handleCloseAddModal();
+    }else{
+      toast.dismiss();
+      toast.error(data?.error || "Failed to add lead");
+    }
   };
 
   return (

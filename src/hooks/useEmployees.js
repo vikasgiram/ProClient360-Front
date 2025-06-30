@@ -35,17 +35,11 @@ const getEmployee = async (id) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-
     return data;
 
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error); 
+    console.error(error.response.data);
+    return error.response.data;
    }
 };
 
