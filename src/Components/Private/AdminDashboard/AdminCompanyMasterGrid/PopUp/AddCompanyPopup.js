@@ -62,8 +62,16 @@ const AddCompanyPopup = ({ handleAdd }) => {
     formData.append('logo', logo);
 
     try {
+      toast.loading("Adding Company...");
       const data = await createCompany(formData);
-      handleAdd();
+      if(data.success) {
+        toast.dismiss();
+        toast.success(data.message);
+        handleAdd();
+      } else {
+        toast.dismiss();
+        toast.error(data.message);
+      }
     } catch (error) {
       setLoading(false);
       toast.error("Failed to create company. Please try again.");

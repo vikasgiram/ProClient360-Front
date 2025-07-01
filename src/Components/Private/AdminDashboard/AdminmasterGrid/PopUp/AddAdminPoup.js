@@ -19,7 +19,7 @@ const AddAdminPoup = ({ handleAdd }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const handleEmployeeAdd = async (event) => {
     event.preventDefault();
-    const data = {
+    const adminData = {
       name,
       email,
       password,
@@ -37,10 +37,19 @@ const AddAdminPoup = ({ handleAdd }) => {
     if (!isValidPassword(password)) {
       return toast.error("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
     }
-    await createAdmin(data);
+
+    toast.loading("Adding Admin...");
+    const data = await createAdmin(adminData);
+    if(data.success){
+      toast.dismiss();
+      toast.success(data.message || "Admin Created Successfully");
+      handleAdd();
+    }else{
+      toast.dismiss();
+      toast.error(data.error || "Failed to create admin");
+    }
     // console.log(data);
 
-    handleAdd();
   };
 
   const [showPassword, setShowPassword] = useState(false);

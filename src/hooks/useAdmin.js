@@ -34,16 +34,12 @@ const createAdmin = async (adminData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-
-    toast.success("Admin Created");
+    return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);}};
+    console.error(error.response.data);
+    return error.response.data;
+  }
+};
 
 const updateAdmin = async (updatedAdminData) => {
   try {
@@ -53,16 +49,10 @@ const updateAdmin = async (updatedAdminData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Admin Updated sucessfully...");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);
+    console.error(error.response.data);
+    return error.response.data;
   }
 };
 
@@ -76,17 +66,10 @@ const deleteAdmin = async (id) => {
 
 
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return alert(data.error);
-    }
-
-    toast.success("Admin Deleted sucessfully...");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data);
+    return error.response.data;}
 };
 
 const getAdminDashboard = async () => {

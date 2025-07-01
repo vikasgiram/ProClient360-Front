@@ -28,8 +28,16 @@ const UpdateAdminPopup = ({ handleUpdate, selectedAdmin }) => {
             if(!isValidEmail(admin.email)){
                 return toast.error("Enter valid Email");
             }
-            await updateAdmin(admin);
-            handleUpdate();
+            toast.loading("Updating Admin...");
+            const data = await updateAdmin(admin);
+            if(data.success){
+                toast.dismiss();
+                toast.success(data.message);
+                handleUpdate();
+            }else{
+                toast.dismiss();
+                toast.error(data.error);
+            }
         } catch (error) {
             toast.error(error);
         }
