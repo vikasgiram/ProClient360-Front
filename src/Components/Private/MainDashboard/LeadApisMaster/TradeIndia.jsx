@@ -37,10 +37,15 @@ const TradeIndiaApiKeyInput = ({ onApiKeySubmit }) => {
             type="number"
             className="form-control"
             id="tradeindia-userid"
-            name="userid"
+            name="userid" 
             placeholder="User ID"
             value={form.userid}
-            onChange={handleChange}
+            onChange={(e) => {
+            const value = e.target.value;
+            if (/^\d{0,40}$/.test(value)) {
+            handleChange(e);
+              }
+            }}    
             style={{ borderColor: 'var(--primary, #1b3066)' }}
             required
             min="0"
@@ -57,12 +62,18 @@ const TradeIndiaApiKeyInput = ({ onApiKeySubmit }) => {
             name="profile_id"
             placeholder="Profile ID"
             value={form.profile_id}
-            onChange={handleChange}
             style={{ borderColor: 'var(--primary, #1b3066)' }}
+            onChange={(e) => {
+            const value = e.target.value;
+            if (/^\d{0,40}$/.test(value)) {
+            handleChange(e);
+              }
+            }}
             required
             min="0"
             inputMode="numeric"
-            pattern="\\d*"
+            pattern="\d*"
+            maxLength="20"
           />
         </div>
         <div className="mb-3 position-relative">
@@ -75,9 +86,14 @@ const TradeIndiaApiKeyInput = ({ onApiKeySubmit }) => {
               name="apiKey"
               placeholder="API Key"
               value={form.apiKey}
-              onChange={handleChange}
-              style={{ borderColor: 'var(--primary, #1b3066)' }}
-              required
+              onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d{0,100}$/.test(value)) {
+              handleChange(e);
+                }
+               }}  
+            style={{ borderColor: 'var(--primary, #1b3066)' }}
+            required
             />
             <button
               type="button"

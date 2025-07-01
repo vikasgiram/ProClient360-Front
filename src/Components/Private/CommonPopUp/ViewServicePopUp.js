@@ -20,7 +20,7 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
         const data = await getAllServiceActions(selectedService._id);
         if(data.success){
           toast.dismiss();
-          setPreviousActions(data);
+          setPreviousActions(data.serviceActions);
         } else {
           toast.dismiss();
           setPreviousActions([]);
