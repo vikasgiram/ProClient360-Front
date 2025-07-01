@@ -477,7 +477,7 @@ export const TaskSheetMaster = () => {
                         className="btn adbtn btn-danger  px-4 mx-auto"
                       >
                
-                        <i class="fa-solid fa-xmark"></i> Clear
+                        <i className="fa-solid fa-xmark"></i> Clear
                       </button>
                     </div>
 

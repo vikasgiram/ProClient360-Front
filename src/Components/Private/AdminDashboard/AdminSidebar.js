@@ -73,7 +73,7 @@ export const AdminSidebar = ({ isopen, active, subMenu }) => {
                         title="Company"
                         className={Open || active === "AdminCompanyMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
                         <Link to='/AdminCompanyMasterGrid' className="nav-link ">
-                            <i class="fa-brands fa-medium  ps-3 side_icon_fs"></i>
+                            <i className="fa-brands fa-medium  ps-3 side_icon_fs"></i>
                             <span
                                 className="menu-title_m"
                                 style={{ display: isopen ? "" : "none" }}
@@ -87,7 +87,7 @@ export const AdminSidebar = ({ isopen, active, subMenu }) => {
                         title="Admin"
                         className={Open || active === "AdminmasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
                         <Link to='/AdminmasterGrid' className="nav-link ">
-                            <i class="fa-solid fa-user-tie ps-3 side_icon_fs"></i>
+                            <i className="fa-solid fa-user-tie ps-3 side_icon_fs"></i>
                             <span
                                 className="menu-title_m"
                                 style={{ display: isopen ? "" : "none" }}

@@ -192,8 +192,8 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                     </div>
                   </div>
                   {showInfo && (
-                    <div class="row">
-                      <div class="col-sm- col-md col-lg">
+                    <div className="row">
+                      <div className="col-sm- col-md col-lg">
                         <h6>
                           <p className="fw-bold ">Complaint:</p>{" "}
                           {selectedService?.ticket?.details || "-"}
@@ -215,7 +215,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                           {selectedService.serviceType}
                         </h6>
                       </div>
-                      <div class="col-sm- col-md col-lg">
+                      <div className="col-sm- col-md col-lg">
                         <p className="fw-bold"> Allotment Date: </p>
                         {formatDateforupdate(selectedService.allotmentDate)}
                         <p className="fw-bold mt-3"> Allocated to: </p>

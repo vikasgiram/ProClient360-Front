@@ -72,7 +72,7 @@ export const EmployeeMaster = () => {
                                                 handleAddDepartment(true)
                                             }}
                                                 title="Delete">
-                                                <i class="fa-solid fa-plus pe-1"></i> Add
+                                                <i className="fa-solid fa-plus pe-1"></i> Add
                                             </span>
                                         </h5>
                                     </div>

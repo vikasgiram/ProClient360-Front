@@ -46,11 +46,11 @@ export const ForgotPassword = () => {
                 <form onSubmit={handelEmailSubmit} action="" method="post">
                   <div className="input-group mb-3">
                     <span className="input-group-text" id="basic-addon1">
-                      <i class="fa-solid fa-envelope"></i>
+                      <i className="fa-solid fa-envelope"></i>
                     </span>
                     <input
                       type="text"
-                      class="form-control"
+                      className="form-control"
                       name="email"
                       value={email}
                       placeholder="Enter Your Registered Email"
@@ -100,7 +100,7 @@ export const ForgotPassword = () => {
                
               <div className="col-12 col-lg-10 mx-auto mb-4 mb-lg-0 pt-4">
               <a href="" onClick={() => navigation('/')}>
-              <i class="fa-solid fa-angle-left"></i>  Back to login page</a>
+              <i className="fa-solid fa-angle-left"></i>  Back to login page</a>
               </div>
               
             </div>

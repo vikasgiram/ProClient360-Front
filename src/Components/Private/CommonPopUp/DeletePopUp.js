@@ -29,7 +29,7 @@ const DeletePopUP = ({ cancelBtnCallBack,confirmBtnCallBack}) => {
                                         type='button'
                                         onClick={() => confirmBtnCallBack()}
                                         className="w-80 btn addbtn btn-success btn-brand btn-md btn-tall btn-wide kt-font-bold kt-font-transform-u m-2 px-4" data-ktwizard-type="action-next">
-                                        <i class="fa-solid fa-check pe-2"></i> Yes
+                                        <i className="fa-solid fa-check pe-2"></i> Yes
                                     </button>
                                     <button
                                         type="button"
