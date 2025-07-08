@@ -204,7 +204,7 @@ export const SalesMasterGrid = () => {
                         winCount={data?.leadCounts?.winCount || 0}
                         pendingCount={data?.leadCounts?.pendingCount || 0}
                         lostCount={data?.leadCounts?.lostCount || 0}
-                        todayCount={data?.leadCounts?.todaysFollowUpCount} // Use calculated today count
+                        todayCount={data?.leadCounts?.todaysFollowUpCount} 
                     /> 
 
                 <div className="row align-items-center p-2 m-1">

@@ -28,11 +28,10 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
   const products = ['surveillance System', 'Access Control System', 'TurnKey Project', 'Alleviz', 'CafeLive', 'WorksJoy', 'WorksJoy Blu', 'Fire Alarm System', 'Fire Hydrant System', 'IDS', 'AI Face Machines', 'Entrance Automation', 'Guard Tour System', 'Home Automation', 'IP PA and Communication System', 'CRM'];
 
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData(prev => ({ ...prev, [name]: value }));
+  // };
 
 
   const handleAddressChange = (e) => {
@@ -50,6 +49,23 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
       }
     }));
   };
+
+
+  const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  if (name === "name") {
+    const regex = /^[A-Za-z\s]*$/;
+    if (!regex.test(value)) return; // ignore invalid input
+  }
+
+  setFormData({
+    ...formData,
+    [name]: value,
+  });
+};
+
+
 
 
   const handlePincodeChange = async (e) => {
@@ -139,11 +155,11 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                 <button onClick={onClose} type="button" className="btn-close" aria-label="Close" style={{ backgroundColor: 'red' }}></button>
               </div>
 
-              <div className="modal-body" style={{ maxHeight: 'calc(60vh - 210px)', overflowY: 'auto' }}>
+              <div className="modal-body" style={{ maxHeight: 'calc(80vh - 240px)', overflowY: 'auto' }}>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label htmlFor="name" className="form-label">Contact Name <RequiredStar /></label>
-                    <input type="text" className="form-control" id="name" name="name" placeholder="Enter a Contact Name...." maxLength={25} value={formData.name} onChange={handleInputChange} required />
+                    <input type="text" className="form-control" id="name" name="name" placeholder="Enter a Contact Name...." maxLength={40} value={formData.name} onChange={handleInputChange} required />
                   </div>
 
                   <div className="col-md-6">

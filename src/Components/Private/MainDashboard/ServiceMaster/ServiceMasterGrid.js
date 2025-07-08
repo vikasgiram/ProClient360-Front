@@ -168,7 +168,7 @@ export const ServiceMasterGrid = () => {
                         onChange={(e) => handleChange('serviceType', e.target.value)}
                         value={filters.serviceType || ""}
                       >
-                        <option value="">Select Service Type</option>
+                        <option value="">Select Service</option>
                         <option value="AMC">AMC</option>
                         <option value="Warranty">Warranty</option>
                         <option value="One Time">One Time</option>
@@ -236,8 +236,29 @@ export const ServiceMasterGrid = () => {
                                 <td className="align_left_td width_tdd">{service?.ticket?.product}</td>
                                 <td className="align_left_td width_tdd">{service.priority}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
+
                                 {service.allotTo && service.allotTo.map((allotTo) => (
-                                  <td key={allotTo._id}>{allotTo.name}</td>
+                                <td style={{ lineHeight: '1.2', padding: '8px' }}>
+                                {service.allotTo && service.allotTo.length > 0 
+                                 ? (() => {
+                                 const uniqueUsers = service.allotTo.filter((user, index, self) => 
+                                 index === self.findIndex(u => u._id === user._id || u.name === user.name)
+                                );
+        
+                                return uniqueUsers.map((allotTo, index) => (
+                                <div key={allotTo._id || index} style={{ 
+                                fontSize: '12px', 
+                                marginBottom: '2px',
+                                whiteSpace: 'nowrap'
+                                }}>
+                                {allotTo.name}
+                                </div>
+                               ));
+                               })()
+                               : 'Not Allocated'
+                               }
+                               </td>
+                               
                                 ))}
                                 <td className={service.status === 'Completed' ? 'text-success' : service.status === 'Inprogress' ? 'text-warning' : 'text-danger'}>{service.status}</td>
                                 <td>

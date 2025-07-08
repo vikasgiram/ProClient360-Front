@@ -182,7 +182,7 @@ const ViewSalesLeadPopUp = ({ closePopUp, selectedLead }) => {
                   </h6>
 
                   <h6 className="mt-3">
-                    <p className="fw-bold d-inline">Complated: </p>
+                    <p className="fw-bold d-inline">Completed: </p>
                     {selectedLead?.complated || "-"}
                   </h6>
                 </div>
