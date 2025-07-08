@@ -24,7 +24,7 @@ export const AdminDashboardCards = ({ activateCompanys,inactiveSubscriptions,tot
                                     </h2>
                                 </div>
                                 <div className="col-3 d-flex align-items-center justify-content-center ">
-                                    <img src="./static/assets/img/checked.png" className="img_opacity all_card_img_size" alt="img not found" srcset="" />
+                                    <img src="./static/assets/img/checked.png" className="img_opacity all_card_img_size" alt="img not found" srcSet="" />
                                 </div>
                             </div>
                         </div>
@@ -48,7 +48,7 @@ export const AdminDashboardCards = ({ activateCompanys,inactiveSubscriptions,tot
                                     </h2>
                                 </div>
                                 <div className="col-3 d-flex align-items-center justify-content-center ">
-                                    <img src="./static/assets/img/planning.png" className="img_opacity all_card_img_size" alt="img not found" srcset="" />
+                                    <img src="./static/assets/img/planning.png" className="img_opacity all_card_img_size" alt="img not found" srcSet="" />
                                 </div>
                             </div>
                         </div>
@@ -73,7 +73,7 @@ export const AdminDashboardCards = ({ activateCompanys,inactiveSubscriptions,tot
                                     </h2>
                                 </div>
                                 <div className="col-3 d-flex align-items-center justify-content-center ">
-                                    <img src="./static/assets/img/cloud.png" className="img_opacity all_card_img_size" alt="" srcset="" />
+                                    <img src="./static/assets/img/cloud.png" className="img_opacity all_card_img_size" alt="" srcSet="" />
                                 </div>
                             </div>
                         </div>

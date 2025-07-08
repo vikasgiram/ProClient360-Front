@@ -28,7 +28,7 @@ export const CompanyInfo = ({categorywise}) => {
                   
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center ">
-                  <img src="./static/assets/img/check.png" className="img_opacity all_card_img_size" alt="img not found" srcset="" />
+                  <img src="./static/assets/img/check.png" className="img_opacity all_card_img_size" alt="img not found" srcSet="" />
                 </div>
               </div>
             </div>
@@ -46,7 +46,7 @@ export const CompanyInfo = ({categorywise}) => {
                   <h2 className="pt-2 fw-bold card_count">{categorywise.inprocess}</h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center ">
-                  <img src="./static/assets/img/agile.png" className="img_opacity all_card_img_size" alt="img not found" srcset="" />
+                  <img src="./static/assets/img/agile.png" className="img_opacity all_card_img_size" alt="img not found" srcSet="" />
                 </div>
               </div>
             </div>
@@ -65,7 +65,7 @@ export const CompanyInfo = ({categorywise}) => {
                   <h2 className="pt-2 fw-bold card_count">{categorywise.upcoming}</h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center ">
-                  <img src="./static/assets/img/upcoming.png" className="img_opacity all_card_img_size" alt="" srcset="" />
+                  <img src="./static/assets/img/upcoming.png" className="img_opacity all_card_img_size" alt="" srcSet="" />
                 </div>
               </div>
             </div>

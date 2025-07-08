@@ -222,7 +222,7 @@ const AddDesignationPopup = ({ handleAdd }) => {
                     </div>
                   </div>
 
-                  <div class="col-10 col-lg-12">
+                  <div className="col-10 col-lg-12">
 
                     <label htmlFor="permissions" className="form-label label_text">
                       Permissions

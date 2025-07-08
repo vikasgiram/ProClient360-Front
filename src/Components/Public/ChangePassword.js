@@ -62,9 +62,9 @@ export const ChangePassword = () => {
                                 <form>
 
 
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">
-                                            <i class="fa-solid fa-key"></i>
+                                    <div className="input-group mb-3">
+                                        <span className="input-group-text">
+                                            <i className="fa-solid fa-key"></i>
                                         </span>
                                         <input
                                             placeholder="Old Password"
@@ -80,7 +80,7 @@ export const ChangePassword = () => {
                                                 // showPassEncrypt()
                                             }}
                                         />
-                                        <span class="input-group-text">
+                                        <span className="input-group-text">
                                             {" "}
 
                                             <i
@@ -92,9 +92,9 @@ export const ChangePassword = () => {
                                     </div>
 
 
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">
-                                            <i class="fa-solid fa-key"></i>
+                                    <div className="input-group mb-3">
+                                        <span className="input-group-text">
+                                            <i className="fa-solid fa-key"></i>
                                         </span>
                                         <input
                                             placeholder="New Password"
@@ -110,7 +110,7 @@ export const ChangePassword = () => {
                                                 // showPassEncrypt()
                                             }}
                                         />
-                                        <span class="input-group-text">
+                                        <span className="input-group-text">
                                             {" "}
 
                                             <i
@@ -125,9 +125,9 @@ export const ChangePassword = () => {
                                     </div>
 
 
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">
-                                            <i class="fa-solid fa-lock"></i>
+                                    <div className="input-group mb-3">
+                                        <span className="input-group-text">
+                                            <i className="fa-solid fa-lock"></i>
                                         </span>
                                         <input
                                             placeholder="confirm Password"
@@ -143,7 +143,7 @@ export const ChangePassword = () => {
                                                 // showPassEncrypt()
                                             }}
                                         />
-                                        <span class="input-group-text">
+                                        <span className="input-group-text">
                                             {" "}
 
                                             <i
@@ -174,7 +174,7 @@ export const ChangePassword = () => {
 
                                 <div className="col-12 col-lg-10 mx-auto mb-4 mb-lg-0 pt-4">
                                 <a href="" onClick={() => navigation('/')}>
-                                <i class="fa-solid fa-angle-left"></i>  Back to Dashboard</a>
+                                <i className="fa-solid fa-angle-left"></i>  Back to Dashboard</a>
                                 </div>
 
                             </div>

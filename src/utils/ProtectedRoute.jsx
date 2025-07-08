@@ -4,9 +4,7 @@ import { useContext } from "react";
 
 const ProtectedRoute = ({Component}) => {
   const { user } = useContext(UserContext);
-  console.log(Component)
   if(!Component){
-    console.log("Childeren is not defined")
     return null;
   }
   if (!user) {

@@ -143,11 +143,11 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
               </div>
               <div className="modal-body">
                 <span className="">
-                  <div class="row mb-4">
-                    <div class="col-12">
-                      <div class="progress">
+                  <div className="row mb-4">
+                    <div className="col-12">
+                      <div className="progress">
                         <div
-                          class="progress-bar"
+                          className="progress-bar"
                           role="progressbar"
                           style={{ width: selectedTask?.taskLevel + "%" }}
                           aria-valuenow="50"
@@ -227,7 +227,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
                                             }
                                           >
-                                            <i class="fa-solid fa-pen-to-square"></i>
+                                            <i className="fa-solid fa-pen-to-square"></i>
                                           </button>
                                         )}</td>
                                     </tr>

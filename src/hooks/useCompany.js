@@ -52,16 +52,11 @@ const createCompany = async (companyData) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("New Company Created...");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data);
+    return error.response.data;
+  }
 };
 
 
@@ -76,18 +71,12 @@ const updateCompany = async (updatedData) => {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
-    console.log("data",response);
     const data = response.data;
-   
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Company Updated successfully");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data);
+    return error.response.data;
+    }
 };
 
 const deleteCompany = async (Id) => {
@@ -98,15 +87,11 @@ const deleteCompany = async (Id) => {
       }
     });
     const data = response.data;
-
-    if (data.error) {
-      return toast.error(data.error);
-    }
-
-    toast.success("Company Deleted sucessfully...");
+    return data;
   } catch (error) {
     console.log(error.response.data);
-    toast.error(error.response.data.error);  }
+    return error.response.data;
+  }
 };
 
 export { getDashboardData, createCompany, updateCompany, deleteCompany,getCompany };

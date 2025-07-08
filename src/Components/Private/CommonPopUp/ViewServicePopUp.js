@@ -64,9 +64,9 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
             </div>
             <div className="modal-body">
               <div className="row modal_body_height_details">
-                <div class="row">
+                <div className="row">
 
-                  <div class="col-sm- col-md col-lg">
+                  <div className="col-sm- col-md col-lg">
                     <h6>
                       {" "}
                       <p className="fw-bold ">Complaint:</p>{" "}
@@ -96,7 +96,7 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                       {formatDate(service.completionDate)}
                     </h6>}
                   </div>
-                  <div class="col-sm- col-md col-lg">
+                  <div className="col-sm- col-md col-lg">
                     <p className="fw-bold"> Allotment Date: </p>
                     {formatDateforupdate(service.allotmentDate)}
                     <p className="fw-bold mt-3"> Allocated to: </p>
@@ -111,7 +111,7 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                     {formatDateforupdate(service.ticket.date)}
                   </div>
 
-                  {service.status === "Stuck" ? <div class="col-12">
+                  {service.status === "Stuck" ? <div className="col-12">
                     <h5>This Service is Stuck due to: <span className="text-danger text-xl-center"> {service.stuckReason}</span></h5>
                   </div> : ""}
                 </div>

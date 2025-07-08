@@ -74,7 +74,7 @@ export const ZonewiseVehicleMapping = () => {
                                                 handleAddDepartment(true)
                                             }}
                                                 title="Add">
-                                                <i class="fa-solid fa-plus pe-1"></i> Add
+                                                <i className="fa-solid fa-plus pe-1"></i> Add
                                             </span>
                                         </h5>
                                     </div>

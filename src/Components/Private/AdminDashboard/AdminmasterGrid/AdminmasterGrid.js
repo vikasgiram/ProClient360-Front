@@ -5,6 +5,7 @@ import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import AddAdminPoup from "./PopUp/AddAdminPoup";
 import UpdateAdminPopup from "./PopUp/UpdateAdminPopup";
 import { getAdmin, deleteAdmin } from "../../../../hooks/useAdmin";
+import { toast } from "react-hot-toast";
 
 export const AdminmasterGrid = () => {
     const [isopen, setIsOpen] = useState(false);
@@ -107,8 +108,16 @@ export const AdminmasterGrid = () => {
         if (selectedId) {
             try {
                 setLoading(true);
-                await deleteAdmin(selectedId);
+                toast.loading("Deleting Admin...");
+                const data = await deleteAdmin(selectedId);
                 setdeletePopUpShow(false);
+                if (data.success) {
+                    toast.dismiss();
+                    toast.success(data.message);
+                } else {
+                    toast.dismiss();
+                    toast.error(data.error);
+                }
                 if (admins.length === 1 && currentPage > 1) {
                     setCurrentPage(currentPage - 1);
                 } else {

@@ -52,9 +52,9 @@ export const ForgotPasswordConfirm = () => {
                             <div className="col-lg-9 mx-auto pt-4">
 
                             <form onSubmit={handelChangePasword} action="" method="post">
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">
-                                        <i class="fa-solid fa-key"></i>
+                                    <div className="input-group mb-3">
+                                        <span className="input-group-text">
+                                        <i className="fa-solid fa-key"></i>
                                         </span>
                                         <input
                                             placeholder="New Password"
@@ -74,7 +74,7 @@ export const ForgotPasswordConfirm = () => {
                                                 // showPassEncrypt()
                                             }}
                                         />
-                                        <span class="input-group-text">
+                                        <span className="input-group-text">
                                             {" "}
 
                                             <i
@@ -89,9 +89,9 @@ export const ForgotPasswordConfirm = () => {
                                     </div>
 
 
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">
-                                            <i class="fa-solid fa-lock"></i>
+                                    <div className="input-group mb-3">
+                                        <span className="input-group-text">
+                                            <i className="fa-solid fa-lock"></i>
                                         </span>
                                         <input
                                             placeholder="confirm Password"
@@ -106,8 +106,8 @@ export const ForgotPasswordConfirm = () => {
                                                 setConfirmPass(e.target.value)
                                                 // showPassEncrypt()
                                             }}
-                                        />
-                                        <span class="input-group-text">
+                                        /> 
+                                        <span className="input-group-text">
                                             {" "}
 
                                             <i

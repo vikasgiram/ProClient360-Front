@@ -87,7 +87,7 @@ const getFcmToken = async () => {
                     </span>
                     <input
                       type="text"
-                      class="form-control"
+                      className="form-control"
                       name="email"
                       value={username}
                       placeholder="Username"
@@ -102,9 +102,9 @@ const getFcmToken = async () => {
                     <span className="eye-icons"></span>
                   </div>
 
-                  <div class="input-group mb-3">
-                    <span class="input-group-text">
-                      <i class="fa-solid fa-lock"></i>
+                  <div className="input-group mb-3">
+                    <span className="input-group-text">
+                      <i className="fa-solid fa-lock"></i>
                     </span>
                     <input
                       placeholder="Password"
@@ -126,7 +126,7 @@ const getFcmToken = async () => {
 
                     // }
                     />
-                    <span class="input-group-text">
+                    <span className="input-group-text">
                       {" "}
 
                       <i

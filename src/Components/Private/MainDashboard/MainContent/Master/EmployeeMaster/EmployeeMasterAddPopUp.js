@@ -35,7 +35,7 @@ const EmployeeMasterAddPopUp = ({ cancelBtnCallBack, confirmBtnCallBack, deleteR
                     <div className="modal-body">
                         <div className="row">
                             <div className="row " >
-                                <div class="col-12 col-lg-6 pt-3">
+                                <div className="col-12 col-lg-6 pt-3">
                                     <DesignationName />
                                     <input type="text" 
                                     value={email}
@@ -46,7 +46,7 @@ const EmployeeMasterAddPopUp = ({ cancelBtnCallBack, confirmBtnCallBack, deleteR
                                       id="email" required />
                                 </div>
 
-                                <div class="col-12 col-lg-6 pt-3">
+                                <div className="col-12 col-lg-6 pt-3">
                                     <EmployeeName />
                                     <Select
                                         id='DDLID'
@@ -66,7 +66,7 @@ const EmployeeMasterAddPopUp = ({ cancelBtnCallBack, confirmBtnCallBack, deleteR
                                     />
                                 </div>
 
-                                <div class="col-12 col-lg-6 pt-3">
+                                <div className="col-12 col-lg-6 pt-3">
                                     <Gender />
                                     <Select
                                         id='DDLID'
@@ -85,15 +85,15 @@ const EmployeeMasterAddPopUp = ({ cancelBtnCallBack, confirmBtnCallBack, deleteR
                                         options={options}
                                     />
                                 </div>
-                                <div class="col-12 col-lg-6 pt-3">
+                                <div className="col-12 col-lg-6 pt-3">
                                     <MobileNumber />
                                     <input type="text" placeholder="" name="email" className="form-control" id="email" required />
                                 </div>
-                                <div class="col-12 col-lg-6 pt-3">
+                                <div className="col-12 col-lg-6 pt-3">
                                     <EmailID />
                                     <input type="text" placeholder="" name="email" className="form-control" id="email" required />
                                 </div>
-                                <div class="col-12 col-lg-6 pt-3">
+                                <div className="col-12 col-lg-6 pt-3">
                                     <JoiningDate />
                                     <input type="date" placeholder="" name="email" className="form-control" id="email" required />
                                 </div>
@@ -106,13 +106,13 @@ const EmployeeMasterAddPopUp = ({ cancelBtnCallBack, confirmBtnCallBack, deleteR
                                         type='button'
                                         onClick={() => confirmBtnCallBack(deleteRecord)}
                                         className="w-80 btn addbtn btn-success btn-brand btn-md btn-tall btn-wide kt-font-bold kt-font-transform-u m-2 px-4" data-ktwizard-type="action-next">
-                                        <i class="fa-solid fa-floppy-disk pe-1"></i> Save
+                                        <i className="fa-solid fa-floppy-disk pe-1"></i> Save
                                     </button>
                                     <button
                                         type="button"
                                         onClick={cancelBtnCallBack}
                                         className="w-80  btn addbtn btn-danger btn-brand btn-md btn-tall btn-wide kt-font-bold kt-font-transform-u m-2 px-4" data-ktwizard-type="action-next">
-                                        <i class="fa-solid fa-xmark pe-1"></i> Cancel
+                                        <i className="fa-solid fa-xmark pe-1"></i> Cancel
 
                                     </button>
                                 </div>

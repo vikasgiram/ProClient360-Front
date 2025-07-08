@@ -118,7 +118,7 @@ export const AdminHeader = (props) => {
 
 									<div className="drop_item_two my-1">
 										<i className="text-danger mr-2" >
-										<i class="fa-solid fa-power-off"></i> Log Out
+										<i className="fa-solid fa-power-off"></i> Log Out
 										</i>
 
 									</div>

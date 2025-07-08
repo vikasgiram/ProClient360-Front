@@ -106,9 +106,17 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
     }
     try {
       // console.log(updatedCompany);
-      await updateCompany(updatedCompany);
-      console.log("update compnay....", updatedCompany);
-      handleUpdate();
+      toast.loading("Updating Company...");
+      const data = await updateCompany(updatedCompany);
+      if(data.success) {
+        toast.dismiss();
+        toast.success("Company Updated Successfully");
+        handleUpdate();
+      } else {
+        toast.dismiss();
+        toast.error("Failed to Update Company");
+      }
+      setLoading(false);
     } catch (error) {
       toast.error(error.massage);
     }
