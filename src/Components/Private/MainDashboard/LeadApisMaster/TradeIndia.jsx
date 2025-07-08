@@ -25,7 +25,7 @@ const TradeIndiaApiKeyInput = ({ onApiKeySubmit }) => {
   };
 
   return (
-    <div className="card shadow-sm p-4 mb-4 bg-white rounded" style={{ maxWidth: 400, margin: '0 auto', border: '1px solid var(--primary, #1b3066)' }}>
+    <div className="card shadow-sm p-4 mb-4 bg-white rounded" style={{ maxWidth: 400, marginLeft: '40px', border: '1px solid var(--primary, #1b3066)' }}>
       <div className="d-flex align-items-center mb-3">
         <i className="fa-solid fa-key fa-lg me-2 text-primary" aria-hidden="true"></i>
         <h5 className="mb-0" style={{ color: 'var(--primary, #1b3066)' }}>TradeIndia API Credentials</h5>

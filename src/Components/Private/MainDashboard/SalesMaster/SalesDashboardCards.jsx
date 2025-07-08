@@ -1,4 +1,4 @@
-const SalesDashboardCards = ({allLeadsCount, ongogingCount, winCount, pendingCount, lostCount }) => {
+const SalesDashboardCards = ({allLeadsCount, ongogingCount, winCount, pendingCount, lostCount, todayCount }) => {
   return (
     <div className="row bg-white p-2 m-1 border rounded">
       <div className="col-12 py-1">
@@ -96,6 +96,27 @@ const SalesDashboardCards = ({allLeadsCount, ongogingCount, winCount, pendingCou
               </div>
             </div>
           </div>
+
+
+          
+          <div className="col-12 col-md-3 pb-3 cursor-pointer">
+            <div className="p-4 background_style"   style={{backgroundColor:"#FAFAD2"}}>
+              <div className="row">
+                <div className="col-9">
+                  <h6 className="text-dark card_heading">
+                    Today's FollowUp
+                  </h6>
+                  <h2 className="pt-2 fw-bold card_count">
+                    {todayCount}
+                  </h2>
+                </div>
+                <div className="col-3 d-flex align-items-center justify-content-center">
+                  <img src="./static/assets/img/only-today.png" className="img_opacity all_card_img_size" alt="" />
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
