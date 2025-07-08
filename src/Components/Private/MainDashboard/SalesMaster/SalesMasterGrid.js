@@ -189,13 +189,13 @@ export const SalesMasterGrid = () => {
                         <div className="col-12 col-lg-4">
                             <h5 className="text-white py-2">Sales Master</h5>
                         </div>
-                        <div className="col- col-lg-2 ms-auto text-end me-5">
                             {user?.permissions?.includes("addLeadMaster") || user?.user === 'company' ? (
+                        <div className="col- col-lg-2 ms-auto text-end me-5">
                             <button onClick={handleOpenAddModal} type="button" className="btn adbtn btn-dark">
                                 <i className="fa-solid fa-plus"></i> Add
                             </button>
-                            ) : ""}
                         </div>
+                            ) : null}
                     </div>
 
                     <SalesDashboardCards
@@ -204,7 +204,7 @@ export const SalesMasterGrid = () => {
                         winCount={data?.leadCounts?.winCount || 0}
                         pendingCount={data?.leadCounts?.pendingCount || 0}
                         lostCount={data?.leadCounts?.lostCount || 0}
-                        todayCount={actualTodayCount} // Use calculated today count
+                        todayCount={data?.leadCounts?.todaysFollowUpCount} // Use calculated today count
                     /> 
 
                 <div className="row align-items-center p-2 m-1">

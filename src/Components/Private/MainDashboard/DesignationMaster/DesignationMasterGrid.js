@@ -204,13 +204,13 @@ export const DesignationMasterGird = () => {
                           ))}
                         </select>
                       </div>
-                      <div className="col-8 col-lg-2 ms-auto me-4">
                         {user?.permission?.include("createDesignation") || user.user==='company'?(
+                      <div className="col-8 col-lg-2 ms-auto me-4">
                         <button onClick={handleAdd} type="button" className="btn adbtn btn-dark ">
                           <i className="fa-solid fa-plus"></i> Add
                         </button>
-                        ):null}
                       </div>
+                        ):null}
                     </div>
                   </div>
                 </div>

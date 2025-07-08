@@ -147,8 +147,8 @@ export const TaskMasterGrid = () => {
                                             </div>
 
 
-                                            <div className="col-4 col-lg-4 ms-auto text-end ">
                                                 {user?.permission?.includes('createTask') || user.user === 'company' ? (
+                                            <div className="col-4 col-lg-4 ms-auto text-end ">
                                                 <button
                                                     onClick={() => {
                                                         handleAdd()
@@ -156,8 +156,8 @@ export const TaskMasterGrid = () => {
                                                     type="button"
                                                     className="btn adbtn btn-dark me-4"> <i className="fa-solid fa-plus"></i> Add
                                                 </button>
-                                                ) : null}
                                             </div>
+                                                ) : null}
                                         </div>
                                     </div>
                                 </div>
