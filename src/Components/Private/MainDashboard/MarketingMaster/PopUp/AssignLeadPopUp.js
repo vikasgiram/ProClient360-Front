@@ -10,18 +10,21 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
   const [formData, setFormData] = useState({
     feasibility: '',
     notFeasibleReason: '',
+    feasibleReason: '', 
   });
 
   const [departments, setDepartments] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [assignedEmployee, setAssignedEmployee] = useState(null);
   const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchDataDep = async () => {
       try {
         const data = await getDepartment();
         setDepartments(data?.departments || []);
+        console.log('Departments:', data?.departments || []);
       } catch (error) {
         console.log(error);
       }
@@ -33,33 +36,69 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
     const fetchDataEmp = async () => {
       setAssignedEmployee(null);
       setEmployeeOptions([]);
+      
       if (!selectedDepartment) return;
-
+      
+      setLoading(true);
       try {
         const data = await getEmployee(selectedDepartment);
-        if (data) {
-          const formattedData = data.map((employee) => ({
+        console.log('Raw employee data:', data);
+        
+        let employeeArray = [];
+        
+        if (Array.isArray(data)) {
+          employeeArray = data;
+        } else if (data && Array.isArray(data.employee)) {
+          employeeArray = data.employee;
+        } else if (data && Array.isArray(data.employees)) {
+          employeeArray = data.employees;
+        } else if (data && Array.isArray(data.data)) {
+          employeeArray = data.data;
+        } else {
+          console.log('Unexpected data structure:', data);
+          toast.error('No employees found for this department');
+          return;
+        }
+        
+        if (employeeArray.length > 0) {
+          const formattedData = employeeArray.map((employee) => ({
             value: employee._id,
             label: employee.name,
             employeeData: employee,
           }));
           setEmployeeOptions(formattedData);
+          console.log('Formatted employee options:', formattedData);
+        } else {
+          console.log('No employees found in the array');
+          toast.info('No employees found for this department');
         }
       } catch (error) {
-        console.log(error);
+        console.log('Error fetching employees:', error);
+        toast.error('Failed to fetch employees');
+      } finally {
+        setLoading(false);
       }
     };
+    
     fetchDataEmp();
   }, [selectedDepartment]);
 
+  useEffect(() => {
+    console.log('Employee options updated:', employeeOptions);
+  }, [employeeOptions]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-
     if (name === 'feasibility') {
-      setFormData(prev => ({ ...prev, notFeasibleReason: '' }));
+      setFormData({
+        feasibility: value,
+        notFeasibleReason: '',
+        feasibleReason: '',
+      });
       setSelectedDepartment("");
       setAssignedEmployee(null);
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
@@ -79,14 +118,14 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
 
     const actionData = {};
 
-    actionData.feasibility=formData.feasibility;
+    actionData.feasibility = formData.feasibility;
 
     if(actionData.feasibility === 'feasible') {
       actionData.assignedTo = assignedEmployee;
-    }else if(actionData.feasibility === 'not-feasible') {
+      actionData.feasibleReason = formData.feasibleReason;
+    } else if(actionData.feasibility === 'not-feasible') {
       actionData.notFeasibleReason = formData.notFeasibleReason;
     }
-
 
     onUpdate(selectedLead._id, actionData);
     onClose();
@@ -94,7 +133,6 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
 
   return (
     <div className="modal fade show" style={{ display: "flex", alignItems: "center", backgroundColor: "#00000090" }}>
-
       <div className="modal-dialog modal-lg" style={{ width: "800px", maxWidth: "800px" }}>
         <div className="modal-content p-3">
           <form onSubmit={handleSubmit}>
@@ -122,7 +160,6 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                 </div>
 
                 <div className="col-12 mt-2" style={{ minHeight: "180px" }}>
-
                   <div className={formData.feasibility === 'feasible' ? 'row' : 'd-none'}>
                     <div className="col-12 col-lg-6 mt-2">
                       <label htmlFor="department" className="form-label label_text">Assign to Department <RequiredStar /></label>
@@ -141,32 +178,45 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                         id="employee"
                         options={employeeOptions}
                         isClearable
+                        isLoading={loading}
                         onChange={(opt) => setAssignedEmployee(opt ? opt.value : null)}
                         value={employeeOptions.find(opt => opt.value === assignedEmployee)}
-                        placeholder="-- Select Employee --"
+                        placeholder={loading ? "Loading employees..." : "-- Select Employee --"}
+                        noOptionsMessage={() => selectedDepartment ? "No employees found" : "Select a department first"}
                       />
+                    </div>
+                    
+                    <div className="col-12 mt-3">
+                      <label htmlFor="feasibleReason" className="form-label fw-bold">Remarks</label>
+                      <textarea
+                        className="form-control rounded-0"
+                        id="feasibleReason"
+                        name="feasibleReason"
+                        rows="2"
+                        placeholder="Enter any optional remarks..."
+                        value={formData.feasibleReason}
+                        onChange={handleChange}
+                      ></textarea>
                     </div>
                   </div>
 
-                <div className={formData.feasibility === 'not-feasible' ? 'row' : 'd-none'}>
-                  <div className="col-12 mt-3">
-                    <label htmlFor="notFeasibleReason" className="form-label fw-bold">Remarks <RequiredStar /></label>
-                    <textarea
-                      className="form-control rounded-0"
-                      id="notFeasibleReason"
-                      name="notFeasibleReason"
-                      rows="4"
-                      placeholder="Enter the detailed reason for non-feasibility..."
-                      value={formData.notFeasibleReason}
-                      onChange={handleChange}
-                    ></textarea>
+                  <div className={formData.feasibility === 'not-feasible' ? 'row' : 'd-none'}>
+                    <div className="col-12 mt-3">
+                      <label htmlFor="notFeasibleReason" className="form-label fw-bold">Remarks <RequiredStar /></label>
+                      <textarea
+                        className="form-control rounded-0"
+                        id="notFeasibleReason"
+                        name="notFeasibleReason"
+                        rows="4"
+                        placeholder="Enter the detailed reason for non-feasibility..."
+                        value={formData.notFeasibleReason}
+                        onChange={handleChange}
+                      ></textarea>
+                    </div>
                   </div>
                 </div>
               </div>
-
             </div>  
-          </div>
-          
 
             <div className="modal-footer border-0 justify-content-start">
               <button type="submit" className="btn addbtn rounded-0 add_button px-4">Submit</button>
