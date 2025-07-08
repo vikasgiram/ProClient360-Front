@@ -66,7 +66,7 @@ const LeadApis = () => {
                     
                     <div className="col-lg-6">
                       <div className="ps-lg-4">
-                        <h5 className="mb-3 text-primary">Export Trade Process</h5>
+                        <h5 className="mb-3 text-primary">How to get TradeIndia Credentials</h5>
                         
                         <div className="mb-3">
                           <h6><strong>Step 1.</strong> Prepare a Business Plan</h6>
@@ -132,7 +132,7 @@ const LeadApis = () => {
                     
                     <div className="col-lg-6">
                       <div className="ps-lg-4">
-                        <h5 className="mb-3 text-success">IndiaMart Integration Process</h5>
+                        <h5 className="mb-3 text-success">How to get IndiaMart Credentials</h5>
                         
                         <div className="mb-3">
                           <h6><strong>Step 1.</strong> Setup Webhook URL</h6>

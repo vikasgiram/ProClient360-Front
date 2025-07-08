@@ -12,7 +12,7 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
   console.log('actionData:', actionData);
 
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString) => {  
     if (!dateString) return "N/A";
     try {
       const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -128,7 +128,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
   useEffect(() => {
     if (selectedLead) {
       setActionData({
-        actionType: selectedLead?.actionDetails?.manualAction || selectedLead?.step || '',
+        actionType: selectedLead?.actionDetails?.step || selectedLead?.step || '',
         date: selectedLead?.actionDetails?.followUpDate || selectedLead?.nextFollowUpDate || '',
         completion: selectedLead?.complated?.toString() || selectedLead?.actionDetails?.completionPercentage?.toString() || '0',
         status: selectedLead.status || selectedLead?.STATUS || '',
@@ -177,11 +177,12 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
     const updatedFormData = {
       ...selectedLead,
       status: actionData.status,
+      step: parseFloat(actionData.step) || null,
       complated: parseFloat(actionData.completion) || 0,
       quotation: isQuotationRequired ? parseFloat(actionData.quotation) || 0 : selectedLead.quotation || 0,
       nextFollowUpDate: actionData.date,
       actionDetails: {
-        manualAction: actionData.actionType,
+        step: actionData.actionType,
         submissionDateTime: dateTime,
         followUpDate: actionData.date,
         completionPercentage: parseFloat(actionData.completion) || 0,
