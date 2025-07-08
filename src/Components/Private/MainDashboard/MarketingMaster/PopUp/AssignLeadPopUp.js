@@ -84,7 +84,7 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
     if(actionData.feasibility === 'feasible') {
       actionData.assignedTo = assignedEmployee;
     }else if(actionData.feasibility === 'not-feasible') {
-      actionData.notFeasibleReason = formData.notFeasibleReason;
+      actionData.remark = formData.notFeasibleReason;
     }
 
 
