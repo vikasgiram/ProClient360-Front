@@ -149,8 +149,8 @@ export const CustomerMasterGrid = () => {
                           </form>
                         </div>
                       </div>
-                      <div className="col- col-lg-2 ms-auto text-end me-4">
                       {user?.permissions && user?.permissions?.includes("createCustomer") || user.user==='company' ? ( 
+                      <div className="col- col-lg-2 ms-auto text-end me-4">
                           <div className="col-12 col-lg-12  ms-auto text-end">
                             <button
                               onClick={handleAdd} // Use handleAdd directly
@@ -161,10 +161,10 @@ export const CustomerMasterGrid = () => {
                               <i className="fa-solid fa-plus"></i> Add
                             </button>
                           </div>
-                        ) : (
-                          ""
-                        )}
                       </div>
+                        ) : (
+                          null
+                        )}
                     </div>
                   </div>
                 </div>
