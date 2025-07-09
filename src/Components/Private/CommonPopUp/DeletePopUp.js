@@ -19,7 +19,7 @@ const DeletePopUP = ({ cancelBtnCallBack,confirmBtnCallBack}) => {
                         <div className="row">
 
                             <div className="col-12 justify-content-center my-4">
-                                <h6 className="fw-bold">Are you sure! Do you want to Delete ?</h6>
+                                <h6 className="fw-bold"><center>Are you sure! Do you want to Delete ?</center></h6>
                             </div>
                             <div className="col-12  d-flex justify-content-center">
                                 <div className="form-group w-80 d-flex justify-content-between">
