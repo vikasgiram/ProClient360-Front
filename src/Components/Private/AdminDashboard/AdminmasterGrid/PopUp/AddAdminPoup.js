@@ -32,7 +32,7 @@ const AddAdminPoup = ({ handleAdd }) => {
       return toast.error("Enter valid Email");
     }
     if (password !== confirmPassword) {
-      return toast.error("Password desen't match");
+      return toast.error("Password doesn't match");
     }
     if (!isValidPassword(password)) {
       return toast.error("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.");

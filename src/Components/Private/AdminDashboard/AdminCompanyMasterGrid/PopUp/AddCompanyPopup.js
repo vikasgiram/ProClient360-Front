@@ -70,8 +70,9 @@ const AddCompanyPopup = ({ handleAdd }) => {
         handleAdd();
       } else {
         toast.dismiss();
-        toast.error(data.message);
+        toast.error(data.error);
       }
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       toast.error("Failed to create company. Please try again.");
