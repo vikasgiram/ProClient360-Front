@@ -107,6 +107,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                   Add Company
                 </h5>
+                
                 <button
                   onClick={() => handleAdd()}
                   type="button"
