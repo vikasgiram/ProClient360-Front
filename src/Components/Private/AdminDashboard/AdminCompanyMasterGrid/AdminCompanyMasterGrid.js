@@ -109,7 +109,10 @@ export const AdminCompanyMasterGrid = () => {
                 return;
             }
              setSearchText(search);
+        } else {
+            setSearchText("");
         }
+        
     }
 
 

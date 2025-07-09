@@ -20,6 +20,7 @@ export const AdminmasterGrid = () => {
     const [loading, setLoading] = useState(true);
     const [admins, setAdmins] = useState([]);
     const [searchText, setSearchText] = useState("");
+    const [search, setSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
     const [pagination, setPagination] = useState({
@@ -153,6 +154,19 @@ export const AdminmasterGrid = () => {
         endPage = Math.min(pagination.totalPages, startPage + maxPageButtons - 1);
     }
 
+    const onSubmitSearch = (e) => {
+        e.preventDefault();
+        if (search.trim() !== "") {
+            if (search.length < 3) {
+                toast.error("Please enter at least 3 characters for search.");
+                return;
+            }
+            setSearchText(search);
+        } else {
+            setSearchText("");
+        }
+    };
+
     const pageButtons = [];
     for (let i = startPage; i <= endPage; i++) {
         pageButtons.push(i);
@@ -179,19 +193,18 @@ export const AdminmasterGrid = () => {
                                     <div className="col-12 col-lg-6">
                                         <div className="row g-2 align-items-center justify-content-end">
                                             <div className="col-sm-8 col-md-6">
-                                                <div className="form position-relative">
+                                                <form onSubmit={onSubmitSearch} className="form position-relative">
                                                     <i className="fa fa-search position-absolute" style={{ top: '10px', left: '10px', color: '#aaa' }}></i>
                                                     <input
                                                         type="text"
-                                                        value={searchText}
+                                                        value={search}
                                                         onChange={(e) => {
-                                                            setSearchText(e.target.value);
-                                                            setCurrentPage(1);
+                                                            setSearch(e.target.value);
                                                         }}
                                                         className="form-control form-input bg-transparant ps-4"
                                                         placeholder="Search Admins..."
                                                     />
-                                                </div>
+                                                </form>
                                             </div>
                                             <div className="col-sm-4 col-md-auto text-end me-4">
                                                 <button
