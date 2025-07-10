@@ -127,11 +127,11 @@ export const EmployeeMasterGrid = () => {
                     </div>
                   </div>
 
-                  <div className="col-12 col-lg-5 ms-auto border">
+                  <div className="col-12 col-lg-5 ms-auto">
 
-                    <div className="row border m-3">
+                    <div className="row ">
 
-                      <div className="col-8 col-lg-5 ms-auto text-end border m-3">
+                      <div className="col-8 col-lg-5 ms-auto text-end">
                         <div className="form">
                           <i className="fa fa-search"></i>
                           <form onSubmit={handleOnSearchSubmit} >
