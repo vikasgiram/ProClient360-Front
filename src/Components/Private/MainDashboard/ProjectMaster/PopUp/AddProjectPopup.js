@@ -127,12 +127,12 @@ const AddProjectPopup = ({ handleAdd }) => {
     formData.append('POCopy', POCopy);
 
     const data = await createProject(formData);
-    if(data){
+    if (data) {
       setLoading(false);
-      toast.success(data.message); 
+      toast.success(data.message);
       handleAdd();
     }
-    else{
+    else {
       setLoading(false);
       toast.error(data.error);
     }
@@ -167,7 +167,6 @@ const AddProjectPopup = ({ handleAdd }) => {
               <div className="modal-header pt-0">
 
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-
                   Create New Project
                   {/* Forward */}
                 </h5>
@@ -182,7 +181,6 @@ const AddProjectPopup = ({ handleAdd }) => {
                       <label htmlFor="customerSearch" className="form-label label_text">
                         Customer Name <RequiredStar />
                       </label>
-
                       {/* Search input */}
                       <input
                         type="text"
@@ -194,14 +192,13 @@ const AddProjectPopup = ({ handleAdd }) => {
                         onChange={(e) => setSearchText(e.target.value)}
                         required
                       />
-
                       {/* Select dropdown */}
                       <select
                         className="form-select rounded-0"
                         value={custId}
                         onChange={(e) => setCustId(e.target.value)}
                       >
-                        <option value =''>Select Client</option>
+                        <option value=''>Select Client</option>
                         {customers.map((cust) => (
                           <option key={cust._id} value={cust._id}>
                             {cust.custName}
@@ -209,12 +206,11 @@ const AddProjectPopup = ({ handleAdd }) => {
                         ))}
                       </select>
                     </div>
-
                   </div>
 
                   <div className="mb-3">
                     <label for="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
-                    <input type="text" className="form-control rounded-0" id="ProjectName" maxLength={30} placeholder="Enter a Project Name...." onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp"  required/>
+                    <input type="text" className="form-control rounded-0" id="ProjectName" maxLength={30} placeholder="Enter a Project Name...." onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp" required />
                   </div>
 
 
@@ -234,16 +230,13 @@ const AddProjectPopup = ({ handleAdd }) => {
                       />
                     </div>
                   </div>
-
                   <div className="col-12 col-lg-6 mt-2" >
-
                     <div className="mb-3">
                       <label for="purchaseOrderNo" className="form-label label_text">Purchase Order Number <RequiredStar /></label>
                       <input type="text" className="form-control rounded-0" maxLength={12} id="purchaseOrderNo"
                         onChange={(e) => setPurchaseOrderNo(e.target.value)}
-                        value={purchaseOrderNo} aria-describedby="emailHelp"  required/>
+                        value={purchaseOrderNo} aria-describedby="emailHelp" required />
                     </div>
-
                   </div>
 
                   <div className="col-12 col-lg-6 mt-2" >
@@ -267,7 +260,6 @@ const AddProjectPopup = ({ handleAdd }) => {
                       />
                     </div>
                   </div>
-
 
                   <div className="col-12 col-lg-6 mt-2" >
 
@@ -335,7 +327,6 @@ const AddProjectPopup = ({ handleAdd }) => {
                     </div>
                   </div>
                   <div className="col-12  mt-2" >
-
                     <div className="row border bg-gray mx-auto">
                       <div className="col-10 mb-3">
                         <span className="SecondaryInfo">
@@ -561,7 +552,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                     <div className="mb-3">
                       <label for="remark" className="form-label label_text">     remark
                       </label>
-                      <input type="text" className="form-control rounded-0" id="remark" placeholder="Enter a Remark...." maxLength={80} onChange={(e) => setRemark(e.target.value)} value={remark} aria-describedby="secemailHelp" required/>
+                      <input type="text" className="form-control rounded-0" id="remark" placeholder="Enter a Remark...." maxLength={80} onChange={(e) => setRemark(e.target.value)} value={remark} aria-describedby="secemailHelp" required />
                     </div>
 
 

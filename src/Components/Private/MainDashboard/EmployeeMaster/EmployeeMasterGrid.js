@@ -1,4 +1,4 @@
-import { useState,useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import AddEmployeePopup from "./PopUp/AddEmployeePopup";
@@ -14,7 +14,7 @@ export const EmployeeMasterGrid = () => {
     setIsOpen(!isopen);
   };
 
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [AddPopUpShow, setAddPopUpShow] = useState(false);
   const [deletePopUpShow, setdeletePopUpShow] = useState(false);
@@ -126,9 +126,12 @@ export const EmployeeMasterGrid = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="col-12 col-lg-5 ms-auto">
-                    <div className="row">
-                      <div className="col-8 col-lg-6 ms-auto text-end">
+
+                  <div className="col-12 col-lg-5 ms-auto border">
+
+                    <div className="row border m-3">
+
+                      <div className="col-8 col-lg-5 ms-auto text-end border m-3">
                         <div className="form">
                           <i className="fa fa-search"></i>
                           <form onSubmit={handleOnSearchSubmit} >
@@ -142,8 +145,9 @@ export const EmployeeMasterGrid = () => {
                           </form>
                         </div>
                       </div>
-                      <div className="col- col-lg-2 ms-auto text-end me-5">
-                      {user?.permissions?.includes("createEmployee") || user?.user==='company' ? (
+
+                      <div className="col-12 col-lg-2 ms-auto text-end ms-5 border m-3">
+                        {user?.permissions?.includes("createEmployee") || user?.user === 'company' ? (
                           <button
                             onClick={handleAdd}
                             type="button"
@@ -156,7 +160,10 @@ export const EmployeeMasterGrid = () => {
                         )}
                       </div>
                     </div>
+
                   </div>
+
+
                 </div>
                 <div className="row bg-white p-2 m-1 border rounded">
                   <div className="col-12 py-2">
@@ -182,7 +189,7 @@ export const EmployeeMasterGrid = () => {
                                 <td>{employee?.department && employee?.department?.name}</td>
                                 <td>{employee?.designation && employee?.designation?.name}</td>
                                 <td>
-                                  {user?.permissions?.includes("updateEmployee") || user?.user==='company' ? (
+                                  {user?.permissions?.includes("updateEmployee") || user?.user === 'company' ? (
                                     <span
                                       onClick={() => handleUpdate(employee)}
                                       className="update"
@@ -192,7 +199,7 @@ export const EmployeeMasterGrid = () => {
                                   ) : (
                                     ""
                                   )}
-                                  {user?.permissions?.includes("deleteEmployee") || user?.user==='company' ? (
+                                  {user?.permissions?.includes("deleteEmployee") || user?.user === 'company' ? (
                                     <span
                                       onClick={() =>
                                         handelDeleteClosePopUpClick(employee._id)
@@ -268,9 +275,8 @@ export const EmployeeMasterGrid = () => {
                         <button
                           key={number}
                           onClick={() => handlePageChange(number)}
-                          className={`btn btn-sm me-1 ${
-                            pagination.currentPage === number ? "btn-primary" : "btn-dark"
-                          }`}
+                          className={`btn btn-sm me-1 ${pagination.currentPage === number ? "btn-primary" : "btn-dark"
+                            }`}
                           style={{ minWidth: "35px", borderRadius: "4px" }}
                           aria-label={`Go to page ${number}`}
                           aria-current={pagination.currentPage === number ? "page" : undefined}
