@@ -32,4 +32,8 @@ jobs:
     - name: Build the project
       run: yarn build --if-present
 
+    - run: |
+        touch .env
+        echo '${{ secrets.PROCLIENT360_FRONT_ENV }}' > .env
+
     
