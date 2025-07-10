@@ -70,8 +70,9 @@ const AddCompanyPopup = ({ handleAdd }) => {
         handleAdd();
       } else {
         toast.dismiss();
-        toast.error(data.message);
+        toast.error(data.error);
       }
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       toast.error("Failed to create company. Please try again.");
@@ -106,6 +107,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                   Add Company
                 </h5>
+                
                 <button
                   onClick={() => handleAdd()}
                   type="button"

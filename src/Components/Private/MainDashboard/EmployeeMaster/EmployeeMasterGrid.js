@@ -145,9 +145,8 @@ export const EmployeeMasterGrid = () => {
                           </form>
                         </div>
                       </div>
-
-                      <div className="col-12 col-lg-2 ms-auto text-end ms-5 border m-3">
-                        {user?.permissions?.includes("createEmployee") || user?.user === 'company' ? (
+                      {user?.permissions?.includes("createEmployee") || user?.user==='company' ? (
+                      <div className="col- col-lg-2 ms-auto text-end me-5">
                           <button
                             onClick={handleAdd}
                             type="button"
@@ -155,10 +154,10 @@ export const EmployeeMasterGrid = () => {
                           >
                             <i className="fa-solid fa-plus"></i> Add
                           </button>
+                      </div>
                         ) : (
                           ""
                         )}
-                      </div>
                     </div>
 
                   </div>

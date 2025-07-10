@@ -43,11 +43,30 @@ export const SalesMasterGrid = () => {
   });
   const itemsPerPage = 10;
 
-
   const { data, loading, error, refetch } = useMyLeads(pagination.currentPage, itemsPerPage, filters);
   const {submitEnquiry} = useSubmitEnquiry();
-
   const { createLead } = useCreateLead();
+
+  const calculateTodayCount = () => {
+  
+    if (data?.leadCounts?.todayCount !== undefined) {
+      return data.leadCounts.todayCount;
+    }
+    
+
+    if (!data?.leads || data.leads.length === 0) return 0;
+    
+    const today = new Date();
+    const todayDateString = today.toISOString().split('T')[0]; 
+    
+    return data.leads.filter(lead => {
+      const leadDate = new Date(lead.createdAt);
+      const leadDateString = leadDate.toISOString().split('T')[0];
+      return leadDateString === todayDateString;
+    }).length;
+  };
+
+  const actualTodayCount = calculateTodayCount();
 
   useEffect(() => {
     if (data) {
@@ -81,11 +100,12 @@ export const SalesMasterGrid = () => {
       toast.success("Lead deleted successfully!");
       setDeletePopUpShow(false);
       setSelectedLeadId(null);
-
+      refetch(); 
     } catch (error) {
       toast.error("Failed to delete lead");
     }
   };
+
   const handleBgColor = (status) => {
     switch (status) {
       case "Won":
@@ -96,6 +116,8 @@ export const SalesMasterGrid = () => {
         return "badge bg-warning text-dark";
       case "Lost":
         return "badge bg-danger text-white";
+      case "today":
+        return "badge bg-warning text-white";    
       default:
         return "badge bg-secondary";
     }
@@ -109,7 +131,7 @@ export const SalesMasterGrid = () => {
       }
     } catch (error) {
       console.error("Update error:", error);
-      toast.error("Failed to Submit Enqury");
+      toast.error("Failed to Submit Enquiry");
     }
   };
 
@@ -135,6 +157,7 @@ export const SalesMasterGrid = () => {
       toast.dismiss();
       toast.success(data?.message || "Lead added successfully!");
       handleCloseAddModal();
+      refetch();
     }else{
       toast.dismiss();
       toast.error(data?.error || "Failed to add lead");
@@ -166,13 +189,13 @@ export const SalesMasterGrid = () => {
                         <div className="col-12 col-lg-4">
                             <h5 className="text-white py-2">Sales Master</h5>
                         </div>
-                        <div className="col- col-lg-2 ms-auto text-end me-5">
                             {user?.permissions?.includes("addLeadMaster") || user?.user === 'company' ? (
+                        <div className="col- col-lg-2 ms-auto text-end me-5">
                             <button onClick={handleOpenAddModal} type="button" className="btn adbtn btn-dark">
                                 <i className="fa-solid fa-plus"></i> Add
                             </button>
-                            ) : ""}
                         </div>
+                            ) : null}
                     </div>
 
                     <SalesDashboardCards
@@ -181,6 +204,7 @@ export const SalesMasterGrid = () => {
                         winCount={data?.leadCounts?.winCount || 0}
                         pendingCount={data?.leadCounts?.pendingCount || 0}
                         lostCount={data?.leadCounts?.lostCount || 0}
+                        todayCount={data?.leadCounts?.todaysFollowUpCount} 
                     /> 
 
                 <div className="row align-items-center p-2 m-1">
@@ -232,7 +256,6 @@ export const SalesMasterGrid = () => {
                   </div>
                 </div>
 
-
                     <div className="row align-items-center p-2 m-1">
                     </div>
 
@@ -259,19 +282,18 @@ export const SalesMasterGrid = () => {
                                     <tr key={lead._id}>
                                         <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
                                         <td>{lead.SOURCE}</td>
-                                        <td>{lead.SENDER_NAME||"Not avaliable."}</td>
-                                        <td>{lead.SENDER_COMPANY||"Not avaliable."}</td>
-                                        <td>{lead.QUERY_PRODUCT_NAME||"Not avaliable."}</td>
-                                        <td>{lead.SENDER_EMAIL||"Not avaliable."}</td>
-                                        <td>{formatDateforTaskUpdate(lead.createdAt)}</td>
+                                        <td>{lead.SENDER_NAME||"Not available."}</td>
+                                        <td>{lead.SENDER_COMPANY||"Not available."}</td>
+                                        <td>{lead.QUERY_PRODUCT_NAME||"Not available."}</td>
+                                        <td>{lead.SENDER_EMAIL||"Not available."}</td>
+                                        <td>{formatDateforTaskUpdate(lead.nextFollowUpDate || lead.createdAt)}</td>
                                         <td>
                                             <span className={handleBgColor(lead.STATUS)}>{lead.STATUS}</span>
                                         </td>
                                         <td>
-                                            
                                             {/* Edit Button */}
                                             {(user?.permissions?.includes('updateLead') || user?.user === 'company')  &&
-                                                <span onClick={() => handleUpdate(lead)} title="Edit Lead">
+                                                <span onClick={() => handleUpdate(lead)} title="Action Lead">
                                                     <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
                                                 </span>
                                             }
@@ -281,13 +303,11 @@ export const SalesMasterGrid = () => {
                                                    <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
                                               </span>
                                             }
- 
 
                                              {/* View Button */}
                                             {/* <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
                                                 <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
                                             </span> */}
-                                        
                                         </td>
                                     </tr>
                                     ))) : (
@@ -399,7 +419,6 @@ export const SalesMasterGrid = () => {
         <AddLeadMaster onAddLead={handleAddLeadSubmit} onClose={handleCloseAddModal} />
       )}
 
-
       {UpdatePopUpShow && selectedLead && (
         <UpdateSalesPopUp
           selectedLead={selectedLead}
@@ -419,7 +438,6 @@ export const SalesMasterGrid = () => {
           confirmBtnCallBack={handleDeleteConfirm}
         />
       )}
-
 
       {showLeadPopUp && selectedLead && (
           <ViewSalesLeadPopUp

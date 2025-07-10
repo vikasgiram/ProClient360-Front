@@ -112,13 +112,13 @@ export const DepartmentMasterGrid = () => {
                   <div className="col-12 col-lg-6">
                     <h5 className="text-white py-2">Department Master</h5>
                   </div>
-                  <div className="col-12 col-lg-6 ms-auto text-end ">
                     {user?.permission?.include('createDepartment') || user.user==='company'?(
+                  <div className="col-12 col-lg-6 ms-auto text-end ">
                     <button onClick={handleAdd} type="button" className="btn adbtn btn-dark me-4">
                       <i className="fa-solid fa-plus"></i> Add
                     </button>
-                    ):null}
                   </div>
+                    ):null}
                 </div>
 
                 <div className="row bg-white p-2 m-1 border rounded">
