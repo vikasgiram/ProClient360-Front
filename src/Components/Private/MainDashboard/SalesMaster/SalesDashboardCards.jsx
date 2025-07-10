@@ -84,7 +84,7 @@ const SalesDashboardCards = ({allLeadsCount, ongogingCount, winCount, pendingCou
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">
-                    Pending followUp
+                    Pending FollowUp
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
                     {pendingCount}
