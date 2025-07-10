@@ -335,14 +335,14 @@ export const TaskMasterGrid = () => {
 
                     handleAdd={handleAdd}
                 // heading="Forward"
-                // cancelBtnCallBack={handleAddDepartment}
+                cancelBtnCallBack={handleAdd}
                 /> : <></>
             }
 
 
             {updatePopUpShow ?
                 <UpdateTaskPopUp
-                    selectedTask={selectedTask}
+                    selectedTask={selectedTask} 
                     handleUpdate={handleUpdate}
                 // heading="Forward"
                 // cancelBtnCallBack={handleAddDepartment}
