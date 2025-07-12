@@ -28,11 +28,12 @@ jobs:
     - name: Install dependencies
       run: yarn install --frozen-lockfile  
     
-    - name: Build the project
-      run: yarn build --if-present
-
     - run: |
         touch .env
         echo '${{ secrets.PROCLIENT360_FRONT_ENV }}' > .env
+        
+    - name: Build the project
+      run: yarn build --if-present
+
 
     
