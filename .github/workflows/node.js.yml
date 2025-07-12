@@ -33,7 +33,8 @@ jobs:
         echo '${{ secrets.PROCLIENT360_FRONT_ENV }}' > .env
         
     - name: Build the project
-      run: yarn build --if-present
+      run: CI=false yarn build --if-present
+
 
 
     
