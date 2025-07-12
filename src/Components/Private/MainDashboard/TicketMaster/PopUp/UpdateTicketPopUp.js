@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { updateTicket } from "../../../../../hooks/useTicket";
 import { getCustomers } from "../../../../../hooks/useCustomer";
-import { getAddress } from "../../../../../hooks/usePincode";
 
 import toast from "react-hot-toast";
 

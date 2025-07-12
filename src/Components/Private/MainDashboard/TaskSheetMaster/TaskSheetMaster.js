@@ -57,7 +57,6 @@ export const TaskSheetMaster = () => {
   const [forTask, setForTask] = useState();
   const [showAction, setShowAction] = useState(false);
 
-  const [projectStartDate, setProjectStartDate] = useState();
 
 
   let columnWidth = 90;
@@ -213,7 +212,6 @@ export const TaskSheetMaster = () => {
     // Extract project information from the task array
     const project = projectData.task[0].project;
     // Create a project task entry
-    setProjectStartDate(project.startDate);
 
     const projectTask = {
       id: project._id,

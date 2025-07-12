@@ -15,7 +15,6 @@ const AddTicketPopup = ({ handleAdd }) => {
   const [contactNumber, setContactNumber] = useState("");
   const [source, setSource] = useState("");
   const [customers, setCustomers] = useState();
-  const [loading, setLoading] = useState(false);
   const [contactPersonEmail, setContactPersonEmail] = useState("");
   const [searchText, setSearchText] = useState("");
   const [Address, setAddress] = useState({
@@ -41,7 +40,7 @@ const AddTicketPopup = ({ handleAdd }) => {
     if (!client || !details || !product || !contactPerson || !contactNumber || !source || !Address) {
       return toast.error("Please fill all fields");
     }
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contactPersonEmail)) {
+    if (!/^[\w-]+@([\w-]+)+[\w-]{2,4}$/.test(contactPersonEmail)) {
       return toast.error("Please Enter Valid Email");
     }
     if (contactNumber.length !== 10) {

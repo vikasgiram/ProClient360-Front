@@ -15,7 +15,7 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
   const [allotmentDate, setAllotmentDate] = useState();
   const [allotTo, setAllotTo] = useState();
   const [workMode, setWorkMode] = useState();
-  const [ticket, setTicket] = useState(selectedTicket);
+  const [ticket] = useState(selectedTicket);
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
@@ -36,7 +36,6 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
       allotmentDate,
       allotTo,
       workMode,
-      ticket,
       // completionDate
     };
     if (!serviceType || !ticket || !priority || !allotmentDate || !allotTo || !workMode) {
