@@ -100,7 +100,6 @@ export const AdminCompanyMasterGrid = () => {
     const handleAdd = () => {
         setAddPopUpShow(!AddPopUpShow);
     };
-
     const handleSearchSubmit = (event) => {
         event.preventDefault();
         if (search.trim() !== "") {
