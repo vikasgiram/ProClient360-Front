@@ -2171,7 +2171,6 @@ table td {
 
 .modal_body_height {
   height: 600px !important;
-  width: 160% !important;
   overflow-y: auto;
 }
 

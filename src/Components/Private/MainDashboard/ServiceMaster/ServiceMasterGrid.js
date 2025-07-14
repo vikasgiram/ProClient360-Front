@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import UpdateServicePopup from "./PopUp/UpdateServicePopUp";
 import useServices from "../../../../hooks/service/useService";
-import useCreateService from "../../../../hooks/service/useCreateService";
 import useUpdateService from "../../../../hooks/service/useUpdateService";
 import useDeleteService from "../../../../hooks/service/useDeleteService";
 import { formatDate } from "../../../../utils/formatDate";
@@ -21,7 +20,7 @@ export const ServiceMasterGrid = () => {
 
   const { user } = useContext(UserContext);
 
-  const [AddPopUpShow, setAddPopUpShow] = useState(false);
+
   const [deletePopUpShow, setdeletePopUpShow] = useState(false);
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
 
@@ -44,7 +43,6 @@ export const ServiceMasterGrid = () => {
 
   // Use hooks
   const { data, loading, error } = useServices(pagination.currentPage, itemsPerPage, filters);
-  const { createService, loading: createLoading } = useCreateService();
   const { updateService, loading: updateLoading } = useUpdateService();
   const { deleteService, loading: deleteLoading } = useDeleteService();
 
@@ -69,17 +67,6 @@ export const ServiceMasterGrid = () => {
     setPagination((prev) => ({ ...prev, currentPage: page }));
   };
 
-  const handleCreate = () => {
-    setAddPopUpShow(!AddPopUpShow);
-  };
-
-  const handleCreateSubmit = async (serviceData) => {
-    const result = await createService(serviceData);
-    if (result) {
-      setAddPopUpShow(false);
-      setPagination((prev) => ({ ...prev, currentPage: 1 })); // Refresh list
-    }
-  };
 
   const handleUpdate = (service = null) => {
     setSelectedService(service);
@@ -117,10 +104,11 @@ export const ServiceMasterGrid = () => {
     setSelectedService(service);
     setDetailsServicePopUp(!detailsServicePopUp);
   };
+  
 
   return (
     <>
-      {(loading || createLoading || updateLoading || deleteLoading) && (
+      {(loading|| updateLoading || deleteLoading) && (
         <div className="overlay">
           <span className="loader"></span>
         </div>
@@ -237,29 +225,30 @@ export const ServiceMasterGrid = () => {
                                 <td className="align_left_td width_tdd">{service.priority}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
 
-                                {service.allotTo && service.allotTo.map((allotTo) => (
-                                <td style={{ lineHeight: '1.2', padding: '8px' }}>
-                                {service.allotTo && service.allotTo.length > 0 
-                                 ? (() => {
-                                 const uniqueUsers = service.allotTo.filter((user, index, self) => 
-                                 index === self.findIndex(u => u._id === user._id || u.name === user.name)
-                                );
-        
-                                return uniqueUsers.map((allotTo, index) => (
-                                <div key={allotTo._id || index} style={{ 
-                                fontSize: '12px', 
-                                marginBottom: '2px',
-                                whiteSpace: 'nowrap'
-                                }}>
-                                {allotTo.name}
-                                </div>
-                               ));
-                               })()
-                               : 'Not Allocated'
-                               }
-                               </td>
-                               
-                                ))}
+                              {service.allotTo && service.allotTo.map((allotTo) => (
+                              <td style={{ lineHeight: '1.2', padding: '8px' }}>
+                              {service.allotTo && service.allotTo.length > 0 ? (
+                              [
+                              ...new Map(
+                              service.allotTo.map(user => [user._id || user.name, user])
+                              ).values(),
+                              ].map((user, index) => (
+                               <div key={user._id || index}
+                               style={{
+                               fontSize: '12px',
+                               marginBottom: '2px',
+                               whiteSpace: 'nowrap',
+                               }}>
+                               {user.name}
+                              </div>
+                              ))
+                              ) : (
+                              'Not Allocated'
+                              )}
+                             </td>
+
+                              ))}
+
                                 <td className={service.status === 'Completed' ? 'text-success' : service.status === 'Inprogress' ? 'text-warning' : 'text-danger'}>{service.status}</td>
                                 <td>
                                   {user?.permissions?.includes('updateService') || user?.user === 'company' ?

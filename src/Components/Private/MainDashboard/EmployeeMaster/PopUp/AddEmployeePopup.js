@@ -81,7 +81,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
       return toast.error("Please fill all fields");
     }
     if (password !== confirmPassword) {
-      return toast.error("Password desen't match");
+      return toast.error("Password doesn't match");
     }
     if (!validator.isStrongPassword(password)) {
       return toast.error("Password should contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.");

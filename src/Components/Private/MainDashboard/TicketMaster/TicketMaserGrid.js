@@ -478,7 +478,6 @@ export const TicketMasterGrid = () => {
 
                     {pagination.totalTickets === 0 && (
                       <div className="text-center my-3 text-muted">
-                        No tickets found.
                       </div>
                     )}
                   </>
