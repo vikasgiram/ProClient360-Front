@@ -348,7 +348,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             htmlFor="endTime"
                             className="form-label label_text"
                           >
-                            Proccess End Dates  <RequiredStar/>
+                            Process End Dates  <RequiredStar/>
                           </label>
                           <input
                             type="datetime-local"
@@ -396,7 +396,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             htmlFor="complated"
                             className="form-label label_text"
                           >
-                            Complete Level <RequiredStar/>
+                            Completed Level <RequiredStar/>
                           </label>
                           <div className="input-group border mb-3">
                             <input
@@ -514,7 +514,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             htmlFor="processEndDate"
                             className="form-label label_text"
                           >
-                            Proccess End Date
+                            Process End Date
                           </label>
                           <input
                             type="datetime-local"
@@ -556,7 +556,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             htmlFor="processEndDate"
                             className="form-label label_text"
                           >
-                            Complete Level
+                            Completed Level
                           </label>
                           <div className="input-group border mb-3">
                           <input

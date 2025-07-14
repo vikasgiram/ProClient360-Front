@@ -111,7 +111,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
             return;
         }
 
-        // ✅ NEW: payAfterCompletion - only numbers, max 3 digits
         if (name === "payAfterCompletion") {
             const numericValue = value.replace(/\D/g, "");
             if (numericValue.length > 3) return;
@@ -183,7 +182,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                 ...address
             }, 
         }
-        if (!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion || !updatedProject.remark) {
+        if (!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion) {
             setLoading(false);
             console.log(updatedProject, "updateProject");
             return toast.error("Please fill all fields");
@@ -642,19 +641,23 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                         </div>
                                         <button type="button" onClick={viewFile}  >View</button>
                                     </div>
-                                    <div className="col-12 col-lg-6 mt-2" >
-
-                                        <div className="mb-3">
-                                            <label for="remark" className="form-label label_text">     remark
-                                            </label>
-                                            <input type="email" className="form-control rounded-0" id="remark"
-                                                name="remark"
-                                                onChange={handleChange}
-                                                maxLength={50}
-                                                value={projects?.remark}
-                                                aria-describedby="secemailHelp" />
-                                        </div>
-                                    </div>
+                                    <div className="col-12 col-lg-6 mt-2">
+  <div className="mb-3">
+    <label htmlFor="remark" className="form-label label_text">
+      Remark
+    </label>
+    <input
+      type="text"
+      className="form-control rounded-0"
+      id="remark"
+      name="remark"
+      onChange={handleChange}
+      maxLength={50}
+      value={projects?.remark || ""}
+      aria-describedby="secemailHelp"
+    />
+  </div>
+</div>
 
 
 

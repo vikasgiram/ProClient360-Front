@@ -358,6 +358,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                             type="textarea"
                             className="form-control rounded-0"
                             id="stuckResion"
+                            maxLength={70}
                             placeholder="Enter Stuck Reason...."
                             onChange={(e) => setStuckReason(e.target.value)}
                             value={stuckReason}
@@ -383,6 +384,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                             ? "Enter Action.... / Optional...." 
                             : "Enter Action...."
                         }
+                        maxLength={70}
                         value={action}
                         onChange={(e) => setAction(e.target.value)}
                         aria-describedby="nameHelp"
