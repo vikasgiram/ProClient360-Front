@@ -100,7 +100,7 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                     <p className="fw-bold"> Allotment Date: </p>
                     {formatDateforupdate(service.allotmentDate)}
                     <p className="fw-bold mt-3"> Allocated to: </p>
-                    {service.allotTo[0].name}
+                    {service.allotTo.map((item, index) => item.name).join(', ')}
                     <p className="fw-bold mt-3"> Status: </p>
                     {service.status}
                     <p className="fw-bold mt-3"> Priority: </p>

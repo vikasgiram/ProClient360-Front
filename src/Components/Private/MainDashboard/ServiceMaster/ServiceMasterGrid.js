@@ -44,7 +44,6 @@ export const ServiceMasterGrid = () => {
 
   // Use hooks
   const { data, loading, error } = useServices(pagination.currentPage, itemsPerPage, filters);
-  const { createService, loading: createLoading } = useCreateService();
   const { updateService, loading: updateLoading } = useUpdateService();
   const { deleteService, loading: deleteLoading } = useDeleteService();
 
@@ -69,17 +68,6 @@ export const ServiceMasterGrid = () => {
     setPagination((prev) => ({ ...prev, currentPage: page }));
   };
 
-  const handleCreate = () => {
-    setAddPopUpShow(!AddPopUpShow);
-  };
-
-  const handleCreateSubmit = async (serviceData) => {
-    const result = await createService(serviceData);
-    if (result) {
-      setAddPopUpShow(false);
-      setPagination((prev) => ({ ...prev, currentPage: 1 })); // Refresh list
-    }
-  };
 
   const handleUpdate = (service = null) => {
     setSelectedService(service);
@@ -87,10 +75,13 @@ export const ServiceMasterGrid = () => {
   };
 
   const handleUpdateSubmit = async (id, updatedData) => {
-    const result = await updateService(id, updatedData);
-    if (result) {
+    const data = await updateService(id, updatedData);
+    if (data.success) {
       setUpdatePopUpShow(false);
-      setPagination((prev) => ({ ...prev, currentPage: 1 })); // Refresh list
+      handlePageChange(1); // Refresh list
+      toast.success(data.message);
+    }else{
+      toast.error(data.error || "Failed to update service");
     }
   };
 
@@ -117,10 +108,10 @@ export const ServiceMasterGrid = () => {
     setSelectedService(service);
     setDetailsServicePopUp(!detailsServicePopUp);
   };
-
+console.log(data?.services);
   return (
     <>
-      {(loading || createLoading || updateLoading || deleteLoading) && (
+      {(loading || updateLoading || deleteLoading) && (
         <div className="overlay">
           <span className="loader"></span>
         </div>
@@ -236,31 +227,8 @@ export const ServiceMasterGrid = () => {
                                 <td className="align_left_td width_tdd">{service?.ticket?.product}</td>
                                 <td className="align_left_td width_tdd">{service.priority}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
-
-                                {service.allotTo && service.allotTo.map((allotTo) => (
-                                <td style={{ lineHeight: '1.2', padding: '8px' }}>
-                                {service.allotTo && service.allotTo.length > 0 
-                                 ? (() => {
-                                 const uniqueUsers = service.allotTo.filter((user, index, self) => 
-                                 index === self.findIndex(u => u._id === user._id || u.name === user.name)
-                                );
-        
-                                return uniqueUsers.map((allotTo, index) => (
-                                <div key={allotTo._id || index} style={{ 
-                                fontSize: '12px', 
-                                marginBottom: '2px',
-                                whiteSpace: 'nowrap'
-                                }}>
-                                {allotTo.name}
-                                </div>
-                               ));
-                               })()
-                               : 'Not Allocated'
-                               }
-                               </td>
-                               
-                                ))}
-                                <td className={service.status === 'Completed' ? 'text-success' : service.status === 'Inprogress' ? 'text-warning' : 'text-danger'}>{service.status}</td>
+                                {service.allotTo.map((item, index) => item.name).join(', ')}
+                                <td className={'font-weight-bold'+ service.status === 'Completed' ? 'text-success' : service.status === 'Inprogress' ? 'text-warning' : 'text-danger'}>{service.status}</td>
                                 <td>
                                   {user?.permissions?.includes('updateService') || user?.user === 'company' ?
                                     <span
