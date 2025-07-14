@@ -31,7 +31,6 @@ export const ProjectMasterGrid = () => {
 
   const [selectedId, setSelecteId] = useState(null);
   const [project, setProject] = useState([]);
-  const [filteredProjects, setFilteredProjects] = useState([]);
 
     const [filters, setFilters] = useState({ status: null});
   
@@ -98,7 +97,6 @@ export const ProjectMasterGrid = () => {
         const data = await getProjects(pagination.currentPage, itemsPerPage, filters);
         if (data) {
           setProject(data.projects || []);
-          setFilteredProjects(data.projects || []);
           setPagination(data.pagination || {
             currentPage: 1,
             totalPages: 0,

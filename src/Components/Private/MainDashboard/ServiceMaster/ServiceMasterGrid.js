@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import UpdateServicePopup from "./PopUp/UpdateServicePopUp";
 import useServices from "../../../../hooks/service/useService";
-import useCreateService from "../../../../hooks/service/useCreateService";
 import useUpdateService from "../../../../hooks/service/useUpdateService";
 import useDeleteService from "../../../../hooks/service/useDeleteService";
 import { formatDate } from "../../../../utils/formatDate";
@@ -21,7 +20,7 @@ export const ServiceMasterGrid = () => {
 
   const { user } = useContext(UserContext);
 
-  const [AddPopUpShow, setAddPopUpShow] = useState(false);
+
   const [deletePopUpShow, setdeletePopUpShow] = useState(false);
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
 
@@ -108,7 +107,8 @@ export const ServiceMasterGrid = () => {
     setSelectedService(service);
     setDetailsServicePopUp(!detailsServicePopUp);
   };
-console.log(data?.services);
+  
+
   return (
     <>
       {(loading || updateLoading || deleteLoading) && (

@@ -10,6 +10,9 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
   const [service, setService] = useState(selectedService || {});
   const [employees, setEmployees] = useState([]);
   
+
+  
+
   // Use the useUpdateService hook
   const { updateService, loading: updateLoading, error: updateError } = useUpdateService();
 
@@ -162,7 +165,8 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
                   </div>
                 </div>
 
-                <div className="col-12 col-lg-6 mt-2">
+  
+               <div className="col-12 col-lg-6 mt-2">
                   <div className="mb-3">
                     <label htmlFor="allotmentDate" className="form-label label_text">
                       Allotment Date <RequiredStar />
@@ -174,11 +178,14 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
                       className="form-control rounded-0"
                       id="allotmentDate"
                       name="allotmentDate"
-                      min={new Date().toISOString().split("T")[0]}
+                      // min={new Date().toISOString().split("T")[0]} 
+                        min={!service?._id ? new Date().toISOString().split("T")[0] : undefined}
+
                       required
                     />
                   </div>
                 </div>
+
 
                 <div className="col-12 col-lg-6 mt-2">
                   <div className="mb-3">

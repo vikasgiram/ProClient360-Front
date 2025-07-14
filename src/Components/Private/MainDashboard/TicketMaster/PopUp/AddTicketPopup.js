@@ -40,7 +40,7 @@ const AddTicketPopup = ({ handleAdd }) => {
     if (!client || !details || !product || !contactPerson || !contactNumber || !source || !Address) {
       return toast.error("Please fill all fields");
     }
-    if (!/^[\w-]+@([\w-]+)+[\w-]{2,4}$/.test(contactPersonEmail)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactPersonEmail)) {
       return toast.error("Please Enter Valid Email");
     }
     if (contactNumber.length !== 10) {
@@ -330,7 +330,8 @@ const AddTicketPopup = ({ handleAdd }) => {
                         aria-label="Default select example"
                         onChange={(e) => setProduct(e.target.value)}
                         required
-                      ><option >Select Product</option>
+                      >
+                        <option value=" ">Select Product</option>
                         <option value={"Surveillance System"}>Surveillance System</option>
                         <option value={"Access Control System"}>Access Control System</option>
                         <option value={"Turnkey Project"}>Turnkey Project</option>

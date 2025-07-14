@@ -44,8 +44,70 @@ const AddCompanyPopup = ({ handleAdd }) => {
       fetchData();
   }, [Address.pincode]);
 
+  const validateForm = () => {
+    if (!name.trim()) {
+      toast.error("Company name is required");
+      return false;
+    }
+    if (!admin.trim()) {
+      toast.error("Admin name is required");
+      return false;
+    }
+    if (!mobileNo || mobileNo.length !== 10) {
+      toast.error("Valid mobile number is required");
+      return false;
+    }
+    if (!email.trim()) {
+      toast.error("Email is required");
+      return false;
+    }
+    if (!password.trim()) {
+      toast.error("Password is required");
+      return false;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return false;
+    }
+    if (!confirmPassword.trim()) {
+      toast.error("Confirm password is required");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return false;
+    }
+    if (!subDate) {
+      toast.error("Subscription end date is required");
+      return false;
+    }
+    if (!subAmount) {
+      toast.error("Subscription amount is required");
+      return false;
+    }
+    if (!GST.trim()) {
+      toast.error("GST number is required");
+      return false;
+    }
+    if (!logo) {
+      toast.error("Logo is required");
+      return false;
+    }
+    if (!Address.pincode || Address.pincode.length !== 6) {
+      toast.error("Valid pincode is required");
+      return false;
+    }
+    return true;
+  };
+
   const handleCompanyAdd = async (event) => {
     event.preventDefault();
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
 
     const formData = new FormData();
@@ -102,7 +164,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
       >
         <div className="modal-dialog modal-lg">
           <div className="modal-content p-3">
-            <form>
+            <form onSubmit={handleCompanyAdd}>
               <div className="modal-header pt-0">
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                   Add Company
@@ -175,6 +237,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                           const onlyDigits = e.target.value.replace(/\D/g, '');
                           setMobileNo(onlyDigits);
                         }}
+                        required
                       />
                     </div>
                   </div>
@@ -250,7 +313,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                           type="text"
                           id="gstNo"
                           maxLength={15}
-                          placeholder="Ente GST Number...."
+                          placeholder="Enter GST Number...."
                           value={GST}
                           onChange={(e) => setGST(e.target.value.toUpperCase())}
                           className="form-control rounded-0 border-0"
@@ -271,6 +334,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                         id="LOGO"
                         accept="image/*"
                         onChange={handleFileChange}
+                        required
                       />
                     </div>
                   </div>
@@ -296,6 +360,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                               });
                             }}
                             value={Address.pincode}
+                            required
                           />
                         </div>
                       </div>
@@ -312,6 +377,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                               setAddress({ ...Address, state: onlyLettersAndSpaces });
                             }}
                             value={Address.state}
+                            required
                           />
                         </div>
                       </div>
@@ -328,6 +394,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                               setAddress({ ...Address, city: onlyLettersAndSpaces });
                             }}
                             value={Address.city}
+                            required
                           />
                         </div>
                       </div>
@@ -344,6 +411,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                               setAddress({ ...Address, country: onlyLettersAndSpaces });
                             }}
                             value={Address.country}
+                            required
                           />
                         </div>
                       </div>
@@ -357,6 +425,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                             onChange={(e) => setAddress({ ...Address, add: e.target.value })}
                             value={Address.add}
                             rows="2"
+                            required
                           ></textarea>
                         </div>
                       </div>
@@ -378,6 +447,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                             id="password"
                             placeholder="Password...."
                             maxLength={40}
+                            minLength={6}
                             required
                           />
                           <button
@@ -389,6 +459,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                             <EyeIcon isOpen={showPassword} />
                           </button>
                         </div>
+                        <small className="text-muted">Minimum 6 characters</small>
                       </div>
                     </div>
 
@@ -402,7 +473,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                             type={showConfirmPassword ? "text" : "password"}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="form-control rounded-0"
+                            className={`form-control rounded-0 ${confirmPassword && password !== confirmPassword ? 'is-invalid' : ''}`}
                             id="ConfirmPassword"
                             placeholder="Confirm Password...."
                             maxLength={40}
@@ -417,6 +488,9 @@ const AddCompanyPopup = ({ handleAdd }) => {
                             <EyeIcon isOpen={showConfirmPassword} />
                           </button>
                         </div>
+                        {confirmPassword && password !== confirmPassword && (
+                          <small className="text-danger">Passwords do not match</small>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -425,8 +499,6 @@ const AddCompanyPopup = ({ handleAdd }) => {
                     <div className="col-12 pt-3 mt-2">
                       <button
                         type="submit"
-                        maxLength={50}
-                        onClick={handleCompanyAdd}
                         disabled={loading}
                         className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
                       >

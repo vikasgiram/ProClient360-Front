@@ -119,37 +119,47 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
               {previousActions ? (
                 <>
                   <h6 className="mt-2"> Past Actions</h6>
-                  <table className="table table-bordered table-responsive">
-                    <thead className="thead-light">
-                      <tr>
-                        <th scope="col">Sr. No</th>
-                        <th scope="col" className="text-start">
-                          Action
-                        </th>
-                        <th scope="col">Action By</th>
-                        <th scope="col">Start Time</th>
-                        <th scope="col">End Time</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {previousActions.map((action, index) => (
-                        <tr key={action._id}>
-                          <td>{index + 1}</td>
-                          <td
-                            className="text-start text-wrap w-100"
-                            style={{
-                              maxWidth: "22rem", // Sets a fixed maximum width for the column
-                            }}
-                          >
-                            {action?.action}
-                          </td>
-                          <td>{action?.actionBy?.name}</td>
-                          <td>{formatDate(action?.startTime)}</td>
-                          <td>{formatDate(action?.endTime)}</td>
+                  <div 
+                    className="table-responsive" 
+                    style={{ 
+                      maxHeight: '170px', 
+                      overflowY: 'auto',
+                      border: '1px solid #dee2e6',
+                      borderRadius: '0.375rem'
+                    }}
+                  >
+                    <table className="table table-bordered mb-0">
+                      <thead className="thead-light sticky-top" style={{ backgroundColor: '#f8f9fa' }}>
+                        <tr>
+                          <th scope="col">Sr. No</th>
+                          <th scope="col" className="text-start">
+                            Action
+                          </th>
+                          <th scope="col">Action By</th>
+                          <th scope="col">Start Time</th>
+                          <th scope="col">End Time</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {previousActions.map((action, index) => (
+                          <tr key={action._id}>
+                            <td>{index + 1}</td>
+                            <td
+                              className="text-start text-wrap w-100"
+                              style={{
+                                maxWidth: "22rem",
+                              }}
+                            >
+                              {action?.action}
+                            </td>
+                            <td>{action?.actionBy?.name}</td>
+                            <td>{formatDate(action?.startTime)}</td>
+                            <td>{formatDate(action?.endTime)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               ) : (
                 <div className="alert alert-warning mt-2" role="alert">
@@ -164,4 +174,4 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
   );
 };
 
-export default ViewServicePopUp;  
+export default ViewServicePopUp;

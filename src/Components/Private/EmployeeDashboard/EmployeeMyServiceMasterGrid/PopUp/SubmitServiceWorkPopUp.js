@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { default as ReactSelect } from "react-select";
 
-
 import {
   formatDate,
   formatDateforupdate,
@@ -15,7 +14,6 @@ import { getEmployee } from "../../../../../hooks/useEmployees";
 import { getDepartment } from "../../../../../hooks/useDepartment";
 import { sendNotification } from "../../../../../hooks/useNotification";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
-
 
 const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
   const [status, setStatus] = useState("");
@@ -32,21 +30,19 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
   const [employeeOptions, setEmployeeOptions] = useState([]);
 
   const [showInfo, setShowInfo] = useState(false);
-
   const [workComplete, setWorkComplete] = useState('');
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const FetchPreviousActions = async () => {
     try {
       const data = await getAllServiceActions(selectedService._id);
-      if (data.success)
-        setPreviousActions(data.serviceActions);
-      else
-        toast(data.error);
+      if (data.success) setPreviousActions(data.serviceActions);
+      else toast(data.error);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+
   useEffect(() => {
     FetchPreviousActions();
   }, [selectedService._id]);
@@ -55,10 +51,8 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
     const fetchDataDep = async () => {
       try {
         const data = await getDepartment();
-        // console.log(data, "department");
-
-        if (data) {
-          setDepartments(data.departments || []);
+        if (data && data.departments) {
+          setDepartments(data.departments);
         }
       } catch (error) {
         console.log(error);
@@ -70,17 +64,13 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
   useEffect(() => {
     const fetchDataEmp = async () => {
       try {
-        // console.log("department Id:" + department);
-        if (!selectedDepartment) {
-          return;
-        }
+        if (!selectedDepartment) return;
         const data = await getEmployee(selectedDepartment);
-        if (data) {
-          const formattedData = data.map((employee) => ({
+        if (data && data.employee) {
+          const formattedData = data.employee.map((employee) => ({
             value: employee._id,
             label: employee.name,
           }));
-
           setEmployeeOptions(formattedData);
         }
       } catch (error) {
@@ -95,61 +85,69 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
       message: stuckReason,
       userIds: employees,
     };
-
     await sendNotification(notificationData);
   };
 
+
   const handleMyService = async (event) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
-    if (status === "") {
-      return toast.error("Please select status");
-    }
-    if (status === "Stuck") {
-      if (responsibleParty === "") {
-        return toast.error("Please select Responsible Party");
+    try {
+      if (status === "") {
+        throw new Error("Please select status");
       }
-      if (stuckReason === "") {
-        return toast.error("Please enter Stuck Reason");
-      }
-      if (responsibleParty === "Company") {
-        if (selectedDepartment === "") {
-          return toast.error("Please select Department");
-        }
-        if (employees.length === 0) {
-          return toast.error("Please select Employee");
-        }
 
-        handleSendNotification();
+      if (status === "Stuck") {
+        if (responsibleParty === "") {
+          throw new Error("Please select Responsible Party");
+        }
+        if (stuckReason === "") {
+          throw new Error("Please enter Stuck Reason");
+        }
+        if (responsibleParty === "Company") {
+          if (selectedDepartment === "") {
+            throw new Error("Please select Department");
+          }
+          if (!employees) {
+            throw new Error("Please select Employee");
+          }
+          await handleSendNotification();
+        }
+      } else {
+
+        if (!startTime || !endTime) {
+          throw new Error("Please select Date and Time");
+        }
+      }
+
+      const finalAction = action || (status === "Stuck" ? `Work stuck: ${stuckReason}` : "");
+      if (!finalAction) {
+        throw new Error("Please enter Action");
+      }
+
+      const actionData = {
+        service: selectedService._id,
+        status,
+        startTime: status === "Stuck" ? undefined : startTime,
+        endTime: status === "Stuck" ? undefined : endTime,
+        stuckReason: status === "Stuck" ? stuckReason : undefined,
+        action: finalAction,
+        workComplete: status === "Inprogress" ? workComplete : undefined
+      };
+
+      const data = await createServiceAction(actionData);
+      if (data.success) {
+        toast.success(data.message);
         handleUpdate();
-        return;
+        FetchPreviousActions();
+      } else {
+        throw new Error(data.error);
       }
-    }
-    if (startTime === "" || startTime === "") {
-      return toast.error("Please select Date and Time");
-    }
-    if (action === "") {
-      return toast.error("Please enter Action");
-    }
-
-    const actionData = {
-      service: selectedService._id,
-      status,
-      startTime,
-      endTime,
-      stuckReason,
-      action,
-    };
-
-    // console.log(employees);
-    const data = await createServiceAction(actionData);
-    // console.log(selectedService._id,data);
-    if (data.success) {
-      toast.success(data.message);
-      handleUpdate();
-      FetchPreviousActions();
-    } else {
-      toast.error(data.error);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -169,7 +167,6 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
               <div className="modal-header pt-0">
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                   Work Submit
-                  {/* Forward */}
                 </h5>
                 <button
                   onClick={handleUpdate}
@@ -180,7 +177,6 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              {/* <div className="modal-body"> */}
               <div className="row modal_body_height">
                 <div className="col-12 mt-2">
                   <div className="text-end">
@@ -191,6 +187,8 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                       {showInfo ? "Hide Info" : "Show Info"}
                     </div>
                   </div>
+                  
+                
                   {showInfo && (
                     <div className="row">
                       <div className="col-sm- col-md col-lg">
@@ -231,7 +229,6 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                       </div>
                     </div>
                   )}
-
 
                   <div className="row">
                     <div className="col-12 col-md-6 mt-2">
@@ -274,185 +271,129 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                             if (value === '' || (value.length <= 3 && Number(value) >= 0 && Number(value) <= 100)) {
                               setWorkComplete(value);
                             }
-                          }} required
+                          }} 
+                          required
                         />
                       </div>
                     )}
                   </div>
 
-
-
+              
                   {status === "Stuck" && (
-                    <div className="col-12 mt-2 inprocess">
-                      <div className="">
-                        <label
-                          for="stuckResion"
-                          className="form-label label_text"
-                        >
-                          Responsible Party <RequiredStar />
-                        </label>
-                        <select
-                          className="form-control rounded-0"
-                          onChange={(e) => setResponsibleParty(e.target.value)}
-                          value={responsibleParty}
-                          aria-describedby="statusHelp"
-                          required
-                        >
-                          <option value="">Select Responsible Party</option>
-                          <option value="Company">Company</option>
-                          <option value="Contractor">Contractor</option>
-                          <option value="Client">Client</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
-                  {responsibleParty === "Company" && (
-                    <div className="row">
-                      <div className="col-6 col-lg-6 mt-2 inprogress-field">
-                        <div className="mb-3">
-                          <label
-                            htmlFor="taskName"
-                            className="form-label label_text"
-                          >
-                            Department  <RequiredStar />
+                    <>
+                      <div className="col-12 mt-2 inprocess">
+                        <div className="">
+                          <label htmlFor="stuckResion" className="form-label label_text">
+                            Responsible Party <RequiredStar />
                           </label>
                           <select
-                            className="form-select rounded-0"
-                            aria-label="Default select example"
-                            onChange={(e) =>
-                              setSelectedDepartment(e.target.value)
-                            }
-                            value={selectedDepartment}
+                            className="form-control rounded-0"
+                            onChange={(e) => setResponsibleParty(e.target.value)}
+                            value={responsibleParty}
+                            aria-describedby="statusHelp"
                             required
                           >
-                            <option value="">
-                              -- Select Department Name --
-                            </option>
-                            {departments &&
-                              departments.map((department) => (
-                                <option value={department._id}>
-                                  {department.name}
-                                </option>
-                              ))}
+                            <option value="">Select Responsible Party</option>
+                            <option value="Company">Company</option>
+                            <option value="Contractor">Contractor</option>
+                            <option value="Client">Client</option>
                           </select>
                         </div>
                       </div>
 
-                      <div className="col-6 col-lg-6 mt-2">
-                        <div className="mb-3">
-                          <label
-                            for="ProjectName"
-                            className="form-label label_text"
-                          >
-                            Employee Name  <RequiredStar />
-                          </label>
-                          <ReactSelect
-                            options={employeeOptions} // Employee options (e.g., from API)
-                            hideSelectedOptions={false} // Show selected options in the dropdown
-                            onChange={(selectedOption) => {
-                              // Check if an option is selected and set the employee ID
-                              const employeeId = selectedOption
-                                ? selectedOption.value
-                                : null;
-                              setEmployees(employeeId);
+                      {responsibleParty === "Company" && (
+                        <div className="row">
+                          <div className="col-6 col-lg-6 mt-2 inprogress-field">
+                            <div className="mb-3">
+                              <label htmlFor="department" className="form-label label_text">
+                                Department <RequiredStar />
+                              </label>
+                              <select
+                                id="department"
+                                className="form-select rounded-0"
+                                onChange={(e) => setSelectedDepartment(e.target.value)}
+                                value={selectedDepartment}
+                                required
+                              >
+                                <option value="">-- Select Department Name --</option>
+                                {departments &&
+                                  departments.map((department) => (
+                                    <option key={department._id} value={department._id}>
+                                      {department.name}
+                                    </option>
+                                  ))}
+                              </select>
+                            </div>
+                          </div>
 
-                            }}
-                            value={employeeOptions.find(
-                              (option) => option.value === employees
-                            )} // Keep selected value synced
+                          <div className="col-6 col-lg-6 mt-2">
+                            <div className="mb-3">
+                              <label htmlFor="employeeSelect" className="form-label label_text">
+                                Employee Name <RequiredStar />
+                              </label>
+                              <ReactSelect
+                                inputId="employeeSelect"
+                                options={employeeOptions}
+                                hideSelectedOptions={false}
+                                onChange={(selectedOption) => {
+                                  const employeeId = selectedOption ? selectedOption.value : null;
+                                  setEmployees(employeeId);
+                                }}
+                                value={employeeOptions.find(
+                                  (option) => option.value === employees
+                                )}
+                                placeholder="Select Employee..."
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="col-12 mt-2">
+                        <div className="">
+                          <label htmlFor="stuckResion" className="form-label label_text">
+                            Stuck Reason <RequiredStar />
+                          </label>
+                          <input
+                            type="textarea"
+                            className="form-control rounded-0"
+                            id="stuckResion"
+                            maxLength={70}
+                            placeholder="Enter Stuck Reason...."
+                            onChange={(e) => setStuckReason(e.target.value)}
+                            value={stuckReason}
+                            aria-describedby="emailHelp"
                             required
                           />
                         </div>
                       </div>
-                    </div>
-                  )}
-
-                  {status === "Stuck" && (
-                    <div className="col-12 mt-2">
-                      <div className="">
-                        <label
-                          for="stuckResion"
-                          className="form-label label_text"
-                        >
-                          Stuck Reason <RequiredStar />
-                        </label>
-                        <input
-                          type="textarea"
-                          className="form-control rounded-0"
-                          id="stuckResion"
-                          placeholder="Enter Stuck Reason...."
-                          onChange={(e) => setStuckReason(e.target.value)}
-                          value={stuckReason}
-                          aria-describedby="emailHelp"
-                          required
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {status !== "Stuck" ? (
-                    <div className="col-12 mt-2">
-                      <div className="">
-                        <label for="action" className="form-label label_text">
-                          Action <RequiredStar />
-                        </label>
-                        <input
-                          type="textarea"
-                          className="form-control rounded-0"
-                          id="action"
-                          placeholder="Enter Action...."
-                          value={action}
-                          onChange={(e) => setAction(e.target.value)}
-                          aria-describedby="nameHelp"
-                          required
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-
-                  {/* {status !== "Stuck" ? (
-                    <>
-                      <div className="col-9 col-lg-6 mt-2">
-                        <label
-                          for="StartTime"
-                          className="form-label label_text"
-                        >
-                          Start Time  <RequiredStar />
-                        </label>
-                        <input
-                          className="form-control rounded-0"
-                          id="StartTime"
-                          type="datetime-local"
-                          onChange={(e) => setStartTime(e.target.value)}
-                          value={startTime}
-                          aria-describedby="statusHelp"
-                          required
-                        />
-                      </div>
-
-                      <div className="col-9 col-lg-6 mt-2">
-                        <label for="EndTime" className="form-label label_text">
-                          End Time <RequiredStar />
-                        </label>
-                        <input
-                          className="form-control rounded-0"
-                          id="EndTime"
-                          type="datetime-local"
-                          onChange={(e) => setEndTime(e.target.value)}
-                          value={endTime}
-                          aria-describedby="statusHelp"
-                          required
-                        />
-                      </div>
                     </>
-                  ) : (
-                    ""
-                  )} */}
+                  )}
 
-                  {status !== "Stuck" ? (
+                  <div className="col-12 mt-2">
+                    <div className="">
+                      <label htmlFor="action" className="form-label label_text">
+                        Action {status !== "Stuck" && <RequiredStar />}
+                      </label>
+                      <input
+                        type="textarea"
+                        className="form-control rounded-0"
+                        id="action"
+                        placeholder={
+                          status === "Stuck" 
+                            ? "Enter Action.... / Optional...." 
+                            : "Enter Action...."
+                        }
+                        maxLength={70}
+                        value={action}
+                        onChange={(e) => setAction(e.target.value)}
+                        aria-describedby="nameHelp"
+                        required={status !== "Stuck"}
+                      />
+                    </div>
+                  </div>
+
+                  {status !== "Stuck" && (
                     <div className="row g-3 mt-2">
                       <div className="col">
                         <label htmlFor="StartTime" className="form-label label_text">
@@ -484,26 +425,29 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                         />
                       </div>
                     </div>
-                  ) : null}
+                  )}
+
+
                   <div className="row">
                     <div className="col-12 pt-3 mt-2">
                       <button
                         type="submit"
-                        onClick={handleMyService}
-                        className="w-80 btn addbtn rounded-0 add_button   m-2 px-4"
+                        className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
+                        disabled={isSubmitting}
                       >
-                        Submit Work
+                        {isSubmitting ? "Submitting..." : "Submit Work"}
                       </button>
                       <button
                         type="button"
                         onClick={handleUpdate}
-                        className="w-80  btn addbtn rounded-0 Cancel_button m-2 px-4"
+                        className="w-80 btn addbtn rounded-0 Cancel_button m-2 px-4"
                       >
                         Cancel
                       </button>
                     </div>
                   </div>
 
+                
                   {previousActions ? (
                     <>
                       <h6 className="mt-2"> Past Actions</h6>
@@ -525,9 +469,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                               <td>{index + 1}</td>
                               <td
                                 className="text-start text-wrap w-100"
-                                style={{
-                                  maxWidth: "22rem", // Sets a fixed maximum width for the column
-                                }}
+                                style={{ maxWidth: "22rem" }}
                               >
                                 {action?.action}
                               </td>
