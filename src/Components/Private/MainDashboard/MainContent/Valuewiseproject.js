@@ -1,6 +1,5 @@
 import { Chart } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { useState, useEffect } from "react";
 
 // Customize chart legend (if needed)
 Chart.Legend.prototype.afterFit = function () {

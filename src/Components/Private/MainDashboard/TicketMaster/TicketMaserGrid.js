@@ -216,6 +216,7 @@ export const TicketMasterGrid = () => {
                   <div className="col-12 col-lg-6">
                     <h5 className="text-white py-2">Ticket Master</h5>
                   </div>
+                  
                   <div className="col-12 col-lg-6 ms-auto">
                     <div className="row align-items-center justify-content-end">
                       <div className="col-8 col-lg-6 text-end">

@@ -142,7 +142,6 @@ const getFcmToken = async () => {
                   <div className=" mb-2 text-start">
                     <span className="">
                       <a
-                        href="#"
                         className="forgot-pass text-decoration-none"
                         style={{ color: "rgb(96 124 7)" }}
                         onClick={() => navigation('/ForgotPassword')}

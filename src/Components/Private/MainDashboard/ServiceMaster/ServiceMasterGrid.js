@@ -147,7 +147,7 @@ export const ServiceMasterGrid = () => {
                 />
 
                 <div className="col-12 col-lg-6 ms-auto text-end me-2">
-                  <div className="row">
+                  <div className="row py-2">
                     <div className="col-4 col-lg-4 ms-auto">
                       <select
                         className="form-select bg_edit"

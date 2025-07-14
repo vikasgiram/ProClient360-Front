@@ -1,9 +1,8 @@
-import React, { useState, useContext } from "react";
+import  { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "././login.css";
 import toast from "react-hot-toast";
-import { changePassword, loginUser } from "../../hooks/useAuth";
-import { UserContext } from "../../context/UserContext";
+import { changePassword } from "../../hooks/useAuth";
 // import { useAuthDispatch, useAuthState } from "../../../helper/Context/context";
 
 

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import axios from 'axios';
-import toast from 'react-hot-toast';
 
 const baseUrl = process.env.REACT_APP_API_URL;
 let url = `${baseUrl}/api/leads`;

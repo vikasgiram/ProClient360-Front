@@ -1,6 +1,5 @@
 import { Chart } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { useState, useEffect } from "react";
 
 Chart.Legend.prototype.afterFit = function () {
   this.height = this.height + 40;

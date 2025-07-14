@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { error } from 'jquery';
 import toast from 'react-hot-toast';
 
 const baseUrl= process.env.REACT_APP_API_URL;

@@ -158,8 +158,8 @@ export const ProjectMasterGrid = () => {
                         </select>
                       </div>
 
-                      <div className="col-4 col-lg-4 ms-auto">
                       {user?.permissions?.includes("createProject") || user?.user==='company' ? (
+                      <div className="col-4 col-lg-4 ms-auto">
                           <button
                             onClick={handleAdd}
                             type="button"
@@ -167,8 +167,8 @@ export const ProjectMasterGrid = () => {
                           >
                             <i className="fa-solid fa-plus"></i> Add
                           </button>
-                        ) : null }
                       </div>
+                      ) : null }
                     </div>
                   </div>
                 </div>
