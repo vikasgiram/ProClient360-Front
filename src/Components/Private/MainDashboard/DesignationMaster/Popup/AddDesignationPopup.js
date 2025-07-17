@@ -161,9 +161,9 @@ const AddDesignationPopup = ({ handleAdd }) => {
 
   return (
     <>
-      <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content p-3">
+      <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090", justifyContent:'center'}}>
+        <div className="modal-dialog modal-lg" style={{ maxWidth: "90%", width: "1200px" }}>
+          <div className="modal-content add p-3" style={{ width: "100%" }}>
             <form>
               <div className="modal-header pt-0">
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">

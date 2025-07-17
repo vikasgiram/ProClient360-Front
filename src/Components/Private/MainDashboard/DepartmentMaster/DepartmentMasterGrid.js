@@ -52,7 +52,6 @@ export const DepartmentMasterGrid = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Modified to fetch all departments without pagination
         const data = await getDepartment(); 
         if (data) {
           setDepartments(data.departments || []);
@@ -115,8 +114,8 @@ export const DepartmentMasterGrid = () => {
                           {departments.length > 0 ? (
                             departments.map((department, index) => (
                               <tr className="border my-4" key={department._id}>
-                                <td>{index + 1}</td> {/* Removed pagination calculation */}
-                                <td>{department.name}</td>
+                                <td>{index + 1}</td>
+                                <td>{department.name}</td>  
                                 <td>
                                   {user?.permission?.include('updateDepartment') || user.user==='company'?(
                                   <span onClick={() => handleUpdate(department)} className="update">
