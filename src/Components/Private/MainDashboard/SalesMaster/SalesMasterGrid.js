@@ -423,6 +423,7 @@ export const SalesMasterGrid = () => {
         <UpdateSalesPopUp
           selectedLead={selectedLead}
           onUpdate={handleUpdateSubmit}
+          isCompany={user.user === 'company'}
           onClose={() => {
             setUpdatePopUpShow(false);
             setSelectedLead(null);

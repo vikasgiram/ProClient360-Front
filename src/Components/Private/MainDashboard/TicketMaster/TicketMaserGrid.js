@@ -69,11 +69,10 @@ export const TicketMasterGrid = () => {
 
     try {
       setLoading(true);
-      const deleteResponse = await deleteTicket(selectedId);
+      const data = await deleteTicket(selectedId);
 
-      if (deleteResponse) {
-        toast.success("Ticket Deleted successfully...");
-
+      if (data.success) {
+        toast.success(data.message || "Ticket deleted successfully.");
         const pageToFetch =
           tickets.length === 1 && pagination.currentPage > 1
             ? pagination.currentPage - 1
@@ -111,7 +110,7 @@ export const TicketMasterGrid = () => {
           });
         }
       } else {
-        toast.error(deleteResponse?.error || "Failed to delete ticket.");
+        toast.error(data?.error || "Failed to delete ticket.");
       }
     } catch (error) {
       console.error("Error deleting ticket:", error);

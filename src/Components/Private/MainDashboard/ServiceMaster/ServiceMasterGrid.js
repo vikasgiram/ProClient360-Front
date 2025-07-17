@@ -41,10 +41,12 @@ export const ServiceMasterGrid = () => {
 
   const itemsPerPage = 10;
 
+  // Use hooks
   const { data, loading, error } = useServices(pagination.currentPage, itemsPerPage, filters);
   const { updateService, loading: updateLoading } = useUpdateService();
   const { deleteService, loading: deleteLoading } = useDeleteService();
 
+  // Update state with fetched data
   useEffect(() => {
     if (data) {
       setPagination(data.pagination || {
@@ -72,10 +74,13 @@ export const ServiceMasterGrid = () => {
   };
 
   const handleUpdateSubmit = async (id, updatedData) => {
-    const result = await updateService(id, updatedData);
-    if (result) {
+    const data = await updateService(id, updatedData);
+    if (data.success) {
       setUpdatePopUpShow(false);
-      setPagination((prev) => ({ ...prev, currentPage: 1 }));
+      handlePageChange(1); // Refresh list
+      toast.success(data.message);
+    }else{
+      toast.error(data.error || "Failed to update service");
     }
   };
 
@@ -106,7 +111,7 @@ export const ServiceMasterGrid = () => {
 
   return (
     <>
-      {(loading|| updateLoading || deleteLoading) && (
+      {(loading || updateLoading || deleteLoading) && (
         <div className="overlay">
           <span className="loader"></span>
         </div>
@@ -222,32 +227,8 @@ export const ServiceMasterGrid = () => {
                                 <td className="align_left_td width_tdd">{service?.ticket?.product}</td>
                                 <td className="align_left_td width_tdd">{service.priority}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
-
-                              {service.allotTo && service.allotTo.map((allotTo) => (
-                              <td style={{ lineHeight: '1.2', padding: '8px' }}>
-                              {service.allotTo && service.allotTo.length > 0 ? (
-                              [
-                              ...new Map(
-                              service.allotTo.map(user => [user._id || user.name, user])
-                              ).values(),
-                              ].map((user, index) => (
-                               <div key={user._id || index}
-                               style={{
-                               fontSize: '12px',
-                               marginBottom: '2px',
-                               whiteSpace: 'nowrap',
-                               }}>
-                               {user.name}
-                              </div>
-                              ))
-                              ) : (
-                              'Not Allocated'
-                              )}
-                             </td>
-
-                              ))}
-
-                                <td className={service.status === 'Completed' ? 'text-success' : service.status === 'Inprogress' ? 'text-warning' : 'text-danger'}>{service.status}</td>
+                                {service.allotTo.map((item, index) => item.name).join(', ')}
+                                <td className={'font-weight-bold'+ service.status === 'Completed' ? 'text-success' : service.status === 'Inprogress' ? 'text-warning' : 'text-danger'}>{service.status}</td>
                                 <td>
                                   {user?.permissions?.includes('updateService') || user?.user === 'company' ?
                                     <span
@@ -285,7 +266,7 @@ export const ServiceMasterGrid = () => {
                   </div>
                 </div>
 
-                {/* add Pagination button */}
+                {/* Pagination */}
                 {!loading && pagination.totalPages > 1 && (
                   <div className="pagination-container text-center my-3">
                     <button
