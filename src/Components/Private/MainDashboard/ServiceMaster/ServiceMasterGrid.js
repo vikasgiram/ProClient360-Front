@@ -41,12 +41,10 @@ export const ServiceMasterGrid = () => {
 
   const itemsPerPage = 10;
 
-  // Use hooks
   const { data, loading, error } = useServices(pagination.currentPage, itemsPerPage, filters);
   const { updateService, loading: updateLoading } = useUpdateService();
   const { deleteService, loading: deleteLoading } = useDeleteService();
 
-  // Update state with fetched data
   useEffect(() => {
     if (data) {
       setPagination(data.pagination || {
@@ -77,7 +75,7 @@ export const ServiceMasterGrid = () => {
     const result = await updateService(id, updatedData);
     if (result) {
       setUpdatePopUpShow(false);
-      setPagination((prev) => ({ ...prev, currentPage: 1 })); // Refresh list
+      setPagination((prev) => ({ ...prev, currentPage: 1 }));
     }
   };
 
@@ -287,7 +285,7 @@ export const ServiceMasterGrid = () => {
                   </div>
                 </div>
 
-                {/* Pagination */}
+                {/* add Pagination button */}
                 {!loading && pagination.totalPages > 1 && (
                   <div className="pagination-container text-center my-3">
                     <button

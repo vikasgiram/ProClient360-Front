@@ -26,6 +26,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   const [forEdit, setForEdit] = useState(false);
   const [editAction, setEditAction] = useState(""); //editAction used for for  update as parameter 
   const [addAction, setAddAction] = useState(true);
+  
 
   console.log(selectedTask, "selected task");
 
@@ -335,7 +336,6 @@ if (new Date(startTime) >= new Date(endTime)) {
                             onChange={handleEditTask}
                             value={formatDateforEditAction(editAction?.startTime)}
                             className="form-control rounded-0"
-                            min={new Date().toISOString().slice(0, 16)}
                             id="startTime"
                             required
                           />
@@ -354,10 +354,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             type="datetime-local"
                             name="endTime"
                             onChange={handleEditTask}
-                            value={formatDateforEditAction(editAction?.endTime)} 
-
-                            min={new Date().toISOString().slice(0, 16)}
-                
+                            value={formatDateforEditAction(editAction?.endTime)}                 
                             className="form-control rounded-0"
                             id="endTime"
                             required
@@ -470,7 +467,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             htmlFor="Action"
                             className="form-label label_text "
                           >
-                            Action
+                            Action  <RequiredStar/>
                           </label>
                           <textarea
                             className="textarea_edit col-12"
@@ -490,20 +487,18 @@ if (new Date(startTime) >= new Date(endTime)) {
                             htmlFor="processStartDate"
                             className="form-label label_text"
                           >
-                            Process Start Date
+                            Process Start Date  <RequiredStar/>
                           </label>
                           <input
                             type="datetime-local"
                             name="processStartDate"
                             onChange={(e) => {
                               setStartTime(e.target.value);
-
                             }}
                             value={startTime}
                             className="form-control rounded-0"
-                            min={new Date().toISOString().slice(0, 16)}
                             id="processStartDate"
-
+                             
                           />
                         </div>
                       </div>
@@ -514,9 +509,9 @@ if (new Date(startTime) >= new Date(endTime)) {
                             htmlFor="processEndDate"
                             className="form-label label_text"
                           >
-                            Process End Date
+                            Process End Date   <RequiredStar/>
                           </label>
-                          <input
+                          {/* <input
                             type="datetime-local"
                             name="processEndDate"
                             onChange={(e) => setEndTime(e.target.value)}
@@ -524,7 +519,16 @@ if (new Date(startTime) >= new Date(endTime)) {
                             min={new Date().toISOString().slice(0, 16)}
                             className="form-control rounded-0"
                             id="processEndDate"
-                          />
+                          /> */}
+
+  <input
+  type="datetime-local"
+  name="processEndDate"
+  onChange={(e) => setEndTime(e.target.value)}
+  value={endTime}
+  className="form-control rounded-0"
+  id="processEndDate"
+/>
                         </div>
                       </div>
 
@@ -533,7 +537,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                           htmlFor="projectStatus"
                           className="form-label label_text"
                         >
-                          Status
+                          Status          <RequiredStar/>
                         </label>
                         <select
                           id="projectStatus"
@@ -556,7 +560,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             htmlFor="processEndDate"
                             className="form-label label_text"
                           >
-                            Completed Level
+                            Completed Level       <RequiredStar/>
                           </label>
                           <div className="input-group border mb-3">
                           <input
