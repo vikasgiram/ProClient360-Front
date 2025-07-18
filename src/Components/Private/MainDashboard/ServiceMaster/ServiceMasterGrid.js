@@ -379,6 +379,7 @@ export const ServiceMasterGrid = () => {
         <ViewServicePopUp
           closePopUp={handelDetailsPopUpClick}
           selectedService={selectedService}
+          
         />
       )}
     </>

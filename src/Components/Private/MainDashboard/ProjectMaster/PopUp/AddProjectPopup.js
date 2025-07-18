@@ -89,8 +89,14 @@ const AddProjectPopup = ({ handleAdd }) => {
 
     else if (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion) > 100) {
       setLoading(false);
-      return toast.error("Total percentage should be less than 100%");
+      return toast.error("The total percentage cannot exceed 100%.");
     }
+   
+    else if (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion) < 100) {
+      setLoading(false);
+      return toast.error("The total percentage cannot less than 100%.");
+    }
+
     if (purchaseOrderValue <= 0) {
       setLoading(false);
       return toast.error("Purchase order value should be greater than 0");

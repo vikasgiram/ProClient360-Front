@@ -1,4 +1,4 @@
-import { useState,useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import toast from 'react-hot-toast';
@@ -10,8 +10,7 @@ import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import { UserContext } from "../../../../context/UserContext";
 
 export const DepartmentMasterGrid = () => {
-
-  const {user} = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [AddPopUpShow, setAddPopUpShow] = useState(false);
   const [updatePopUpShow, setUpdatePopUpShow] = useState(false);
@@ -21,19 +20,6 @@ export const DepartmentMasterGrid = () => {
   const [selectedId, setSelecteId] = useState(null);
   const [selectedDep, setSelectedDep] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 0,
-    totalDepartments: 0,
-    limit: 10,
-    hasNextPage: false,
-    hasPrevPage: false,
-  });
-  const itemsPerPage = 10;
-
-  const handlePageChange = (page) => {
-    setPagination((prev) => ({ ...prev, currentPage: page }));
-  };
 
   const toggle = () => {
     setIsOpen(!isopen);
@@ -66,17 +52,9 @@ export const DepartmentMasterGrid = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getDepartment(pagination.currentPage, itemsPerPage);
+        const data = await getDepartment(); 
         if (data) {
           setDepartments(data.departments || []);
-          setPagination(data.pagination || {
-            currentPage: 1,
-            totalPages: 0,
-            totalDepartments: 0,
-            limit: itemsPerPage,
-            hasNextPage: false,
-            hasPrevPage: false,
-          });
         }
       } catch (error) {
         setLoading(false);
@@ -86,7 +64,7 @@ export const DepartmentMasterGrid = () => {
     };
 
     fetchData();
-  }, [pagination.currentPage, AddPopUpShow, deletePopUpShow, updatePopUpShow]);
+  }, [AddPopUpShow, deletePopUpShow, updatePopUpShow]);
 
   return (
     <>
@@ -136,8 +114,8 @@ export const DepartmentMasterGrid = () => {
                           {departments.length > 0 ? (
                             departments.map((department, index) => (
                               <tr className="border my-4" key={department._id}>
-                                <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
-                                <td>{department.name}</td>
+                                <td>{index + 1}</td>
+                                <td>{department.name}</td>  
                                 <td>
                                   {user?.permission?.include('updateDepartment') || user.user==='company'?(
                                   <span onClick={() => handleUpdate(department)} className="update">
@@ -164,109 +142,6 @@ export const DepartmentMasterGrid = () => {
                     </div>
                   </div>
                 </div>
-      
-                {!loading && pagination.totalPages > 1 && (
-           <div className="pagination-container text-center my-3">
-      <button
-      onClick={() => handlePageChange(1)}
-      disabled={!pagination.hasPrevPage}
-      className="btn btn-dark btn-sm me-1"
-      style={{ borderRadius: "4px" }}
-      aria-label="First Page"
-      >
-      First
-      </button>
-      <button
-      onClick={() => handlePageChange(pagination.currentPage - 1)}
-      disabled={!pagination.hasPrevPage}
-      className="btn btn-dark btn-sm me-1"
-      style={{ borderRadius: "4px" }}
-      aria-label="Previous Page"
-      >
-      Previous
-      </button>
-
-      {(() => {
-      const pageButtons = [];
-      const maxPagesToShow = 5;
-      let startPage, endPage;
-
-      if (pagination.totalPages <= maxPagesToShow) {
-        startPage = 1;
-        endPage = pagination.totalPages;
-      } else {
-        if (pagination.currentPage <= 3) {
-          startPage = 1;
-          endPage = maxPagesToShow;
-        } else if (pagination.currentPage >= pagination.totalPages - 2) {
-          startPage = pagination.totalPages - maxPagesToShow + 1;
-          endPage = pagination.totalPages;
-        } else {
-          startPage = pagination.currentPage - 2;
-          endPage = pagination.currentPage + 2;
-        }
-
-        startPage = Math.max(1, startPage);
-        endPage = Math.min(pagination.totalPages, endPage);
-       }
-
-      if (startPage > 1) {
-        pageButtons.push(
-          <span key="start-ellipsis" className="mx-2">
-            ...
-          </span>
-        );
-      }
-
-      
-      for (let i = startPage; i <= endPage; i++) {
-        pageButtons.push(
-          <button
-            key={i}
-            onClick={() => handlePageChange(i)}
-            className={`btn btn-sm me-1 ${
-              pagination.currentPage === i ? "btn-primary" : "btn-dark"
-            }`}
-            style={{ minWidth: "35px", borderRadius: "4px" }}
-            aria-label={`Go to page ${i}`}
-            aria-current={pagination.currentPage === i ? "page" : undefined}
-          >
-            {i}
-          </button>
-        );
-      }
-
-      
-      if (endPage < pagination.totalPages) {
-        pageButtons.push(
-          <span key="end-ellipsis" className="mx-2">
-            ...
-          </span>
-        );
-      }
-
-      return pageButtons;
-    })()}
-
-     <button
-      disabled={!pagination.hasNextPage}
-      onClick={() => handlePageChange(pagination.currentPage + 1)}
-      className="btn btn-dark btn-sm me-1"
-      >
-      Next
-    </button>
-    <button
-      onClick={() => handlePageChange(pagination.totalPages)}
-      disabled={!pagination.hasNextPage}
-      className="btn btn-dark btn-sm"
-      style={{ borderRadius: "4px" }}
-      aria-label="Last Page"
-     >
-      Last
-    </button>
-  </div>
-)}
-
               </div>
             </div>
           </div>

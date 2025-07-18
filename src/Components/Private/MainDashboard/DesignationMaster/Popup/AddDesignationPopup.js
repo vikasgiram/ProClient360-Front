@@ -182,6 +182,45 @@ const AddDesignationPopup = ({ handleAdd }) => {
                     required
                   />
                 </div>
+      <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090", justifyContent:'center'}}>
+        <div className="modal-dialog modal-lg" style={{ maxWidth: "90%", width: "1200px" }}>
+          <div className="modal-content add p-3" style={{ width: "100%" }}>
+            <form>
+              <div className="modal-header pt-0">
+                <h5 className="card-title fw-bold" id="exampleModalLongTitle">
+                  Create New Designation
+                </h5>
+                <button
+                  onClick={() => handleAdd()}
+                  type="button"
+                  className="close px-3"
+                  style={{ marginLeft: "auto" }}
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+
+                <div className="row modal_body_height">
+
+                  <div className="col-12">
+                    <div className="mb-3">
+                      <label htmlFor="name" className="form-label label_text">
+                        Designation Name <RequiredStar />
+                      </label>
+                      <input
+                        type="text"
+                        value={name}
+                        maxLength={50}
+                        placeholder="Enter a Designation Name...."
+                        onChange={(e) => setName(e.target.value)}
+                        className="form-control rounded-0"
+                        id="name"
+                        aria-describedby="roleNameHelp"
+                        required
+                      />
+                    </div>
+                  </div>
 
                 <div className="col-12 col-lg-6 mb-3">
                   <label className="form-label label_text">
