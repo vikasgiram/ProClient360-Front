@@ -155,37 +155,10 @@ const AddDesignationPopup = ({ handleAdd }) => {
 
   return (
     <>
-    <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
-      <div className="modal-dialog modal-lg">
-        <div className="modal-content p-3">
-          <form onSubmit={handleDesignationAdd}>
-            <div className="modal-header pt-0">
-              <h5 className="card-title fw-bold">Create New Designation</h5>
-              <button type="button" className="close px-3 " style={{ marginLeft: "auto" }} onClick={handleAdd}>
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="row modal_body_height">
-                <div className="col-12 mb-3">
-                  <label htmlFor="name" className="form-label label_text">
-                    Designation Name <RequiredStar />
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    maxLength={50}
-                    placeholder="Enter a Designation Name..."
-                    className="form-control rounded-0"
-                    required
-                  />
-                </div>
       <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090", justifyContent:'center'}}>
         <div className="modal-dialog modal-lg" style={{ maxWidth: "90%", width: "1200px" }}>
           <div className="modal-content add p-3" style={{ width: "100%" }}>
-            <form>
+            <form onSubmit={handleDesignationAdd}>
               <div className="modal-header pt-0">
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                   Create New Designation
@@ -247,14 +220,15 @@ const AddDesignationPopup = ({ handleAdd }) => {
 
                     <div className="table-responsive">
                       <table className="table table-striped table-class" id="table-id">
-
-                        <tr className="th_border" >
-                          <th >Form Level Details</th>
-                          <th >Add</th>
-                          <th >View</th>
-                          <th>Update</th>
-                          <th >Delete</th>
-                        </tr>
+                        <thead>
+                          <tr className="th_border" >
+                            <th >Form Level Details</th>
+                            <th >Add</th>
+                            <th >View</th>
+                            <th>Update</th>
+                            <th >Delete</th>
+                          </tr>
+                        </thead>
                         <tbody>
                           <tr>
                             <td>Employee</td>
@@ -884,9 +858,6 @@ const AddDesignationPopup = ({ handleAdd }) => {
                               </div>
                             </td>
                           </tr>
-
-
-
 
                         </tbody>
                       </table>

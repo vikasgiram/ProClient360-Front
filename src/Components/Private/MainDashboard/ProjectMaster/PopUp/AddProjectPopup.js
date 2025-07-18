@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
+import Select from "react-select";
 import { getCustomers } from "../../../../../hooks/useCustomer";
 import { createProject } from "../../../../../hooks/useProjects";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { getAddress } from "../../../../../hooks/usePincode";
 
+const PAGE_SIZE = 15;
+
 const AddProjectPopup = ({ handleAdd }) => {
 
-  const [custId, setCustId] = useState('');
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [purchaseOrderNo, setPurchaseOrderNo] = useState("");
@@ -21,7 +23,14 @@ const AddProjectPopup = ({ handleAdd }) => {
   const [category, setCategory] = useState('');
   const [POCopy, setPOCopy] = useState("");
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState("");
+
+  // Customer dropdown state
+  const [custOptions, setCustOptions] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [custPage, setCustPage] = useState(1);
+  const [custHasMore, setCustHasMore] = useState(true);
+  const [custLoading, setCustLoading] = useState(false);
+  const [custSearch, setCustSearch] = useState("");
 
   const [Address, setAddress] = useState({
     pincode: "",
@@ -44,30 +53,32 @@ const AddProjectPopup = ({ handleAdd }) => {
       fetchData();
   }, [Address.pincode]);
 
+  // Fetch customers with pagination & search
+  const loadCustomers = useCallback(async (page, search) => {
+    if (custLoading || !custHasMore) return;
+    setCustLoading(true);
+    const data = await getCustomers(page, PAGE_SIZE, search);
 
-
-  const [customers, setCustomers] = useState([]);
-
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (searchText.trim() !== "" && searchText.length > 2) {
-        fetchCustomers(searchText);
-      } else {
-        setCustomers([]); // empty when no input
-      }
-    }, 500); // debounce API call by 500ms
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchText]);
-
-  const fetchCustomers = async () => {
-    const data = await getCustomers(1, 15, searchText);
-    // console.log(data);
-    if (data) {
-      setCustomers(data.customers || []);
-      // console.log(employees,"data from useState");
+    if (data.error) {
+      toast.error(data.error || 'Failed to load customers');
+      setCustLoading(false);
+      return;
     }
-  };
+
+    const newOpts = (data.customers || []).map(c => ({ value: c._id, label: c.custName }));
+    setCustOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+    setCustHasMore(newOpts.length === PAGE_SIZE);
+    setCustLoading(false);
+    setCustPage(page + 1);
+  }, [custLoading, custHasMore]);
+
+  // Initial & search-triggered load (reset on search)
+  useEffect(() => {
+    setCustPage(1);
+    setCustHasMore(true);
+    setCustOptions([]);
+    loadCustomers(1, custSearch);
+  }, [custSearch]);
 
 
   const handleProjectAdd = async (event) => {
@@ -76,7 +87,7 @@ const AddProjectPopup = ({ handleAdd }) => {
     const formData = new FormData();
     formData.append('POCopy', POCopy);
 
-    if (!custId || !name || !purchaseOrderDate || !purchaseOrderNo || !purchaseOrderValue || !category || !startDate || !endDate || !advancePay || !payAgainstDelivery || !payAfterCompletion
+    if (!selectedCustomer?.value || !name || !purchaseOrderDate || !purchaseOrderNo || !purchaseOrderValue || !category || !startDate || !endDate || !advancePay || !payAgainstDelivery || !payAfterCompletion
       || !Address.pincode ||
       !Address.state ||
       !Address.city ||
@@ -117,7 +128,7 @@ const AddProjectPopup = ({ handleAdd }) => {
       return toast.error("Start date should be less than end date");
     }
 
-    formData.append('custId', custId);
+    formData.append('custId', selectedCustomer.value);
     formData.append('name', name);
     formData.append('purchaseOrderDate', purchaseOrderDate);
     formData.append('purchaseOrderNo', purchaseOrderNo);
@@ -187,30 +198,17 @@ const AddProjectPopup = ({ handleAdd }) => {
                       <label htmlFor="customerSearch" className="form-label label_text">
                         Customer Name <RequiredStar />
                       </label>
-                      {/* Search input */}
-                      <input
-                        type="text"
-                        className="form-control mb-2"
-                        id="customerSearch"
-                        maxLength={30}
-                        placeholder="Type to search customer..."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        required
+                      <Select
+                        options={custOptions}
+                        value={selectedCustomer}
+                        onChange={opt => setSelectedCustomer(opt)}
+                        onInputChange={val => setCustSearch(val)}
+                        onMenuScrollToBottom={() => loadCustomers(custPage, custSearch)}
+                        isLoading={custLoading}
+                        placeholder="Search and select customer..."
+                        noOptionsMessage={() => custLoading ? 'Loading...' : 'No customers'}
+                        closeMenuOnSelect={true}
                       />
-                      {/* Select dropdown */}
-                      <select
-                        className="form-select rounded-0"
-                        value={custId}
-                        onChange={(e) => setCustId(e.target.value)}
-                      >
-                        <option value=''>Select Client</option>
-                        {customers.map((cust) => (
-                          <option key={cust._id} value={cust._id}>
-                            {cust.custName}
-                          </option>
-                        ))}
-                      </select>
                     </div>
                   </div>
 

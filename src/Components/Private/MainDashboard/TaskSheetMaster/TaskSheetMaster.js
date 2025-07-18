@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Header } from "../Header/Header";
@@ -8,6 +8,7 @@ import { initTasks } from "../../../Helper/GanttChartHelper";
 import "gantt-task-react/dist/index.css";
 import { ViewSwitcher } from "../../../Helper/ViewSwitcher";
 import { default as ReactSelect } from "react-select";
+import Select from "react-select";
 import { useParams } from "react-router-dom";
 import { getTaskSheet, createTaskSheet, deleteTaskSheet } from "../../../../hooks/useTaskSheet";
 import toast from "react-hot-toast";
@@ -19,6 +20,8 @@ import { getAllActions } from "../../../../hooks/useAction";
 import { formatDateforEditAction } from "../../../../utils/formatDate";
 import { RequiredStar } from "../../RequiredStar/RequiredStar";
 
+
+const PAGE_SIZE = 10;
 
 export const TaskSheetMaster = () => {
   /**
@@ -49,8 +52,15 @@ export const TaskSheetMaster = () => {
   const [endDate, setEndDate] = useState("");
   const [remark, setRemark] = useState("");
   const [taskDropDown, setTaskDropDown] = useState([]);
-  const [departmentName, setDepartmentName] = useState([]);
-  const [department, setDepartment] = useState(null);
+  
+  // Department dropdown state
+  const [deptOptions, setDeptOptions] = useState([]);
+  const [selectedDept, setSelectedDept] = useState(null);
+  const [deptPage, setDeptPage] = useState(1);
+  const [deptHasMore, setDeptHasMore] = useState(true);
+  const [deptLoading, setDeptLoading] = useState(false);
+  const [deptSearch, setDeptSearch] = useState("");
+  
   const [projectName, setProjectName] = useState("");
   const [renderPage, setRenderPage] = useState(false);
   const [taskAddPopUpShow, setTaskAddPopUpShow] = useState(false);
@@ -58,6 +68,33 @@ export const TaskSheetMaster = () => {
   const [showAction, setShowAction] = useState(false);
 
 
+
+  // Fetch departments with pagination & search
+  const loadDepartments = useCallback(async (page, search) => {
+    if (deptLoading || !deptHasMore) return;
+    setDeptLoading(true);
+    const data = await getDepartment(page, PAGE_SIZE, search);
+
+    if (data.error) {
+      toast.error(data.error || 'Failed to load departments');
+      setDeptLoading(false);
+      return;
+    }
+
+    const newOpts = (data.departments || []).map(d => ({ value: d._id, label: d.name }));
+    setDeptOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+    setDeptHasMore(newOpts.length === PAGE_SIZE);
+    setDeptLoading(false);
+    setDeptPage(page + 1);
+  }, [deptLoading, deptHasMore]);
+
+  // Initial & search-triggered load (reset on search)
+  useEffect(() => {
+    setDeptPage(1);
+    setDeptHasMore(true);
+    setDeptOptions([]);
+    loadDepartments(1, deptSearch);
+  }, [deptSearch]);
 
   let columnWidth = 90;
   if (view === ViewMode.Month) {
@@ -171,26 +208,13 @@ export const TaskSheetMaster = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getDepartment();
-
-        if (data) {
-          setDepartmentName(data.departments || []);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
         // console.log("department Id:" + department);
-        if (!department) {
+        if (!selectedDept) {
+          setEmployeeOptions([]);
+          setEmployees([]);
           return;
         }
-        const data = await getEmployee(department);
+        const data = await getEmployee(selectedDept.value);
         if (data.success) {
           const formattedData = data.employee.map((employee) => ({
             value: employee._id,
@@ -206,7 +230,7 @@ export const TaskSheetMaster = () => {
       }
     };
     fetchData();
-  }, [department]);
+  }, [selectedDept]);
 
   const transformProjectToTasks = (projectData) => {
     // Extract project information from the task array
@@ -271,7 +295,7 @@ export const TaskSheetMaster = () => {
     setEndDate("");
     setRemark("");
     setEmployees([]);
-    setDepartment("");
+    setSelectedDept(null);
   };
 
   return (
@@ -324,7 +348,7 @@ export const TaskSheetMaster = () => {
                           <option value="">-- Select Task Name --</option>
                           {taskDropDown &&
                             taskDropDown.map((task) => (
-                              <option value={task._id}>{task.name}</option>
+                              <option key={task._id} value={task._id}>{task.name}</option>
                             ))}
                           <option value="AddNewTask" >-- Add New Task --</option>
                         </select>
@@ -388,23 +412,17 @@ export const TaskSheetMaster = () => {
                         >
                           Department <RequiredStar/>
                         </label>
-                        <select
-                          className="form-select rounded-0"
-                          aria-label="Default select example"
-                          onChange={(e) => setDepartment(e.target.value)}
-                          value={department}
-                          required
-                        >
-                          <option value="">-- Select Department Names --</option>
-
-                          {departmentName &&
-                            departmentName.map((department) => (
-                              <option value={department._id}>
-                                {department.name}
-                              </option>
-                            ))}
-
-                        </select>
+                        <Select
+                          options={deptOptions}
+                          value={selectedDept}
+                          onChange={opt => setSelectedDept(opt)}
+                          onInputChange={val => setDeptSearch(val)}
+                          onMenuScrollToBottom={() => loadDepartments(deptPage, deptSearch)}
+                          isLoading={deptLoading}
+                          placeholder="Search and select department..."
+                          noOptionsMessage={() => deptLoading ? 'Loading...' : 'No departments'}
+                          closeMenuOnSelect={true}
+                        />
                       </div>
                     </div>
 
