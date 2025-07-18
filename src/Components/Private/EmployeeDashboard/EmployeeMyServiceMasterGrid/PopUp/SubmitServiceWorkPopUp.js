@@ -370,7 +370,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                     </>
                   )}
 
-                  <div className="col-12 mt-2">
+                  {status !== "Stuck" && (<div className="col-12 mt-2">
                     <div className="">
                       <label htmlFor="action" className="form-label label_text">
                         Action {status !== "Stuck" && <RequiredStar />}
@@ -379,11 +379,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                         type="textarea"
                         className="form-control rounded-0"
                         id="action"
-                        placeholder={
-                          status === "Stuck" 
-                            ? "Enter Action.... / Optional...." 
-                            : "Enter Action...."
-                        }
+                        placeholder="Enter Action..."
                         maxLength={70}
                         value={action}
                         onChange={(e) => setAction(e.target.value)}
@@ -392,6 +388,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                       />
                     </div>
                   </div>
+                  )}
 
                   {status !== "Stuck" && (
                     <div className="row g-3 mt-2">

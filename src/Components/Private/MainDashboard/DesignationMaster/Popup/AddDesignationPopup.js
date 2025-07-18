@@ -1,54 +1,50 @@
-import { useState, useEffect } from "react";
-import { getDepartment } from "../../../../../hooks/useDepartment";
+import React, { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
+import Select from "react-select";
+import { getDepartment } from "../../../../../hooks/useDepartment";
 import { createDesignation } from "../../../../../hooks/useDesignation";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
+const PAGE_SIZE = 10;
+
 const AddDesignationPopup = ({ handleAdd }) => {
-
-  const [getDepartments, setGetDepartments] = useState([]);
-  const [department, setDepartment] = useState(null);
-  const [permissions, setPermissions] = useState([]);
   const [name, setName] = useState("");
+  const [permissions, setPermissions] = useState([]);
 
+  // Department dropdown state
+  const [deptOptions, setDeptOptions] = useState([]);
+  const [selectedDept, setSelectedDept] = useState(null);
+  const [deptPage, setDeptPage] = useState(1);
+  const [deptHasMore, setDeptHasMore] = useState(true);
+  const [deptLoading, setDeptLoading] = useState(false);
+  const [deptSearch, setDeptSearch] = useState("");
 
-  // const DependentCheckboxes = () => {
-  //   const [checkboxes, setCheckboxes] = useState({
-  //     parent: false,
-  //     childA: false,
-  //     childB: false,
-  //   });
+  // Fetch departments with pagination & search
+  const loadDepartments = useCallback(async (page, search) => {
+    if (deptLoading || !deptHasMore) return;
+    setDeptLoading(true);
+    const data = await getDepartment(page, PAGE_SIZE, search);
 
-  //   // Handler for Parent checkbox
-  //   const handleParentChange = () => {
-  //     const newParentValue = !checkboxes.parent;
-  //     setCheckboxes({
-  //       parent: newParentValue,
-  //       childA: newParentValue,
-  //       childB: newParentValue,
-  //     });
-  //   };
+    if (data.error) {
+      toast.error(data.error || 'Failed to load departments');
+      setDeptLoading(false);
+      return;
+    }
 
-  //   // Handler for individual child checkboxes
-  //   const handleChildChange = (childName) => {
-  //     setCheckboxes((prevState) => ({
-  //       ...prevState,
-  //       [childName]: !prevState[childName],
-  //     }));
-  //   };
-  // }
+    const newOpts = (data.departments || []).map(d => ({ value: d._id, label: d.name }));
+    setDeptOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+    setDeptHasMore(newOpts.length === PAGE_SIZE);
+    setDeptLoading(false);
+    setDeptPage(page + 1);
+  }, [deptLoading, deptHasMore]);
 
-
-  // Fetch departments
+  // Initial & search-triggered load (reset on search)
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getDepartment();
-      if (data) {
-        setGetDepartments(data.departments || []);
-      }
-    };
-    fetchData();
-  }, []);
+    setDeptPage(1);
+    setDeptHasMore(true);
+    setDeptOptions([]);
+    loadDepartments(1, deptSearch);
+  }, [deptSearch]);
 
 
 
@@ -135,93 +131,75 @@ const AddDesignationPopup = ({ handleAdd }) => {
 
 
 
-  // Handle role addition
+  // Handle form submission
   const handleDesignationAdd = async (e) => {
     e.preventDefault();
-    const designationData = {
+    const payload = {
       name,
-      department,
+      department: selectedDept?.value,
       permissions
     };
 
-    if (!name || !department || permissions.length === 0) {
+    if (!payload.name || !payload.department || permissions.length === 0) {
       return toast.error("Please fill all fields");
     }
-    // console.log(data);
-    
-    const data = await createDesignation(designationData);
-    if(data.success){
-      toast.success(data.message);
+
+    const res = await createDesignation(payload);
+    if (res.success) {
+      toast.success(res.message);
       handleAdd();
-    }else{
-      toast.error(data.error);
+    } else {
+      toast.error(res.error || 'Failed to create');
     }
   };
 
-
   return (
     <>
-      <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content p-3">
-            <form>
-              <div className="modal-header pt-0">
-                <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-                  Create New Designation
-                </h5>
-                <button
-                  onClick={() => handleAdd()}
-                  type="button"
-                  className="close px-3"
-                  style={{ marginLeft: "auto" }}
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div className="modal-body">
+    <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
+      <div className="modal-dialog modal-lg">
+        <div className="modal-content p-3">
+          <form onSubmit={handleDesignationAdd}>
+            <div className="modal-header pt-0">
+              <h5 className="card-title fw-bold">Create New Designation</h5>
+              <button type="button" className="close px-3 " style={{ marginLeft: "auto" }} onClick={handleAdd}>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="row modal_body_height">
+                <div className="col-12 mb-3">
+                  <label htmlFor="name" className="form-label label_text">
+                    Designation Name <RequiredStar />
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    maxLength={50}
+                    placeholder="Enter a Designation Name..."
+                    className="form-control rounded-0"
+                    required
+                  />
+                </div>
 
-                <div className="row modal_body_height">
-
-                  <div className="col-12">
-                    <div className="mb-3">
-                      <label htmlFor="name" className="form-label label_text">
-                        Designation Name <RequiredStar />
-                      </label>
-                      <input
-                        type="text"
-                        value={name}
-                        maxLength={50}
-                        placeholder="Enter a Designation Name...."
-                        onChange={(e) => setName(e.target.value)}
-                        className="form-control rounded-0"
-                        id="name"
-                        aria-describedby="roleNameHelp"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Department Selection */}
-                  <div className="col-12 col-lg-6 my-3">
-                    <div className="mb-3">
-                      <label htmlFor="Department" className="form-label label_text">
-                        Department <RequiredStar />
-                      </label>
-                      <select
-                        className="form-select rounded-0"
-                        onChange={(e) => setDepartment(e.target.value)}
-                        required
-                      >
-                        <option value="">Select Department</option>
-                        {getDepartments.map((department) => (
-                          <option key={department._id} value={department._id}>
-                            {department.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
+                <div className="col-12 col-lg-6 mb-3">
+                  <label className="form-label label_text">
+                    Department <RequiredStar />
+                  </label>
+                  <Select
+                    options={deptOptions}
+                    value={selectedDept}
+                    onChange={opt => setSelectedDept(opt)}
+                    onInputChange={val => setDeptSearch(val)}
+                    onMenuScrollToBottom={() => loadDepartments(deptPage, deptSearch)}
+                    isLoading={deptLoading}
+                    placeholder="Search and select department..."
+                    noOptionsMessage={() => deptLoading ? 'Loading...' : 'No departments'}
+                    // keep menu open on select if needed:
+                    closeMenuOnSelect={true}
+                  />
+                </div>
                   <div className="col-10 col-lg-12">
 
                     <label htmlFor="permissions" className="form-label label_text">
@@ -239,74 +217,6 @@ const AddDesignationPopup = ({ handleAdd }) => {
                           <th >Delete</th>
                         </tr>
                         <tbody>
-                          {/* <tr>
-                          <td>Employee</td>
-                          <td>
-                            <div>
-
-                              <label class="toggler-wrapper style-22">
-                                <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('createEmployee', e.target.checked) 
-                                }}
-                                
-                                />
-                                <div class="toggler-slider" >
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-
-                              
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('viewEmployee', e.target.checked)}
-                                }
-                                />
-                                 <div class="toggler-slider" >
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('updateEmployee', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td> <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('deleteEmployee', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                        </tr> */}
-
-
                           <tr>
                             <td>Employee</td>
                             <td>
@@ -435,256 +345,6 @@ const AddDesignationPopup = ({ handleAdd }) => {
                             </td>
                           </tr>
 
-                          {/* <tr>
-                          <td>Project</td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('createProject', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('viewProject', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('updateProject', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td> <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('deleteProject', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Task Name</td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('createTask', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('viewTask', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('updateTask', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td> <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('deleteTask', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <td>Task Sheet</td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('createTaskSheet', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('viewTaskSheet', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('updateTaskSheet', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td> <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('deleteTaskSheet', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <td>Department</td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('createDepartment', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('viewDepartment', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                          <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('updateDepartment', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td> <td>
-                            <div>
-                              <label class="toggler-wrapper style-22">
-                              <input type="checkbox"
-                                onChange={(e) =>{
-                                  setIsChecked(e.target.checked);
-                                  handlePermissionChange('deleteDepartment', e.target.checked)}
-                                }
-                                />
-                                <div class="toggler-slider">
-                                  <div class="toggler-knob"></div>
-                                </div>
-                              </label>
-                            </div>
-                          </td>
-                        </tr> */}
                           <tr>
                             <td>Project</td>
                             <td>
@@ -1218,7 +878,7 @@ const AddDesignationPopup = ({ handleAdd }) => {
           </div>
         </div>
       </div>
-    </>
+      </>
   );
 };
 
