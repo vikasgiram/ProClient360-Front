@@ -39,11 +39,11 @@ export const MarketingMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalServices: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: true,
     hasPrevPage: false,
   });
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const { data, loading, error, refetch } = useLeads(pagination.currentPage, itemsPerPage, filters);
   const {assignLead } = useAssignLead();

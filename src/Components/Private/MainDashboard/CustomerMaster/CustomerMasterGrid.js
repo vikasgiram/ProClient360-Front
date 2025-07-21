@@ -30,12 +30,12 @@ export const CustomerMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalCustomers: 0,
-    limit: 15,
+    limit: 20,
     hasNextPage: false,
     hasPrevPage: false,
   });
 
-  const itemsPerPage = 15;
+  const itemsPerPage = 20;
 
   const handlePageChange = (page) => {
     setCurrentPage(page);

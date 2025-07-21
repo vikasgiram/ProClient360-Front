@@ -4,7 +4,7 @@ import  toast  from 'react-hot-toast';
 const baseUrl = process.env.REACT_APP_API_URL;
 const url = baseUrl + "/api/department";
 
-const getDepartment = async (page = 1, limit = 10, search) => {
+const getDepartment = async (page = 1, limit = 20, search) => {
   try {
     const response = await axios.get(`${url}`, {
       params: {

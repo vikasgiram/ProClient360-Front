@@ -106,9 +106,17 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
 };
 
 const actionOptions = [
-  'Requirement Understanding', 'Site Visit', 'Online Demo', 'Proof of Concept (POC)',
-  'Documentation & Planning', 'quotation Submission', 'quotation Discussion',
-  'Follow-Up Call', 'Negotiation Call', 'Negotiation Meetings', 'Deal Status'
+    '1. Requirement Understanding',
+    '2. Site Visit',
+    '3. Online Demo',
+    '4. Proof of Concept (POC)',
+    '5. Documentation & Planning',
+    '6. Quotation Submission',
+    '7. Quotation Discussion',
+    '8. Follow-Up Call',
+    '9. Negotiation Call',
+    '10. Negotiation Meetings',
+    '11. Deal Status'
 ];
 
 const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {

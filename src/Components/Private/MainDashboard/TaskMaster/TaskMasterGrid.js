@@ -34,7 +34,7 @@ export const TaskMasterGrid = () => {
 
     const [tasks, setTasks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1); 
-    const itemsPerPage = 10; 
+    const itemsPerPage = 20; 
 
     const handlePageChange = (page) => {
         setCurrentPage(page);

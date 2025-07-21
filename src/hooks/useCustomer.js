@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 const baseUrl= process.env.REACT_APP_API_URL;
 const url=baseUrl+"/api/customer";
 
-const getCustomers = async (page=1, limit=10, search=null) => {
+const getCustomers = async (page=1, limit=20, search=null) => {
   try {
     const response = await axios.get(`${url}?q=${search}&page=${page}&limit=${limit}`,{
       headers: {

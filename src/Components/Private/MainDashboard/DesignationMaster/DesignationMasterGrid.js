@@ -43,12 +43,12 @@ export const DesignationMasterGird = () => {
     currentPage: 1,
     totalPages: 0,
     totalDesignations: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: false,
     hasPrevPage: false,
   });
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const toggle = () => {
     setIsOpen(!isopen);
