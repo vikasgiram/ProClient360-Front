@@ -8,7 +8,7 @@ const getDepartment = async (page = 1, limit = 10, search) => {
   try {
     const response = await axios.get(`${url}`, {
       params: {
-        page, limit, search
+        page, limit, q:search
       },
       headers: { 
         Authorization: `Bearer ${localStorage.getItem('token')}`

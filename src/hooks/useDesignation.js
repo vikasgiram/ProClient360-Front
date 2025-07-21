@@ -24,9 +24,12 @@ const getDesignation = async (department) => {
     toast.error(error.response.data.error);  }
 };
 
-const getAllDesignations = async (page, limit) => {
+const getAllDesignations = async (page, limit, department) => {
   try {
-    const response = await axios.get(`${url}/allDesignations?page=${page}&limit=${limit}`,{
+    const response = await axios.get(`${url}/allDesignations`,{
+      params: {
+        page, limit, department
+      },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
