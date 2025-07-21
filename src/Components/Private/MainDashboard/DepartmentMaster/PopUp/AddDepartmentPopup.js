@@ -17,7 +17,9 @@ const AddDepartmentPopup = ({ handleAdd }) => {
         if (!name) {
             return toast.error("Please Enter Department Name");
         }
+        toast.loading("Creating Customer.....")
         const data = await createDepartment(depData);
+        toast.dismiss()
         if(data.success){
             toast.success(data.message);
             handleAdd();

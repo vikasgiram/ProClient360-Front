@@ -86,10 +86,12 @@ export const AdminmasterGrid = () => {
         }
     };
 
+
     useEffect(() => {
-        if(searchText.length >2 || searchText.length === 0) 
-        fetchData(currentPage);
-    }, [currentPage, AddPopUpShow, deletePopUpShow, updatePopUpShow, searchText]);
+  if (searchText.length > 2 || searchText.length === 0) {
+    fetchData(currentPage);
+  }
+}, [currentPage, AddPopUpShow, deletePopUpShow, updatePopUpShow, searchText]);
 
     const handleAdd = () => {
         setAddPopUpShow(!AddPopUpShow);

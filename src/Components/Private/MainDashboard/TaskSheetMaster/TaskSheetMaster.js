@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Header } from "../Header/Header";
@@ -21,6 +22,10 @@ import { RequiredStar } from "../../RequiredStar/RequiredStar";
 
 
 export const TaskSheetMaster = () => {
+  
+  const navigate = useNavigate();
+
+
   /**
    * Component for displaying a Gantt chart of a project's tasks.
    *
@@ -296,6 +301,12 @@ export const TaskSheetMaster = () => {
                 }}
               >
                 <div className="content-wrapper ps-3 ps-md-0 pt-3">
+
+                <div className="col-12 col-lg-10 mx-auto mb-4 mb-lg-0 pt-4">
+                  <a href="#" onClick={() => navigate('/')}>
+                  <i className="fa-solid text-light fa-angle-left"></i>  Back to Project Mater</a>
+                </div>
+
                   <div className="row px-2 py-1   ">
                     <div className="col-12 col-lg-6">
                       <h5 className="text-white py-2">

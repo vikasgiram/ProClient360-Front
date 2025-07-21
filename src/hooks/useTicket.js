@@ -15,9 +15,9 @@ const getAllTickets = async (page, limit, search= null) => {
     // console.log("api actions",data);
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.message);  }
-};
+    console.error( error?.response?.data);
+    return error?.response?.data;
+  }};
 
 
 

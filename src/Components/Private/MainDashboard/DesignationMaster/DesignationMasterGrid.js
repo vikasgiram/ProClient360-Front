@@ -47,8 +47,10 @@ export const DesignationMasterGird = () => {
   };
 
   const handelDeleteClick = async () => {
+    toast.loading("Deleting Designation...")
     const data = await deleteDesignation(selectedId);
-    if (data) {
+    toast.dismiss()
+    if (data.success) {
       handelDeleteClosePopUpClick();
       return toast.success("Designation Deleted successfully...");
     }

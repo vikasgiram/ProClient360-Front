@@ -40,7 +40,9 @@ export const DepartmentMasterGrid = () => {
   };
 
   const handelDeleteClick = async () => {
+    toast.loading("Deleting Department.....")
     const data = await deleteDepartment(selectedId);
+    toast.dismiss()
     if (data) {
       handelDeleteClosePopUpClick();
       return toast.success("Department Deleted successfully...");

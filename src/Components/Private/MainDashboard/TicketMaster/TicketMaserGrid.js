@@ -17,7 +17,6 @@ export const TicketMasterGrid = () => {
 
   const { user } = useContext(UserContext);
 
-
   const [addServicePopUpShow, setAddServicePopUpShow] = useState(false);
   const [AddPopUpShow, setAddPopUpShow] = useState(false);
   const [deletePopUpShow, setdeletePopUpShow] = useState(false);
@@ -93,11 +92,11 @@ export const TicketMasterGrid = () => {
               limit: itemsPerPage,
               hasNextPage: false,
               hasPrevPage: false,
-            }
+            }           
           );
           if (pageToFetch !== pagination.currentPage) {
             setPagination((prev) => ({ ...prev, currentPage: pageToFetch }));
-          }
+          }         
         } else {
           setTickets([]);
           setPagination({
@@ -110,7 +109,7 @@ export const TicketMasterGrid = () => {
           });
         }
       } else {
-        toast.error(data?.error || "Failed to delete ticket.");
+        toast(data?.error || "Failed to delete ticket.");
       }
     } catch (error) {
       console.error("Error deleting ticket:", error);
@@ -131,7 +130,7 @@ export const TicketMasterGrid = () => {
           itemsPerPage,
           search
         );
-        if (data) {
+        if (data.success) {
           setTickets(data.tickets || []);
           setPagination(
             data.pagination || {
@@ -143,16 +142,9 @@ export const TicketMasterGrid = () => {
               hasPrevPage: false,
             }
           );
-        } else {
-          setTickets([]);
-          setPagination({
-            currentPage: 1,
-            totalPages: 0,
-            totalTickets: 0,
-            limit: itemsPerPage,
-            hasNextPage: false,
-            hasPrevPage: false,
-          });
+        }
+        else {
+          toast(data.message);
         }
       } catch (error) {
         console.error("Error fetching tickets:", error);
@@ -184,12 +176,18 @@ export const TicketMasterGrid = () => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   }, [searchText]);
 
-
   const handleSubmitSearch = (e) => {
     e.preventDefault();
     setSearch(searchText);
   }
 
+  // Function to determine the appropriate "no data" message
+  const getNoDataMessage = () => {
+    if (search && search.trim() !== "") {
+    return "No Tickets Found";
+    }
+  };
+  
 
   return (
     <>
@@ -322,7 +320,7 @@ export const TicketMasterGrid = () => {
                           ) : (
                             <tr>
                               <td colSpan="7" className="text-center">
-                                No Tickets Found
+                                {getNoDataMessage()}
                               </td>
                             </tr>
                           )}

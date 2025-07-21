@@ -29,10 +29,12 @@ const EmployeeUpdateFeedbackPopUp = ({ handleUpdate, selectedFeedback }) => {
     event.preventDefault();
     try {
       console.log(formData);
-      
+      toast.loading("Creating Feedback...")
       await createFeedback(formData);
       handleUpdate();
+      toast.dismiss()
     } catch (error) {
+      toast.dismiss()
       toast.error(error);
     }
   };

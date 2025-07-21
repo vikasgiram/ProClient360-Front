@@ -149,7 +149,9 @@ const AddDesignationPopup = ({ handleAdd }) => {
     }
     // console.log(data);
     
+    toast.loading("Creating Designation...")
     const data = await createDesignation(designationData);
+    toast.dismiss()
     if(data.success){
       toast.success(data.message);
       handleAdd();

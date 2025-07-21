@@ -21,7 +21,7 @@ function MainDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-  
+        
         const data = await getDashboardData();
         console.log(data);
         

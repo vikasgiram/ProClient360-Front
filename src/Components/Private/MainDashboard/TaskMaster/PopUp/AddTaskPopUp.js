@@ -19,8 +19,9 @@ const AddTaskPopUp = ({ handleAdd, cancelBtnCallBack }) => {
         if (!taskname) {
             return toast.error("Please Enter Task Name");
         }
+        toast.loading("Creating Task....")
         const data = await createTask(taskData);
-
+        toast.dismiss()
         if(data.success){
             toast.success(data.message);
             handleAdd();

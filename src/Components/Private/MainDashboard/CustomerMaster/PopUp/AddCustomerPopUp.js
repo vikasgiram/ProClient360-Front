@@ -84,8 +84,9 @@ const AddCustomerPopUp = ({ handleAdd }) => {
       && !validator.isMobilePhone(phoneNumber2, 'any', { strictMode: false })) {
       return toast.error("Please enter valid 10-digit phone numbers.");
     }
-
+    toast.loading("Creating Customer.....")
     const data = await createCustomer(customerData);
+    toast.dismiss()
     if(data.success){
       toast.success(data.message);
       handleAdd();

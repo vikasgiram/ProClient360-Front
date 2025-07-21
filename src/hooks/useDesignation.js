@@ -86,9 +86,8 @@ const deleteDesignation = async (Id) => {
     
     return data;
   } catch (error) {
-    console.error(error);
     console.log("error is :",error.response.data.error);
-    toast.error(error.response.data.error); 
+    return error.response.data; 
    }
 };
 

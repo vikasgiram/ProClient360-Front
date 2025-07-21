@@ -14,16 +14,12 @@ const getEmployees = async (page, limit, search= null) => {
 
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return alert(data.error);
-    }
-
     return data;
   } 
   catch (error) {
-    console.error(error);
-    toast.error(error?.response?.data?.error|| "Something Went Wrong!");  }
+    console.error( error?.response?.data);
+    return error?.response?.data;
+  }
 };
 
 const getEmployee = async (id) => {

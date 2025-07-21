@@ -13,9 +13,11 @@ const getCustomers = async (page=1, limit=10, search=null) => {
     });
     const data = response.data;
     return data;
-  } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+   } 
+    catch (error) {
+    console.error( error?.response?.data);
+    return error?.response?.data;
+  }
 };
 
 const createCustomer = async (customerData) => {

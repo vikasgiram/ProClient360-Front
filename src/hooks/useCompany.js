@@ -41,7 +41,9 @@ const getCompany = async (page, limit=10, search=null) => {
     return data;
   } catch (error) {
     console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error( error?.response?.data);
+    return error?.response?.data;
+  }
 };
 
 const createCompany = async (companyData) => {

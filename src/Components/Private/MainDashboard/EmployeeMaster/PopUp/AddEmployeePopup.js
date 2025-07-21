@@ -104,7 +104,10 @@ const AddEmployeePopup = ({ handleAdd }) => {
     if (!/^\d*\.?\d+$/.test(hourlyRate) || parseFloat(hourlyRate) <= 0) {
       return toast.error("Hourly Rate should be a number greater than 0");
     }
+
+    toast.loading("Creating Employee...")
     const data = await createEmployee(employeeData);
+    toast.dismiss()
     if (data.success) {
       toast.success(data.message);
       handleAdd();

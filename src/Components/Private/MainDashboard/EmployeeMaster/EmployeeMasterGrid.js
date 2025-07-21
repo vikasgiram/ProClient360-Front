@@ -56,11 +56,13 @@ export const EmployeeMasterGrid = () => {
   };
 
   const handelDeleteClick = async () => {
+    toast.loading("Deleting Employee...")
     const data = await deleteEmployee(selectedId);
+    toast.dismiss()
     if (data) {
       handelDeleteClosePopUpClick();
       return toast.success("Employee Deleted successfully...");
-    }
+  }
     toast.error(data.error);
   };
 
@@ -69,7 +71,7 @@ export const EmployeeMasterGrid = () => {
       try {
         setLoading(true);
         const data = await getEmployees(pagination.currentPage, itemsPerPage, search);
-        if (data) {
+        if (data.success) {
           setEmployees(data.employees || []);
           setPagination(data.pagination || {
             currentPage: 1,
@@ -79,6 +81,8 @@ export const EmployeeMasterGrid = () => {
             hasNextPage: false,
             hasPrevPage: false,
           });
+        }else{
+          toast(data.error);
         }
       } catch (error) {
         console.error("Error fetching employees:", error);

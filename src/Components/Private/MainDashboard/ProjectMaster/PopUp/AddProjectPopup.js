@@ -53,9 +53,9 @@ const AddProjectPopup = ({ handleAdd }) => {
       if (searchText.trim() !== "" && searchText.length > 2) {
         fetchCustomers(searchText);
       } else {
-        setCustomers([]); // empty when no input
+        setCustomers([]);
       }
-    }, 500); // debounce API call by 500ms
+    }, 500);
 
     return () => clearTimeout(delayDebounce);
   }, [searchText]);
@@ -132,7 +132,9 @@ const AddProjectPopup = ({ handleAdd }) => {
     formData.append('Address', JSON.stringify(Address));
     formData.append('POCopy', POCopy);
 
+    toast.loading("Creating Project...")
     const data = await createProject(formData);
+    toast.dismiss()
     if (data) {
       setLoading(false);
       toast.success(data.message);

@@ -49,7 +49,9 @@ const AddTicketPopup = ({ handleAdd }) => {
     if (/[a-zA-Z]/.test(contactNumber)) {
       return toast.error("Phone number should not contain alphabets");
     }
+    toast.loading("Creating Ticket...")
     const data = await createTicket(ticketData);
+    toast.dismiss()
     if (data.success){
       handleAdd();
       toast.success(data?.message);

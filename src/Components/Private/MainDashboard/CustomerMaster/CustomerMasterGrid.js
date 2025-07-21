@@ -6,6 +6,7 @@ import AddCustomerPopUp from "./PopUp/AddCustomerPopUp";
 import UpdateCustomerPopUp from "./PopUp/UpdateCustomerPopUp";
 import { getCustomers, deleteCustomer } from "../../../../hooks/useCustomer";
 import { UserContext } from "../../../../context/UserContext";
+import toast from "react-hot-toast";
 
 export const CustomerMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -65,7 +66,7 @@ export const CustomerMasterGrid = () => {
       try {
         setLoading(true);
         const data = await getCustomers(currentPage, itemsPerPage, search);
-        if (data) {
+        if (data.success) {
           setCustomers(data.customers || []);
           setPagination(data.pagination || {
             currentPage: 1,
@@ -75,6 +76,9 @@ export const CustomerMasterGrid = () => {
             hasNextPage: false,
             hasPrevPage: false,
           });
+        }
+        else {
+          toast(data.error)
         }
       } catch (error) {
         console.error("Error fetching customers:", error);

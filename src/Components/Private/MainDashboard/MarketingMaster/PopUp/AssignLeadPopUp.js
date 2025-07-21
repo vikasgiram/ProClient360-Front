@@ -161,31 +161,40 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
 
                 <div className="col-12 mt-2" style={{ minHeight: "180px" }}>
                   <div className={formData.feasibility === 'feasible' ? 'row' : 'd-none'}>
-                    <div className="col-12 col-lg-6 mt-2">
-                      <label htmlFor="department" className="form-label label_text">Assign to Department <RequiredStar /></label>
-                      <select id="department" className="form-select rounded-0" onChange={(e) => setSelectedDepartment(e.target.value)} value={selectedDepartment}>
-                        <option value="">-- Select Department --</option>
-                        {departments?.map((department) => (
-                          <option key={department._id} value={department._id}>
-                            {department.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-12 col-lg-6 mt-2">
-                      <label htmlFor="employee" className="form-label label_text">Assign to Employee <RequiredStar /></label>
-                      <ReactSelect
-                        id="employee"
-                        options={employeeOptions}
-                        isClearable
-                        isLoading={loading}
-                        onChange={(opt) => setAssignedEmployee(opt ? opt.value : null)}
-                        value={employeeOptions.find(opt => opt.value === assignedEmployee)}
-                        placeholder={loading ? "Loading employees..." : "-- Select Employee --"}
-                        noOptionsMessage={() => selectedDepartment ? "No employees found" : "Select a department first"}
-                      />
-                    </div>
-                    
+               <div className="col-12 col-lg-6 mt-2">
+               <label htmlFor="department" className="form-label label_text">Assign to Department <RequiredStar /></label>
+                <select 
+                id="department" 
+                className="form-select rounded-0" 
+                onChange={(e) => {
+                setSelectedDepartment(e.target.value);
+                setAssignedEmployee(null);
+                setEmployeeOptions([]);
+                }} 
+               value={selectedDepartment}
+               >
+               <option value="">-- Select Department --</option>
+              {departments?.map((department) => (
+              <option key={department._id} value={department._id}>
+              {department.name}
+              </option>
+               ))}
+             </select>
+            </div>
+           <div className="col-12 col-lg-6 mt-2">
+          <label htmlFor="employee" className="form-label label_text">Assign to Employee <RequiredStar /></label>
+         <ReactSelect
+            id="employee"
+            options={employeeOptions}
+            isClearable
+            isLoading={loading}
+            onChange={(opt) => setAssignedEmployee(opt ? opt.value : null)}
+            value={assignedEmployee ? employeeOptions.find(opt => opt.value === assignedEmployee) : null}
+            placeholder={loading ? "Loading employees..." : "-- Select Employee --"}
+            noOptionsMessage={() => selectedDepartment ? "No employees found" : "Select a department first"}
+            isDisabled={!selectedDepartment || loading}
+          />
+      </div>
                     <div className="col-12 mt-3">
                       <label htmlFor="feasibleReason" className="form-label fw-bold">Remarks</label>
                       <textarea

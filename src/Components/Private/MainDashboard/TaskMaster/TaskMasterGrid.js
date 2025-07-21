@@ -8,6 +8,7 @@ import UpdateTaskPopUp from "./PopUp/UpdateTaskPopUp";
 import { UserContext } from "../../../../context/UserContext";
 
 import { getTask, deleteTask } from "../../../../hooks/useTask";
+import toast from "react-hot-toast";
 
 
 export const TaskMasterGrid = () => {
@@ -58,7 +59,9 @@ export const TaskMasterGrid = () => {
     }
 
     const handelDeleteClick = async () => {
+        toast.loading("Deleting Task.....")
         const data = await deleteTask(selectedId);
+        toast.dismiss()
         if (data) {
             handelDeleteClosePopUpClick();
         }

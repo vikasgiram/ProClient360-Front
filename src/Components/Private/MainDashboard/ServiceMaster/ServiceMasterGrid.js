@@ -20,7 +20,6 @@ export const ServiceMasterGrid = () => {
 
   const { user } = useContext(UserContext);
 
-
   const [deletePopUpShow, setdeletePopUpShow] = useState(false);
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
 
@@ -67,7 +66,6 @@ export const ServiceMasterGrid = () => {
     setPagination((prev) => ({ ...prev, currentPage: page }));
   };
 
-
   const handleUpdate = (service = null) => {
     setSelectedService(service);
     setUpdatePopUpShow(!UpdatePopUpShow);
@@ -108,7 +106,6 @@ export const ServiceMasterGrid = () => {
     setDetailsServicePopUp(!detailsServicePopUp);
   };
   
-
   return (
     <>
       {(loading || updateLoading || deleteLoading) && (
@@ -134,7 +131,6 @@ export const ServiceMasterGrid = () => {
                   <div className="col-12 col-lg-4">
                     <h5 className="text-white py-2">Service Master</h5>
                   </div>
-
                 </div>
 
                 <ServiceDashboardCards
@@ -217,7 +213,6 @@ export const ServiceMasterGrid = () => {
                           </tr>
                         </thead>
                         <tbody className="broder my-4">
-                          
                           {data?.services?.length > 0 ? (
                             data.services.map((service, index) => (
                               <tr className="border my-4" key={service._id}>
@@ -227,8 +222,10 @@ export const ServiceMasterGrid = () => {
                                 <td className="align_left_td width_tdd">{service?.ticket?.product}</td>
                                 <td className="align_left_td width_tdd">{service.priority}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
-                                {service.allotTo.map((item, index) => item.name).join(', ')}
-                                <td className={'font-weight-bold'+ service.status === 'Completed' ? 'text-success' : service.status === 'Inprogress' ? 'text-warning' : 'text-danger'}>{service.status}</td>
+                                <td className='width_tdd'>{service.allotTo?.map((item, index) => item.name).join(', ')}</td>
+                                <td className="font-weight-bold"style={{ color:service.status === 'Completed' ? '#28a745': service.status === 'Inprogress' ? '#F8EFDE' : service.status === 'Pending' ? '#FFA726' : service.status === 'Stuck' ? '#E53935': '#000'}}>
+                                  {service.status}
+                                </td>
                                 <td>
                                   {user?.permissions?.includes('updateService') || user?.user === 'company' ?
                                     <span
@@ -266,7 +263,7 @@ export const ServiceMasterGrid = () => {
                   </div>
                 </div>
 
-                {/* Pagination */}
+                {/* Pagination Button */}
                 {!loading && pagination.totalPages > 1 && (
                   <div className="pagination-container text-center my-3">
                     <button
@@ -379,7 +376,6 @@ export const ServiceMasterGrid = () => {
         <ViewServicePopUp
           closePopUp={handelDetailsPopUpClick}
           selectedService={selectedService}
-          
         />
       )}
     </>

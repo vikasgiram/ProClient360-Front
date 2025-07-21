@@ -139,8 +139,10 @@ useEffect(() => {
     };
 
     // console.log(employees);
+    toast.loading("Create Service Action...")
     const data = await createServiceAction(actionData);
     // console.log(selectedService._id,data);
+    toast.dismiss()
     if (data.success) {
       toast.success(data.message);
       handleUpdate();
