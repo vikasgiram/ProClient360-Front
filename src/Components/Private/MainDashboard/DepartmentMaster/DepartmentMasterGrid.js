@@ -20,6 +20,19 @@ export const DepartmentMasterGrid = () => {
   const [selectedId, setSelecteId] = useState(null);
   const [selectedDep, setSelectedDep] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 0,
+    totalDepartments: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+
+  const itemsPerPage = 10;
 
   const toggle = () => {
     setIsOpen(!isopen);
@@ -27,6 +40,10 @@ export const DepartmentMasterGrid = () => {
 
   const handleAdd = () => {
     setAddPopUpShow(!AddPopUpShow);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const handleUpdate = (department = null) => {
@@ -45,6 +62,7 @@ export const DepartmentMasterGrid = () => {
     toast.dismiss()
     if (data) {
       handelDeleteClosePopUpClick();
+      setCurrentPage(1); // Reset to page 1 after deletion
       return toast.success("Department Deleted successfully...");
     }
     toast.error(data.error);
@@ -54,19 +72,52 @@ export const DepartmentMasterGrid = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getDepartment(); 
-        if (data) {
+        const data = await getDepartment(currentPage, itemsPerPage, search); 
+        if (data.success) {
           setDepartments(data.departments || []);
+          setPagination(data.pagination || {
+            currentPage: 1,
+            totalPages: 0,
+            totalDepartments: 0,
+            limit: itemsPerPage,
+            hasNextPage: false,
+            hasPrevPage: false,
+          });
+        } else {
+          toast.error(data.error || "Failed to fetch departments");
         }
       } catch (error) {
-        setLoading(false);
+        console.error("Error fetching departments:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [AddPopUpShow, deletePopUpShow, updatePopUpShow]);
+  }, [currentPage, AddPopUpShow, deletePopUpShow, updatePopUpShow, search]);
+
+  // Pagination button rendering logic
+  const maxPageButtons = 5; // Maximum number of page buttons to display
+  const halfMaxButtons = Math.floor(maxPageButtons / 2);
+  let startPage = Math.max(1, currentPage - halfMaxButtons);
+  let endPage = Math.min(pagination.totalPages, startPage + maxPageButtons - 1);
+
+  // Adjust startPage if endPage is at the totalPages
+  if (endPage - startPage + 1 < maxPageButtons) {
+    startPage = Math.max(1, endPage - maxPageButtons + 1);
+  }
+
+  const handleOnSearchSubmit = (event) => {
+    event.preventDefault();
+    console.log("Search text:", searchText);
+    setSearch(searchText);
+    setCurrentPage(1); // Reset to page 1 when searching
+  };
+
+  const pageButtons = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pageButtons.push(i);
+  }
 
   return (
     <>
@@ -92,13 +143,40 @@ export const DepartmentMasterGrid = () => {
                   <div className="col-12 col-lg-6">
                     <h5 className="text-white py-2">Department Master</h5>
                   </div>
-                    {user?.permission?.include('createDepartment') || user.user==='company'?(
-                  <div className="col-12 col-lg-6 ms-auto text-end ">
-                    <button onClick={handleAdd} type="button" className="btn adbtn btn-dark me-4">
-                      <i className="fa-solid fa-plus"></i> Add
-                    </button>
+                  <div className="col-12 col-lg-5 ms-auto">
+                    <div className="row">
+                      <div className="col-8 col-lg-6 ms-auto text-end">
+                        <div className="form">
+                          <i className="fa fa-search"></i>
+                          <form onSubmit={handleOnSearchSubmit}>
+                          <input
+                            type="text"
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            className="form-control form-input bg-transparant"
+                            placeholder="Search ..."
+                          />
+                          </form>
+                        </div>
+                      </div>
+                      {user?.permissions?.includes('createDepartment') || user.user==='company' ? ( 
+                      <div className="col- col-lg-2 ms-auto text-end me-4">
+                          <div className="col-12 col-lg-12  ms-auto text-end">
+                            <button
+                              onClick={handleAdd}
+                              type="button"
+                              className="btn adbtn btn-dark"
+                            >
+                              {" "}
+                              <i className="fa-solid fa-plus"></i> Add
+                            </button>
+                          </div>
+                      </div>
+                        ) : (
+                          null
+                        )}
+                    </div>
                   </div>
-                    ):null}
                 </div>
 
                 <div className="row bg-white p-2 m-1 border rounded">
@@ -116,15 +194,15 @@ export const DepartmentMasterGrid = () => {
                           {departments.length > 0 ? (
                             departments.map((department, index) => (
                               <tr className="border my-4" key={department._id}>
-                                <td>{index + 1}</td>
+                                <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                                 <td>{department.name}</td>  
                                 <td>
-                                  {user?.permission?.include('updateDepartment') || user.user==='company'?(
+                                  {user?.permissions?.includes('updateDepartment') || user.user==='company'?(
                                   <span onClick={() => handleUpdate(department)} className="update">
                                     <i className="fa-solid fa-pen text-success cursor-pointer me-3"></i>
                                   </span>
                                   ):null}
-                                  {user?.permission?.include('deleteDepartment') || user.user==='company'?(
+                                  {user?.permissions?.includes('deleteDepartment') || user.user==='company'?(
                                   <span onClick={() => handelDeleteClosePopUpClick(department._id)} className="delete">
                                     <i className="mx-1 fa-solid fa-trash text-danger cursor-pointer"></i>
                                   </span>
@@ -143,6 +221,52 @@ export const DepartmentMasterGrid = () => {
                       </table>
                     </div>
                   </div>
+                </div>
+
+                <div className="pagination-container text-center my-3 sm">
+                  <button
+                    disabled={!pagination.hasPrevPage}
+                    onClick={() => handlePageChange(1)}
+                    className="btn btn-dark btn-sm me-2"
+                  >
+                    First
+                  </button>
+                  <button
+                    disabled={!pagination.hasPrevPage}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="btn btn-dark btn-sm me-2"
+                  >
+                    Previous
+                  </button>
+                  {startPage > 1 && <span className="mx-2">...</span>}
+
+                  {pageButtons.map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`btn btn-sm me-1 ${ 
+                        pagination.currentPage === page ? "btn-primary" : "btn-dark"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  {endPage < pagination.totalPages && <span className="mx-2">...</span>}
+                  <button
+                    disabled={!pagination.hasNextPage}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="btn btn-dark btn-sm me-2"
+                  >
+                    Next
+                  </button>
+                  <button
+                    disabled={!pagination.hasNextPage}
+                    onClick={() => handlePageChange(pagination.totalPages)}
+                    className="btn btn-dark btn-sm"
+                  >
+                    Last
+                  </button>
                 </div>
               </div>
             </div>

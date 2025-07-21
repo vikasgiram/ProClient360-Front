@@ -1,7 +1,8 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import toast from 'react-hot-toast';
+import Select from "react-select";
 
 import AddDesignationPopup from "./Popup/AddDesignationPopup";
 import UpdateDesignationPopup from "./Popup/UpdateDesignationPopup";
@@ -11,6 +12,9 @@ import {
   deleteDesignation,
 } from "../../../../hooks/useDesignation";
 import { UserContext } from "../../../../context/UserContext";
+import { getDepartment } from "../../../../hooks/useDepartment";
+
+const PAGE_SIZE = 10;
 
 export const DesignationMasterGird = () => {
   const { user } = useContext(UserContext);
@@ -23,10 +27,28 @@ export const DesignationMasterGird = () => {
   const [selectedId, setSelecteId] = useState(null);
   const [selectedDes, setSelectedDes] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Department filter dropdown state
+  const [deptFilterOptions, setDeptFilterOptions] = useState([]);
+  const [selectedDeptFilter, setSelectedDeptFilter] = useState(null);
+  const [deptFilterPage, setDeptFilterPage] = useState(1);
+  const [deptFilterHasMore, setDeptFilterHasMore] = useState(true);
+  const [deptFilterLoading, setDeptFilterLoading] = useState(false);
+  const [deptFilterSearch, setDeptFilterSearch] = useState("");
+  
   const [designations, setDesignation] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filteredData, setFilteredData] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 0,
+    totalDesignations: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+
+  const itemsPerPage = 10;
 
   const toggle = () => {
     setIsOpen(!isopen);
@@ -34,6 +56,10 @@ export const DesignationMasterGird = () => {
 
   const handleAdd = () => {
     setAddPopUpShow(!AddPopUpShow);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   const handelDeleteClosePopUpClick = (id) => {
@@ -46,45 +72,63 @@ export const DesignationMasterGird = () => {
     setUpdatePopUpShow(!UpdatePopUpShow);
   };
 
+  // Fetch departments with pagination & search for filter dropdown
+  const loadDepartmentsFilter = useCallback(async (page, search) => {
+    if (deptFilterLoading || !deptFilterHasMore) return;
+    setDeptFilterLoading(true);
+    const data = await getDepartment(page, PAGE_SIZE, search);
+
+    if (data.error) {
+      toast(data.error || 'Failed to load departments');
+      setDeptFilterLoading(false);
+      return;
+    }
+
+    const newOpts = (data.departments || []).map(d => ({ value: d.name, label: d.name }));
+    setDeptFilterOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+    setDeptFilterHasMore(newOpts.length === PAGE_SIZE);
+    setDeptFilterLoading(false);
+    setDeptFilterPage(page + 1);
+  }, [deptFilterLoading, deptFilterHasMore]);
+
+  // Initial & search-triggered load for department filter (reset on search)
+  useEffect(() => {
+    setDeptFilterPage(1);
+    setDeptFilterHasMore(true);
+    setDeptFilterOptions([]);
+    loadDepartmentsFilter(1, deptFilterSearch);
+  }, [deptFilterSearch]);
+
   const handelDeleteClick = async () => {
     toast.loading("Deleting Designation...")
     const data = await deleteDesignation(selectedId);
     toast.dismiss()
     if (data.success) {
       handelDeleteClosePopUpClick();
+      setCurrentPage(1); // Reset to page 1 after deletion
       return toast.success("Designation Deleted successfully...");
     }
     toast.error(data.error);
   };
 
-  const handleChange = (value) => {
-    setSelectedDepartment(value);
-    if (value) {
-      const filtered = designations.filter((designation) => designation.department._id === value);
-      setFilteredData(filtered);
-    } else {
-      setFilteredData(designations);
-    }
-  };
-
-  const uniqueDepartments = designations.reduce((acc, designation) => {
-    const departmentId = designation.department._id;
-    if (!acc.some((dept) => dept._id === departmentId)) {
-      acc.push(designation.department);
-    }
-    return acc;
-  }, []);
-
-  const displayData = selectedDepartment ? filteredData : designations;
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getAllDesignations(); // Modified to fetch all without pagination
-        if (data) {
+        const data = await getAllDesignations(currentPage, itemsPerPage, selectedDeptFilter?.value || "");
+        if (data.success) {
           setDesignation(data.designations || []);
-          setFilteredData(data.designations || []);
+          setPagination(data.pagination || {
+            currentPage: 1,
+            totalPages: 0,
+            totalDesignations: 0,
+            limit: itemsPerPage,
+            hasNextPage: false,
+            hasPrevPage: false,
+          });
+        }
+        else {
+          toast(data.error || "Failed to fetch designations");
         }
       } catch (error) {
         console.error("Error fetching designations:", error);
@@ -93,7 +137,24 @@ export const DesignationMasterGird = () => {
       }
     };
     fetchData();
-  }, [AddPopUpShow, deletePopUpShow, UpdatePopUpShow]);
+  }, [currentPage, AddPopUpShow, deletePopUpShow, UpdatePopUpShow, selectedDeptFilter]);    
+
+  // Pagination button rendering logic
+  const maxPageButtons = 5; // Maximum number of page buttons to display
+  const halfMaxButtons = Math.floor(maxPageButtons / 2);
+  let startPage = Math.max(1, currentPage - halfMaxButtons);
+  let endPage = Math.min(pagination.totalPages, startPage + maxPageButtons - 1);
+
+  // Adjust startPage if endPage is at the totalPages
+   if (endPage - startPage + 1 < maxPageButtons) {
+    startPage = Math.max(1, endPage - maxPageButtons + 1);
+  }
+
+  
+  const pageButtons = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pageButtons.push(i);
+  }
 
   return (
     <>
@@ -119,20 +180,48 @@ export const DesignationMasterGird = () => {
                   <div className="col-12 col-lg-5 ms-auto text-end">
                     <div className="row">
                       <div className="col-4 col-lg-6 ms-auto">
-                        <select 
-                          className="form-select bg_edit" 
-                          onChange={(e) => handleChange(e.target.value)} 
-                          value={selectedDepartment}
-                        >
-                          <option value="">Select Department</option>
-                          {uniqueDepartments.map((department) => (
-                            <option key={department._id} value={department._id}>
-                              {department.name}
-                            </option>
-                          ))}
-                        </select>
+                        <Select
+                          options={deptFilterOptions}
+                          value={selectedDeptFilter}
+                          onChange={opt => {
+                            setSelectedDeptFilter(opt);
+                            setCurrentPage(1); // Reset to page 1 when department changes
+                          }}
+                          onInputChange={val => setDeptFilterSearch(val)}
+                          onMenuScrollToBottom={() => loadDepartmentsFilter(deptFilterPage, deptFilterSearch)}
+                          isLoading={deptFilterLoading}
+                          placeholder="Filter by department..."
+                          noOptionsMessage={() => deptFilterLoading ? 'Loading...' : 'No departments'}
+                          closeMenuOnSelect={true}
+                          isClearable={true}
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              backgroundColor: '#333',
+                              borderColor: '#555',
+                              color: '#fff',
+                            }),
+                            menu: (provided) => ({
+                              ...provided,
+                              backgroundColor: '#333',
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isFocused ? '#555' : '#333',
+                              color: '#fff',
+                            }),
+                            singleValue: (provided) => ({
+                              ...provided,
+                              color: '#fff',
+                            }),
+                            placeholder: (provided) => ({
+                              ...provided,
+                              color: '#aaa',
+                            }),
+                          }}
+                        />
                       </div>
-                      {user?.permission?.include("createDesignation") || user.user==='company'?(
+                      {user?.permissions?.includes("createDesignation") || user.user==='company'?(
                         <div className="col-8 col-lg-2 ms-auto me-4">
                           <button onClick={handleAdd} type="button" className="btn adbtn btn-dark">
                             <i className="fa-solid fa-plus"></i> Add
@@ -156,19 +245,19 @@ export const DesignationMasterGird = () => {
                           </tr>
                         </thead>
                         <tbody className="broder my-4">
-                          {displayData.length > 0 ? (
-                            displayData.map((designation, index) => (
+                          {designations.length > 0 ? (
+                            designations.map((designation, index) => (
                               <tr className="border my-4" key={designation._id}>
-                                <td>{index + 1}</td>
+                                <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                                 <td>{designation.department.name}</td>
                                 <td>{designation.name}</td>
                                 <td>
-                                  {user?.permission?.include("updateDesignation") || user.user==='company'?(
+                                  {user?.permissions?.includes("updateDesignation") || user.user==='company'?(
                                     <span onClick={() => handleUpdate(designation)} className="update">
                                       <i className="fa-solid fa-pen text-success cursor-pointer me-3"></i>
                                     </span>
                                   ):null}
-                                  {user?.permission?.include("deleteDesignation") || user.user==='company'?(
+                                  {user?.permissions?.includes("deleteDesignation") || user.user==='company'?(
                                     <span onClick={() => handelDeleteClosePopUpClick(designation._id)} className="delete">
                                       <i className="mx-1 fa-solid fa-trash text-danger cursor-pointer"></i>
                                     </span>
@@ -188,6 +277,67 @@ export const DesignationMasterGird = () => {
                     </div>
                   </div>
                 </div>
+                <div className="pagination-container text-center my-3 sm">
+                  <button
+                    disabled={!pagination.hasPrevPage}
+                    onClick={() => handlePageChange(1)}
+                    className="btn btn-dark btn-sm me-2"
+                  >
+                    First
+                  </button>
+                  <button
+                    disabled={!pagination.hasPrevPage}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="btn btn-dark btn-sm me-2"
+                  >
+                    Previous
+                  </button>
+                  {startPage > 1 && <span className="mx-2">...</span>}
+
+
+                  {/* {pageButtons.map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`btn btn-dark btn-sm me-2 ${
+                        currentPage === page ? "active" : ""
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))} */}
+
+
+                  {pageButtons.map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`btn btn-sm me-1 ${ 
+                        pagination.currentPage === page ? "btn-primary" : "btn-dark"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+
+                  {endPage < pagination.totalPages && <span className="mx-2">...</span>}
+                  <button
+                    disabled={!pagination.hasNextPage}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="btn btn-dark btn-sm me-2"
+                  >
+                    Next
+                  </button>
+                  <button
+                    disabled={!pagination.hasNextPage}
+                    onClick={() => handlePageChange(pagination.totalPages)}
+                    className="btn btn-dark btn-sm"
+                  >
+                    Last
+                  </button>
+                </div>
+
               </div>
             </div>
           </div>

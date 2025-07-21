@@ -3,10 +3,9 @@ import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import toast from 'react-hot-toast';
 import AddLeadMaster from "./PopUp/AddLeadMaster";
-import { formatDate, formatDateforTaskUpdate } from "../../../../utils/formatDate";
+import {  formatDateforTaskUpdate } from "../../../../utils/formatDate";
 import SalesDashboardCards from './SalesDashboardCards';
 import { UserContext } from "../../../../context/UserContext";
-import useLeads from '../../../../hooks/leads/useLeads';
 
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
@@ -164,6 +163,7 @@ export const SalesMasterGrid = () => {
     }
   };
 
+
   return (
     <>
     {loading && (
@@ -189,13 +189,13 @@ export const SalesMasterGrid = () => {
                         <div className="col-12 col-lg-4">
                             <h5 className="text-white py-2">Sales Master</h5>
                         </div>
-                            {user?.permissions?.includes("addLeadMaster") || user?.user === 'company' ? (
+                      {user?.permissions?.includes("createLead") || user?.user === 'company' ? (
                         <div className="col- col-lg-2 ms-auto text-end me-5">
                             <button onClick={handleOpenAddModal} type="button" className="btn adbtn btn-dark">
                                 <i className="fa-solid fa-plus"></i> Add
                             </button>
                         </div>
-                            ) : null}
+                      ) : null}
                     </div>
 
                     <SalesDashboardCards

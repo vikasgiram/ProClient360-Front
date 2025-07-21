@@ -379,46 +379,25 @@ useEffect(() => {
                     </div>
                   )}
 
-                  {status !== "Stuck" ? (
-                    <div className="col-12 mt-2">
-                      <div className="">
-                        <label for="action" className="form-label label_text">
-                          Action <RequiredStar />
-                        </label>
-                        <input
-                          type="textarea"
-                          className="form-control rounded-0"
-                          id="action"
-                          placeholder="Enter Action...."
-                          value={action}
-                          onChange={(e) => setAction(e.target.value)}
-                          aria-describedby="nameHelp"
-                          required
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-
-                  {/* {status !== "Stuck" ? (
+                  {status !== "Stuck" && (
                     <>
-                      <div className="col-9 col-lg-6 mt-2">
-                        <label
-                          for="StartTime"
-                          className="form-label label_text"
-                        >
-                          Start Time  <RequiredStar />
-                        </label>
-                        <input
-                          className="form-control rounded-0"
-                          id="StartTime"
-                          type="datetime-local"
-                          onChange={(e) => setStartTime(e.target.value)}
-                          value={startTime}
-                          aria-describedby="statusHelp"
-                          required
-                        />
+                      <div className="col-12 mt-2">
+                        <div className="">
+                          <label htmlFor="action" className="form-label label_text">
+                            Action {status !== "Stuck" && <RequiredStar />}
+                          </label>
+                          <input
+                            type="textarea"
+                            className="form-control rounded-0"
+                            id="action"
+                            placeholder="Enter Action..."
+                            maxLength={70}
+                            value={action}
+                            onChange={(e) => setAction(e.target.value)}
+                            aria-describedby="nameHelp"
+                            required={status !== "Stuck"}
+                          />
+                        </div>
                       </div>
 
                       <div className="col-9 col-lg-6 mt-2">
@@ -436,9 +415,7 @@ useEffect(() => {
                         />
                       </div>
                     </>
-                  ) : (
-                    ""
-                  )} */}
+                  )}
 
                   {status !== "Stuck" ? (
                     <div className="row g-3 mt-2">

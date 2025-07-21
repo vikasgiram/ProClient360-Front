@@ -56,15 +56,9 @@ const createService = async (serviceData) => {
     });
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Service Assigned..");
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error(error.response.data.error);  }
 };
 
 const updateService = async (id, updatedData) => {

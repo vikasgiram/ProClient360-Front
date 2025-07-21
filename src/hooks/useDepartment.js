@@ -4,47 +4,24 @@ import  toast  from 'react-hot-toast';
 const baseUrl = process.env.REACT_APP_API_URL;
 const url = baseUrl + "/api/department";
 
-const getDepartment = async (page = 1, limit = 40) => {
+const getDepartment = async (page = 1, limit = 10, search) => {
   try {
-    const response = await axios.get(`${url}?page=${page}&limit=${limit}`, {
-      headers: {
+    const response = await axios.get(`${url}`, {
+      params: {
+        page, limit, q:search
+      },
+      headers: { 
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
-    
-  
-    if (response.status !== 200) {
-      toast.error("Failed to fetch departments");
-      return { success: false, error: "Failed to fetch departments" };
-    }
-    
+
     const data = response.data;
     
-    
-    if (!data) {
-      console.error("Empty response from server");
-      return { success: false, error: "Empty response from server" };
-    }
-    
-  
-    return { 
-      success: true, 
-      departments: data.departments || [], 
-      pagination: data.pagination || {
-        currentPage: page,
-        totalPages: 0,
-        totalDepartments: 0,
-        limit: limit,
-        hasNextPage: false,
-        hasPrevPage: false
-      }
-    };
+    return data;
     
   } catch (error) {
-    console.error("Error fetching departments:", error);
-    const errorMessage = error.response?.data?.error || "Failed to connect to server";
-    toast.error(errorMessage);
-    return { success: false, error: errorMessage };
+    console.error("Error fetching departments:", error.response?.data);
+    return error.response.data;
   }
 };
 

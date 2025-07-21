@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import validator from "validator";
+import Select from "react-select";
 import { getDepartment } from "../../../../../hooks/useDepartment";
 import { createEmployee } from "../../../../../hooks/useEmployees";
 import toast from "react-hot-toast";
 import { getDesignation } from "../../../../../hooks/useDesignation";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
+
+const PAGE_SIZE = 10;
 
 const EyeIcon = ({ isOpen }) => (
   <span style={{ cursor: 'pointer', userSelect: 'none', padding: '0 5px' }}>
@@ -20,9 +23,14 @@ const AddEmployeePopup = ({ handleAdd }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // Department dropdown state
+  const [deptOptions, setDeptOptions] = useState([]);
+  const [selectedDept, setSelectedDept] = useState(null);
+  const [deptPage, setDeptPage] = useState(1);
+  const [deptHasMore, setDeptHasMore] = useState(true);
+  const [deptLoading, setDeptLoading] = useState(false);
+  const [deptSearch, setDeptSearch] = useState("");
 
-  const [getDepartments, setGetDepartments] = useState([]);
-  const [department, setDepartment] = useState(null);
   const [designations, setDesignations] = useState([]);
 
   const [name, setName] = useState("");
@@ -35,24 +43,38 @@ const AddEmployeePopup = ({ handleAdd }) => {
   const [gender, setGender] = useState('');
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getDepartment();
-      // console.log(data);
-      if (data) {
-        setGetDepartments(data.departments || []);
-        // console.log(employees,"data from useState");
-      }
-    };
+  // Fetch departments with pagination & search
+  const loadDepartments = useCallback(async (page, search) => {
+    if (deptLoading || !deptHasMore) return;
+    setDeptLoading(true);
+    const data = await getDepartment(page, PAGE_SIZE, search);
 
-    fetchData();
-  }, []);
+    if (data.error) {
+      toast.error(data.error || 'Failed to load departments');
+      setDeptLoading(false);
+      return;
+    }
+
+    const newOpts = (data.departments || []).map(d => ({ value: d._id, label: d.name }));
+    setDeptOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+    setDeptHasMore(newOpts.length === PAGE_SIZE);
+    setDeptLoading(false);
+    setDeptPage(page + 1);
+  }, [deptLoading, deptHasMore]);
+
+  // Initial & search-triggered load (reset on search)
+  useEffect(() => {
+    setDeptPage(1);
+    setDeptHasMore(true);
+    setDeptOptions([]);
+    loadDepartments(1, deptSearch);
+  }, [deptSearch]);
 
   useEffect(() => {
-    if (department) {
+    if (selectedDept) {
       const fetchDesignations = async () => {
 
-        const data = await getDesignation(department);
+        const data = await getDesignation(selectedDept.value);
 
         if (data) {
           setDesignations(data.designations || []);
@@ -61,8 +83,12 @@ const AddEmployeePopup = ({ handleAdd }) => {
       };
 
       fetchDesignations();
+    } else {
+      // Clear designations when no department is selected
+      setDesignations([]);
+      setDesignation('');
     }
-  }, [department]);
+  }, [selectedDept]);
 
   const handleEmployeeAdd = async (event) => {
     event.preventDefault();
@@ -73,11 +99,11 @@ const AddEmployeePopup = ({ handleAdd }) => {
       hourlyRate,
       password,
       confirmPassword,
-      department,
+      department: selectedDept?.value,
       designation,
       gender
     };
-    if (!name || !mobileNo || !email || !hourlyRate || !password || !confirmPassword || !department || !designation || !gender) {
+    if (!name || !mobileNo || !email || !hourlyRate || !password || !confirmPassword || !selectedDept?.value || !designation || !gender) {
       return toast.error("Please fill all fields");
     }
     if (password !== confirmPassword) {
@@ -259,21 +285,17 @@ const AddEmployeePopup = ({ handleAdd }) => {
                       >
                         Department <RequiredStar />
                       </label>
-                      <select
-                        className="form-select rounded-0"
-                        id="Department"
-                        aria-label="Default select example"
-                        onChange={(e) => setDepartment(e.target.value)}
-                        required
-                      >
-                        <option value="">Select Department</option>
-                        {getDepartments &&
-                          getDepartments.map((department) => (
-                            <option value={department._id}>
-                              {department.name}
-                            </option>
-                          ))}
-                      </select>{" "}
+                      <Select
+                        options={deptOptions}
+                        value={selectedDept}
+                        onChange={opt => setSelectedDept(opt)}
+                        onInputChange={val => setDeptSearch(val)}
+                        onMenuScrollToBottom={() => loadDepartments(deptPage, deptSearch)}
+                        isLoading={deptLoading}
+                        placeholder="Search and select department..."
+                        noOptionsMessage={() => deptLoading ? 'Loading...' : 'No departments'}
+                        closeMenuOnSelect={true}
+                      />
                     </div>
                   </div>
 
@@ -289,13 +311,14 @@ const AddEmployeePopup = ({ handleAdd }) => {
                         className="form-select rounded-0"
                         aria-label="Default select example"
                         id="Designation"
+                        value={designation}
                         onChange={(e) => setDesignation(e.target.value)} //S
                         required
                       >
                         <option>Select Role</option>
                         {designations &&
                           designations.map((designation) => (
-                            <option value={designation._id}>{designation.name}</option>
+                            <option key={designation._id} value={designation._id}>{designation.name}</option>
                           ))}
                       </select>
                     </div>
