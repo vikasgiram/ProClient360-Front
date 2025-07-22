@@ -48,9 +48,14 @@ const getFcmToken = async () => {
     try {
       const data = await loginUser(username, password, fcmToken);
       // console.log(username,password);
-      console.log(data,"login data");
+      console.log("Login data:", data);
       setUser(data);
-      if (data.user === "employee" || data.user === "company") {
+      if(data.newUser===true){
+        toast.success("Please complete your profile to continue.");
+        navigation("/ChangePassword");
+        console.log("New user, redirecting to ChangePassword");
+      }
+      else if (data.user === "employee" || data.user === "company") {
         navigation("/MainDashboard");
       } else if (data.user === "admin") {
         navigation("/AdminMainDashboard");

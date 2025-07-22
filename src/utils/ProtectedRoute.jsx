@@ -12,14 +12,14 @@ const ProtectedRoute = ({Component}) => {
   }
 
   switch (user.user) {
-        case "company":
-        return <Navigate to="/MainDashboard" />;
-        case "admin":
-        return <Navigate to="/AdminMainDashboard" />;
-        case "employee":
-        return <Navigate to="/EmployeeMainDashboard" />;
-        default:
-        return <Component/>
+      case "company":
+      return <Navigate to="/MainDashboard" />;
+      case "admin":
+      return <Navigate to="/AdminMainDashboard" />;
+      case "employee":
+      return <Navigate to="/EmployeeMainDashboard" />;
+      default:
+      return <Component/>
     };
 
 }

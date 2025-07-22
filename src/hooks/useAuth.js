@@ -71,7 +71,7 @@ export const changePassword = async (oldPass, newPass, confirmPass) => {
   try {
       // Check if new password and confirm password match
       if (newPass !== confirmPass) {
-          return toast.error("New Password and confirm password don't match...");
+          return toast.error("New Password and confirm password dosen't match...");
       }
 
       const token = localStorage.getItem('token'); // Retrieve the token from local storage
@@ -86,16 +86,10 @@ export const changePassword = async (oldPass, newPass, confirmPass) => {
           }
       );
 
-      // Check for errors in the response
-      if (res.data.error) {
-          console.log(res.data.error);
-          return res.data;
-      }
-
-      return res.data; // Return the response data if successful
+      return res.data;
   } catch (error) {
       console.log(error.response?.data?.error || error.message);
-      toast.error(error.response?.data?.error || "An error occurred while changing the password.");
+      return error?.response?.data;
   }
 };
 

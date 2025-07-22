@@ -1,8 +1,9 @@
-import  { useState } from "react";
+import  { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "././login.css";
 import toast from "react-hot-toast";
 import { changePassword } from "../../hooks/useAuth";
+import { UserContext } from "../../context/UserContext";
 // import { useAuthDispatch, useAuthState } from "../../../helper/Context/context";
 
 
@@ -18,11 +19,15 @@ export const ChangePassword = () => {
     const [confirmPassword, setConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const { setUser } = useContext(UserContext);
 
     const handelChangePasword = async (e) => {
         e.preventDefault();
         if (newPass === '' || oldPass === '') {
             return toast.error("Required Field")
+        }
+        if(newPass === oldPass){
+            return toast.error("New Password and Old Password should not be same...");
         }
         if (newPass !== confirmPass) {
             return toast.error("New Password and Confirm Password doesn't match...");
@@ -33,9 +38,14 @@ export const ChangePassword = () => {
             if (data.error) {
                 return toast.error(data.error);
             }
-            navigation('/');
+            console.log("Password changed successfully, redirecting to login...");
             setLoading(true);
+            setUser(null);
+            navigation('/');
             toast.success(data.message);
+            console.log('Clearing local storage...');
+            localStorage.removeItem('token');
+            localStorage.removeItem('fcmToken');
         } catch (error) {
             console.error(error);
         }
@@ -59,16 +69,14 @@ export const ChangePassword = () => {
                             <div className="col-lg-9 mx-auto pt-4">
 
                                 <form>
-
-
                                     <div className="input-group mb-3">
                                         <span className="input-group-text">
                                             <i className="fa-solid fa-key"></i>
                                         </span>
                                         <input
                                             placeholder="Old Password"
-                                            id="password"
-                                            name="password"
+                                            id="old-password"
+                                            name="old-password"
                                             type={oldPassword ? "text" : "password"}
                                             className="form-control"
                                             autoComplete="new-Password"
@@ -97,8 +105,8 @@ export const ChangePassword = () => {
                                         </span>
                                         <input
                                             placeholder="New Password"
-                                            id="password"
-                                            name="password"
+                                            id="new-password"
+                                            name="new-password"
                                             type={newPassword ? "text" : "password"}
                                             className="form-control"
                                             autoComplete="new-Password"
@@ -130,8 +138,8 @@ export const ChangePassword = () => {
                                         </span>
                                         <input
                                             placeholder="confirm Password"
-                                            id="password"
-                                            name="password"
+                                            id="confirm-password"
+                                            name="confirm-password"
                                             type={confirmPassword ? "text" : "password"}
                                             className="form-control"
                                             autoComplete="new-Password"
