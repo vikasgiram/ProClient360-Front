@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getCustomers } from "../../../../../hooks/useCustomer";
 import { updateProject } from "../../../../../hooks/useProjects";
 import { formatDateforupdate } from "../../../../../utils/formatDate";
+import Select from "react-select";
 
 import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { getAddress } from "../../../../../hooks/usePincode";
+
+const PAGE_SIZE = 15;
 
 const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
@@ -14,7 +17,10 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [searchText, setSearchText] = useState("");
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [hasMoreCustomers, setHasMoreCustomers] = useState(true);
+    const [customerPage, setCustomerPage] = useState(1);
+    const [customerSearchTerm, setCustomerSearchTerm] = useState("");
 
     const [projects, setProjects] = useState({
         ...selectedProject,
@@ -35,7 +41,37 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
     console.log(selectedProject?.Address);
 
-    //   console.log(selectedProject?.Address?.city,"address");
+    // Load customers with pagination and search
+    const loadCustomers = useCallback(async (page = 1, search = "") => {
+        try {
+            const data = await getCustomers(page, PAGE_SIZE, search);
+            if (data && data.customers) {
+                if (page === 1) {
+                    setCustomers(data.customers);
+                } else {
+                    setCustomers(prev => [...prev, ...data.customers]);
+                }
+                setHasMoreCustomers(data.customers.length === PAGE_SIZE);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadCustomers(1, customerSearchTerm);
+    }, [loadCustomers, customerSearchTerm]);
+
+    // Set initial selected customer from selectedProject
+    useEffect(() => {
+        if (selectedProject?.custId) {
+            setSelectedCustomer({
+                value: selectedProject.custId._id,
+                label: selectedProject.custId.custName
+            });
+        }
+    }, [selectedProject]);
+
     useEffect(() => {
         const fetchData = async () => {
             const data = await getAddress(address.pincode);
@@ -48,28 +84,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         if (address.pincode > 0)
             fetchData();
     }, [address.pincode]);
-
-
-    useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            if (searchText.trim() !== "" && searchText.length > 2) {
-                fetchCustomers(searchText);
-            } else {
-                setCustomers([]); // empty when no input
-            }
-        }, 500); // debounce API call by 500ms
-
-        return () => clearTimeout(delayDebounce);
-    }, );
-
-    const fetchCustomers = async () => {
-        const data = await getCustomers(1, 15, searchText);
-        // console.log(data);
-        if (data) {
-            setCustomers(data.customers || []);
-            // console.log(employees,"data from useState");
-        }
-    };
 
 
 
@@ -121,7 +135,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         if (name === "custId") {
             setProjects((prev) => ({
                 ...prev,
-                custId: { _id: value },
+                custId: { _id: value, custName: selectedCustomer?.label || "" },
             }));
             return;
         }
@@ -258,36 +272,55 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                     <div className="col-12" >
 
                                         <div className="mb-3">
-                                            <label htmlFor="customerSearch" className="form-label label_text">
+                                            <label htmlFor="customerSelect" className="form-label label_text">
                                                 Customer Name <RequiredStar />
                                             </label>
-
-                                            {/* Search input */}
-                                            <input
-                                                type="text"
-                                                className="form-control mb-2"
-                                                id="customerSearch"
-                                                maxLength={40}
-                                                placeholder="Type to search customer..."
-                                                value={searchText}
-                                                onChange={(e) => setSearchText(e.target.value)}
+                                            <Select
+                                                id="customerSelect"
+                                                options={customers.map(customer => ({ 
+                                                    value: customer._id, 
+                                                    label: customer.custName 
+                                                }))}
+                                                value={selectedCustomer}
+                                                onChange={(selectedOption) => {
+                                                    setSelectedCustomer(selectedOption);
+                                                    if (selectedOption) {
+                                                        setProjects(prev => ({
+                                                            ...prev,
+                                                            custId: { 
+                                                                _id: selectedOption.value, 
+                                                                custName: selectedOption.label 
+                                                            }
+                                                        }));
+                                                    }
+                                                }}
+                                                onInputChange={(inputValue) => {
+                                                    setCustomerSearchTerm(inputValue);
+                                                    setCustomerPage(1);
+                                                }}
+                                                onMenuScrollToBottom={() => {
+                                                    if (hasMoreCustomers) {
+                                                        const nextPage = customerPage + 1;
+                                                        setCustomerPage(nextPage);
+                                                        loadCustomers(nextPage, customerSearchTerm);
+                                                    }
+                                                }}
+                                                placeholder="Search and select customer..."
+                                                isClearable
+                                                styles={{
+                                                    control: (provided) => ({
+                                                        ...provided,
+                                                        borderRadius: 0,
+                                                        borderColor: '#ced4da',
+                                                        fontSize: '16px',
+                                                    }),
+                                                    option: (provided, state) => ({
+                                                        ...provided,
+                                                        backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                                                        color: state.isSelected ? 'white' : '#212529',
+                                                    }),
+                                                }}
                                             />
-
-                                            {/* Select dropdown */}
-                                            <select
-                                                className="form-select rounded-0"
-                                                name="custId"
-                                                value={projects?.custId?._id || ''}
-                                                onChange={handleChange}
-                                            >
-                                                <option value={projects?.custId?._id || ''}>
-                                                    {projects?.custId?.custName || 'Select Customer'}</option>
-                                                {customers.map((cust) => (
-                                                    <option key={cust._id} value={cust._id}>
-                                                        {cust.custName}
-                                                    </option>
-                                                ))}
-                                            </select>
                                         </div>
                                     </div>
 

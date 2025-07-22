@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { createTicket } from "../../../../../hooks/useTicket"
 import { getCustomers } from "../../../../../hooks/useCustomer";
 import { getAddress } from "../../../../../hooks/usePincode";
+import Select from "react-select";
 
 
+
+const PAGE_SIZE = 15;
 
 const AddTicketPopup = ({ handleAdd }) => {
   const [client, setClient] = useState("");
@@ -14,9 +17,12 @@ const AddTicketPopup = ({ handleAdd }) => {
   const [contactPerson, setContactPerson] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [source, setSource] = useState("");
-  const [customers, setCustomers] = useState();
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [hasMoreCustomers, setHasMoreCustomers] = useState(true);
+  const [customerPage, setCustomerPage] = useState(1);
+  const [customerSearchTerm, setCustomerSearchTerm] = useState("");
   const [contactPersonEmail, setContactPersonEmail] = useState("");
-  const [searchText, setSearchText] = useState("");
   const [Address, setAddress] = useState({
     add: "",
     city: "",
@@ -24,6 +30,27 @@ const AddTicketPopup = ({ handleAdd }) => {
     pincode: "",
     state: ""
   })
+
+  // Load customers with pagination and search
+  const loadCustomers = useCallback(async (page = 1, search = "") => {
+    try {
+      const data = await getCustomers(page, PAGE_SIZE, search);
+      if (data && data.customers) {
+        if (page === 1) {
+          setCustomers(data.customers);
+        } else {
+          setCustomers(prev => [...prev, ...data.customers]);
+        }
+        setHasMoreCustomers(data.customers.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCustomers(1, customerSearchTerm);
+  }, [loadCustomers, customerSearchTerm]);
 
   const handleEmployeeAdd = async (event) => {
     event.preventDefault();
@@ -61,27 +88,6 @@ const AddTicketPopup = ({ handleAdd }) => {
   };
 
 
-
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (searchText.trim() !== "" && searchText.length > 2) {
-        fetchCustomers(searchText);
-      } else {
-        setCustomers([]); // empty when no input
-      }
-    }, 500); // debounce API call by 500ms
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchText]);
-
-  const fetchCustomers = async () => {
-    const data = await getCustomers(1, 15, searchText);
-    // console.log(data);
-    if (data) {
-      setCustomers(data.customers || []);
-      // console.log(employees,"data from useState");
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -179,40 +185,49 @@ const AddTicketPopup = ({ handleAdd }) => {
                   <div className="col-12">
                     <div className="mb-3">
                       <label
-                        for="clientName"
+                        htmlFor="clientName"
                         className="form-label label_text"
                       >
                         Client Name <RequiredStar />
                       </label>
-                      {/* <input
-                        type="text"
-                        value={clientName}
-                        onChange={(e) => setClientName(e.target.value)}
-                        className="form-control rounded-0"
+                      <Select
                         id="clientName"
-                        aria-describedby="emailHelp"
-                        required
-                      /> */}
-                      <input
-                        type="text"
-                        className="form-control mb-2"
-                        id="customerSearch"
-                        placeholder="Type to search customer..."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
+                        options={customers.map(customer => ({ 
+                          value: customer._id, 
+                          label: customer.custName 
+                        }))}
+                        value={selectedCustomer}
+                        onChange={(selectedOption) => {
+                          setSelectedCustomer(selectedOption);
+                          setClient(selectedOption ? selectedOption.value : "");
+                        }}
+                        onInputChange={(inputValue) => {
+                          setCustomerSearchTerm(inputValue);
+                          setCustomerPage(1);
+                        }}
+                        onMenuScrollToBottom={() => {
+                          if (hasMoreCustomers) {
+                            const nextPage = customerPage + 1;
+                            setCustomerPage(nextPage);
+                            loadCustomers(nextPage, customerSearchTerm);
+                          }
+                        }}
+                        placeholder="Search and select client..."
+                        isClearable
+                        styles={{
+                          control: (provided) => ({
+                            ...provided,
+                            borderRadius: 0,
+                            borderColor: '#ced4da',
+                            fontSize: '16px',
+                          }),
+                          option: (provided, state) => ({
+                            ...provided,
+                            backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                            color: state.isSelected ? 'white' : '#212529',
+                          }),
+                        }}
                       />
-
-                      <select
-                        className="form-select rounded-0"
-                        id=""
-                        aria-label="Default select example"
-                        onChange={(e) => setClient(e.target.value)}
-                        required
-                      ><option >Select Client</option>
-                        {customers && customers.map((cust) =>
-                          <option value={cust._id}>{cust.custName}</option>
-                        )}
-                      </select>
                     </div>
                   </div>
                   <div className="col-12  mt-2">

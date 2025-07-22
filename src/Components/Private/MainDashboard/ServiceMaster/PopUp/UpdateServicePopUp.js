@@ -32,7 +32,6 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
     const data = await getEmployees(page, PAGE_SIZE, search);
 
     if (data.error) {
-      toast.error(data.error || 'Failed to load employees');
       setEmpLoading(false);
       return;
     }

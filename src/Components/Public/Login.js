@@ -86,7 +86,7 @@ export const LogIn = () => {
 
 
   const showForgotPassword = () => {
-    alert('Demo: Forgot Password\n\nIn a real application, this would redirect to a password reset page.');
+    navigation('/ForgotPassword')
   };
 
   const showSignUp = () => {
