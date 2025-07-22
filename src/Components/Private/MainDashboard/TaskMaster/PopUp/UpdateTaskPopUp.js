@@ -20,7 +20,9 @@ const[task,setTask]=useState(selectedTask);
       return
     }
     try {
+      toast.loading("Updating Task.....")
       const data = await updateTask(task._id,task);
+      toast.dismiss()
       if(data.success){
         toast.success(data.message);
         handleUpdate();
@@ -45,7 +47,7 @@ const[task,setTask]=useState(selectedTask);
         }}
       >
         <div className="modal-dialog modal-lg">
-          <div className="modal-content p-3">
+          <div className="modal-content taskbar p-3" style={{width:'121%', height:'330px', padding:'3rem'}}>
             <form onSubmit={handleTaskUpdate}>
             <div className="modal-header pt-0">
               <h5 className="card-title fw-bold" id="exampleModalLongTitle">

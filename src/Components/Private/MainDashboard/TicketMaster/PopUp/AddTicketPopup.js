@@ -15,7 +15,6 @@ const AddTicketPopup = ({ handleAdd }) => {
   const [contactNumber, setContactNumber] = useState("");
   const [source, setSource] = useState("");
   const [customers, setCustomers] = useState();
-  const [loading, setLoading] = useState(false);
   const [contactPersonEmail, setContactPersonEmail] = useState("");
   const [searchText, setSearchText] = useState("");
   const [Address, setAddress] = useState({
@@ -41,7 +40,7 @@ const AddTicketPopup = ({ handleAdd }) => {
     if (!client || !details || !product || !contactPerson || !contactNumber || !source || !Address) {
       return toast.error("Please fill all fields");
     }
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contactPersonEmail)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactPersonEmail)) {
       return toast.error("Please Enter Valid Email");
     }
     if (contactNumber.length !== 10) {
@@ -50,7 +49,9 @@ const AddTicketPopup = ({ handleAdd }) => {
     if (/[a-zA-Z]/.test(contactNumber)) {
       return toast.error("Phone number should not contain alphabets");
     }
+    toast.loading("Creating Ticket...")
     const data = await createTicket(ticketData);
+    toast.dismiss()
     if (data.success){
       handleAdd();
       toast.success(data?.message);
@@ -331,7 +332,8 @@ const AddTicketPopup = ({ handleAdd }) => {
                         aria-label="Default select example"
                         onChange={(e) => setProduct(e.target.value)}
                         required
-                      ><option >Select Product</option>
+                      >
+                        <option value=" ">Select Product</option>
                         <option value={"Surveillance System"}>Surveillance System</option>
                         <option value={"Access Control System"}>Access Control System</option>
                         <option value={"Turnkey Project"}>Turnkey Project</option>

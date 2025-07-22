@@ -108,6 +108,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
       // console.log(updatedCompany);
       toast.loading("Updating Company...");
       const data = await updateCompany(updatedCompany);
+      toast.dismiss()
       if(data.success) {
         toast.dismiss();
         toast.success("Company Updated Successfully");
@@ -122,7 +123,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
     }
 
 
-
+    
   };
 
 

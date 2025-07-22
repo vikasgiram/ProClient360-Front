@@ -20,8 +20,9 @@ const getTask = async (page, limit) => {
 
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error( error?.response?.data);
+    return error?.response?.data;
+  }
 };
 
 const createTask = async (taskData) => {

@@ -46,7 +46,9 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedEmp }) => {
       return toast.error("Hourly rate should be greater than 0");
     }
     try {
+      toast.loading("Updating Employee...")
       await updateEmployee(employee);
+      toast.dismiss()
       handleUpdate();
     } catch (error) {
       toast.error(error);

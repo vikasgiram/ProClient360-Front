@@ -11,6 +11,8 @@ import useLeads from "../../../../hooks/leads/useLeads";
 import AssignMarketingLeadPopUp from "./PopUp/AssignLeadPopUp";
 import useAssignLead from "../../../../hooks/leads/useAssignLead";
 import { formatDate } from "../../../../utils/formatDate";
+import AddLeadMaster from "../SalesMaster/PopUp/AddLeadMaster";
+import useCreateLead from "../../../../hooks/leads/useCreateLead";
 
 
 export const MarketingMasterGrid = () => {
@@ -21,6 +23,9 @@ export const MarketingMasterGrid = () => {
   };
 
   // const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
+  const [addpop, setIsAddModalVisible] = useState(false);
+  
 
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
 
@@ -34,15 +39,15 @@ export const MarketingMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalServices: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: true,
     hasPrevPage: false,
   });
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const { data, loading, error, refetch } = useLeads(pagination.currentPage, itemsPerPage, filters);
   const {assignLead } = useAssignLead();
-  
+  const { createLead } = useCreateLead();
 
   useEffect(() => {
     if (data) {
@@ -65,6 +70,21 @@ export const MarketingMasterGrid = () => {
   };
 
 
+  const handleAddLeadSubmit = async (leadData) => {
+      toast.loading("Adding lead...");
+      const data = await createLead(leadData);
+      console.log("Lead Data:", data);
+      if (data?.success) {
+        toast.dismiss();
+        toast.success(data?.message || "Lead added successfully!");
+        handleCloseAddModal();
+        refetch();
+      }else{
+        toast.dismiss();
+        toast.error(data?.error || "Failed to add lead");
+      }
+    };
+
 
   const handleUpdateSubmit = async (id, actionData) => {
     try {
@@ -78,6 +98,10 @@ export const MarketingMasterGrid = () => {
       toast.error("Failed to update lead");
     }
   };
+
+  const handleOpenAddModal = () => setIsAddModalVisible(true);
+  const handleCloseAddModal = () => setIsAddModalVisible(false);
+
 
   const handleDetailsPopUpClick = (lead) => {
     setSelectedLead(lead);
@@ -111,8 +135,16 @@ export const MarketingMasterGrid = () => {
                   <div className="col-12 col-lg-4">
                     <h5 className="text-white py-2">Marketing Master</h5>
                   </div>
-
+                  {user?.permissions?.includes("createLead") || user?.user === 'company' ? (
+                    <div className="col- col-lg-2 ms-auto text-end me-5">
+                        <button onClick={handleOpenAddModal} type="button" className="btn adbtn btn-dark">
+                            <i className="fa-solid fa-plus"></i> Add
+                        </button>
+                    </div>
+                  ) : null}
                 </div>
+
+
 
                 <MarketingDashboardCards
                   allLeads={data?.allLeadsCount || 0}
@@ -179,11 +211,11 @@ export const MarketingMasterGrid = () => {
                         <tbody className="broder my-4">
                           {data?.leads?.length > 0 ? (
                             data.leads.map((lead, index) => (
-                              <tr >
-                                <td>{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
+                              <tr key={lead._id}>
+                                <td >{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
                                 <td>{lead?.SOURCE}</td>
                                 <td>{lead?.SENDER_NAME}</td>
-                                <td>{lead?.SENDER_COMPANY}</td>
+                                <td>{lead?.SENDER_COMPANY}</td> 
                                 <td>{lead?.QUERY_PRODUCT_NAME}</td>
                                 <td>{lead?.SENDER_EMAIL}</td>
                                 <td>{formatDate(lead?.createdAt)}</td>
@@ -329,6 +361,10 @@ export const MarketingMasterGrid = () => {
           }}
         />
       )}
+
+       {addpop && (
+          <AddLeadMaster onAddLead={handleAddLeadSubmit} onClose={handleCloseAddModal} />
+        )}
 
 
       {detailsServicePopUp && selectedLead && (

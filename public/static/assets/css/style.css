@@ -2171,7 +2171,6 @@ table td {
 
 .modal_body_height {
   height: 600px !important;
-  width: 160% !important;
   overflow-y: auto;
 }
 
@@ -2837,8 +2836,8 @@ width: 65% !important;
 
 .modal_body_height {
   max-height: 60vh;
-  max-width: 60vh;
-
+  max-width: 200vh !important;
+  
   overflow-y: auto; 
 }
 
@@ -2856,3 +2855,20 @@ width: 65% !important;
   display: inline-block;
 }
 
+
+
+
+.custom-modal-dialog {
+  max-width: 1600px !important;
+  width: 500% !important;
+}
+
+.custom-modal-content {
+  height: 1200px !important;
+  overflow-y: auto;
+}
+
+.department {
+  max-width: 800px;
+  
+}

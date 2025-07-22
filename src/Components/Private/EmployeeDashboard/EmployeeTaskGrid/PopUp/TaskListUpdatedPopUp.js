@@ -23,10 +23,10 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [actionHistory, setActionHistory] = useState();
-  const [hideInput, setHideInput] = useState(false);
   const [forEdit, setForEdit] = useState(false);
   const [editAction, setEditAction] = useState(""); //editAction used for for  update as parameter 
   const [addAction, setAddAction] = useState(true);
+  
 
   console.log(selectedTask, "selected task");
 
@@ -36,8 +36,13 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
     if (status === "completed") {
       setTaskLevel(100);
     }
+    else if (status=== "inprocess" || status === "stuck") { 
 
-  };
+      setTaskLevel((prev) => (parseInt(prev) < 100 ? prev : ""));
+  } else {
+    setTaskLevel("");
+  }
+};
 
   const toggleVisibility = async () => {
     const res = await getAllActions(selectedTask._id);
@@ -46,10 +51,15 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
     setIsVisible(!isVisible);
   };
 
+if (new Date(startTime) >= new Date(endTime)) {
+  return toast.error("Start Time must be earlier than End Time");
+}
+
+
   const handelTaskUpdate = async (event) => {
     event.preventDefault();
     if (taskStatus === "completed") {
-      setTaskLevel(100); // Update the state for completion level
+      setTaskLevel(100); 
     }
     if (
       !action ||
@@ -94,12 +104,46 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   }
 
   const handleEditTask = async (event) => {
-    const { name, value } = event.target;
-    setEditAction((prevAction) => ({
-      ...prevAction,
-      [name]: value
-    }));
+  const { name, value } = event.target;
+
+  if (name === "taskStatus") {
+    if (value === "completed") {
+      setEditAction((prevAction) => ({
+        ...prevAction,
+        taskStatus: value,
+        complated: "100",
+      }));
+    } else {
+      setEditAction((prevAction) => ({
+        ...prevAction,
+        taskStatus: value,
+        complated: "",
+      }));
+    }
+    return;
   }
+
+  if (name === "complated") {
+    if (editAction.taskStatus !== "completed") {
+      if (/^\d{0,2}$/.test(value)) {
+        setEditAction((prevAction) => ({
+          ...prevAction,
+          complated: value,
+        }));
+      }
+    }
+    return;
+  }
+
+  // Default
+  setEditAction((prevAction) => ({
+    ...prevAction,
+    [name]: value,
+  }));
+};
+
+
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -179,15 +223,19 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                   </Steps>
                 </span>
 
-                <div className="row modal_body_height mt-2" style={{ maxWidth: '60vw', width: '60vw' }}>                 
-                   <div className="col-20 col-lg-20">
-                  <button
-                    type="button"
-                    className="w-80 btn btn-sm addbtn rounded-0 add_button m-2 px-4 d-block mx-auto"
-                    onClick={toggleVisibility}
-                  >
-                    {isVisible ? "x" : "Show More..."}
-                  </button>
+                <div className="row modal_body_height mt-2 " style={{ maxWidth: '60vw', width: '60vw' }}>                 
+                   <div className="col-20 col-lg-20 align-items-center">
+
+                  <div className="d-flex justify-content-end mt-3">
+                   <button type="button" className={`btn btn-sm rounded-0 add_button px-4 me-3 text-white ${
+                   isVisible ? 'btn-danger' : 'btn-success'
+                   }`}
+                   onClick={toggleVisibility}
+                   >
+                   {isVisible ? 'x' : 'Show More...'}
+                   </button>
+                  </div>
+
 
                   {isVisible && (
 
@@ -288,7 +336,6 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             onChange={handleEditTask}
                             value={formatDateforEditAction(editAction?.startTime)}
                             className="form-control rounded-0"
-                            // min={new Date().toISOString().slice(0, 16)}
                             id="startTime"
                             required
                           />
@@ -301,14 +348,13 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="endTime"
                             className="form-label label_text"
                           >
-                            Proccess End Date  <RequiredStar/>
+                            Process End Dates  <RequiredStar/>
                           </label>
                           <input
                             type="datetime-local"
                             name="endTime"
                             onChange={handleEditTask}
-                            value={formatDateforEditAction(editAction?.endTime)}
-
+                            value={formatDateforEditAction(editAction?.endTime)}                 
                             className="form-control rounded-0"
                             id="endTime"
                             required
@@ -347,20 +393,20 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="complated"
                             className="form-label label_text"
                           >
-                            Complete Level  <RequiredStar/>
+                            Completed Level <RequiredStar/>
                           </label>
                           <div className="input-group border mb-3">
                             <input
-                              type="text"
-                              name="complated"
-                              onChange={handleEditTask}
-                              value={editAction?.complated}
-                              className="form-control rounded-0 border-0"
-                              id="complated"
-                              placeholder="eg. 65 %"
-
-                              readOnly={taskStatus === "completed"}
-                              required
+                             type="text"
+                             name="complated"
+                             maxLength={3}
+                             onChange={handleEditTask}
+                             value={editAction?.complated}
+                             className="form-control rounded-0 border-0"
+                             id="complated"
+                             placeholder="eg. 65 %"
+                             readOnly={editAction.taskStatus === "completed"} 
+                             required
                             />
 
                             <span
@@ -421,7 +467,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="Action"
                             className="form-label label_text "
                           >
-                            Action
+                            Action  <RequiredStar/>
                           </label>
                           <textarea
                             className="textarea_edit col-12"
@@ -441,20 +487,18 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="processStartDate"
                             className="form-label label_text"
                           >
-                            Process Start Date
+                            Process Start Date  <RequiredStar/>
                           </label>
                           <input
                             type="datetime-local"
                             name="processStartDate"
                             onChange={(e) => {
                               setStartTime(e.target.value);
-
                             }}
                             value={startTime}
                             className="form-control rounded-0"
-                            // min={new Date().toISOString().slice(0, 16)}
                             id="processStartDate"
-
+                             
                           />
                         </div>
                       </div>
@@ -465,9 +509,9 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="processEndDate"
                             className="form-label label_text"
                           >
-                            Proccess End Date
+                            Process End Date   <RequiredStar/>
                           </label>
-                          <input
+                          {/* <input
                             type="datetime-local"
                             name="processEndDate"
                             onChange={(e) => setEndTime(e.target.value)}
@@ -475,7 +519,16 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             min={new Date().toISOString().slice(0, 16)}
                             className="form-control rounded-0"
                             id="processEndDate"
-                          />
+                          /> */}
+
+  <input
+  type="datetime-local"
+  name="processEndDate"
+  onChange={(e) => setEndTime(e.target.value)}
+  value={endTime}
+  className="form-control rounded-0"
+  id="processEndDate"
+/>
                         </div>
                       </div>
 
@@ -484,7 +537,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                           htmlFor="projectStatus"
                           className="form-label label_text"
                         >
-                          Status
+                          Status          <RequiredStar/>
                         </label>
                         <select
                           id="projectStatus"
@@ -507,20 +560,26 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             htmlFor="processEndDate"
                             className="form-label label_text"
                           >
-                            Complete Level
+                            Completed Level       <RequiredStar/>
                           </label>
                           <div className="input-group border mb-3">
-                            <input
-                              type="text"
-                              name="hourlyRate"
-                              onChange={(e) => setTaskLevel(e.target.value)}
-                              value={taskLevel}
-                              className="form-control rounded-0 border-0"
-                              id="HourlyRate"
-                              placeholder="eg. 65 %"
-                              aria-label="Hourly Rate"
-                              readOnly={taskStatus === "completed"}
-                            />
+                          <input
+                           type="text"
+                           name="hourlyRate"
+                           maxLength={2}
+                           onChange={(e) => {
+                           const value = e.target.value;
+                           if (taskStatus !== "completed" && /^\d{1,2}$/.test(value)) {
+                           setTaskLevel(value);
+                           }
+                          }}
+                          value={taskLevel}
+                          className="form-control rounded-0 border-0"
+                          id="HourlyRate"
+                          placeholder="eg. 65 %"
+                          aria-label="Hourly Rate"
+                          readOnly={taskStatus === "completed"}
+                          />
 
                             <span
                               className="input-group-text rounded-0 bg-white border-0"

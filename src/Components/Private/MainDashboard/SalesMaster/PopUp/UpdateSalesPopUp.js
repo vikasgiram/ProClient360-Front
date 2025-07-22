@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { RequiredStar } from '../../../RequiredStar/RequiredStar';
 import useUpdateLead from '../../../../../hooks/leads/useUpdateLead';
@@ -7,9 +7,6 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
   if (!selectedLead) {
     return null;
   }
-
-  console.log('selectedLead:', selectedLead);
-  console.log('actionData:', actionData);
 
 
   const formatDate = (dateString) => {  
@@ -109,13 +106,21 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
 };
 
 const actionOptions = [
-  'Requirement Understanding', 'Site Visit', 'Online Demo', 'Proof of Concept (POC)',
-  'Documentation & Planning', 'quotation Submission', 'quotation Discussion',
-  'Follow-Up Call', 'Negotiation Call', 'Negotiation Meetings', 'Deal Status'
+    '1. Requirement Understanding',
+    '2. Site Visit',
+    '3. Online Demo',
+    '4. Proof of Concept (POC)',
+    '5. Documentation & Planning',
+    '6. Quotation Submission',
+    '7. Quotation Discussion',
+    '8. Follow-Up Call',
+    '9. Negotiation Call',
+    '10. Negotiation Meetings',
+    '11. Deal Status'
 ];
 
-const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
-  const [showInfo, setShowInfo] = useState(false);
+const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
+  const [showInfo, setShowInfo] = useState(isCompany);
   const [actionData, setActionData] = useState({
     actionType: '', 
     date: '', 
@@ -123,6 +128,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
     status: '', 
     quotation: ''
   });
+
   const useUpdate = useUpdateLead();
 
   useEffect(() => {
@@ -158,7 +164,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
 
   const handleActionSubmit = (e) => {
     e.preventDefault();
-    const isQuotationRequired = actionData.actionType === 'quotation Submission';
+    const isQuotationRequired = actionData.actionType === '6. Quotation Submission';
     
     if (!actionData.status || !actionData.actionType || !actionData.date || !actionData.completion || 
         (isQuotationRequired && !actionData.quotation)) {
@@ -177,7 +183,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
     const updatedFormData = {
       ...selectedLead,
       status: actionData.status,
-      step: parseFloat(actionData.step) || null,
+      step: actionData.step || null,
       complated: parseFloat(actionData.completion) || 0,
       quotation: isQuotationRequired ? parseFloat(actionData.quotation) || 0 : selectedLead.quotation || 0,
       nextFollowUpDate: actionData.date,
@@ -217,91 +223,93 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose }) => {
               </div>
             </div>
 
-            <button
+            {!isCompany&&<button
               type="button"
               className="btn btn-sm rounded-0 btn-outline-success d-flex align-items-center ms-auto me-4 justify-content-end"
               onClick={() => setShowInfo(!showInfo)}
             >
               {showInfo ? "Hide Info" : "Show Info"}
-            </button>
+            </button>}
 
             <div className="modal-body" style={{ maxHeight: '45vh', overflowY: 'auto' }}>
               {showInfo && <LeadInfoView selectedLead={selectedLead} actionData={actionData} />}
-
-              <h5 className={`text-muted border-top pb-2 mb-3 ${showInfo ? 'pt-3 mt-4' : 'pt-0 mt-0'}`}>
-                Work Data
-              </h5>
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label htmlFor="status" className="form-label fw-bold">Status<RequiredStar /></label>
-                  <select id="status" className="form-select bg_edit" name="status" onChange={handleActionChange} value={actionData.status} required>
-                    <option value="" disabled>-- Select a status --</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Ongoing">Ongoing</option>
-                    <option value="Won">Won</option>
-                    <option value="Lost">Lost</option>
-                  </select>
-                </div>
-
-                <div className="col-md-6">
-                  <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar /></label>
-                  <select id="actionType" name="actionType" className="form-select" value={actionData.actionType} onChange={handleActionChange} required>
-                    <option value="" disabled>-- Select an action --</option>
-                    {actionOptions.map((action, index) => (
-                      <option key={index} value={action}>{index + 1}. {action}</option>
-                    ))}
-                  </select>
-                </div>            
-
-                <div className="col-md-6">
-                  <label htmlFor="completion" className="form-label fw-bold">Completion (%)<RequiredStar /></label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    id="completion" 
-                    name="completion" 
-                    placeholder="Enter work completion %" 
-                    maxLength={6} 
-                    value={actionData.completion} 
-                    onChange={handleActionChange} 
-                    required 
-                  />
-                </div>
-
-                {actionData.actionType === 'quotation Submission' && (
+              {!isCompany && (<div className={`text-muted border-top pb-2 mb-3 ${showInfo ? 'pt-3 mt-4' : 'pt-0 mt-0'}`}>
+                <h5>
+                  Work Data
+                </h5>
+                <div className="row g-3">
                   <div className="col-md-6">
-                    <label htmlFor="quotation" className="form-label fw-bold">Quotation Amount (₹)<RequiredStar /></label>
+                    <label htmlFor="status" className="form-label fw-bold">Status<RequiredStar /></label>
+                    <select id="status" className="form-select bg_edit" name="status" onChange={handleActionChange} value={actionData.status} required>
+                      <option value="" disabled>-- Select a status --</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Ongoing">Ongoing</option>
+                      <option value="Won">Won</option>
+                      <option value="Lost">Lost</option>
+                    </select>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar /></label>
+                    <select id="actionType" name="actionType" className="form-select" value={actionData.actionType} onChange={handleActionChange} required>
+                      <option value="" disabled>-- Select an action --</option>
+                      {actionOptions.map((action, index) => (
+                        <option key={index} value={action}>{action}</option>
+                      ))}
+                    </select>
+                  </div>            
+
+                  <div className="col-md-6">
+                    <label htmlFor="completion" className="form-label fw-bold">Completion (%)<RequiredStar /></label>
                     <input 
                       type="text" 
                       className="form-control" 
-                      id="quotation" 
-                      name="quotation" 
-                      placeholder="Enter quotation amount" 
-                      value={actionData.quotation}
+                      id="completion" 
+                      name="completion" 
+                      placeholder="Enter work completion %" 
+                      maxLength={6} 
+                      value={actionData.completion} 
                       onChange={handleActionChange} 
                       required 
                     />
                   </div>
-                )}
 
-                <div className="col-md-6">
-                  <label htmlFor="date" className="form-label fw-bold">Next Follow-up Date<RequiredStar /></label>
-                  <input 
-                    id="date" 
-                    type="datetime-local" 
-                    className="form-control bg_edit" 
-                    name="date" 
-                    value={actionData.date || ''} 
-                    onChange={handleActionChange} 
-                    required 
-                  />
+                  {actionData.actionType === '6. Quotation Submission' && (
+                    <div className="col-md-6">
+                      <label htmlFor="quotation" className="form-label fw-bold">Quotation Amount (₹)<RequiredStar /></label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        id="quotation" 
+                        name="quotation" 
+                        placeholder="Enter quotation amount" 
+                        value={actionData.quotation}
+                        onChange={handleActionChange} 
+                        required 
+                      />
+                    </div>
+                  )}
+
+                  <div className="col-md-6">
+                    <label htmlFor="date" className="form-label fw-bold">Next Follow-up Date<RequiredStar /></label>
+                    <input 
+                      id="date" 
+                      type="datetime-local" 
+                      className="form-control bg_edit" 
+                      name="date" 
+                      value={actionData.date || ''} 
+                      onChange={handleActionChange} 
+                      required 
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
+            
 
             <div className="modal-footer border-0 justify-content-start mt-3">
               <button type="submit" className="btn addbtn rounded-0 add_button px-4">Submit</button>
               <button type="button" onClick={onClose} className="btn addbtn rounded-0 Cancel_button px-4">Cancel</button>
+            </div>
+            </div>)}
             </div>
           </form>
         </div>

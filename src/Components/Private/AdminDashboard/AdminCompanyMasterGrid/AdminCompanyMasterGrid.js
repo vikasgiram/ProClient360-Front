@@ -24,7 +24,7 @@ export const AdminCompanyMasterGrid = () => {
 
     const [companies, setCompanies] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 20;
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 0,
@@ -96,11 +96,40 @@ export const AdminCompanyMasterGrid = () => {
          
         fetchData(currentPage);
     }, [currentPage, AddPopUpShow, deletePopUpShow, updatePopUpShow, searchText]);
+    
+
+
+//     useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         setLoading(true);
+//         const data = await getCompany(pagination.currentPage, itemsPerPage, search);
+//         if (data.success) {
+//           setCompanies(data.employees || []);
+//           setPagination(data.pagination || {
+//             currentPage: 1,
+//             totalPages: 0,
+//             totalEmployees: 0,
+//             limit: itemsPerPage,
+//             hasNextPage: false,
+//             hasPrevPage: false,
+//           });
+//         }else{
+//           toast(data.error);
+//         }
+//       } catch (error) {
+//         console.error("Error fetching Companies:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchData(currentPage);
+//   }, [pagination.currentPage, deletePopUpShow, updatePopUpShow, AddPopUpShow, searchText]);
+
 
     const handleAdd = () => {
         setAddPopUpShow(!AddPopUpShow);
     };
-
     const handleSearchSubmit = (event) => {
         event.preventDefault();
         if (search.trim() !== "") {

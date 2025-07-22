@@ -63,11 +63,11 @@ export const EmployeeTaskGrid = () => {
         currentPage: 1,
         totalPages: 0,
         totalProjects: 0,
-        limit: 10,
+        limit: 20,
         hasNextPage: false,
         hasPrevPage: false,
     });
-    const itemsPerPage = 10;
+    const itemsPerPage = 20;
 
     const [notifiedTomorrowProjects, setNotifiedTomorrowProjects] = useState(new Set());
 

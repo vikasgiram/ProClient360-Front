@@ -25,7 +25,7 @@ const getDashboardData = async () => {
     toast.error(error.response.data.error);  }
 };
 
-const getCompany = async (page, limit=10, search=null) => {
+const getCompany = async (page, limit=20, search=null) => {
   try {
     const response = await axios.get(`${url}?q=${search}&page=${page}&limit=${limit}`,{
       headers: {
@@ -41,7 +41,9 @@ const getCompany = async (page, limit=10, search=null) => {
     return data;
   } catch (error) {
     console.error(error);
-    toast.error(error.response.data.error);  }
+    console.error( error?.response?.data);
+    return error?.response?.data;
+  }
 };
 
 const createCompany = async (companyData) => {

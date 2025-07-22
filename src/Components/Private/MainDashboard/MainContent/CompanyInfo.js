@@ -1,11 +1,8 @@
-
-import { useNavigate } from "react-router-dom"
 import { CompanyInfoPieChart } from "./CompanyInfoPieChart"
 
 
 export const CompanyInfo = ({categorywise}) => {
 
-  const navigate = useNavigate()
 
   return (
     <div className="row  bg-white p-2 m-1 border rounded" >

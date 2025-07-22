@@ -46,7 +46,7 @@ export const AssignInproccessSection = ({
               Assigned Tasks
             </h6>
             <div className="col-12">
-              <div className="shadow_custom ">
+              <div className="shadow_custom " style={{maxHeight : '300px', overflow:'auto'}}>
                 <div className="table-responsive">
                   <table className="table align-items-center table-flush">
                     <thead className="thead-light">
@@ -100,7 +100,7 @@ export const AssignInproccessSection = ({
           <div className="row  bg-white ms-md-1 rounded p-lg-3">
             <h6 className="mb-0 fw-bold mb-3 text-warning-dark">Inprocess Tasks</h6>
             <div className="col-12">
-              <div className="shadow_custom ">
+              <div className="shadow_custom" style={{maxHeight : '300px', overflow :'auto'}}>
                 <div className="table-responsive">
                   <table className="table align-items-center table-flush">
                     <thead className="thead-light">

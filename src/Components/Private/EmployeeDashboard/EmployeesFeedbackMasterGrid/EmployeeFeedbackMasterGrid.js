@@ -22,7 +22,7 @@ export const EmployeeFeedbackMasterGrid = () => {
 
     const [feedbacks, setFeedbacks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 20;
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 0,

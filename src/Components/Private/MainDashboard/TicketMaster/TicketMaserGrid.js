@@ -17,7 +17,6 @@ export const TicketMasterGrid = () => {
 
   const { user } = useContext(UserContext);
 
-
   const [addServicePopUpShow, setAddServicePopUpShow] = useState(false);
   const [AddPopUpShow, setAddPopUpShow] = useState(false);
   const [deletePopUpShow, setdeletePopUpShow] = useState(false);
@@ -34,12 +33,12 @@ export const TicketMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalTickets: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: false,
     hasPrevPage: false,
   });
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, currentPage: page }));
@@ -69,11 +68,10 @@ export const TicketMasterGrid = () => {
 
     try {
       setLoading(true);
-      const deleteResponse = await deleteTicket(selectedId);
+      const data = await deleteTicket(selectedId);
 
-      if (deleteResponse) {
-        toast.success("Ticket Deleted successfully...");
-
+      if (data.success) {
+        toast.success(data.message || "Ticket deleted successfully.");
         const pageToFetch =
           tickets.length === 1 && pagination.currentPage > 1
             ? pagination.currentPage - 1
@@ -94,11 +92,11 @@ export const TicketMasterGrid = () => {
               limit: itemsPerPage,
               hasNextPage: false,
               hasPrevPage: false,
-            }
+            }           
           );
           if (pageToFetch !== pagination.currentPage) {
             setPagination((prev) => ({ ...prev, currentPage: pageToFetch }));
-          }
+          }         
         } else {
           setTickets([]);
           setPagination({
@@ -111,7 +109,7 @@ export const TicketMasterGrid = () => {
           });
         }
       } else {
-        toast.error(deleteResponse?.error || "Failed to delete ticket.");
+        toast(data?.error || "Failed to delete ticket.");
       }
     } catch (error) {
       console.error("Error deleting ticket:", error);
@@ -132,7 +130,7 @@ export const TicketMasterGrid = () => {
           itemsPerPage,
           search
         );
-        if (data) {
+        if (data.success) {
           setTickets(data.tickets || []);
           setPagination(
             data.pagination || {
@@ -144,16 +142,9 @@ export const TicketMasterGrid = () => {
               hasPrevPage: false,
             }
           );
-        } else {
-          setTickets([]);
-          setPagination({
-            currentPage: 1,
-            totalPages: 0,
-            totalTickets: 0,
-            limit: itemsPerPage,
-            hasNextPage: false,
-            hasPrevPage: false,
-          });
+        }
+        else {
+          toast(data.message);
         }
       } catch (error) {
         console.error("Error fetching tickets:", error);
@@ -185,12 +176,18 @@ export const TicketMasterGrid = () => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   }, [searchText]);
 
-
   const handleSubmitSearch = (e) => {
     e.preventDefault();
     setSearch(searchText);
   }
 
+  // Function to determine the appropriate "no data" message
+  const getNoDataMessage = () => {
+    if (search && search.trim() !== "") {
+    return "No Tickets Found";
+    }
+  };
+  
 
   return (
     <>
@@ -323,7 +320,7 @@ export const TicketMasterGrid = () => {
                           ) : (
                             <tr>
                               <td colSpan="7" className="text-center">
-                                No Tickets Found
+                                {getNoDataMessage()}
                               </td>
                             </tr>
                           )}
@@ -479,7 +476,6 @@ export const TicketMasterGrid = () => {
 
                     {pagination.totalTickets === 0 && (
                       <div className="text-center my-3 text-muted">
-                        No tickets found.
                       </div>
                     )}
                   </>

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { error } from 'jquery';
 import toast from 'react-hot-toast';
 
 const baseUrl= process.env.REACT_APP_API_URL;
@@ -16,9 +15,9 @@ const getAllTickets = async (page, limit, search= null) => {
     // console.log("api actions",data);
     return data;
   } catch (error) {
-    console.error(error);
-    toast.error(error.response.data.message);  }
-};
+    console.error( error?.response?.data);
+    return error?.response?.data;
+  }};
 
 
 

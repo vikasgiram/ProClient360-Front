@@ -13,9 +13,9 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
   const [priority, setPriority] = useState();
   const [zone, setZone] = useState();
   const [allotmentDate, setAllotmentDate] = useState();
-  const [allotTo, setAllotTo] = useState();
+  const [allotTo, setAllotTo] = useState(null);
   const [workMode, setWorkMode] = useState();
-  const [ticket, setTicket] = useState(selectedTicket);
+  const [ticket] = useState(selectedTicket);
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = {
+    const serviceData = {
       serviceType,
       ticket,
       priority,
@@ -36,16 +36,19 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
       allotmentDate,
       allotTo,
       workMode,
-      ticket,
       // completionDate
     };
     if (!serviceType || !ticket || !priority || !allotmentDate || !allotTo || !workMode) {
-      console.log(data);
       return toast.error("Please fill all the fields");
     }
 
-    await createService(data);
-    handleAddService();
+    const data = await createService(serviceData);
+    if(data?.success){
+      toast.success(data.message);
+      setLoading(false);
+      handleAddService();
+    }else
+      toast.error(data.error || "Failed to add service");
 
   }
 
@@ -167,7 +170,7 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                         aria-label="Default select example"
                         onChange={(e) => setAllotTo(e.target.value)}
                         required
-                      ><option >Select Employee</option>
+                      ><option value={null} >Select Employee</option>
                         {employees.map((emp) => (
                           <option value={emp._id}>{emp.name}</option>
                         ))}

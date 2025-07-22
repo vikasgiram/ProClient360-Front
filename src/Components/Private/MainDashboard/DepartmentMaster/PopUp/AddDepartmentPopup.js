@@ -17,7 +17,9 @@ const AddDepartmentPopup = ({ handleAdd }) => {
         if (!name) {
             return toast.error("Please Enter Department Name");
         }
+        toast.loading("Creating Customer.....")
         const data = await createDepartment(depData);
+        toast.dismiss()
         if(data.success){
             toast.success(data.message);
             handleAdd();
@@ -30,9 +32,9 @@ const AddDepartmentPopup = ({ handleAdd }) => {
         <>
             <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
                 <div className="modal-dialog modal-lg">
-                    <div className="modal-content p-3">
+                    <div className="modal-content department p-3" style={{width:'121%', height:'330px', padding:'3rem'}}>
                         <form onSubmit={handleProjectAdd}>
-                        <div className="modal-header pt-0">
+                        <div className="modal-header pt-0" >
 
                             <h5 className="card-title fw-bold" id="exampleModalLongTitle">
 

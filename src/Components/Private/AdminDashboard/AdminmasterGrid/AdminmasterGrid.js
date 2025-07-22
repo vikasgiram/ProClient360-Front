@@ -22,7 +22,7 @@ export const AdminmasterGrid = () => {
     const [searchText, setSearchText] = useState("");
     const [search, setSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 20;
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 0,
@@ -86,10 +86,12 @@ export const AdminmasterGrid = () => {
         }
     };
 
+
     useEffect(() => {
-        if(searchText.length >2 || searchText.length === 0) 
-        fetchData(currentPage);
-    }, [currentPage, AddPopUpShow, deletePopUpShow, updatePopUpShow, searchText]);
+  if (searchText.length > 2 || searchText.length === 0) {
+    fetchData(currentPage);
+  }
+}, [currentPage, AddPopUpShow, deletePopUpShow, updatePopUpShow, searchText]);
 
     const handleAdd = () => {
         setAddPopUpShow(!AddPopUpShow);

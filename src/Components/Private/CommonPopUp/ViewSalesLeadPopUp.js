@@ -1,5 +1,4 @@
-import React from 'react';
-import { formatDateforTaskUpdate } from '../../../utils/formatDate';
+
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
@@ -168,7 +167,7 @@ const ViewSalesLeadPopUp = ({ closePopUp, selectedLead }) => {
 
                   <h6 className="mt-3">
                     <p className="fw-bold d-inline">Assigned By: </p>
-                    {selectedLead?.assignedBy?.name || "Unknown"}
+                    {selectedLead?.assignedBy?.name || "None"}
                   </h6>
 
                   <h6 className="mt-3">

@@ -121,8 +121,8 @@ export const Sidebar = ({ isopen, active }) => {
 {/* new sales sidebar */}
 
 
-                    {(user?.permissions?.includes("viewLead") && 
-                    !user?.permissions?.includes("viewMarketingDashboard") || user?.user === 'company')  ? (
+                    {(user?.permissions?.includes("viewLead") || user?.user === 'company') && 
+                    (!user?.permissions?.includes("viewMarketingDashboard") )  ? (
                         <li title="Sales Master"
                             className={active === "SalesMasterGrid" ? "nav-item active" : "nav-item sidebar_item"}>
                             <Link to='/SalesMasterGrid' className="nav-link ">

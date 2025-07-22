@@ -19,8 +19,9 @@ const AddTaskPopUp = ({ handleAdd, cancelBtnCallBack }) => {
         if (!taskname) {
             return toast.error("Please Enter Task Name");
         }
+        toast.loading("Creating Task....")
         const data = await createTask(taskData);
-
+        toast.dismiss()
         if(data.success){
             toast.success(data.message);
             handleAdd();
@@ -41,7 +42,7 @@ const AddTaskPopUp = ({ handleAdd, cancelBtnCallBack }) => {
                 }}
             >
                 <div className="modal-dialog modal-md">
-                    <div className="modal-content p-3">
+                    <div className="modal-content taskbar p-3" style={{width:'121%', height:'330px', padding:'3rem'}}>
                         <div className="modal-header pt-0">
                             <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                                 Create New Task

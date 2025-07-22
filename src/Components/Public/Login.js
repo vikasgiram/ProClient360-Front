@@ -48,7 +48,8 @@ export const LogIn = () => {
       const data = await loginUser(username, password, fcmToken);
       // console.log(username,password);
       setUser(data);
-      if (data.newUser === true) {
+      if(data.newUser===true){
+        toast.success("Please complete your profile to continue.");
         navigation("/ChangePassword");
         console.log("New user, redirecting to ChangePassword");
       }

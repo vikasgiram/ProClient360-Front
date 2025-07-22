@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import  { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "././login.css";
 import toast from "react-hot-toast";
@@ -8,7 +8,6 @@ export const ForgotPassword = () => {
   const navigation = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
 
@@ -99,7 +98,7 @@ export const ForgotPassword = () => {
               </div>
                
               <div className="col-12 col-lg-10 mx-auto mb-4 mb-lg-0 pt-4">
-              <a href="" onClick={() => navigation('/')}>
+              <a onClick={() => navigation('/')}>
               <i className="fa-solid fa-angle-left"></i>  Back to login page</a>
               </div>
               

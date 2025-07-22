@@ -51,44 +51,41 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
     FetchPreviousActions();
   }, [selectedService._id]);
 
-  useEffect(() => {
-    const fetchDataDep = async () => {
-      try {
-        const data = await getDepartment();
-        // console.log(data, "department");
 
-        if (data) {
-          setDepartments(data.departments || []);
-        }
-      } catch (error) {
-        console.log(error);
+useEffect(() => {
+  const fetchDataDep = async () => {
+    try {
+      const data = await getDepartment();
+      if (data && data.departments) {
+        setDepartments(data.departments);
       }
-    };
-    fetchDataDep();
-  }, []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  fetchDataDep();
+}, []);
 
-  useEffect(() => {
-    const fetchDataEmp = async () => {
-      try {
-        // console.log("department Id:" + department);
-        if (!selectedDepartment) {
-          return;
-        }
-        const data = await getEmployee(selectedDepartment);
-        if (data) {
-          const formattedData = data.map((employee) => ({
-            value: employee._id,
-            label: employee.name,
-          }));
 
-          setEmployeeOptions(formattedData);
-        }
-      } catch (error) {
-        console.log(error);
+useEffect(() => {
+  const fetchDataEmp = async () => {
+    try {
+      if (!selectedDepartment) return;
+
+      const data = await getEmployee(selectedDepartment);
+      if (data && data.employee) {
+        const formattedData = data.employee.map((employee) => ({
+          value: employee._id,
+          label: employee.name,
+        }));
+        setEmployeeOptions(formattedData);
       }
-    };
-    fetchDataEmp();
-  }, [selectedDepartment]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  fetchDataEmp();
+}, [selectedDepartment]);
 
   const handleSendNotification = async () => {
     const notificationData = {
@@ -142,8 +139,10 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
     };
 
     // console.log(employees);
+    toast.loading("Create Service Action...")
     const data = await createServiceAction(actionData);
     // console.log(selectedService._id,data);
+    toast.dismiss()
     if (data.success) {
       toast.success(data.message);
       handleUpdate();
@@ -307,66 +306,55 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                     </div>
                   )}
 
-                  {responsibleParty === "Company" && (
-                    <div className="row">
-                      <div className="col-6 col-lg-6 mt-2 inprogress-field">
-                        <div className="mb-3">
-                          <label
-                            htmlFor="taskName"
-                            className="form-label label_text"
-                          >
-                            Department  <RequiredStar />
-                          </label>
-                          <select
-                            className="form-select rounded-0"
-                            aria-label="Default select example"
-                            onChange={(e) =>
-                              setSelectedDepartment(e.target.value)
-                            }
-                            value={selectedDepartment}
-                            required
-                          >
-                            <option value="">
-                              -- Select Department Name --
-                            </option>
-                            {departments &&
-                              departments.map((department) => (
-                                <option value={department._id}>
-                                  {department.name}
-                                </option>
-                              ))}
-                          </select>
-                        </div>
-                      </div>
+                {responsibleParty === "Company" && (
+  <div className="row">
+    <div className="col-6 col-lg-6 mt-2 inprogress-field">
+      <div className="mb-3">
+        <label htmlFor="department" className="form-label label_text">
+          Department <RequiredStar />
+        </label>
+        <select
+          id="department"
+          className="form-select rounded-0"
+          onChange={(e) => setSelectedDepartment(e.target.value)}
+          value={selectedDepartment}
+          required
+        >
+          <option value="">-- Select Department Name --</option>
+          {departments &&
+            departments.map((department) => (
+              <option key={department._id} value={department._id}>
+                {department.name}
+              </option>
+            ))}
+        </select>
+      </div>
+    </div>
 
-                      <div className="col-6 col-lg-6 mt-2">
-                        <div className="mb-3">
-                          <label
-                            for="ProjectName"
-                            className="form-label label_text"
-                          >
-                            Employee Name  <RequiredStar />
-                          </label>
-                          <ReactSelect
-                            options={employeeOptions} // Employee options (e.g., from API)
-                            hideSelectedOptions={false} // Show selected options in the dropdown
-                            onChange={(selectedOption) => {
-                              // Check if an option is selected and set the employee ID
-                              const employeeId = selectedOption
-                                ? selectedOption.value
-                                : null;
-                              setEmployees(employeeId);
+    {/* Employee ReactSelect */}
+    <div className="col-6 col-lg-6 mt-2">
+      <div className="mb-3">
+        <label htmlFor="employeeSelect" className="form-label label_text">
+          Employee Name <RequiredStar />
+        </label>
+        <ReactSelect
+          inputId="employeeSelect"
+          options={employeeOptions}
+          hideSelectedOptions={false}
+          onChange={(selectedOption) => {
+            const employeeId = selectedOption ? selectedOption.value : null;
+            setEmployees(employeeId);
+          }}
+          value={employeeOptions.find(
+            (option) => option.value === employees
+          )}
+          placeholder="Select Employee..."
+        />
+      </div>
+    </div>
+  </div>
+)}
 
-                            }}
-                            value={employeeOptions.find(
-                              (option) => option.value === employees
-                            )} // Keep selected value synced
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {status === "Stuck" && (
                     <div className="col-12 mt-2">
@@ -391,66 +379,30 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
                     </div>
                   )}
 
-                  {status !== "Stuck" ? (
-                    <div className="col-12 mt-2">
-                      <div className="">
-                        <label for="action" className="form-label label_text">
-                          Action <RequiredStar />
-                        </label>
-                        <input
-                          type="textarea"
-                          className="form-control rounded-0"
-                          id="action"
-                          placeholder="Enter Action...."
-                          value={action}
-                          onChange={(e) => setAction(e.target.value)}
-                          aria-describedby="nameHelp"
-                          required
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-
-                  {/* {status !== "Stuck" ? (
+                  {status !== "Stuck" && (
                     <>
-                      <div className="col-9 col-lg-6 mt-2">
-                        <label
-                          for="StartTime"
-                          className="form-label label_text"
-                        >
-                          Start Time  <RequiredStar />
-                        </label>
-                        <input
-                          className="form-control rounded-0"
-                          id="StartTime"
-                          type="datetime-local"
-                          onChange={(e) => setStartTime(e.target.value)}
-                          value={startTime}
-                          aria-describedby="statusHelp"
-                          required
-                        />
+                      <div className="col-12 mt-2">
+                        <div className="">
+                          <label htmlFor="action" className="form-label label_text">
+                            Action {status !== "Stuck" && <RequiredStar />}
+                          </label>
+                          <input
+                            type="textarea"
+                            className="form-control rounded-0"
+                            id="action"
+                            placeholder="Enter Action..."
+                            maxLength={70}
+                            value={action}
+                            onChange={(e) => setAction(e.target.value)}
+                            aria-describedby="nameHelp"
+                            required={status !== "Stuck"}
+                          />
+                        </div>
                       </div>
 
-                      <div className="col-9 col-lg-6 mt-2">
-                        <label for="EndTime" className="form-label label_text">
-                          End Time <RequiredStar />
-                        </label>
-                        <input
-                          className="form-control rounded-0"
-                          id="EndTime"
-                          type="datetime-local"
-                          onChange={(e) => setEndTime(e.target.value)}
-                          value={endTime}
-                          aria-describedby="statusHelp"
-                          required
-                        />
-                      </div>
+                      
                     </>
-                  ) : (
-                    ""
-                  )} */}
+                  )}
 
                   {status !== "Stuck" ? (
                     <div className="row g-3 mt-2">

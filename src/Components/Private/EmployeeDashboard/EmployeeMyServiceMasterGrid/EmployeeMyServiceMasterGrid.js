@@ -34,12 +34,12 @@ export const EmployeeMyServiceMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalServices: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: false,
     hasPrevPage: false,
   });
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   // Use Hooks
   const { data, loading, error } = useMyServices(
@@ -91,7 +91,9 @@ export const EmployeeMyServiceMasterGrid = () => {
   const handleDeleteClick = async () => {
     if (selectedId) {
       try {
+        toast.loading("Delete Service....")
         const result = await deleteService(selectedId);
+        toast.dismiss()
         if (result) {
           toast.success("Service deleted successfully.");
           setDeletePopUpShow(false);

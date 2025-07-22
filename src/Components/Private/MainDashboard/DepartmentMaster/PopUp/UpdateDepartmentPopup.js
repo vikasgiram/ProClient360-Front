@@ -20,7 +20,9 @@ const UpdateDepartmentPopup = ({ handleUpdate, selectedDep }) => {
             return toast.error("Please Enter department Name");
         }
         try {
+            toast.loading("Updating Department.....")
             const data = await updateDepartment(department);
+            toast.dismiss()
             if(data.success){
                 toast.success(data.message);
                 handleUpdate();
@@ -37,7 +39,7 @@ const UpdateDepartmentPopup = ({ handleUpdate, selectedDep }) => {
         <>
             <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
                 <div className="modal-dialog modal-lg">
-                    <div className="modal-content p-3">
+                    <div className="modal-content department p-3" style={{width:'121%', height:'330px', padding:'3rem'}}>
                         <form onSubmit={handleProjectUpdate}>
                             <div className="modal-header pt-0">
 

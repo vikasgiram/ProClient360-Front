@@ -168,7 +168,9 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
       return toast.error("Please select at least one permission");
     }
    try{
+    toast.loading("Updating Designation...")
     const data = await updateDesignation(designation);
+    toast.dismiss()
     if(data.success){
       toast.success(data.message);
       handleUpdate();

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 const baseUrl= process.env.REACT_APP_API_URL;
 let url = `${baseUrl}/api/service/myService`;
 
-const useMyServices = (page = 1, limit = 10, filters = {}) => {
+const useMyServices = (page = 1, limit = 20, filters = {}) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

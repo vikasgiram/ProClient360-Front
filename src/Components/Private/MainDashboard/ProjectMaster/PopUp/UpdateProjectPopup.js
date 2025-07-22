@@ -13,7 +13,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
 
     const [customers, setCustomers] = useState([]);
-    const [POCopy, setPOCopy] = useState(selectedProject?.POCopy || "");
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
 
@@ -61,7 +60,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         }, 500); // debounce API call by 500ms
 
         return () => clearTimeout(delayDebounce);
-    }, [searchText]);
+    }, );
 
     const fetchCustomers = async () => {
         const data = await getCustomers(1, 15, searchText);
@@ -112,7 +111,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
             return;
         }
 
-        // ✅ NEW: payAfterCompletion - only numbers, max 3 digits
         if (name === "payAfterCompletion") {
             const numericValue = value.replace(/\D/g, "");
             if (numericValue.length > 3) return;
@@ -128,19 +126,19 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
             return;
         }
 
-        if (name === "projectStatus") {
-            setProjects((prev) => ({
-                ...prev,
-                projectStatus: value,
-                completeLevel:
-                    value === "completed"
-                        ? 100
-                        : prev.completeLevel < 100
-                            ? prev.completeLevel
-                            : "",
-            }));
-            return;
-        }
+       if (name === "projectStatus") {
+  setProjects((prev) => ({
+    ...prev,
+    projectStatus: value,
+    completeLevel:
+      value === "Completed"
+        ? "100"
+        : prev.completeLevel < 100
+          ? prev.completeLevel
+          : "",
+  }));
+  return;
+}
 
         setProjects((prev) => ({ ...prev, [name]: value }));
     };
@@ -182,9 +180,9 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
             ...projects,
             Address: {
                 ...address
-            }, POCopy
+            }, 
         }
-        if (!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion || !updatedProject.remark) {
+        if (!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion) {
             setLoading(false);
             console.log(updatedProject, "updateProject");
             return toast.error("Please fill all fields");
@@ -204,8 +202,9 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
         try {
             // console.log(updatedProject,"updatedProject");
-
+            toast.loading("Updating Project...")
             const data = await updateProject(updatedProject);
+            toast.dismiss()
             if(data.success){
                 toast.success(data.message);
                 handleUpdate();
@@ -225,7 +224,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
     //     if (file) {
     //       const reader = new FileReader();
     //       reader.onloadend = () => {
-    //         setPOCopy(reader.result);
 
     //       };
     //       reader.readAsDataURL(file);
@@ -310,7 +308,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                         >
                                             <option value="Upcoming">Upcoming</option>
                                             <option value="Inprocess">Inprocess</option>
-                                            <option value="Completed">Complete</option>
+                                            <option value="Completed">Completed</option>
 
                                         </select>
                                     </div>
@@ -320,19 +318,21 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                             <label htmlFor="completeLevel"
                                                 name="completeLevel" className="form-label label_text">Completion level <RequiredStar /></label>
                                             <input
-                                                onChange={handleChange}
-                                                value={projects?.completeLevel}
-                                                name="completeLevel"
-                                                type="text"
-                                                placeholder="Update Completion level...."
-                                                inputMode="numeric"
-                                                pattern="^\d{1,10}$"
-                                                maxLength="10"
-                                                className="form-control rounded-0"
-                                                id="completeLevel"
-                                                aria-describedby="dateHelp"
-                                                required
-                                            />
+  onChange={handleChange}
+  value={projects?.completeLevel}
+  name="completeLevel"
+  type="text"
+  placeholder="Update Completion level...."
+  inputMode="numeric"
+  pattern="^\d{1,10}$"
+  maxLength="2"
+  className="form-control rounded-0"
+  id="completeLevel"
+  aria-describedby="dateHelp"
+  required
+  disabled={projects?.projectStatus === "Completed"}
+/>
+                                                
 
                                         </div>
                                     </div>
@@ -642,19 +642,23 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                         </div>
                                         <button type="button" onClick={viewFile}  >View</button>
                                     </div>
-                                    <div className="col-12 col-lg-6 mt-2" >
-
-                                        <div className="mb-3">
-                                            <label for="remark" className="form-label label_text">     remark <RequiredStar />
-                                            </label>
-                                            <input type="email" className="form-control rounded-0" id="remark"
-                                                name="remark"
-                                                onChange={handleChange}
-                                                maxLength={50}
-                                                value={projects?.remark}
-                                                aria-describedby="secemailHelp" />
-                                        </div>
-                                    </div>
+                                    <div className="col-12 col-lg-6 mt-2">
+  <div className="mb-3">
+    <label htmlFor="remark" className="form-label label_text">
+      Remark
+    </label>
+    <input
+      type="text"
+      className="form-control rounded-0"
+      id="remark"
+      name="remark"
+      onChange={handleChange}
+      maxLength={50}
+      value={projects?.remark || ""}
+      aria-describedby="secemailHelp"
+    />
+  </div>
+</div>
 
 
 
