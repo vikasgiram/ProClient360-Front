@@ -145,8 +145,9 @@ export const EmployeeMasterGrid = () => {
                           </form>
                         </div>
                       </div>
+
                       {user?.permissions?.includes("createEmployee") || user?.user==='company' ? (
-                      <div className="col- col-lg-2 ms-auto text-end me-5">
+                      <div className="col-12 col-lg-2 ms-auto text-end me-5">
                           <button
                             onClick={handleAdd}
                             type="button"

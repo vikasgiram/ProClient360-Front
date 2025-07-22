@@ -104,7 +104,6 @@ export const Header = (props) => {
 
 
 
-
 						<li className="nav-item nav-profile dropdown">
 							<a
 								onClick={toggleuser}
