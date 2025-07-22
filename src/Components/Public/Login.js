@@ -48,7 +48,6 @@ const getFcmToken = async () => {
     try {
       const data = await loginUser(username, password, fcmToken);
       // console.log(username,password);
-      console.log("Login data:", data);
       setUser(data);
       if(data.newUser===true){
         toast.success("Please complete your profile to continue.");
