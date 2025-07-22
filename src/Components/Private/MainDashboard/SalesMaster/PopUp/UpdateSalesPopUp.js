@@ -178,23 +178,16 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata'
     });
 
-    console.log({actionData});
-
+    console.log("Action Data:", actionData);
     const updatedFormData = {
-      ...selectedLead,
       status: actionData.status,
-      step: actionData.step || null,
-      complated: parseFloat(actionData.completion) || 0,
-      quotation: isQuotationRequired ? parseFloat(actionData.quotation) || 0 : selectedLead.quotation || 0,
-      nextFollowUpDate: actionData.date,
-      actionDetails: {
-        step: actionData.actionType,
-        submissionDateTime: dateTime,
-        followUpDate: actionData.date,
-        completionPercentage: parseFloat(actionData.completion) || 0,
-        quotation: isQuotationRequired ? parseFloat(actionData.quotation) || 0 : null
-      }
+      step: actionData.actionType,
+      complated: actionData.completion ? parseFloat(actionData.completion) : 0,
+      nextFollowUpDate: actionData.date ? new Date(actionData.date).toISOString() : null,
+      quotation: actionData.quotation ? parseFloat(actionData.quotation) : 0,
     };
+
+    console.log("Updated Form Data:", updatedFormData);
 
     //api call to store updated data
     useUpdate.updateLead(selectedLead?._id, updatedFormData);

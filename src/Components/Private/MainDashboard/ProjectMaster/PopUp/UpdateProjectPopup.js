@@ -191,10 +191,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
             setLoading(false);
             return toast.error("Sum of  Advance Payment,Pay Against Delivery,and Pay After Completion cannot exceed 100%");
         }
-        if (updatedProject.purchaseOrderValue <= 0 || updatedProject.advancePay <= 0 || updatedProject.payAgainstDelivery <= 0 || updatedProject.payfterCompletion <= 0 || updatedProject.purchaseOrderNo <= 0) {
-            setLoading(false);
-            return toast.error("Value must be greater than 0");
-        }
         if (updatedProject.startDate > updatedProject.endDate) {
             setLoading(false);
             return toast.error("Start Date cannot be greater than End Date");

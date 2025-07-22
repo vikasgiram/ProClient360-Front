@@ -16,13 +16,15 @@ const AddProjectPopup = ({ handleAdd }) => {
   const [purchaseOrderDate, setPurchaseOrderDate] = useState("");
   const [purchaseOrderValue, setPurchaseOrderValue] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [advancePay, setAdvancePayment] = useState("");
-  const [payAgainstDelivery, setPayAgainstDelivery] = useState("");
-  const [payAfterCompletion, setPayAfterCompletion] = useState("");
+  const [advancePay, setAdvancePayment] = useState(0);
+  const [payAgainstDelivery, setPayAgainstDelivery] = useState(0);
+  const [payAfterCompletion, setPayAfterCompletion] = useState(0);
   const [remark, setRemark] = useState("");
   const [category, setCategory] = useState('');
   const [POCopy, setPOCopy] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [retention, setRetention] = useState(0);
 
   // Customer dropdown state
   const [custOptions, setCustOptions] = useState([]);
@@ -102,20 +104,12 @@ const AddProjectPopup = ({ handleAdd }) => {
       setLoading(false);
       return toast.error("The total percentage cannot exceed 100%.");
     }
-   
-    else if (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion) < 100) {
-      setLoading(false);
-      return toast.error("The total percentage cannot less than 100%.");
-    }
 
     if (purchaseOrderValue <= 0) {
       setLoading(false);
       return toast.error("Purchase order value should be greater than 0");
     }
-    if (advancePay <= 0 || payAgainstDelivery <= 0 || payAfterCompletion <= 0) {
-      setLoading(false);
-      return toast.error("Percentage should be greater than 0");
-    }
+
     if (Address.pincode.length !== 6 || Address.pincode < 0) {
       return toast.error("Enter valid Pincode");
     }
@@ -142,6 +136,7 @@ const AddProjectPopup = ({ handleAdd }) => {
     formData.append('remark', remark);
     formData.append('Address', JSON.stringify(Address));
     formData.append('POCopy', POCopy);
+    formData.append('retention', retention);
 
     toast.loading("Creating Project...")
     const data = await createProject(formData);
@@ -157,6 +152,15 @@ const AddProjectPopup = ({ handleAdd }) => {
     }
   };
 
+  useEffect(() => {
+    const retentionValue = 100 - (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion));
+    if( retentionValue >= 0) {
+      setRetention(retentionValue);
+    }else{
+      toast.error("The total percentage cannot exceed 100%.");
+      setRetention(0);
+    }
+  },[advancePay, payAgainstDelivery, payAfterCompletion]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -418,6 +422,27 @@ const AddProjectPopup = ({ handleAdd }) => {
                         </div>
                       </div>
 
+
+                      <div className="col-12 col-lg-6 mt-2">
+                        <div className="mb-3">
+                          <label htmlFor="retention" className="form-label label_text">
+                            Retention (%) <RequiredStar />
+                          </label>
+                          <input
+                            type="text"
+
+                            className="form-control rounded-0"
+                            id="retention"
+                            inputMode="decimal"
+                            maxLength="3"
+                            pattern="[0-9]*"
+                            value={retention}
+                            aria-describedby="secemailHelp"
+                            required
+                          />
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                   <div className="col-12  mt-2">
@@ -553,16 +578,19 @@ const AddProjectPopup = ({ handleAdd }) => {
 
                   </div>
 
-                  <div className="col-12 col-lg-6 mt-2" >
-
-                    <div className="mb-3">
-                      <label for="remark" className="form-label label_text">     remark
-                      </label>
-                      <input type="text" className="form-control rounded-0" id="remark" placeholder="Enter a Remark...." maxLength={80} onChange={(e) => setRemark(e.target.value)} value={remark} aria-describedby="secemailHelp" required />
+                   <div className="col-12 col-lg-12 mt-2">
+                        <div className="mb-3">
+                          <textarea
+                            className="textarea_edit col-12"
+                            id="remark"
+                            maxLength={500}
+                            name="remark"
+                            placeholder="Enter a Remark..."
+                            onChange={(e) => setRemark(e.target.value)} value={remark}
+                            rows="2"
+                          ></textarea>
+                          </div>
                     </div>
-
-
-                  </div>
 
 
 
