@@ -239,7 +239,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                   <div className="col-12 col-lg-6 mt-2" >
                     <div className="mb-3">
                       <label for="purchaseOrderNo" className="form-label label_text">Purchase Order Number <RequiredStar /></label>
-                      <input type="text" className="form-control rounded-0" maxLength={12} id="purchaseOrderNo"
+                      <input type="text" className="form-control rounded-0" maxLength={200} id="purchaseOrderNo"
                         onChange={(e) => setPurchaseOrderNo(e.target.value)}
                         value={purchaseOrderNo} aria-describedby="emailHelp" required />
                     </div>
