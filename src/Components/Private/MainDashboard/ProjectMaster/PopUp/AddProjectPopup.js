@@ -216,7 +216,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
                   <div className="mb-3">
                     <label for="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
-                    <input type="text" className="form-control rounded-0" id="ProjectName" maxLength={30} placeholder="Enter a Project Name...." onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp" required />
+                    <input type="text" className="form-control rounded-0" id="ProjectName" maxLength={1000} placeholder="Enter a Project Name...." onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp" required />
                   </div>
 
 

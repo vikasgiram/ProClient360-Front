@@ -400,20 +400,7 @@ useEffect(() => {
                         </div>
                       </div>
 
-                      <div className="col-9 col-lg-6 mt-2">
-                        <label for="EndTime" className="form-label label_text">
-                          End Time <RequiredStar />
-                        </label>
-                        <input
-                          className="form-control rounded-0"
-                          id="EndTime"
-                          type="datetime-local"
-                          onChange={(e) => setEndTime(e.target.value)}
-                          value={endTime}
-                          aria-describedby="statusHelp"
-                          required
-                        />
-                      </div>
+                      
                     </>
                   )}
 

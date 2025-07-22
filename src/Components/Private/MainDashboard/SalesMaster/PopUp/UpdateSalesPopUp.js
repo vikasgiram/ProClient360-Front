@@ -164,7 +164,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
 
   const handleActionSubmit = (e) => {
     e.preventDefault();
-    const isQuotationRequired = actionData.actionType === 'quotation Submission';
+    const isQuotationRequired = actionData.actionType === '6. Quotation Submission';
     
     if (!actionData.status || !actionData.actionType || !actionData.date || !actionData.completion || 
         (isQuotationRequired && !actionData.quotation)) {
@@ -183,7 +183,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     const updatedFormData = {
       ...selectedLead,
       status: actionData.status,
-      step: parseFloat(actionData.step) || null,
+      step: actionData.step || null,
       complated: parseFloat(actionData.completion) || 0,
       quotation: isQuotationRequired ? parseFloat(actionData.quotation) || 0 : selectedLead.quotation || 0,
       nextFollowUpDate: actionData.date,
@@ -254,7 +254,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                     <select id="actionType" name="actionType" className="form-select" value={actionData.actionType} onChange={handleActionChange} required>
                       <option value="" disabled>-- Select an action --</option>
                       {actionOptions.map((action, index) => (
-                        <option key={index} value={action}>{index + 1}. {action}</option>
+                        <option key={index} value={action}>{action}</option>
                       ))}
                     </select>
                   </div>            
@@ -274,7 +274,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                     />
                   </div>
 
-                  {actionData.actionType === 'quotation Submission' && (
+                  {actionData.actionType === '6. Quotation Submission' && (
                     <div className="col-md-6">
                       <label htmlFor="quotation" className="form-label fw-bold">Quotation Amount (₹)<RequiredStar /></label>
                       <input 
