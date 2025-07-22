@@ -36,11 +36,11 @@ export const SalesMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalServices: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: true,
     hasPrevPage: false,
   });
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const { data, loading, error, refetch } = useMyLeads(pagination.currentPage, itemsPerPage, filters);
   const {submitEnquiry} = useSubmitEnquiry();

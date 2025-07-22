@@ -41,11 +41,11 @@ export const ProjectMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalProjects: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: false,
     hasPrevPage: false,
   });
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, currentPage: page }));

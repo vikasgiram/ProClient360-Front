@@ -3,7 +3,7 @@ import axios from 'axios';
 const baseUrl= process.env.REACT_APP_API_URL;
 const url = baseUrl+"/api/service";
 
-const useServices = (page = 1, limit = 10, filters = {}) => {
+const useServices = (page = 1, limit = 20, filters = {}) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

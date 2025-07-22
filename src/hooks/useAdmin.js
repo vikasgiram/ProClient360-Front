@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 const baseUrl= process.env.REACT_APP_API_URL;
 const url=baseUrl+"/api/admin";
 
-const getAdmin = async (page, limit=10, search=null) => {
+const getAdmin = async (page, limit=20, search=null) => {
   try {
     const response = await axios.get(`${url}?q=${search}&page=${page}&limit=${limit}`,{
       headers: {

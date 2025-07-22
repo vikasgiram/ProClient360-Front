@@ -33,12 +33,12 @@ export const ServiceMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalServices: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: false,
     hasPrevPage: false,
   });
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   // Use hooks
   const { data, loading, error } = useServices(pagination.currentPage, itemsPerPage, filters);

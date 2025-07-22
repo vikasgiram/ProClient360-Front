@@ -34,12 +34,12 @@ export const EmployeeMyServiceMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalServices: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: false,
     hasPrevPage: false,
   });
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   // Use Hooks
   const { data, loading, error } = useMyServices(

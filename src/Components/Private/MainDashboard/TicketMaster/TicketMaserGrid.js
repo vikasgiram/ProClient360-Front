@@ -33,12 +33,12 @@ export const TicketMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalTickets: 0,
-    limit: 10,
+    limit: 20,
     hasNextPage: false,
     hasPrevPage: false,
   });
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const handlePageChange = (page) => {
     setPagination((prev) => ({ ...prev, currentPage: page }));
