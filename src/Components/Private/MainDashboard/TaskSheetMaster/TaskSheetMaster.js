@@ -13,8 +13,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getTaskSheet, createTaskSheet, deleteTaskSheet } from "../../../../hooks/useTaskSheet";
 import toast from "react-hot-toast";
 import { getTask } from "../../../../hooks/useTask";
-import { getEmployee } from "../../../../hooks/useEmployees";
-import { getDepartment } from "../../../../hooks/useDepartment";
+import { getEmployees } from "../../../../hooks/useEmployees";
+// Removed department import
 import AddTaskPopUp from "../TaskMaster/PopUp/AddTaskPopUp";
 import { getAllActions } from "../../../../hooks/useAction";
 import { formatDateforEditAction } from "../../../../utils/formatDate";
@@ -50,20 +50,20 @@ export const TaskSheetMaster = () => {
   const [isChecked, setIsChecked] = React.useState(true);
 
   const [employees, setEmployees] = useState([]);
-  const [employeeOptions, setEmployeeOptions] = useState([]);
+  // Removed duplicate employeeOptions declaration
   const [taskName, setTaskName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [remark, setRemark] = useState("");
   const [taskDropDown, setTaskDropDown] = useState([]);
   
-  // Department dropdown state
-  const [deptOptions, setDeptOptions] = useState([]);
-  const [selectedDept, setSelectedDept] = useState(null);
-  const [deptPage, setDeptPage] = useState(1);
-  const [deptHasMore, setDeptHasMore] = useState(true);
-  const [deptLoading, setDeptLoading] = useState(false);
-  const [deptSearch, setDeptSearch] = useState("");
+  // Employee dropdown state
+  const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
+  const [employeePage, setEmployeePage] = useState(1);
+  const [employeeHasMore, setEmployeeHasMore] = useState(true);
+  const [employeeLoading, setEmployeeLoading] = useState(false);
+  const [employeeSearch, setEmployeeSearch] = useState("");
   
   const [projectName, setProjectName] = useState("");
   const [renderPage, setRenderPage] = useState(false);
@@ -73,32 +73,28 @@ export const TaskSheetMaster = () => {
 
 
 
-  // Fetch departments with pagination & search
-  const loadDepartments = useCallback(async (page, search) => {
-    if (deptLoading || !deptHasMore) return;
-    setDeptLoading(true);
-    const data = await getDepartment(page, PAGE_SIZE, search);
-
-    if (data.error) {
-      toast.error(data.error || 'Failed to load departments');
-      setDeptLoading(false);
-      return;
+  // Fetch employees with pagination & search
+  const loadEmployees = useCallback(async (page = 1, search = "") => {
+    setEmployeeLoading(true);
+    try {
+      const data = await getEmployees(page, PAGE_SIZE, search);
+      if (data && data.employees) {
+        const newOpts = data.employees.map(emp => ({ value: emp._id, label: emp.name }));
+        setEmployeeOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+        setEmployeeHasMore(newOpts.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      toast.error("Failed to load employees");
     }
+    setEmployeeLoading(false);
+  }, []);
 
-    const newOpts = (data.departments || []).map(d => ({ value: d._id, label: d.name }));
-    setDeptOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
-    setDeptHasMore(newOpts.length === PAGE_SIZE);
-    setDeptLoading(false);
-    setDeptPage(page + 1);
-  }, [deptLoading, deptHasMore]);
-
-  // Initial & search-triggered load (reset on search)
   useEffect(() => {
-    setDeptPage(1);
-    setDeptHasMore(true);
-    setDeptOptions([]);
-    loadDepartments(1, deptSearch);
-  }, [deptSearch]);
+    setEmployeePage(1);
+    setEmployeeHasMore(true);
+    setEmployeeOptions([]);
+    loadEmployees(1, employeeSearch);
+  }, [employeeSearch]);
 
   let columnWidth = 90;
   if (view === ViewMode.Month) {
@@ -209,32 +205,7 @@ export const TaskSheetMaster = () => {
   }, [taskAddPopUpShow]);
   // console.log(taskName,"task n ");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // console.log("department Id:" + department);
-        if (!selectedDept) {
-          setEmployeeOptions([]);
-          setEmployees([]);
-          return;
-        }
-        const data = await getEmployee(selectedDept.value);
-        if (data.success) {
-          const formattedData = data.employee.map((employee) => ({
-            value: employee._id,
-            label: employee.name,
-          }));
-
-          setEmployeeOptions(formattedData);
-        }else{
-          toast.error(data.error);  
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchData();
-  }, [selectedDept]);
+  // Removed department-based employee fetch
 
   const transformProjectToTasks = (projectData) => {
     // Extract project information from the task array
@@ -270,15 +241,16 @@ export const TaskSheetMaster = () => {
 
   const handleTaskAdd = async (event) => {
     // event.preventDefault();
+    const employeeIds = selectedEmployees.map(emp => emp.value);
     const data = {
       project: id,
-      employees,
+      employees: employeeIds,
       taskName,
       startDate,
       endDate,
       remark,
     };
-    if (!employees || !taskName || !startDate || !endDate ) {
+    if (!selectedEmployees.length || !taskName || !startDate || !endDate ) {
       return toast.error("Please fill all fields");
     }
 
@@ -298,8 +270,7 @@ export const TaskSheetMaster = () => {
     setStartDate("");
     setEndDate("");
     setRemark("");
-    setEmployees([]);
-    setSelectedDept(null);
+    setSelectedEmployees([]);
   };
 
   return (
@@ -414,54 +385,52 @@ export const TaskSheetMaster = () => {
                       </div>
                     </div>
 
-                    <div className="col-12 col-md-6 col-lg-3">
-                      <div className="mb-3">
-                        <label
-                          htmlFor="taskName"
-                          className="form-label label_text"
-                        >
-                          Department <RequiredStar/>
-                        </label>
-                        <Select
-                          options={deptOptions}
-                          value={selectedDept}
-                          onChange={opt => setSelectedDept(opt)}
-                          onInputChange={val => setDeptSearch(val)}
-                          onMenuScrollToBottom={() => loadDepartments(deptPage, deptSearch)}
-                          isLoading={deptLoading}
-                          placeholder="Search and select department..."
-                          noOptionsMessage={() => deptLoading ? 'Loading...' : 'No departments'}
-                          closeMenuOnSelect={true}
-                        />
-                      </div>
-                    </div>
+                    {/* Removed Department Dropdown */}
 
 
                     <div className="col-12 col-md-6 col-lg-3">
                       <div className="mb-3">
                         <label
-                          for="ProjectName"
+                          htmlFor="employeeSelect"
                           className="form-label label_text"
                         >
                           Employee Name <RequiredStar/>
                         </label>
-                        <ReactSelect
-                          options={employeeOptions} 
-                          isMulti 
-                          closeMenuOnSelect={false} 
-                          hideSelectedOptions={false} 
-                          onChange={(selectedOption) => {
-                            const employeeIds = selectedOption
-                              ? selectedOption.map((option) => option.value)
-                              : [];
-                            setEmployees(employeeIds);
+                        <Select
+                          id="employeeSelect"
+                          options={employeeOptions}
+                          value={selectedEmployees}
+                          isMulti
+                          onChange={opts => setSelectedEmployees(opts || [])}
+                          onInputChange={val => {
+                            setEmployeeSearch(val);
+                            setEmployeePage(1);
                           }}
-                          value={employees.map((id) =>
-                            employeeOptions.find(
-                              (option) => option.value === id
-                            )
-                          )}
-                          required
+                          onMenuScrollToBottom={() => {
+                            if (employeeHasMore) {
+                              const nextPage = employeePage + 1;
+                              setEmployeePage(nextPage);
+                              loadEmployees(nextPage, employeeSearch);
+                            }
+                          }}
+                          placeholder="Search and select employees..."
+                          isClearable
+                          isLoading={employeeLoading}
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              borderRadius: 0,
+                              borderColor: '#ced4da',
+                              fontSize: '16px',
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                              color: state.isSelected ? 'white' : '#212529',
+                            }),
+                          }}
+                          noOptionsMessage={() => employeeLoading ? 'Loading...' : 'No employees'}
+                          closeMenuOnSelect={false}
                         />
                       </div>
                     </div>
