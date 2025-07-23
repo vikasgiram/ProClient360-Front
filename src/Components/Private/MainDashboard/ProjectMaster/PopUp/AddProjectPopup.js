@@ -478,7 +478,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
-                            maxLength={40}
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="State"
                             id="exampleInputEmail1"
@@ -500,7 +500,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
-                            maxLength={40}
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="City"
                             id="exampleInputEmail1"
@@ -522,7 +522,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
-                            maxLength={40}
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="Country"
                             id="exampleInputEmail1"
@@ -545,7 +545,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                           <textarea
                             className="textarea_edit col-12"
                             id=""
-                            maxLength={100}
+                            maxLength={500}
                             name="add"
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={(e) => setAddress({ ...Address, add: e.target.value })}
@@ -583,7 +583,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                           <textarea
                             className="textarea_edit col-12"
                             id="remark"
-                            maxLength={500}
+                            maxLength={1000}
                             name="remark"
                             placeholder="Enter a Remark..."
                             onChange={(e) => setRemark(e.target.value)} value={remark}
