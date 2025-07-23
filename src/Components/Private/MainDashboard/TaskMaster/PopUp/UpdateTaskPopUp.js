@@ -70,17 +70,17 @@ const[task,setTask]=useState(selectedTask);
                       <label htmlFor="name" className="form-label label_text">
                         Task Name <RequiredStar />
                       </label>
-                      <input
+                      <textarea
                         name="name"
                         type="text"
-                        max={50}
+                        max={200}
                         placeholder="Update Task Name...."
                         value={task.name}
                         onChange={handleChange}
                         className="form-control rounded-0"
                         id="name"
                         required
-                      />
+                      ></textarea>
                     </div>
                 </div>
 

@@ -296,9 +296,10 @@ export const TaskSheetMaster = () => {
               >
                 <div className="content-wrapper ps-3 ps-md-0 pt-3">
 
-                <div className="col-12 col-lg-10 mx-auto mb-4 mb-lg-0 pt-4">
-                  <a href="#" onClick={() => navigate('/')}>
-                  <i className="fa-solid text-light fa-angle-left"></i>  Back to Project Mater</a>
+               <div className="col-12 col-lg-12 mx-auto mb-4 mb-lg-0 pt-4 ">
+                  <button className="btn btn-outline-light d-flex align-items-center" onClick={() => navigate('/ProjectMasterGrid')}>             
+                  <i className="fa-solid text-light fa-angle-left me-2"></i>  Back 
+                   </button>
                 </div>
 
                   <div className="row px-2 py-1   ">

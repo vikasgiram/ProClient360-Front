@@ -83,7 +83,7 @@ const UpdateAdminPopup = ({ handleUpdate, selectedAdmin }) => {
                                             <input
                                                 name="name"
                                                 type="text"
-                                                maxLength={40}
+                                                maxLength={50}
                                                 placeholder="Update Full Name...."
                                                 value={admin.name}
                                                 onChange={handleChange}
@@ -101,7 +101,7 @@ const UpdateAdminPopup = ({ handleUpdate, selectedAdmin }) => {
                                             <input
                                                 type="email"
                                                 name="email"
-                                                maxLength={40}
+                                                maxLength={50}
                                                 placeholder="Update Email...."
                                                 value={admin.email}
                                                 onChange={handleChange}

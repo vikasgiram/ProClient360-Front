@@ -223,7 +223,7 @@ export const ServiceMasterGrid = () => {
                                 <td className="align_left_td width_tdd">{service.priority}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
                                 <td className='width_tdd'>{service.allotTo?.map((item, index) => item.name).join(', ')}</td>
-                                <td className="font-weight-bold"style={{ color:service.status === 'Completed' ? '#28a745': service.status === 'Inprogress' ? '#F8EFDE' : service.status === 'Pending' ? '#FFA726' : service.status === 'Stuck' ? '#E53935': '#000'}}>
+                                <td className="font-weight-bold"style={{ color:service.status === 'Completed' ? '#28a745': service.status === 'Inprogress' ? '#0000FF' : service.status === 'Pending' ? '#FFA726' : service.status === 'Stuck' ? '#E53935': '#000'}}>
                                   {service.status}
                                 </td>
                                 <td>

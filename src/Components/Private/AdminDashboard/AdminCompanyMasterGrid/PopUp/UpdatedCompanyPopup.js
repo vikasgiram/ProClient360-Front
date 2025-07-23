@@ -165,7 +165,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                         name="name"
                         type="text"
                         placeholder="Update Full Name...."
-                        maxLength={40}
+                        maxLength={100}
                         value={company.name}
                         onChange={handleChange}
                         className="form-control rounded-0"
@@ -185,7 +185,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                         type="text"
                         name="admin"
                         placeholder="Update Admin Name...."
-                        maxLength={40}
+                        maxLength={50}
                         value={company.admin}
                         onChange={handleChange}
                         className="form-control rounded-0"

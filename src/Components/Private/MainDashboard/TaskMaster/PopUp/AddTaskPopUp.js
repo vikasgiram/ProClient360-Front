@@ -72,9 +72,9 @@ const AddTaskPopUp = ({ handleAdd, cancelBtnCallBack }) => {
                                                 Task Name <RequiredStar />
                                             </label>
                                             
-                                            <input
+                                            <textarea
                                                 type="text"
-                                                maxLength={50}
+                                                maxLength={200}
                                                 value={taskname}
                                                 onChange={(e) => setTaskname(e.target.value)}
                                                 className="form-control rounded-0"
@@ -82,7 +82,7 @@ const AddTaskPopUp = ({ handleAdd, cancelBtnCallBack }) => {
                                                 placeholder="Enter a Task Name...."
                                                 aria-describedby="emailHelp"
                                                 required
-                                            />
+                                            ></textarea>
                                         </div>
                                 </div>
 

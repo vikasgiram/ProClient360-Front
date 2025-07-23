@@ -95,7 +95,7 @@ const AddAdminPoup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
-                        maxLength={40}
+                        maxLength={50}
                         placeholder="Enter a Full Name...."
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -126,7 +126,7 @@ const AddAdminPoup = ({ handleAdd }) => {
                         }}
                         className="form-control rounded-0"
                         id="Email"
-                        maxLength={40}
+                        maxLength={50}
                         placeholder="Enter Email..."
                         aria-describedby="emailHelp"
                       />
@@ -149,7 +149,7 @@ const AddAdminPoup = ({ handleAdd }) => {
                             className="form-control rounded-0"
                             id="password"
                             placeholder="Password...."
-                            maxLength={40}
+                            maxLength={50}
                             required
                           />
                           <button
@@ -177,7 +177,7 @@ const AddAdminPoup = ({ handleAdd }) => {
                             className="form-control rounded-0"
                             id="ConfirmPassword"
                             placeholder="Confirm Password...."
-                            maxLength={40}
+                            maxLength={50}
                             required
                           />
                           <button

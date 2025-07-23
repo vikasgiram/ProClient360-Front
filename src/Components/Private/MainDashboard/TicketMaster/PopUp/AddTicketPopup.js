@@ -258,7 +258,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                             className="form-control rounded-0"
                             placeholder="State"
                             id="exampleInputEmail1"
-                            maxLength={30}
+                            maxLength={50}
                             onChange={handleStateChange}
                             value={Address.state}
                             aria-describedby="emailHelp"
@@ -270,7 +270,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
-                            maxLength={30}
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="City"
                             id="exampleInputEmail1"
@@ -286,7 +286,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
-                            maxLength={30}
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="Country"
                             id="exampleInputEmail1"
@@ -303,7 +303,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                             className="textarea_edit col-12"
                             id=""
                             name=""
-                            maxLength={70}
+                            maxLength={500}
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={(e) => setAddress({ ...Address, add: e.target.value })}
                             value={Address.add}
@@ -327,6 +327,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                         onChange={(e) => setDetails(e.target.value)}
                         className="form-control rounded-0"
                         id="name"
+                        maxLength={500}
                         aria-describedby="emailHelp"
                         required
                       ></textarea>
@@ -376,7 +377,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
-                        maxLength={30}
+                        maxLength={50}
                         value={contactPerson}
                         onChange={handleContactPersonName}
                         className="form-control rounded-0"
@@ -396,7 +397,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="email"
-                        maxLength={30}
+                        maxLength={50}
                         value={contactPersonEmail}
                         onChange={(e) => setContactPersonEmail(e.target.value)}
                         className="form-control rounded-0"

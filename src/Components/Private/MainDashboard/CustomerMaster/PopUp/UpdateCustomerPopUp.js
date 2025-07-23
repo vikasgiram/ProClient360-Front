@@ -306,6 +306,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             id="State"
                             onChange={handleBillingChange}
                             name="state"
+                            maxLength={50}
                             value={billingAddress.state}
                             aria-describedby="emailHelp"
                           />
@@ -321,6 +322,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             id="city"
                             onChange={handleBillingChange}
                             name="city"
+                            maxLength={50}
                             value={billingAddress.city}
                             aria-describedby="emailHelp"
                           />
@@ -335,6 +337,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             placeholder="Country"
                             id="country"
                             name="country"
+                            maxLength={50}
                             onChange={handleBillingChange}
                             value={billingAddress.country}
                             aria-describedby="emailHelp"
@@ -348,6 +351,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             className="textarea_edit col-12"
                             id="add"
                             name="add"
+                            maxLength={500}
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={handleBillingChange}
                             value={billingAddress.add}

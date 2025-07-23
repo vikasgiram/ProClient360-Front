@@ -3,7 +3,6 @@ import { getCustomers } from "../../../../../hooks/useCustomer";
 import { updateProject } from "../../../../../hooks/useProjects";
 import { formatDateforupdate } from "../../../../../utils/formatDate";
 import Select from "react-select";
-
 import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { getAddress } from "../../../../../hooks/usePincode";

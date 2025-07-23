@@ -438,8 +438,9 @@ useEffect(() => {
                         >
                           Stuck Reason <RequiredStar />
                         </label>
-                        <input
+                        <textarea
                           type="textarea"
+                          maxLength={500}
                           className="form-control rounded-0"
                           id="stuckResion"
                           placeholder="Enter Stuck Reason...."
@@ -447,7 +448,7 @@ useEffect(() => {
                           value={stuckReason}
                           aria-describedby="emailHelp"
                           required
-                        />
+                        ></textarea>
                       </div>
                     </div>
                   )}
@@ -459,17 +460,17 @@ useEffect(() => {
                           <label htmlFor="action" className="form-label label_text">
                             Action {status !== "Stuck" && <RequiredStar />}
                           </label>
-                          <input
+                          <textarea
                             type="textarea"
                             className="form-control rounded-0"
                             id="action"
                             placeholder="Enter Action..."
-                            maxLength={70}
+                            maxLength={500}
                             value={action}
                             onChange={(e) => setAction(e.target.value)}
                             aria-describedby="nameHelp"
                             required={status !== "Stuck"}
-                          />
+                          ></textarea>
                         </div>
                       </div>
 
