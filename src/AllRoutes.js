@@ -53,7 +53,7 @@ const {user} = useContext(UserContext);
                     <Route exact path="/" element={<ProtectedRoute  Component={LogIn} />} />
                     <Route exact path="/ForgotPassword" element={<ForgotPassword />} />
                     <Route exact path="/Mailsentsuccessfully" element={<Mailsentsuccessfully />} />
-                    <Route exact path="/api/reset-password/:id/:token" element={<ForgotPasswordConfirm />} />
+                    <Route exact path="/ResetPassword/:id/:token" element={<ForgotPasswordConfirm />} />
                     <Route exact path="/feedback/:id" element={<Feedback />} />
                     
                     {user ? (

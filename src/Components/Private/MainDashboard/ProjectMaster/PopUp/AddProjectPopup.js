@@ -89,18 +89,7 @@ const AddProjectPopup = ({ handleAdd }) => {
     const formData = new FormData();
     formData.append('POCopy', POCopy);
 
-    if (!selectedCustomer?.value || !name || !purchaseOrderDate || !purchaseOrderNo || !purchaseOrderValue || !category || !startDate || !endDate || !advancePay || !payAgainstDelivery || !payAfterCompletion
-      || !Address.pincode ||
-      !Address.state ||
-      !Address.city ||
-      !Address.add ||
-      !Address.country
-    ) {
-      setLoading(false);
-      return toast.error("Please fill all fields");
-    }
-
-    else if (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion) > 100) {
+    if (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion) > 100) {
       setLoading(false);
       return toast.error("The total percentage cannot exceed 100%.");
     }
@@ -141,7 +130,7 @@ const AddProjectPopup = ({ handleAdd }) => {
     toast.loading("Creating Project...")
     const data = await createProject(formData);
     toast.dismiss()
-    if (data) {
+    if (data.success) {
       setLoading(false);
       toast.success(data.message);
       handleAdd();
