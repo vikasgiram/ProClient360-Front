@@ -8,7 +8,6 @@ import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
 import useMyServices from "../../../../hooks/service/useMyService";
 import useDeleteService from "../../../../hooks/service/useDeleteService";
 import { formatDate } from "../../../../utils/formatDate";
-import { getMyService } from "../../../../hooks/useService";
 
 export const EmployeeMyServiceMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -20,10 +19,6 @@ export const EmployeeMyServiceMasterGrid = () => {
   const [deletePopUpShow, setDeletePopUpShow] = useState(false);
   const [updatePopUpShow, setUpdatePopUpShow] = useState(false);
   const [detailsServicePopUp, setDetailsServicePopUp] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-
-  const [services, setServices] = useState([]);
 
   // Filter State
   const [filters, setFilters] = useState({
@@ -46,35 +41,26 @@ export const EmployeeMyServiceMasterGrid = () => {
 
   const itemsPerPage = 20;
 
+  // Use hooks
+  const { data, loading, error } = useMyServices(pagination.currentPage, itemsPerPage, filters);
   const { deleteService, loading: deleteLoading } = useDeleteService();
 
-  // Update Pagination and Data
+  // Update state with fetched data
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const data= await getMyService();
-
-      setLoading(false);
-      if (data.success) {
-        setServices(data.services || []);
-        setPagination(
-          data.pagination || {
-            currentPage: 1,
-            totalPages: 0,
-            totalServices: 0,
-            limit: itemsPerPage,
-            hasNextPage: false,
-            hasPrevPage: false,
-          }
-        );
-      }
-      else{
-        toast(data.error || "Failed to fetch services");
-      }
+    if (data) {
+      setPagination(data.pagination || {
+        currentPage: 1,
+        totalPages: 0,
+        totalServices: 0,
+        limit: itemsPerPage,
+        hasNextPage: false,
+        hasPrevPage: false,
+      });
     }
-  
-    fetchData();
-  }, [ updatePopUpShow, deletePopUpShow]);
+    if (error) {
+      toast.error(error);
+    }
+  }, [data, error]);
 
   // Event Handlers
   const handlePageChange = (page) => {
@@ -105,10 +91,7 @@ export const EmployeeMyServiceMasterGrid = () => {
         if (result) {
           toast.success("Service deleted successfully.");
           setDeletePopUpShow(false);
-          setPagination((prev) => ({
-            ...prev,
-            currentPage: prev.currentPage > 1 && services?.length === 1 ? prev.currentPage - 1 : prev.currentPage,
-          }));
+          setPagination((prev) => ({ ...prev, currentPage: 1 })); // Refresh list
         }
       } catch (err) {
         toast.error(err.message || "Failed to delete service.");
@@ -117,29 +100,18 @@ export const EmployeeMyServiceMasterGrid = () => {
   };
 
   const handleFilterChange = (filterType, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [filterType]: value || null,
-    }));
+    const updatedFilters = { ...filters, [filterType]: value || null };
+    setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
 
   // Pagination Buttons
   const maxPageButtons = 5;
-  const pageButtons = [];
-  let startPage = Math.max(1, pagination.currentPage - Math.floor(maxPageButtons / 2));
-  let endPage = Math.min(pagination.totalPages, startPage + maxPageButtons - 1);
-  if (endPage - startPage + 1 < maxPageButtons) {
-    startPage = Math.max(1, endPage - maxPageButtons + 1);
-  }
-  for (let i = startPage; i <= endPage; i++) {
-    pageButtons.push(i);
-  }
 
   return (
     <>
-      {(loading ) && (
+      {(loading || deleteLoading) && (
         <div className="overlay">
           <span className="loader"></span>
         </div>
@@ -173,7 +145,7 @@ export const EmployeeMyServiceMasterGrid = () => {
                           value={filters.serviceType || ""}
                           onChange={(e) => handleFilterChange("serviceType", e.target.value)}
                         >
-                          <option value="">All Service Types</option>
+                          <option value="">Select Service</option>
                           <option value="AMC">AMC</option>
                           <option value="Warranty">Warranty</option>
                           <option value="One Time">One Time</option>
@@ -186,7 +158,7 @@ export const EmployeeMyServiceMasterGrid = () => {
                           value={filters.status || ""}
                           onChange={(e) => handleFilterChange("status", e.target.value)}
                         >
-                          <option value="">All Status</option>
+                          <option value="">Select Status</option>
                           <option value="Completed">Completed</option>
                           <option value="Pending">Pending</option>
                           <option value="Inprogress">Inprogress</option>
@@ -200,10 +172,10 @@ export const EmployeeMyServiceMasterGrid = () => {
                           value={filters.priority || ""}
                           onChange={(e) => handleFilterChange("priority", e.target.value)}
                         >
-                          <option value="">All Priority</option>
-                          <option value="High">High</option>
-                          <option value="Medium">Medium</option>
-                          <option value="Low">Low</option>
+                          <option value="">Select Priority</option>
+                          <option value="High">High Priority</option>
+                          <option value="Medium">Medium Priority</option>
+                          <option value="Low">Low Priority</option>
                         </select>
                       </div>
                     </div>
@@ -231,15 +203,14 @@ export const EmployeeMyServiceMasterGrid = () => {
                           </tr>
                         </thead>
                         <tbody className="broder my-4">
-                          {services?.length > 0 ? (
-                            services.map((service, index) => (
+                          {data?.services?.length > 0 ? (
+                            data.services.map((service, index) => (
                               <tr className="border my-4" key={service._id}>
                                 <td>
                                   {index + 1 + (pagination.currentPage - 1) * itemsPerPage}
                                 </td>
                                 <td
-                                  className="align_left_td width_tdd"
-                                  style={{ width: "20%" }}
+                                  className="align_left_td width_tdd wrap-text-of-col"
                                 >
                                   {service.ticket?.details || "N/A"}
                                 </td>
@@ -250,17 +221,13 @@ export const EmployeeMyServiceMasterGrid = () => {
                                 <td>{service.priority || "N/A"}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
                                 <td
-                                  className={
-                                    service.status === "Completed"
-                                      ? "text-success"
-                                      : service.status === "Inprogress"
-                                      ? "text-primary"
-                                      : service.status === "Stuck"
-                                      ? "text-danger"
-                                      : service.status === "Pending"
-                                      ? "text-warning"
-                                      : ""
-                                  }
+                                  className="font-weight-bold"
+                                  style={{ 
+                                    color: service.status === 'Completed' ? '#28a745' : 
+                                           service.status === 'Inprogress' ? '#0000FF' : 
+                                           service.status === 'Pending' ? '#FFA726' : 
+                                           service.status === 'Stuck' ? '#E53935' : '#000'
+                                  }}
                                 >
                                   {service.status || "N/A"}
                                 </td>
@@ -296,7 +263,7 @@ export const EmployeeMyServiceMasterGrid = () => {
                           ) : (
                             <tr>
                               <td colSpan="8" className="text-center">
-                                {loading ? "Loading..." : "No services found matching your criteria."}
+                                No data found
                               </td>
                             </tr>
                           )}
@@ -306,56 +273,87 @@ export const EmployeeMyServiceMasterGrid = () => {
                   </div>
                 </div>
 
-                {pagination.totalPages > 1 && (
+                {/* Pagination Button */}
+                {!loading && pagination.totalPages > 1 && (
                   <div className="pagination-container text-center my-3">
                     <button
-                      disabled={!pagination.hasPrevPage}
                       onClick={() => handlePageChange(1)}
-                      className="btn btn-dark btn-sm me-2"
+                      disabled={!pagination.hasPrevPage}
+                      className="btn btn-dark btn-sm me-1"
+                      style={{ borderRadius: "4px" }}
                       aria-label="First Page"
-                      title="First Page"
                     >
                       First
                     </button>
+
                     <button
-                      disabled={!pagination.hasPrevPage}
                       onClick={() => handlePageChange(pagination.currentPage - 1)}
-                      className="btn btn-dark btn-sm me-2"
+                      disabled={!pagination.hasPrevPage}
+                      className="btn btn-dark btn-sm me-1"
+                      style={{ borderRadius: "4px" }}
                       aria-label="Previous Page"
-                      title="Previous Page"
                     >
                       Previous
                     </button>
-                    {startPage > 1 && <span className="mx-2">...</span>}
-                    {pageButtons.map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`btn btn-sm me-1 ${
-                          pagination.currentPage === page ? "btn-primary" : "btn-dark"
-                        }`}
-                        aria-label={`Go to page ${page}`}
-                        aria-current={pagination.currentPage === page ? "page" : undefined}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                    {endPage < pagination.totalPages && <span className="mx-2">...</span>}
+
+                    {(() => {
+                      const pageNumbers = [];
+                      const maxPagesToShow = 5;
+
+                      if (pagination.totalPages <= maxPagesToShow) {
+                        for (let i = 1; i <= pagination.totalPages; i++) {
+                          pageNumbers.push(i);
+                        }
+                      } else {
+                        let startPage, endPage;
+                        if (pagination.currentPage <= 3) {
+                          startPage = 1;
+                          endPage = maxPagesToShow;
+                        } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                          startPage = pagination.totalPages - maxPagesToShow + 1;
+                          endPage = pagination.totalPages;
+                        } else {
+                          startPage = pagination.currentPage - 2;
+                          endPage = pagination.currentPage + 2;
+                        }
+                        startPage = Math.max(1, startPage);
+                        endPage = Math.min(pagination.totalPages, endPage);
+
+                        for (let i = startPage; i <= endPage; i++) {
+                          pageNumbers.push(i);
+                        }
+                      }
+
+                      return pageNumbers.map((number) => (
+                        <button
+                          key={number}
+                          onClick={() => handlePageChange(number)}
+                          className={`btn btn-sm me-1 ${
+                            pagination.currentPage === number ? "btn-primary" : "btn-dark"
+                          }`}
+                          style={{ minWidth: "35px", borderRadius: "4px" }}
+                          aria-label={`Go to page ${number}`}
+                          aria-current={pagination.currentPage === number ? "page" : undefined}
+                        >
+                          {number}
+                        </button>
+                      ));
+                    })()}
+
                     <button
                       disabled={!pagination.hasNextPage}
                       onClick={() => handlePageChange(pagination.currentPage + 1)}
-                      className="btn btn-dark btn-sm ms-1 me-2"
-                      aria-label="Next Page"
-                      title="Next Page"
+                      className="btn btn-dark btn-sm me-1"
                     >
                       Next
                     </button>
+
                     <button
-                      disabled={!pagination.hasNextPage}
                       onClick={() => handlePageChange(pagination.totalPages)}
+                      disabled={!pagination.hasNextPage}
                       className="btn btn-dark btn-sm"
+                      style={{ borderRadius: "4px" }}
                       aria-label="Last Page"
-                      title="Last Page"
                     >
                       Last
                     </button>
@@ -379,7 +377,7 @@ export const EmployeeMyServiceMasterGrid = () => {
         <SubmitServiceWorkPopUp
           selectedService={selectedService}
           handleUpdate={handleUpdate}
-          onSuccess={() => setPagination((prev) => ({ ...prev }))}
+          onSuccess={() => setPagination((prev) => ({ ...prev, currentPage: 1 }))}
         />
       )}
       {detailsServicePopUp && selectedService && (

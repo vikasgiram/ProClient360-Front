@@ -282,7 +282,7 @@ export const TicketMasterGrid = () => {
                                 <td className="align_left_td">
                                   {ticket?.client?.custName || "N/A"}
                                 </td>
-                                <td className="align_left_td width_tdd">
+                                <td className="align_left_td width_tdd wrap-text-of-col">
                                   {ticket?.details}
                                 </td>
                                 <td>{ticket?.product}</td>

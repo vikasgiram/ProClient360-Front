@@ -2872,3 +2872,12 @@ width: 65% !important;
   max-width: 800px;
   
 }
+
+
+.wrap-text-of-col{
+  max-width: 4rem; 
+  word-wrap: break-word; 
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
