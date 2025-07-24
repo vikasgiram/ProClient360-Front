@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { createService } from "../../../../../hooks/useService";
 import { getEmployees } from "../../../../../hooks/useEmployees";
-
+import Select from "react-select";
 
 import toast from "react-hot-toast";
+const PAGE_SIZE = 10;
+
 const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
 
@@ -13,16 +15,43 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
   const [priority, setPriority] = useState();
   const [zone, setZone] = useState();
   const [allotmentDate, setAllotmentDate] = useState();
-  const [allotTo, setAllotTo] = useState(null);
   const [workMode, setWorkMode] = useState();
   const [ticket] = useState(selectedTicket);
-  const [employees, setEmployees] = useState([]);
 
+  // Employee dropdown state
+  const [empOptions, setEmpOptions] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [empPage, setEmpPage] = useState(1);
+  const [empHasMore, setEmpHasMore] = useState(true);
+  const [empLoading, setEmpLoading] = useState(false);
+  const [empSearch, setEmpSearch] = useState("");
+
+  // Fetch employees with pagination & search
+  const loadEmployees = useCallback(async (page, search) => {
+    if (empLoading || !empHasMore) return;
+    setEmpLoading(true);
+    const data = await getEmployees(page, PAGE_SIZE, search);
+
+    if (data.error) {
+      toast.error(data.error || 'Failed to load employees');
+      setEmpLoading(false);
+      return;
+    }
+
+    const newOpts = (data.employees || []).map(e => ({ value: e._id, label: e.name }));
+    setEmpOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+    setEmpHasMore(newOpts.length === PAGE_SIZE);
+    setEmpLoading(false);
+    setEmpPage(page + 1);
+  }, [empLoading, empHasMore]);
+
+  // Initial & search-triggered load (reset on search)
   useEffect(() => {
-    getEmployees().then((res) => {
-      setEmployees(res.employees || []);
-    });
-  }, []);
+    setEmpPage(1);
+    setEmpHasMore(true);
+    setEmpOptions([]);
+    loadEmployees(1, empSearch);
+  }, [empSearch]);
 
 
 
@@ -34,11 +63,11 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
       priority,
       zone,
       allotmentDate,
-      allotTo,
+      allotTo: selectedEmployee?.value,
       workMode,
       // completionDate
     };
-    if (!serviceType || !ticket || !priority || !allotmentDate || !allotTo || !workMode) {
+    if (!serviceType || !ticket || !priority || !allotmentDate || !selectedEmployee?.value || !workMode) {
       return toast.error("Please fill all the fields");
     }
 
@@ -164,18 +193,17 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                       >
                         Allocated to  <RequiredStar />
                       </label>
-                      <select
-                        className="form-select rounded-0"
-                        id=""
-                        aria-label="Default select example"
-                        onChange={(e) => setAllotTo(e.target.value)}
-                        required
-                      ><option value={null} >Select Employee</option>
-                        {employees.map((emp) => (
-                          <option value={emp._id}>{emp.name}</option>
-                        ))}
-
-                      </select>
+                      <Select
+                        options={empOptions}
+                        value={selectedEmployee}
+                        onChange={opt => setSelectedEmployee(opt)}
+                        onInputChange={val => setEmpSearch(val)}
+                        onMenuScrollToBottom={() => loadEmployees(empPage, empSearch)}
+                        isLoading={empLoading}
+                        placeholder="Search and select employee..."
+                        noOptionsMessage={() => empLoading ? 'Loading...' : 'No employees'}
+                        closeMenuOnSelect={true}
+                      />
                     </div>
                   </div>
 

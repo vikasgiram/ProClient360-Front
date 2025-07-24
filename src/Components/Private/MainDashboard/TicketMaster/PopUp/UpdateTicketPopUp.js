@@ -216,6 +216,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         <div className="mb-3">
                           <input
                             type="text"
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="State"
                             name="state"
@@ -232,6 +233,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         <div className="mb-3">
                           <input
                             type="text"
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="City"
                             name="city"
@@ -248,6 +250,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         <div className="mb-3">
                           <input
                             type="text"
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="Country"
                             id="country"
@@ -266,6 +269,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                             className="textarea_edit col-12"
                             id="add"
                             name="add"
+                            maxLength={500}
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={handleChange}
                             value={ticket?.Address?.add}
@@ -282,10 +286,10 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                       <label for="details" className="form-label label_text">
                         Complaint Details <RequiredStar />
                       </label>
-                      <input
+                      <textarea
                         type="text"
                         name="details"
-                        maxLength={70}
+                        maxLength={500}
                         placeholder="Update a Complaint Details...."
                         value={ticket?.details}
                         onChange={handleChange}
@@ -293,7 +297,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         id="details"
                         aria-describedby="emailHelp"
                         required
-                      />
+                      ></textarea>
                     </div>
                   </div>
 
@@ -360,6 +364,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                       </label>
                       <input
                         type="text"
+                        maxLength={50}
                         value={ticket?.contactPerson}
                         onChange={handleChange}
                         className="form-control rounded-0"
@@ -381,6 +386,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                       </label>
                       <input
                         type="text"
+                        maxLength={50}
                         value={ticket?.contactPersonEmail}
                         onChange={handleChange}
                         className="form-control rounded-0"

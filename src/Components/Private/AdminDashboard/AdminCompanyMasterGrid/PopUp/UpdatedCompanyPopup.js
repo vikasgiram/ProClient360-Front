@@ -165,7 +165,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                         name="name"
                         type="text"
                         placeholder="Update Full Name...."
-                        maxLength={40}
+                        maxLength={100}
                         value={company.name}
                         onChange={handleChange}
                         className="form-control rounded-0"
@@ -185,7 +185,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                         type="text"
                         name="admin"
                         placeholder="Update Admin Name...."
-                        maxLength={40}
+                        maxLength={50}
                         value={company.admin}
                         onChange={handleChange}
                         className="form-control rounded-0"
@@ -248,6 +248,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                           aria-label="Username"
                           aria-describedby="basic-addon1"
                           min={0}
+                          maxLength={12}
                           required
                         />
                       </div>{" "}
@@ -338,6 +339,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                             className="form-control rounded-0"
                             placeholder="State"
                             name="state"
+                            maxLength={50}
                             id="exampleInputEmail1"
                             // onChange={(e) => setAddress({ ...Address, state: e.target.value })}
                             onChange={handleAddressChange}
@@ -354,6 +356,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                             className="form-control rounded-0"
                             placeholder="City"
                             name="city"
+                            maxLength={50}
                             id="exampleInputEmail1"
                             onChange={handleAddressChange}
                             value={Address.city}
@@ -369,6 +372,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                             className="form-control rounded-0"
                             placeholder="Country"
                             name="country"
+                            maxLength={50}
                             id="exampleInputEmail1"
                             onChange={handleAddressChange}
                             value={Address.country}
@@ -383,6 +387,7 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
                             className="textarea_edit col-12"
                             id="add"
                             name="add"
+                            maxLength={500}
                             onChange={handleAddressChange}
                             value={Address.add}
                             rows="2"

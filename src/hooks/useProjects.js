@@ -64,7 +64,7 @@ const createProject = async (projectData) => {
     return data;
   } catch (error) {
     console.error(error.response.data);
-    return null;
+    return error.response.data;
   }
 };
 

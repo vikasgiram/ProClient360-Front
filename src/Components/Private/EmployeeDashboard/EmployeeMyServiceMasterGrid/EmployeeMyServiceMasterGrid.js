@@ -8,6 +8,7 @@ import ViewServicePopUp from "../../CommonPopUp/ViewServicePopUp";
 import useMyServices from "../../../../hooks/service/useMyService";
 import useDeleteService from "../../../../hooks/service/useDeleteService";
 import { formatDate } from "../../../../utils/formatDate";
+import { getMyService } from "../../../../hooks/useService";
 
 export const EmployeeMyServiceMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -19,6 +20,10 @@ export const EmployeeMyServiceMasterGrid = () => {
   const [deletePopUpShow, setDeletePopUpShow] = useState(false);
   const [updatePopUpShow, setUpdatePopUpShow] = useState(false);
   const [detailsServicePopUp, setDetailsServicePopUp] = useState(false);
+
+  const [loading, setLoading] = useState(true);
+
+  const [services, setServices] = useState([]);
 
   // Filter State
   const [filters, setFilters] = useState({
@@ -41,32 +46,35 @@ export const EmployeeMyServiceMasterGrid = () => {
 
   const itemsPerPage = 20;
 
-  // Use Hooks
-  const { data, loading, error } = useMyServices(
-    pagination.currentPage,
-    itemsPerPage,
-    filters
-  );
   const { deleteService, loading: deleteLoading } = useDeleteService();
 
   // Update Pagination and Data
   useEffect(() => {
-    if (data) {
-      setPagination(
-        data.pagination || {
-          currentPage: 1,
-          totalPages: 0,
-          totalServices: 0,
-          limit: itemsPerPage,
-          hasNextPage: false,
-          hasPrevPage: false,
-        }
-      );
+    const fetchData = async () => {
+      setLoading(true);
+      const data= await getMyService();
+
+      setLoading(false);
+      if (data.success) {
+        setServices(data.services || []);
+        setPagination(
+          data.pagination || {
+            currentPage: 1,
+            totalPages: 0,
+            totalServices: 0,
+            limit: itemsPerPage,
+            hasNextPage: false,
+            hasPrevPage: false,
+          }
+        );
+      }
+      else{
+        toast(data.error || "Failed to fetch services");
+      }
     }
-    if (error) {
-      toast.error(error);
-    }
-  }, [data, error]);
+  
+    fetchData();
+  }, [ updatePopUpShow, deletePopUpShow]);
 
   // Event Handlers
   const handlePageChange = (page) => {
@@ -91,7 +99,7 @@ export const EmployeeMyServiceMasterGrid = () => {
   const handleDeleteClick = async () => {
     if (selectedId) {
       try {
-        toast.loading("Delete Service....")
+        toast.loading("Deleting Service...")
         const result = await deleteService(selectedId);
         toast.dismiss()
         if (result) {
@@ -99,7 +107,7 @@ export const EmployeeMyServiceMasterGrid = () => {
           setDeletePopUpShow(false);
           setPagination((prev) => ({
             ...prev,
-            currentPage: prev.currentPage > 1 && data?.services?.length === 1 ? prev.currentPage - 1 : prev.currentPage,
+            currentPage: prev.currentPage > 1 && services?.length === 1 ? prev.currentPage - 1 : prev.currentPage,
           }));
         }
       } catch (err) {
@@ -131,7 +139,7 @@ export const EmployeeMyServiceMasterGrid = () => {
 
   return (
     <>
-      {(loading || deleteLoading) && (
+      {(loading ) && (
         <div className="overlay">
           <span className="loader"></span>
         </div>
@@ -223,8 +231,8 @@ export const EmployeeMyServiceMasterGrid = () => {
                           </tr>
                         </thead>
                         <tbody className="broder my-4">
-                          {data?.services?.length > 0 ? (
-                            data.services.map((service, index) => (
+                          {services?.length > 0 ? (
+                            services.map((service, index) => (
                               <tr className="border my-4" key={service._id}>
                                 <td>
                                   {index + 1 + (pagination.currentPage - 1) * itemsPerPage}

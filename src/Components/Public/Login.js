@@ -70,9 +70,9 @@ export const LogIn = () => {
   };
 
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  // const toggleShowPassword = () => {
+  //   setShowPassword(!showPassword);
+  // };
 
   useEffect(() => {
     const elements = document.querySelectorAll('.slide-in');
@@ -86,7 +86,7 @@ export const LogIn = () => {
 
 
   const showForgotPassword = () => {
-    alert('Demo: Forgot Password\n\nIn a real application, this would redirect to a password reset page.');
+    navigation('/ForgotPassword')
   };
 
   const showSignUp = () => {
@@ -95,22 +95,6 @@ export const LogIn = () => {
 
 
 
-
-
-  const InputField = ({ type, name, placeholder, Icon }) => (
-    <div className="relative">
-      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-        <Icon />
-      </div>
-      <input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        required
-        className="input-focus w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-gray-50/50"
-      />
-    </div>
-  );
 
   const DashboardIcon = () => (
     <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -139,19 +123,6 @@ export const LogIn = () => {
   const TeamIcon = () => (
     <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
       <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
-    </svg>
-  );
-
-  const EmailIcon = () => (
-    <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-    </svg>
-  );
-
-  const PasswordIcon = () => (
-    <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
     </svg>
   );
 

@@ -1,14 +1,24 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { getDepartment } from "../../../../../hooks/useDepartment";
 import toast from "react-hot-toast";
+import Select from "react-select";
 import { updateDesignation } from "../../../../../hooks/useDesignation";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
+const PAGE_SIZE = 10;
+
 const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
 
-  const [getDepartments, setGetDepartments] = useState([]);
   const [permissions, setPermissions] = useState([]);
   const [designation, setDesignation] = useState(selectedDes);
+
+  // Department dropdown state
+  const [deptOptions, setDeptOptions] = useState([]);
+  const [selectedDept, setSelectedDept] = useState(null);
+  const [deptPage, setDeptPage] = useState(1);
+  const [deptHasMore, setDeptHasMore] = useState(true);
+  const [deptLoading, setDeptLoading] = useState(false);
+  const [deptSearch, setDeptSearch] = useState("");
 
 
     
@@ -38,16 +48,42 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
   //   };}
  
 
-  // Fetch departments
+  // Fetch departments with pagination & search
+  const loadDepartments = useCallback(async (page, search) => {
+    if (deptLoading || !deptHasMore) return;
+    setDeptLoading(true);
+    const data = await getDepartment(page, PAGE_SIZE, search);
+
+    if (data.error) {
+      toast.error(data.error || 'Failed to load departments');
+      setDeptLoading(false);
+      return;
+    }
+
+    const newOpts = (data.departments || []).map(d => ({ value: d._id, label: d.name }));
+    setDeptOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+    setDeptHasMore(newOpts.length === PAGE_SIZE);
+    setDeptLoading(false);
+    setDeptPage(page + 1);
+  }, [deptLoading, deptHasMore]);
+
+  // Initial & search-triggered load (reset on search)
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getDepartment();
-      if (data) {
-        setGetDepartments(data.departments || []);
+    setDeptPage(1);
+    setDeptHasMore(true);
+    setDeptOptions([]);
+    loadDepartments(1, deptSearch);
+  }, [deptSearch]);
+
+  // Set selected department when designation data is loaded
+  useEffect(() => {
+    if (designation?.department?._id && deptOptions.length > 0) {
+      const selectedOption = deptOptions.find(opt => opt.value === designation.department._id);
+      if (selectedOption) {
+        setSelectedDept(selectedOption);
       }
-    };
-    fetchData();
-  }, []);
+    }
+  }, [designation, deptOptions]);
 
 
 
@@ -156,6 +192,15 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
     }));
   };
 
+  // Handle department selection
+  const handleDepartmentChange = (selectedOption) => {
+    setSelectedDept(selectedOption);
+    setDesignation((prevDesignation) => ({
+      ...prevDesignation,
+      department: selectedOption ? selectedOption.value : null,
+    }));
+  };
+
   
 
   // Handle role addition
@@ -214,7 +259,7 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
                     <input
                       type="text"
                       placeholder="Update Designation Name...."
-                      maxLength={40}
+                      maxLength={50}
                       value={designation.name}
                       onChange={handleInputChange}
                       className="form-control rounded-0"
@@ -232,20 +277,37 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
                     <label htmlFor="Department" className="form-label label_text">
                       Department <RequiredStar />
                     </label>
-                    <select
-                      className="form-select rounded-0"
-                      id="department"
-                      name="department"
-                      value={designation.department._id}
-                      onChange={handleInputChange}
-                    >
-                      {/* <option value="" >{designation.department.name}</option> */}
-                      {getDepartments.map((department) => (
-                        <option key={department._id} value={department._id}>
-                          {department.name}
-                        </option>
-                      ))}
-                    </select>
+                    <Select
+                      value={selectedDept}
+                      onChange={handleDepartmentChange}
+                      onInputChange={(inputValue) => setDeptSearch(inputValue)}
+                      options={deptOptions}
+                      isLoading={deptLoading}
+                      onMenuScrollToBottom={() => {
+                        if (deptHasMore && !deptLoading) {
+                          loadDepartments(deptPage, deptSearch);
+                        }
+                      }}
+                      placeholder="Select Department..."
+                      isClearable
+                      menuPlacement="auto"
+                      className="react-select-container"
+                      classNamePrefix="react-select"
+                      styles={{
+                        control: (provided) => ({
+                          ...provided,
+                          borderRadius: '0px',
+                          border: '1px solid #ced4da',
+                          '&:hover': {
+                            border: '1px solid #ced4da',
+                          },
+                        }),
+                        menu: (provided) => ({
+                          ...provided,
+                          zIndex: 9999,
+                        }),
+                      }}
+                    />
                   </div>
                 </div>
 

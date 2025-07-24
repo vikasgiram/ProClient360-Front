@@ -29,11 +29,19 @@ export const TaskMasterGrid = () => {
     const [loading, setLoading] = useState(true);
     const [selectedTask, setSelectedTask] = useState(null);
     const [searchText, setSearchText] = useState("");
-    const [filteredData, setFilteredData] = useState([]);
-
+    const [search, setSearch] = useState("");
 
     const [tasks, setTasks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1); 
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 0,
+        totalTasks: 0,
+        limit: 20,
+        hasNextPage: false,
+        hasPrevPage: false,
+    });
+
     const itemsPerPage = 20; 
 
     const handlePageChange = (page) => {
@@ -64,6 +72,7 @@ export const TaskMasterGrid = () => {
         toast.dismiss()
         if (data) {
             handelDeleteClosePopUpClick();
+            setCurrentPage(1); // Reset to page 1 after deletion
         }
 
     };
@@ -73,32 +82,56 @@ export const TaskMasterGrid = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const allTasks = await getTask();
-                if (allTasks) {
-                    setTasks(allTasks.task);
-                    setFilteredData(allTasks.task);
-                    setLoading(false);
+                const data = await getTask(currentPage, itemsPerPage, search);
+                if (data.success) {
+                    setTasks(data.task || []);
+                    setPagination(data.pagination || {
+                        currentPage: 1,
+                        totalPages: 0,
+                        totalTasks: 0,
+                        limit: itemsPerPage,
+                        hasNextPage: false,
+                        hasPrevPage: false,
+                    });
+                } else {
+                    toast(data.error);
                 }
             } catch (error) {
-                console.log(error)
-                setLoading(false);
-            }
-            finally {
+                console.error("Error fetching tasks:", error);
+            } finally {
                 setLoading(false);
             }
         };
 
-        fetchData();
-    }, [AddPopUpShow, deletePopUpShow, updatePopUpShow]);
+        fetchData(); 
+    }, [currentPage, AddPopUpShow, deletePopUpShow, updatePopUpShow, search]);
+
+    // Pagination button rendering logic
+    const maxPageButtons = 5; // Maximum number of page buttons to display
+    const halfMaxButtons = Math.floor(maxPageButtons / 2);
+    let startPage = Math.max(1, currentPage - halfMaxButtons);
+    let endPage = Math.min(pagination.totalPages, startPage + maxPageButtons - 1);
+
+    // Adjust startPage if endPage is at the totalPages
+    if (endPage - startPage + 1 < maxPageButtons) {
+        startPage = Math.max(1, endPage - maxPageButtons + 1);
+    }
+
+    const handleOnSearchSubmit = (event) => {
+        event.preventDefault();
+        console.log("Search text:", searchText);
+        setSearch(searchText);
+    };
+
+    const pageButtons = [];
+    for (let i = startPage; i <= endPage; i++) {
+        pageButtons.push(i);
+    }
 
     // console.log(tasks,"tasks");
-
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-
-    // Total pages
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const currentData = tasks;
 
 
     return (
@@ -132,25 +165,18 @@ export const TaskMasterGrid = () => {
                                             <div className="col-4 col--md-6 col-lg-8">
                                                 <div className="form">
                                                     <i className="fa fa-search"></i>
-                                                    <input type="text"
-                                                        value={searchText}
-                                                        onChange={(e) => {
-                                                            const newSearchText = e.target.value;
-                                                            setSearchText(newSearchText);
-
-                                                            // Filter tasks as the search text changes
-                                                            const filtered = tasks.filter((task) =>
-                                                                task.name.toLowerCase().includes(newSearchText.toLowerCase())
-                                                            );
-                                                            setFilteredData(filtered);
-                                                        }}
-                                                        className="form-control form-input bg-transparant"
-                                                        placeholder="Search ..." />
+                                                    <form onSubmit={handleOnSearchSubmit}>
+                                                        <input type="text"
+                                                            value={searchText}
+                                                            onChange={(e) => setSearchText(e.target.value)}
+                                                            className="form-control form-input bg-transparant"
+                                                            placeholder="Search ..." />
+                                                    </form>
                                                 </div>
                                             </div>
 
 
-                                                {user?.permission?.includes('createTask') || user.user === 'company' ? (
+                                                {user?.permissions?.includes('createTask') || user.user === 'company' ? (
                                             <div className="col-4 col-lg-4 ms-auto text-end ">
                                                 <button
                                                     onClick={() => {
@@ -182,11 +208,11 @@ export const TaskMasterGrid = () => {
                                                 <tbody className="broder my-4">
                                                     {currentData && currentData.map((task, index) => (
                                                         <tr className="border my-4" key={task._id}>
-                                                            <td>{ index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                                                            <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                                                             <td className="align_left_td td_width">{task.name}</td>
 
                                                             <td>
-                                                                {user?.permission?.includes('updateTask') || user.user === 'company' ? (
+                                                                {user?.permissions?.includes('updateTask') || user.user === 'company' ? (
                                                                 <span
                                                                     onClick={() => handleUpdate(task)}
 
@@ -195,7 +221,7 @@ export const TaskMasterGrid = () => {
                                                                 </span>
                                                                 ) : null}
 
-                                                                {user?.permission?.includes('deleteTask') || user.user === 'company' ? (
+                                                                {user?.permissions?.includes('deleteTask') || user.user === 'company' ? (
                                                                 <span
                                                                     onClick={() => handelDeleteClosePopUpClick(task._id)}
                                                                     className="delete">
@@ -205,7 +231,13 @@ export const TaskMasterGrid = () => {
                                                             </td>
                                                         </tr>
                                                     ))}
-                                                    {filteredData.length === 0 && (<p>No data found</p>)}
+                                                    {tasks.length === 0 && (
+                                                        <tr>
+                                                            <td colSpan="3" className="text-center">
+                                                                No data found
+                                                            </td>
+                                                        </tr>
+                                                    )}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -214,106 +246,52 @@ export const TaskMasterGrid = () => {
                                 </div>
 
 
-                            {/*  Full Pagination */}
-                            {!loading && totalPages > 1 && ( 
-                                    <div className="pagination-container text-center my-3">
-                                        {/* First button */}
-                                        <button
-                                            onClick={() => handlePageChange(1)}
-                                            disabled={currentPage <= 1}
-                                            className="btn btn-dark btn-sm me-1"
-                                            style={{ borderRadius: "4px" }}
-                                            aria-label="First Page"
-                                        >
-                                            First
-                                        </button>
+                            {/*  Pagination */}
+                            <div className="pagination-container text-center my-3 sm">
+                                <button
+                                    disabled={!pagination.hasPrevPage}
+                                    onClick={() => handlePageChange(1)}
+                                    className="btn btn-dark btn-sm me-2"
+                                >
+                                    First
+                                </button>
+                                <button
+                                    disabled={!pagination.hasPrevPage}
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    className="btn btn-dark btn-sm me-2"
+                                >
+                                    Previous
+                                </button>
+                                {startPage > 1 && <span className="mx-2">...</span>}
 
-                                        {/* Previous button */}
-                                        <button
-                                            onClick={() => handlePageChange(currentPage - 1)}
-                                            disabled={currentPage <= 1}
-                                            className="btn btn-dark btn-sm me-1"
-                                            style={{ borderRadius: "4px" }}
-                                            aria-label="Previous Page"
-                                        >
-                                            Previous
-                                        </button>
+                                {pageButtons.map((page) => (
+                                    <button
+                                        key={page}
+                                        onClick={() => handlePageChange(page)}
+                                        className={`btn btn-sm me-1 ${ 
+                                            pagination.currentPage === page ? "btn-primary" : "btn-dark"
+                                        }`}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
 
-                                        {/* Page numbers 5 */}
-                                        {(() => {
-                                            const pageNumbers = [];
-                                            const maxPagesToShow = 5;
-
-                                            if (totalPages <= maxPagesToShow) {
-                                                // Case 1: Total pages is 5 or less - show all
-                                                for (let i = 1; i <= totalPages; i++) {
-                                                    pageNumbers.push(i);
-                                                }
-                                            } else {
-                                                // Case 2: Total pages is more than 5
-                                                let startPage, endPage;
-                                                if (currentPage <= 3) {
-                                                    // Near the beginning: 1, 2, 3, 4, 5
-                                                    startPage = 1;
-                                                    endPage = maxPagesToShow;
-                                                } else if (currentPage >= totalPages - 2) {
-                                                    // Near the end: last 5 pages
-                                                    startPage = totalPages - maxPagesToShow + 1;
-                                                    endPage = totalPages;
-                                                } else {
-                                                    // In the middle: current +/- 2
-                                                    startPage = currentPage - 2;
-                                                    endPage = currentPage + 2;
-                                                }
-                                                // Ensure start/end are within bounds (redundant check for safety)
-                                                startPage = Math.max(1, startPage);
-                                                endPage = Math.min(totalPages, endPage);
-
-                                                for (let i = startPage; i <= endPage; i++) {
-                                                    pageNumbers.push(i);
-                                                }
-                                            }
-
-                                            // Render the calculated page number buttons
-                                            return pageNumbers.map((number) => (
-                                                <button
-                                                    key={number}
-                                                    onClick={() => handlePageChange(number)}
-                                                    className={`btn btn-sm me-1 ${
-                                                        currentPage === number ? "btn-primary" : "btn-dark"
-                                                    }`}
-                                                    style={{ minWidth: "35px", borderRadius: "4px" }}
-                                                    aria-label={`Go to page ${number}`}
-                                                    aria-current={currentPage === number ? 'page' : undefined}
-                                                >
-                                                    {number}
-                                                </button>
-                                            ));
-                                        })()}
-
-                                        {/* Next button */}
-                                        <button
-                                            onClick={() => handlePageChange(currentPage + 1)}
-                                            disabled={currentPage >= totalPages}
-                                            className="btn btn-dark btn-sm me-1"
-                                            style={{ borderRadius: "4px" }}
-                                            aria-label="Next Page"
-                                        >
-                                            Next
-                                        </button>
-
-                                        {/* Last button */}
-                                        <button
-                                            onClick={() => handlePageChange(totalPages)}
-                                            disabled={currentPage >= totalPages}
-                                            className="btn btn-dark btn-sm"
-                                            style={{ borderRadius: "4px" }}
-                                            aria-label="Last Page"
-                                        >
-                                            Last
-                                        </button>
-                                    </div>
-                                )}
+                                {endPage < pagination.totalPages && <span className="mx-2">...</span>}
+                                <button
+                                    disabled={!pagination.hasNextPage}
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    className="btn btn-dark btn-sm me-2"
+                                >
+                                    Next
+                                </button>
+                                <button
+                                    disabled={!pagination.hasNextPage}
+                                    onClick={() => handlePageChange(pagination.totalPages)}
+                                    className="btn btn-dark btn-sm"
+                                >
+                                    Last
+                                </button>
+                            </div>
                             </div>
                         </div>
                     </div>

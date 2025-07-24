@@ -144,7 +144,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                         type="text"
                         className="form-control rounded-0"
                         id="FullName"
-                        maxLength={40}
+                        maxLength={300}
                         placeholder="Update a Full Name.... "
                         name="custName"
                         value={customer.custName}
@@ -163,7 +163,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                       <input
                         type="email"
                         name="email"
-                        maxLength={40}
+                        maxLength={50}
                         placeholder="Update a Email...."
                         className="form-control rounded-0"
                         id="Email"
@@ -193,6 +193,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             type="text"
                             className="form-control rounded-0"
                             id="ContactPerson1"
+                            maxLength={100}
                             name="customerContactPersonName1"
                             onChange={handleChange}
                             value={customer.customerContactPersonName1}
@@ -240,6 +241,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
 
                             className="form-control rounded-0"
                             id="ContactPerson2"
+                            maxLength={100}
                             name="customerContactPersonName2"
                             onChange={handleChange}
                             value={customer.customerContactPersonName2}
@@ -306,6 +308,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             id="State"
                             onChange={handleBillingChange}
                             name="state"
+                            maxLength={50}
                             value={billingAddress.state}
                             aria-describedby="emailHelp"
                           />
@@ -321,6 +324,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             id="city"
                             onChange={handleBillingChange}
                             name="city"
+                            maxLength={50}
                             value={billingAddress.city}
                             aria-describedby="emailHelp"
                           />
@@ -335,6 +339,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             placeholder="Country"
                             id="country"
                             name="country"
+                            maxLength={50}
                             onChange={handleBillingChange}
                             value={billingAddress.country}
                             aria-describedby="emailHelp"
@@ -348,6 +353,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             className="textarea_edit col-12"
                             id="add"
                             name="add"
+                            maxLength={500}
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={handleBillingChange}
                             value={billingAddress.add}

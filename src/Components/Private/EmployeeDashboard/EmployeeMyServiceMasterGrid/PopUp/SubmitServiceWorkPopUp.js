@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { default as ReactSelect } from "react-select";
-
+import Select from "react-select";
 
 import {
   formatDate,
@@ -17,24 +17,77 @@ import { sendNotification } from "../../../../../hooks/useNotification";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
 
-const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
+const PAGE_SIZE = 10;
+
+const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate}) => {
   const [status, setStatus] = useState("");
   const [action, setAction] = useState("");
   const [stuckReason, setStuckReason] = useState("");
-  const [startTime, setStartTime] = useState();
-  const [endTime, setEndTime] = useState();
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
   const [previousActions, setPreviousActions] = useState([]);
 
   const [responsibleParty, setResponsibleParty] = useState("");
-  const [departments, setDepartments] = useState("");
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [employees, setEmployees] = useState();
+  
+  // Department dropdown state
+  const [departments, setDepartments] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [hasMoreDepartments, setHasMoreDepartments] = useState(true);
+  const [deptPage, setDeptPage] = useState(1);
+  const [deptSearchTerm, setDeptSearchTerm] = useState("");
+  
+  // Employee dropdown state
+  const [employees, setEmployees] = useState("");
   const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [hasMoreEmployees, setHasMoreEmployees] = useState(true);
+  const [empPage, setEmpPage] = useState(1);
+  const [empSearchTerm, setEmpSearchTerm] = useState("");
 
   const [showInfo, setShowInfo] = useState(false);
 
   const [workComplete, setWorkComplete] = useState('');
 
+
+  // Load departments with pagination and search
+  const loadDepartments = useCallback(async (page = 1, search = "") => {
+    try {
+      const data = await getDepartment(page, PAGE_SIZE, search);
+      if (data && data.departments) {
+        if (page === 1) {
+          setDepartments(data.departments);
+        } else {
+          setDepartments(prev => [...prev, ...data.departments]);
+        }
+        setHasMoreDepartments(data.departments.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  // Load employees with pagination and search
+  const loadEmployees = useCallback(async (page = 1, search = "") => {
+    try {
+      if (!selectedDepartment) return;
+
+      const data = await getEmployee(selectedDepartment.value, page, PAGE_SIZE, search);
+      if (data && data.employee) {
+        const formattedData = data.employee.map((employee) => ({
+          value: employee._id,
+          label: employee.name,
+        }));
+        
+        if (page === 1) {
+          setEmployeeOptions(formattedData);
+        } else {
+          setEmployeeOptions(prev => [...prev, ...formattedData]);
+        }
+        setHasMoreEmployees(data.employee.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [selectedDepartment]);
 
   const FetchPreviousActions = async () => {
     try {
@@ -53,54 +106,46 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate }) => {
 
 
 useEffect(() => {
-  const fetchDataDep = async () => {
-    try {
-      const data = await getDepartment();
-      if (data && data.departments) {
-        setDepartments(data.departments);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  fetchDataDep();
-}, []);
+  loadDepartments(1, deptSearchTerm);
+}, [loadDepartments, deptSearchTerm]);
 
 
 useEffect(() => {
-  const fetchDataEmp = async () => {
-    try {
-      if (!selectedDepartment) return;
-
-      const data = await getEmployee(selectedDepartment);
-      if (data && data.employee) {
-        const formattedData = data.employee.map((employee) => ({
-          value: employee._id,
-          label: employee.name,
-        }));
-        setEmployeeOptions(formattedData);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  fetchDataEmp();
-}, [selectedDepartment]);
+  if (selectedDepartment) {
+    setEmpPage(1);
+    setEmployeeOptions([]);
+    setEmployees("");
+    loadEmployees(1, empSearchTerm);
+  } else {
+    setEmployeeOptions([]);
+    setEmployees("");
+  }
+}, [selectedDepartment, loadEmployees, empSearchTerm]);
 
   const handleSendNotification = async () => {
     const notificationData = {
       message: stuckReason,
       userIds: employees,
     };
-
     await sendNotification(notificationData);
   };
 
   const handleMyService = async (event) => {
     event.preventDefault();
-
+    
+    let actionData = {};
+    
+    if (startTime === null || endTime === null) {
+      return toast.error("Please select Date and Time");
+    }
     if (status === "") {
       return toast.error("Please select status");
+    }
+    if (status!=='Stuck' && action === "" ) {
+      return toast.error("Please enter Action");
+    }
+    if (status === "Inprogress" && workComplete === "") {
+      return toast.error("Please enter Work Complete Percentage");
     }
     if (status === "Stuck") {
       if (responsibleParty === "") {
@@ -110,31 +155,25 @@ useEffect(() => {
         return toast.error("Please enter Stuck Reason");
       }
       if (responsibleParty === "Company") {
-        if (selectedDepartment === "") {
+        if (!selectedDepartment) {
           return toast.error("Please select Department");
         }
-        if (employees.length === 0) {
+        if (!employees || employees === "") {
           return toast.error("Please select Employee");
         }
 
         handleSendNotification();
         handleUpdate();
-        return;
       }
     }
-    if (startTime === "" || startTime === "") {
-      return toast.error("Please select Date and Time");
-    }
-    if (action === "") {
-      return toast.error("Please enter Action");
-    }
 
-    const actionData = {
+    actionData = {
       service: selectedService._id,
       status,
       startTime,
       endTime,
       stuckReason,
+      completeLevel: workComplete,
       action,
     };
 
@@ -148,9 +187,18 @@ useEffect(() => {
       handleUpdate();
       FetchPreviousActions();
     } else {
-      toast.error(data.error);
+      toast.error(data?.error);
     }
   };
+
+  const onStatusChange = (e) => {
+    setStatus(e.target.value);
+    console.log(e.target.value);
+    if (e.target.value !== "Stuck") {
+      setResponsibleParty("");
+      setStuckReason("");
+    }
+  }
 
   return (
     <>
@@ -240,7 +288,7 @@ useEffect(() => {
                       <select
                         className="form-control rounded-0"
                         id="status"
-                        onChange={(e) => setStatus(e.target.value)}
+                        onChange={onStatusChange}
                         value={status}
                         aria-describedby="statusHelp"
                         required
@@ -307,53 +355,92 @@ useEffect(() => {
                   )}
 
                 {responsibleParty === "Company" && (
-  <div className="row">
-    <div className="col-6 col-lg-6 mt-2 inprogress-field">
-      <div className="mb-3">
-        <label htmlFor="department" className="form-label label_text">
-          Department <RequiredStar />
-        </label>
-        <select
-          id="department"
-          className="form-select rounded-0"
-          onChange={(e) => setSelectedDepartment(e.target.value)}
-          value={selectedDepartment}
-          required
-        >
-          <option value="">-- Select Department Name --</option>
-          {departments &&
-            departments.map((department) => (
-              <option key={department._id} value={department._id}>
-                {department.name}
-              </option>
-            ))}
-        </select>
-      </div>
-    </div>
+                  <div className="row">
+                    <div className="col-6 col-lg-6 mt-2 inprogress-field">
+                      <div className="mb-3">
+                        <label htmlFor="department" className="form-label label_text">
+                          Department <RequiredStar />
+                        </label>
+                        <Select
+                          id="department"
+                          options={departments.map(dept => ({ value: dept._id, label: dept.name }))}
+                          value={selectedDepartment}
+                          onChange={(selectedOption) => setSelectedDepartment(selectedOption)}
+                          onInputChange={(inputValue) => {
+                            setDeptSearchTerm(inputValue);
+                            setDeptPage(1);
+                          }}
+                          onMenuScrollToBottom={() => {
+                            if (hasMoreDepartments) {
+                              const nextPage = deptPage + 1;
+                              setDeptPage(nextPage);
+                              loadDepartments(nextPage, deptSearchTerm);
+                            }
+                          }}
+                          placeholder="Select Department..."
+                          isClearable
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              borderRadius: 0,
+                              borderColor: '#ced4da',
+                              fontSize: '16px',
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                              color: state.isSelected ? 'white' : '#212529',
+                            }),
+                          }}
+                        />
+                      </div>
+                    </div>
 
-    {/* Employee ReactSelect */}
-    <div className="col-6 col-lg-6 mt-2">
-      <div className="mb-3">
-        <label htmlFor="employeeSelect" className="form-label label_text">
-          Employee Name <RequiredStar />
-        </label>
-        <ReactSelect
-          inputId="employeeSelect"
-          options={employeeOptions}
-          hideSelectedOptions={false}
-          onChange={(selectedOption) => {
-            const employeeId = selectedOption ? selectedOption.value : null;
-            setEmployees(employeeId);
-          }}
-          value={employeeOptions.find(
-            (option) => option.value === employees
-          )}
-          placeholder="Select Employee..."
-        />
-      </div>
-    </div>
-  </div>
-)}
+                    {/* Employee ReactSelect */}
+                    <div className="col-6 col-lg-6 mt-2">
+                      <div className="mb-3">
+                        <label htmlFor="employeeSelect" className="form-label label_text">
+                          Employee Name <RequiredStar />
+                        </label>
+                        <Select
+                          inputId="employeeSelect"
+                          options={employeeOptions}
+                          value={employeeOptions.find(option => option.value === employees)}
+                          onChange={(selectedOption) => {
+                            setEmployees(selectedOption ? selectedOption.value : "");
+                          }}
+                          onInputChange={(inputValue) => {
+                            setEmpSearchTerm(inputValue);
+                            setEmpPage(1);
+                          }}
+                          onMenuScrollToBottom={() => {
+                            if (hasMoreEmployees) {
+                              const nextPage = empPage + 1;
+                              setEmpPage(nextPage);
+                              loadEmployees(nextPage, empSearchTerm);
+                            }
+                          }}
+                          placeholder="Select Employee..."
+                          isClearable
+                          isDisabled={!selectedDepartment}
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              borderRadius: 0,
+                              borderColor: '#ced4da',
+                              fontSize: '16px',
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                              color: state.isSelected ? 'white' : '#212529',
+                            }),
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
 
                   {status === "Stuck" && (
@@ -365,8 +452,9 @@ useEffect(() => {
                         >
                           Stuck Reason <RequiredStar />
                         </label>
-                        <input
+                        <textarea
                           type="textarea"
+                          maxLength={500}
                           className="form-control rounded-0"
                           id="stuckResion"
                           placeholder="Enter Stuck Reason...."
@@ -374,7 +462,7 @@ useEffect(() => {
                           value={stuckReason}
                           aria-describedby="emailHelp"
                           required
-                        />
+                        ></textarea>
                       </div>
                     </div>
                   )}
@@ -386,17 +474,17 @@ useEffect(() => {
                           <label htmlFor="action" className="form-label label_text">
                             Action {status !== "Stuck" && <RequiredStar />}
                           </label>
-                          <input
+                          <textarea
                             type="textarea"
                             className="form-control rounded-0"
                             id="action"
                             placeholder="Enter Action..."
-                            maxLength={70}
+                            maxLength={500}
                             value={action}
                             onChange={(e) => setAction(e.target.value)}
                             aria-describedby="nameHelp"
                             required={status !== "Stuck"}
-                          />
+                          ></textarea>
                         </div>
                       </div>
 
@@ -404,7 +492,6 @@ useEffect(() => {
                     </>
                   )}
 
-                  {status !== "Stuck" ? (
                     <div className="row g-3 mt-2">
                       <div className="col">
                         <label htmlFor="StartTime" className="form-label label_text">
@@ -417,7 +504,7 @@ useEffect(() => {
                           onChange={(e) => setStartTime(e.target.value)}
                           value={startTime}
                           aria-describedby="statusHelp"
-                          required
+                          required="true"
                         />
                       </div>
 
@@ -432,11 +519,10 @@ useEffect(() => {
                           onChange={(e) => setEndTime(e.target.value)}
                           value={endTime}
                           aria-describedby="statusHelp"
-                          required
+                          required="true"
                         />
                       </div>
                     </div>
-                  ) : null}
                   <div className="row">
                     <div className="col-12 pt-3 mt-2">
                       <button

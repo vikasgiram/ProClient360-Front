@@ -179,7 +179,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                         type="text"
                         className="form-control rounded-0"
                         id="FullName"
-                        maxLength={30}
+                        maxLength={300}
                         value={custName}
                         onChange={handleCustNameChange}
                         aria-describedby="nameHelp"
@@ -196,7 +196,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                       </label>
                       <input
                         type="email"
-                        maxLength={30}
+                        maxLength={50}
                         className="form-control rounded-0"
                         id="email"
                         value={email}
@@ -224,7 +224,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                           </label>
                           <input
                             type="text"
-                            maxLength={30}
+                            maxLength={50}
                             className="form-control rounded-0"
                             id="SecondaryPersonName"
                             value={customerContactPersonName1}
@@ -244,7 +244,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                             type="text"
                             className="form-control rounded-0"
                             id="SecondaryPersonName2"
-                            maxLength={30}
+                            maxLength={50}
                             value={customerContactPersonName2}
                             onChange={handleContactPersonName2Change}
                             aria-describedby="emailHelp"
@@ -340,7 +340,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                             type="text"
                             className="form-control rounded-0"
                             placeholder="State"
-                            maxLength={30}
+                            maxLength={50}
                             id="exampleInputEmail1"
                             onChange={handleStateChange}
                             value={billingAddress.state}
@@ -356,7 +356,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                             className="form-control rounded-0"
                             placeholder="City"
                             id="exampleInputEmail1"
-                            maxLength={20}
+                            maxLength={50}
                             value={billingAddress.city}
                             onChange={handleCityChange}
                             aria-describedby="emailHelp"
@@ -370,6 +370,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                             type="text"
                             className="form-control rounded-0"
                             placeholder="Country"
+                            maxLength={50}
                             id="exampleInputEmail1"
                             onChange={(e) => setBillingAddress({ ...billingAddress, country: e.target.value })}
                             value={billingAddress.country}
@@ -384,7 +385,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                             className="textarea_edit col-12"
                             id=""
                             name=""
-                            maxLength={100}
+                            maxLength={500}
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={(e) => setBillingAddress({ ...billingAddress, add: e.target.value })}
                             value={billingAddress.add}

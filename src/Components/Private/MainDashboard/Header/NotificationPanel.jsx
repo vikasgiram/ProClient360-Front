@@ -20,8 +20,8 @@ const NotificationPanel = ({ closePopUp }) => {
     const fetchNotifications = async () => {
       try {
         const fetchedNotifications = await getNotifications();
-        console.log(fetchedNotifications);
-        dispatch(setNotifications(fetchedNotifications));
+        console.log(fetchedNotifications.notifications);
+        dispatch(setNotifications(fetchedNotifications.notifications));
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
@@ -67,7 +67,7 @@ const NotificationPanel = ({ closePopUp }) => {
     
 };
 
-
+console.log(notifications)
   return (
     <div
       className="modal fade show"

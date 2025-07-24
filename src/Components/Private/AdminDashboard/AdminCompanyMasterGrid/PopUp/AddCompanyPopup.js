@@ -189,7 +189,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
-                        maxLength={40}
+                        maxLength={499}
                         placeholder="Enter Company Name...."
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -207,7 +207,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
-                        maxLength={40}
+                        maxLength={50}
                         placeholder="Enter Admin Name...."
                         value={admin}
                         onChange={(e) => {
@@ -249,7 +249,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="email"
-                        maxLength={40}
+                        maxLength={50}
                         placeholder="Enter Email...."
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -369,7 +369,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
-                            maxLength={40}
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="State"
                             onChange={(e) => {
@@ -386,7 +386,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
-                            maxLength={40}
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="City"
                             onChange={(e) => {
@@ -403,7 +403,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <input
                             type="text"
-                            maxLength={40}
+                            maxLength={50}
                             className="form-control rounded-0"
                             placeholder="Country"
                             onChange={(e) => {
@@ -421,7 +421,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                           <textarea
                             className="textarea_edit col-12"
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
-                            maxLength={70}
+                            maxLength={200}
                             onChange={(e) => setAddress({ ...Address, add: e.target.value })}
                             value={Address.add}
                             rows="2"
@@ -446,7 +446,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                             className="form-control rounded-0"
                             id="password"
                             placeholder="Password...."
-                            maxLength={40}
+                            maxLength={50}
                             minLength={6}
                             required
                           />
@@ -476,7 +476,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                             className={`form-control rounded-0 ${confirmPassword && password !== confirmPassword ? 'is-invalid' : ''}`}
                             id="ConfirmPassword"
                             placeholder="Confirm Password...."
-                            maxLength={40}
+                            maxLength={50}
                             required
                           />
                           <button

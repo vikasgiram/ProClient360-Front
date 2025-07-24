@@ -194,7 +194,7 @@ export const ProjectMasterGrid = () => {
                             project.map((project, index) => (
                               <tr className="border my-4" key={project._id}>
                                 <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
-                                <td className="align_left_td td_width">{project.name}</td>
+                                <td className="align_left_td td_width text-wrap">{project.name}</td>
                                 <td>{project.custId?.custName || "N/A"}</td>
                                 <td>{formatDate(project.startDate)}</td>
                                 <td>{formatDate(project.endDate)}</td>

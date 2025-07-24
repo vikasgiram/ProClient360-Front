@@ -42,7 +42,7 @@ const LeadApis = () => {
         <div className="row background_main_all">
           <Header toggle={toggle} isopen={isopen} />
           <div className="container-fluid page-body-wrapper">
-            <Sidebar isopen={isopen} active="TaskSheetMaster"  style={{ width: isopen ? "" : "calc(100%  - 120px )", marginLeft: isopen ? "" : "125px" }} />
+            <Sidebar isopen={isopen} active="TaskSheetMaster" style={{ width: isopen ? "" : "calc(100%  - 120px )", marginLeft: isopen ? "" : "125px" }} />
 
             <div
               className="main-panel"

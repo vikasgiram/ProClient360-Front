@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
-import { default as ReactSelect } from "react-select";
+import React, { useState, useEffect, useCallback } from 'react';
+import toast from "react-hot-toast";
+import Select from "react-select";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { getDepartment } from "../../../../../hooks/useDepartment";
 import { getEmployee } from "../../../../../hooks/useEmployees";
 import { sendNotification } from "../../../../../hooks/useNotification";
+
+const PAGE_SIZE = 10;
 
 const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
   const [formData, setFormData] = useState({
@@ -13,75 +15,105 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
     feasibleReason: '', 
   });
 
+  // Department dropdown state
   const [departments, setDepartments] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [hasMoreDepartments, setHasMoreDepartments] = useState(true);
+  const [deptPage, setDeptPage] = useState(1);
+  const [deptSearchTerm, setDeptSearchTerm] = useState("");
+  
+  // Employee dropdown state
   const [assignedEmployee, setAssignedEmployee] = useState(null);
   const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [hasMoreEmployees, setHasMoreEmployees] = useState(true);
+  const [empPage, setEmpPage] = useState(1);
+  const [empSearchTerm, setEmpSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchDataDep = async () => {
-      try {
-        const data = await getDepartment();
-        setDepartments(data?.departments || []);
-        console.log('Departments:', data?.departments || []);
-      } catch (error) {
-        console.log(error);
+  // Load departments with pagination and search
+  const loadDepartments = useCallback(async (page = 1, search = "") => {
+    try {
+      const data = await getDepartment(page, PAGE_SIZE, search);
+      if (data && data.departments) {
+        if (page === 1) {
+          setDepartments(data.departments);
+        } else {
+          setDepartments(prev => [...prev, ...data.departments]);
+        }
+        setHasMoreDepartments(data.departments.length === PAGE_SIZE);
       }
-    };
-    fetchDataDep();
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
 
-  useEffect(() => {
-    const fetchDataEmp = async () => {
-      setAssignedEmployee(null);
-      setEmployeeOptions([]);
-      
+  // Load employees with pagination and search
+  const loadEmployees = useCallback(async (page = 1, search = "") => {
+    try {
       if (!selectedDepartment) return;
-      
+
       setLoading(true);
-      try {
-        const data = await getEmployee(selectedDepartment);
-        console.log('Raw employee data:', data);
-        
-        let employeeArray = [];
-        
-        if (Array.isArray(data)) {
-          employeeArray = data;
-        } else if (data && Array.isArray(data.employee)) {
-          employeeArray = data.employee;
-        } else if (data && Array.isArray(data.employees)) {
-          employeeArray = data.employees;
-        } else if (data && Array.isArray(data.data)) {
-          employeeArray = data.data;
-        } else {
-          console.log('Unexpected data structure:', data);
-          toast.error('No employees found for this department');
-          return;
-        }
-        
-        if (employeeArray.length > 0) {
-          const formattedData = employeeArray.map((employee) => ({
-            value: employee._id,
-            label: employee.name,
-            employeeData: employee,
-          }));
-          setEmployeeOptions(formattedData);
-          console.log('Formatted employee options:', formattedData);
-        } else {
-          console.log('No employees found in the array');
-          toast.info('No employees found for this department');
-        }
-      } catch (error) {
-        console.log('Error fetching employees:', error);
-        toast.error('Failed to fetch employees');
-      } finally {
-        setLoading(false);
+      const data = await getEmployee(selectedDepartment.value, page, PAGE_SIZE, search);
+      
+      let employeeArray = [];
+      
+      if (Array.isArray(data)) {
+        employeeArray = data;
+      } else if (data && Array.isArray(data.employee)) {
+        employeeArray = data.employee;
+      } else if (data && Array.isArray(data.employees)) {
+        employeeArray = data.employees;
+      } else if (data && Array.isArray(data.data)) {
+        employeeArray = data.data;
       }
-    };
-    
-    fetchDataEmp();
+      
+      if (employeeArray.length > 0) {
+        const formattedData = employeeArray.map((employee) => ({
+          value: employee._id,
+          label: employee.name,
+          employeeData: employee,
+        }));
+        
+        if (page === 1) {
+          setEmployeeOptions(formattedData);
+        } else {
+          setEmployeeOptions(prev => [...prev, ...formattedData]);
+        }
+        setHasMoreEmployees(employeeArray.length === PAGE_SIZE);
+      } else {
+        if (page === 1) {
+          setEmployeeOptions([]);
+          if (search === "") {
+            toast.info('No employees found for this department');
+          }
+        }
+        setHasMoreEmployees(false);
+      }
+    } catch (error) {
+      console.log('Error fetching employees:', error);
+      if (page === 1) {
+        toast.error('Failed to fetch employees');
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [selectedDepartment]);
+
+  useEffect(() => {
+    loadDepartments(1, deptSearchTerm);
+  }, [loadDepartments, deptSearchTerm]);
+
+  useEffect(() => {
+    if (selectedDepartment) {
+      setEmpPage(1);
+      setEmployeeOptions([]);
+      setAssignedEmployee(null);
+      loadEmployees(1, empSearchTerm);
+    } else {
+      setEmployeeOptions([]);
+      setAssignedEmployee(null);
+    }
+  }, [selectedDepartment, loadEmployees, empSearchTerm]);
 
   useEffect(() => {
     console.log('Employee options updated:', employeeOptions);
@@ -95,7 +127,7 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
         notFeasibleReason: '',
         feasibleReason: '',
       });
-      setSelectedDepartment("");
+      setSelectedDepartment(null);
       setAssignedEmployee(null);
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -163,36 +195,81 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                   <div className={formData.feasibility === 'feasible' ? 'row' : 'd-none'}>
                <div className="col-12 col-lg-6 mt-2">
                <label htmlFor="department" className="form-label label_text">Assign to Department <RequiredStar /></label>
-                <select 
-                id="department" 
-                className="form-select rounded-0" 
-                onChange={(e) => {
-                setSelectedDepartment(e.target.value);
-                setAssignedEmployee(null);
-                setEmployeeOptions([]);
-                }} 
-               value={selectedDepartment}
-               >
-               <option value="">-- Select Department --</option>
-              {departments?.map((department) => (
-              <option key={department._id} value={department._id}>
-              {department.name}
-              </option>
-               ))}
-             </select>
+                <Select
+                  id="department"
+                  options={departments.map(dept => ({ value: dept._id, label: dept.name }))}
+                  value={selectedDepartment}
+                  onChange={(selectedOption) => {
+                    setSelectedDepartment(selectedOption);
+                    setAssignedEmployee(null);
+                    setEmployeeOptions([]);
+                  }}
+                  onInputChange={(inputValue) => {
+                    setDeptSearchTerm(inputValue);
+                    setDeptPage(1);
+                  }}
+                  onMenuScrollToBottom={() => {
+                    if (hasMoreDepartments) {
+                      const nextPage = deptPage + 1;
+                      setDeptPage(nextPage);
+                      loadDepartments(nextPage, deptSearchTerm);
+                    }
+                  }}
+                  placeholder="Select Department..."
+                  isClearable
+                  styles={{
+                    control: (provided) => ({
+                      ...provided,
+                      borderRadius: 0,
+                      borderColor: '#ced4da',
+                      fontSize: '16px',
+                    }),
+                    option: (provided, state) => ({
+                      ...provided,
+                      backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                      color: state.isSelected ? 'white' : '#212529',
+                    }),
+                  }}
+                />
             </div>
            <div className="col-12 col-lg-6 mt-2">
           <label htmlFor="employee" className="form-label label_text">Assign to Employee <RequiredStar /></label>
-         <ReactSelect
+         <Select
             id="employee"
             options={employeeOptions}
             isClearable
             isLoading={loading}
-            onChange={(opt) => setAssignedEmployee(opt ? opt.value : null)}
+            onChange={(selectedOption) => {
+              setAssignedEmployee(selectedOption ? selectedOption.value : null);
+            }}
+            onInputChange={(inputValue) => {
+              setEmpSearchTerm(inputValue);
+              setEmpPage(1);
+            }}
+            onMenuScrollToBottom={() => {
+              if (hasMoreEmployees) {
+                const nextPage = empPage + 1;
+                setEmpPage(nextPage);
+                loadEmployees(nextPage, empSearchTerm);
+              }
+            }}
             value={assignedEmployee ? employeeOptions.find(opt => opt.value === assignedEmployee) : null}
-            placeholder={loading ? "Loading employees..." : "-- Select Employee --"}
+            placeholder={loading ? "Loading employees..." : "Select Employee..."}
             noOptionsMessage={() => selectedDepartment ? "No employees found" : "Select a department first"}
             isDisabled={!selectedDepartment || loading}
+            styles={{
+              control: (provided) => ({
+                ...provided,
+                borderRadius: 0,
+                borderColor: '#ced4da',
+                fontSize: '16px',
+              }),
+              option: (provided, state) => ({
+                ...provided,
+                backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                color: state.isSelected ? 'white' : '#212529',
+              }),
+            }}
           />
       </div>
                     <div className="col-12 mt-3">
@@ -203,6 +280,7 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                         name="feasibleReason"
                         rows="2"
                         placeholder="Enter any optional remarks..."
+                        maxLength={200}
                         value={formData.feasibleReason}
                         onChange={handleChange}
                       ></textarea>
@@ -218,6 +296,7 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                         name="notFeasibleReason"
                         rows="4"
                         placeholder="Enter the detailed reason for non-feasibility..."
+                        maxLength={200}
                         value={formData.notFeasibleReason}
                         onChange={handleChange}
                       ></textarea>
