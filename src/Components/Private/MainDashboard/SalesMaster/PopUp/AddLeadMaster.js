@@ -159,7 +159,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label htmlFor="name" className="form-label">Contact Name <RequiredStar /></label>
-                    <input type="text" className="form-control" id="name" name="name" placeholder="Enter a Contact Name...." maxLength={40} value={formData.name} onChange={handleInputChange} required />
+                    <input type="text" className="form-control" id="name" name="name" placeholder="Enter a Contact Name...." maxLength={50} value={formData.name} onChange={handleInputChange} required />
                   </div>
 
                   <div className="col-md-6">
@@ -172,7 +172,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       id="email"
                       name="email"
                       placeholder="Enter Email ID...."
-                      maxLength={40}
+                      maxLength={50}
                       value={formData.email}
                       onChange={handleInputChange}
                       required
@@ -205,12 +205,12 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
 
                   <div className="col-md-6">
                     <label htmlFor="subject" className="form-label">Subject <RequiredStar /></label>
-                    <input type="text" className="form-control" id="subject" name="subject" placeholder="Enter a Subject...." maxLength={50} value={formData.subject} onChange={handleInputChange} required />
+                    <textarea type="text" className="form-control" id="subject" name="subject" placeholder="Enter a Subject...." maxLength={200} value={formData.subject} onChange={handleInputChange} required ></textarea>
                   </div>
 
                   <div className="col-md-6">
                     <label htmlFor="company" className="form-label">Company Name<RequiredStar /></label>
-                    <input type="text" className="form-control" id="company" name="company" placeholder="Enter a Company Name...." maxLength={30} value={formData.company} onChange={handleInputChange} required />
+                    <input type="text" className="form-control" id="company" name="company" placeholder="Enter a Company Name...." maxLength={100} value={formData.company} onChange={handleInputChange} required />
                   </div>
 
                   <div className='col-md-6'>
@@ -232,7 +232,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       value={formData.message}
                       onChange={handleInputChange}
                       style={{ width: '201%', height: '100px' }}
-                      maxLength={200}
+                      maxLength={500}
                     />
                   </div>
 
@@ -260,7 +260,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       <div className="col-12 col-lg-6 mb-3">
                         <input
                           type="text"
-                          maxLength={40}
+                          maxLength={50}
                           className="form-control"
                           placeholder="State"
                           id="state"
@@ -274,7 +274,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       <div className="col-12 col-lg-6 mb-3">
                         <input
                           type="text"
-                          maxLength={40}
+                          maxLength={50}
                           className="form-control"
                           placeholder="City"
                           id="city"
@@ -288,7 +288,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       <div className="col-12 col-lg-6 mb-3">
                         <input
                           type="text"
-                          maxLength={40}
+                          maxLength={50}
                           className="form-control"
                           placeholder="Country"
                           id="country"
@@ -303,7 +303,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                         <textarea
                           className="form-control"
                           id="add"
-                          maxLength={150}
+                          maxLength={500}
                           name="add"
                           placeholder="House No., Building Name, Road Name, Area, Colony"
                           onChange={handleAddressChange}

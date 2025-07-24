@@ -315,6 +315,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             id="action"
                             name="action"
                             rows="2"
+                            maxLength={300}
                             onChange={handleEditTask}
                             value={editAction?.action}
                             required
@@ -429,6 +430,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             id="remark"
                             name="remark"
                             placeholder="Remark ..."
+                            maxLength={300}
                             rows="2"
                             onChange={handleEditTask}
                             value={editAction?.remark}
@@ -474,6 +476,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             id="Action"
                             name="Action"
                             placeholder="Details ..."
+                            maxLength={300}
                             rows="2"
                             onChange={(e) => { setAction(e.target.value) }}
                             value={action}
@@ -601,6 +604,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             id=""
                             name=""
                             placeholder="Remark ..."
+                            maxLength={300}
                             rows="2"
                             onChange={(e) => setRemark(e.target.value)}
                             value={remark}

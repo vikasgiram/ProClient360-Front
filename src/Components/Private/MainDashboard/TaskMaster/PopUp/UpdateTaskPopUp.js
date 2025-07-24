@@ -73,7 +73,7 @@ const[task,setTask]=useState(selectedTask);
                       <textarea
                         name="name"
                         type="text"
-                        max={200}
+                        maxLength={200}
                         placeholder="Update Task Name...."
                         value={task.name}
                         onChange={handleChange}

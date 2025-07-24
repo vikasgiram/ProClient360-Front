@@ -280,6 +280,7 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                         name="feasibleReason"
                         rows="2"
                         placeholder="Enter any optional remarks..."
+                        maxLength={200}
                         value={formData.feasibleReason}
                         onChange={handleChange}
                       ></textarea>
@@ -295,6 +296,7 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                         name="notFeasibleReason"
                         rows="4"
                         placeholder="Enter the detailed reason for non-feasibility..."
+                        maxLength={200}
                         value={formData.notFeasibleReason}
                         onChange={handleChange}
                       ></textarea>

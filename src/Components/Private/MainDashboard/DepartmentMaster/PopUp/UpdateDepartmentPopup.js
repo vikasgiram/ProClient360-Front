@@ -62,7 +62,7 @@ const UpdateDepartmentPopup = ({ handleUpdate, selectedDep }) => {
                                         <div className="mb-3">
                                             <label for="name" className="form-label label_text">     Department Name <RequiredStar />
                                             </label>
-                                            <input type="text" className="form-control rounded-0" id="name" placeholder="Enter a Department Name...." maxLength={40} name="name" onChange={handleInputChange} value={department.name} aria-describedby="secemailHelp"  required/> 
+                                            <input type="text" className="form-control rounded-0" id="name" placeholder="Enter a Department Name...." maxLength={50} name="name" onChange={handleInputChange} value={department.name} aria-describedby="secemailHelp"  required/> 
                                         </div>
                                         
 
