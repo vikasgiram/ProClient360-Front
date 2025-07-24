@@ -239,10 +239,10 @@ useEffect(() => {
                           <p className="fw-bold mt-3">Product:</p>{" "}
                           {selectedService.ticket.product}
                         </h6>
-                        <h6>
+                        {/* <h6>
                           <p className="fw-bold mt-3">Zone:</p>{" "}
                           {selectedService.zone}
-                        </h6>
+                        </h6> */}
                         <h6>
                           <p className="fw-bold mt-3">Service Type:</p>{" "}
                           {selectedService.serviceType}
