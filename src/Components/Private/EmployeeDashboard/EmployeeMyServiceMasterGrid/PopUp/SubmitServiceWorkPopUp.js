@@ -132,9 +132,20 @@ useEffect(() => {
 
   const handleMyService = async (event) => {
     event.preventDefault();
-
+    
+    let actionData = {};
+    
+    if (startTime === null || endTime === null) {
+      return toast.error("Please select Date and Time");
+    }
     if (status === "") {
       return toast.error("Please select status");
+    }
+    if (status!=='Stuck' && action === "" ) {
+      return toast.error("Please enter Action");
+    }
+    if (status === "Inprogress" && workComplete === "") {
+      return toast.error("Please enter Work Complete Percentage");
     }
     if (status === "Stuck") {
       if (responsibleParty === "") {
@@ -153,20 +164,10 @@ useEffect(() => {
 
         handleSendNotification();
         handleUpdate();
-        return;
       }
     }
-    else if (status!=='Stuck' && startTime === null || endTime === null) {
-      return toast.error("Please select Date and Time");
-    }
-    if (status!=='Stuck' && action === "" ) {
-      return toast.error("Please enter Action");
-    }
-    if (status === "Inprogress" && workComplete === "") {
-      return toast.error("Please enter Work Complete Percentage");
-    }
 
-    const actionData = {
+    actionData = {
       service: selectedService._id,
       status,
       startTime,
@@ -189,6 +190,15 @@ useEffect(() => {
       toast.error(data?.error);
     }
   };
+
+  const onStatusChange = (e) => {
+    setStatus(e.target.value);
+    console.log(e.target.value);
+    if (e.target.value !== "Stuck") {
+      setResponsibleParty("");
+      setStuckReason("");
+    }
+  }
 
   return (
     <>
@@ -278,7 +288,7 @@ useEffect(() => {
                       <select
                         className="form-control rounded-0"
                         id="status"
-                        onChange={(e) => setStatus(e.target.value)}
+                        onChange={onStatusChange}
                         value={status}
                         aria-describedby="statusHelp"
                         required
@@ -345,92 +355,92 @@ useEffect(() => {
                   )}
 
                 {responsibleParty === "Company" && (
-  <div className="row">
-    <div className="col-6 col-lg-6 mt-2 inprogress-field">
-      <div className="mb-3">
-        <label htmlFor="department" className="form-label label_text">
-          Department <RequiredStar />
-        </label>
-        <Select
-          id="department"
-          options={departments.map(dept => ({ value: dept._id, label: dept.name }))}
-          value={selectedDepartment}
-          onChange={(selectedOption) => setSelectedDepartment(selectedOption)}
-          onInputChange={(inputValue) => {
-            setDeptSearchTerm(inputValue);
-            setDeptPage(1);
-          }}
-          onMenuScrollToBottom={() => {
-            if (hasMoreDepartments) {
-              const nextPage = deptPage + 1;
-              setDeptPage(nextPage);
-              loadDepartments(nextPage, deptSearchTerm);
-            }
-          }}
-          placeholder="Select Department..."
-          isClearable
-          styles={{
-            control: (provided) => ({
-              ...provided,
-              borderRadius: 0,
-              borderColor: '#ced4da',
-              fontSize: '16px',
-            }),
-            option: (provided, state) => ({
-              ...provided,
-              backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
-              color: state.isSelected ? 'white' : '#212529',
-            }),
-          }}
-        />
-      </div>
-    </div>
+                  <div className="row">
+                    <div className="col-6 col-lg-6 mt-2 inprogress-field">
+                      <div className="mb-3">
+                        <label htmlFor="department" className="form-label label_text">
+                          Department <RequiredStar />
+                        </label>
+                        <Select
+                          id="department"
+                          options={departments.map(dept => ({ value: dept._id, label: dept.name }))}
+                          value={selectedDepartment}
+                          onChange={(selectedOption) => setSelectedDepartment(selectedOption)}
+                          onInputChange={(inputValue) => {
+                            setDeptSearchTerm(inputValue);
+                            setDeptPage(1);
+                          }}
+                          onMenuScrollToBottom={() => {
+                            if (hasMoreDepartments) {
+                              const nextPage = deptPage + 1;
+                              setDeptPage(nextPage);
+                              loadDepartments(nextPage, deptSearchTerm);
+                            }
+                          }}
+                          placeholder="Select Department..."
+                          isClearable
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              borderRadius: 0,
+                              borderColor: '#ced4da',
+                              fontSize: '16px',
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                              color: state.isSelected ? 'white' : '#212529',
+                            }),
+                          }}
+                        />
+                      </div>
+                    </div>
 
-    {/* Employee ReactSelect */}
-    <div className="col-6 col-lg-6 mt-2">
-      <div className="mb-3">
-        <label htmlFor="employeeSelect" className="form-label label_text">
-          Employee Name <RequiredStar />
-        </label>
-        <Select
-          inputId="employeeSelect"
-          options={employeeOptions}
-          value={employeeOptions.find(option => option.value === employees)}
-          onChange={(selectedOption) => {
-            setEmployees(selectedOption ? selectedOption.value : "");
-          }}
-          onInputChange={(inputValue) => {
-            setEmpSearchTerm(inputValue);
-            setEmpPage(1);
-          }}
-          onMenuScrollToBottom={() => {
-            if (hasMoreEmployees) {
-              const nextPage = empPage + 1;
-              setEmpPage(nextPage);
-              loadEmployees(nextPage, empSearchTerm);
-            }
-          }}
-          placeholder="Select Employee..."
-          isClearable
-          isDisabled={!selectedDepartment}
-          styles={{
-            control: (provided) => ({
-              ...provided,
-              borderRadius: 0,
-              borderColor: '#ced4da',
-              fontSize: '16px',
-            }),
-            option: (provided, state) => ({
-              ...provided,
-              backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
-              color: state.isSelected ? 'white' : '#212529',
-            }),
-          }}
-        />
-      </div>
-    </div>
-  </div>
-)}
+                    {/* Employee ReactSelect */}
+                    <div className="col-6 col-lg-6 mt-2">
+                      <div className="mb-3">
+                        <label htmlFor="employeeSelect" className="form-label label_text">
+                          Employee Name <RequiredStar />
+                        </label>
+                        <Select
+                          inputId="employeeSelect"
+                          options={employeeOptions}
+                          value={employeeOptions.find(option => option.value === employees)}
+                          onChange={(selectedOption) => {
+                            setEmployees(selectedOption ? selectedOption.value : "");
+                          }}
+                          onInputChange={(inputValue) => {
+                            setEmpSearchTerm(inputValue);
+                            setEmpPage(1);
+                          }}
+                          onMenuScrollToBottom={() => {
+                            if (hasMoreEmployees) {
+                              const nextPage = empPage + 1;
+                              setEmpPage(nextPage);
+                              loadEmployees(nextPage, empSearchTerm);
+                            }
+                          }}
+                          placeholder="Select Employee..."
+                          isClearable
+                          isDisabled={!selectedDepartment}
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              borderRadius: 0,
+                              borderColor: '#ced4da',
+                              fontSize: '16px',
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                              color: state.isSelected ? 'white' : '#212529',
+                            }),
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
 
                   {status === "Stuck" && (
@@ -482,7 +492,6 @@ useEffect(() => {
                     </>
                   )}
 
-                  {status !== "Stuck" ? (
                     <div className="row g-3 mt-2">
                       <div className="col">
                         <label htmlFor="StartTime" className="form-label label_text">
@@ -514,7 +523,6 @@ useEffect(() => {
                         />
                       </div>
                     </div>
-                  ) : null}
                   <div className="row">
                     <div className="col-12 pt-3 mt-2">
                       <button
