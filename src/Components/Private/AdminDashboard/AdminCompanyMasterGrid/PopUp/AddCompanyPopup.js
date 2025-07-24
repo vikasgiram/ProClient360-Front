@@ -189,7 +189,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
-                        maxLength={50}
+                        maxLength={499}
                         placeholder="Enter Company Name...."
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -421,7 +421,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                           <textarea
                             className="textarea_edit col-12"
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
-                            maxLength={500}
+                            maxLength={200}
                             onChange={(e) => setAddress({ ...Address, add: e.target.value })}
                             value={Address.add}
                             rows="2"

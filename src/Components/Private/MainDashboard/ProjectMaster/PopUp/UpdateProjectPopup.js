@@ -1,13 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { getCustomers } from "../../../../../hooks/useCustomer";
 import { updateProject } from "../../../../../hooks/useProjects";
 import { formatDateforupdate } from "../../../../../utils/formatDate";
-import Select from "react-select";
 import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { getAddress } from "../../../../../hooks/usePincode";
-
-const PAGE_SIZE = 15;
 
 const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
@@ -16,10 +13,9 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [hasMoreCustomers, setHasMoreCustomers] = useState(true);
-    const [customerPage, setCustomerPage] = useState(1);
-    const [customerSearchTerm, setCustomerSearchTerm] = useState("");
+    const [searchText, setSearchText] = useState("");
+
+    const [retention, setRetention] =  useState(0);
 
     const [projects, setProjects] = useState({
         ...selectedProject,
@@ -40,37 +36,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
     console.log(selectedProject?.Address);
 
-    // Load customers with pagination and search
-    const loadCustomers = useCallback(async (page = 1, search = "") => {
-        try {
-            const data = await getCustomers(page, PAGE_SIZE, search);
-            if (data && data.customers) {
-                if (page === 1) {
-                    setCustomers(data.customers);
-                } else {
-                    setCustomers(prev => [...prev, ...data.customers]);
-                }
-                setHasMoreCustomers(data.customers.length === PAGE_SIZE);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }, []);
-
-    useEffect(() => {
-        loadCustomers(1, customerSearchTerm);
-    }, [loadCustomers, customerSearchTerm]);
-
-    // Set initial selected customer from selectedProject
-    useEffect(() => {
-        if (selectedProject?.custId) {
-            setSelectedCustomer({
-                value: selectedProject.custId._id,
-                label: selectedProject.custId.custName
-            });
-        }
-    }, [selectedProject]);
-
+    //   console.log(selectedProject?.Address?.city,"address");
     useEffect(() => {
         const fetchData = async () => {
             const data = await getAddress(address.pincode);
@@ -83,6 +49,47 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         if (address.pincode > 0)
             fetchData();
     }, [address.pincode]);
+
+
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            if (searchText.trim() !== "" && searchText.length > 2) {
+                fetchCustomers(searchText);
+            } else {
+                setCustomers([]); // empty when no input
+            }
+        }, 500); // debounce API call by 500ms
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchText]);
+
+    
+
+useEffect(() => {
+    const retentionValue = 100 - (Number(projects.advancePay || 0) + Number(projects.payAgainstDelivery || 0) + Number(projects.payAfterCompletion || 0));
+    if( retentionValue >= 0) {
+        setRetention(retentionValue);
+        setProjects(prev => ({
+            ...prev,
+            retention: retentionValue
+        }));
+    } else {
+        toast.error("The total percentage cannot exceed 100%.");
+        setRetention(0);
+        setProjects(prev => ({
+            ...prev,
+            retention: 0
+        }));
+    }
+}, [projects.advancePay, projects.payAgainstDelivery, projects.payAfterCompletion]);
+
+
+    const fetchCustomers = async () => {
+        const data = await getCustomers(1, 15, searchText);
+        if (data) {
+            setCustomers(data.customers || []);
+        }
+    };
 
 
 
@@ -134,7 +141,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         if (name === "custId") {
             setProjects((prev) => ({
                 ...prev,
-                custId: { _id: value, custName: selectedCustomer?.label || "" },
+                custId: { _id: value },
             }));
             return;
         }
@@ -185,45 +192,45 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
 
     const handleProjectUpdate = async (event) => {
+    event.preventDefault();
+    setLoading(!loading);
 
-        event.preventDefault();
-        setLoading(!loading);
+    const updatedProject = {
+        ...projects,
+        retention: retention,
+        Address: {
+            ...address
+        },
+    }
+    
+    if (!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion) {
+        setLoading(false);
+        console.log(updatedProject, "updateProject");
+    }
+    if (Number(updatedProject.advancePay) + Number(updatedProject.payAgainstDelivery) + Number(updatedProject.payAfterCompletion) > 100) {
+        setLoading(false);
+        return toast.error("Sum of  Advance Payment,Pay Against Delivery,and Pay After Completion cannot exceed 100%");
+    }
+    if (updatedProject.startDate > updatedProject.endDate) {
+        setLoading(false);
+        return toast.error("Start Date cannot be greater than End Date");
+    }
 
-        const updatedProject = {
-            ...projects,
-            Address: {
-                ...address
-            }, 
+    try {
+        console.log(updatedProject,"updatedProject"); 
+        toast.loading("Updating Project...")
+        const data = await updateProject(updatedProject);
+        toast.dismiss()
+        if(data.success){
+            toast.success(data.message);
+            handleUpdate();
+        }else{
+            toast.error(data.error);
         }
-        if (!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion) {
-            setLoading(false);
-            console.log(updatedProject, "updateProject");
-            return toast.error("Please fill all fields");
-        }
-        if (Number(updatedProject.advancePay) + Number(updatedProject.payAgainstDelivery) + Number(updatedProject.payfterCompletion) > 100) {
-            setLoading(false);
-            return toast.error("Sum of  Advance Payment,Pay Against Delivery,and Pay After Completion cannot exceed 100%");
-        }
-        if (updatedProject.startDate > updatedProject.endDate) {
-            setLoading(false);
-            return toast.error("Start Date cannot be greater than End Date");
-        }
-
-        try {
-            // console.log(updatedProject,"updatedProject");
-            toast.loading("Updating Project...")
-            const data = await updateProject(updatedProject);
-            toast.dismiss()
-            if(data.success){
-                toast.success(data.message);
-                handleUpdate();
-            }else{
-                toast.error(data.error);
-            }
-        } catch (error) {
-            toast.error(error);
-        }
-    };
+    } catch (error) {
+        toast.error(error);
+    }
+};
     const viewFile = () => {
         window.open(projects.POCopy);
     };
@@ -271,61 +278,42 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                     <div className="col-12" >
 
                                         <div className="mb-3">
-                                            <label htmlFor="customerSelect" className="form-label label_text">
+                                            <label htmlFor="customerSearch" className="form-label label_text">
                                                 Customer Name <RequiredStar />
                                             </label>
-                                            <Select
-                                                id="customerSelect"
-                                                options={customers.map(customer => ({ 
-                                                    value: customer._id, 
-                                                    label: customer.custName 
-                                                }))}
-                                                value={selectedCustomer}
-                                                onChange={(selectedOption) => {
-                                                    setSelectedCustomer(selectedOption);
-                                                    if (selectedOption) {
-                                                        setProjects(prev => ({
-                                                            ...prev,
-                                                            custId: { 
-                                                                _id: selectedOption.value, 
-                                                                custName: selectedOption.label 
-                                                            }
-                                                        }));
-                                                    }
-                                                }}
-                                                onInputChange={(inputValue) => {
-                                                    setCustomerSearchTerm(inputValue);
-                                                    setCustomerPage(1);
-                                                }}
-                                                onMenuScrollToBottom={() => {
-                                                    if (hasMoreCustomers) {
-                                                        const nextPage = customerPage + 1;
-                                                        setCustomerPage(nextPage);
-                                                        loadCustomers(nextPage, customerSearchTerm);
-                                                    }
-                                                }}
-                                                placeholder="Search and select customer..."
-                                                isClearable
-                                                styles={{
-                                                    control: (provided) => ({
-                                                        ...provided,
-                                                        borderRadius: 0,
-                                                        borderColor: '#ced4da',
-                                                        fontSize: '16px',
-                                                    }),
-                                                    option: (provided, state) => ({
-                                                        ...provided,
-                                                        backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
-                                                        color: state.isSelected ? 'white' : '#212529',
-                                                    }),
-                                                }}
+
+                                            {/* Search input */}
+                                            <input
+                                                type="text"
+                                                className="form-control mb-2"
+                                                id="customerSearch"
+                                                maxLength={40}
+                                                placeholder="Type to search customer..."
+                                                value={searchText}
+                                                onChange={(e) => setSearchText(e.target.value)}
                                             />
+
+                                            {/* Select dropdown */}
+                                            <select
+                                                className="form-select rounded-0"
+                                                name="custId"
+                                                value={projects?.custId?._id || ''}
+                                                onChange={handleChange}
+                                            >
+                                                <option value={projects?.custId?._id || ''}>
+                                                    {projects?.custId?.custName || 'Select Customer'}</option>
+                                                {customers.map((cust) => (
+                                                    <option key={cust._id} value={cust._id}>
+                                                        {cust.custName}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
 
                                     <div className="mb-3">
                                         <label for="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
-                                        <input type="text" className="form-control rounded-0" id="ProjectName" name="name" onChange={handleChange} maxLength={40} placeholder="Update Project Name...." value={projects.name} aria-describedby="emailHelp" />
+                                        <textarea type="text" className="form-control rounded-0" id="ProjectName" name="name" onChange={handleChange} maxLength={1000} placeholder="Update Project Name...." value={projects.name} aria-describedby="emailHelp" ></textarea>
                                     </div>
                                     <div className="col-12 col-lg-6 mt-2">
                                         <label for="ProjectName" className="form-label label_text">Project Status <RequiredStar /></label>
@@ -393,7 +381,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 id="PurchaseOrderNumber"
                                                 name="purchaseOrderNo"
                                                 placeholder="Purchase Order Number...."
-                                                maxLength={10}
+                                                maxLength={200}
                                                 value={projects?.purchaseOrderNo}
                                                 onChange={handleChange}
                                                 aria-describedby="emailHelp"
@@ -494,68 +482,88 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 </span>
                                             </div>
 
-                                            <div className="col-12 col-lg-6 mt-2" >
-                                                <div className="mb-3">
-                                                    <label for="advancePay" className="form-label label_text">     Advance Payment <RequiredStar />
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        inputMode="numeric"
-                                                        pattern="^\d{1,3}$"
-                                                        maxLength={3}
-                                                        className="form-control rounded-0"
-                                                        id="advancePay"
-                                                        name="advancePay"
-                                                        onChange={handleChange}
-                                                        value={projects?.advancePay}
-                                                        aria-describedby="mobileNoHelp"
-                                                        required
-                                                    />
+                                            <div className="col-12 col-lg-6 mt-2">
+  <div className="mb-3">
+    <label htmlFor="advancePay" className="form-label label_text">
+      Advance Payment <RequiredStar />
+    </label>
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="^\d{1,3}$"
+      maxLength={3}
+      className="form-control rounded-0"
+      id="advancePay"
+      name="advancePay"
+      onChange={handleChange}
+      value={projects?.advancePay}
+      required
+    />
+  </div>
+</div>
 
-                                                </div>
-                                            </div>
-                                            <div className="col-12 col-lg-6 mt-2" >
-                                                <div className="mb-3">
-                                                    <label for="payAgainstDelivery" className="form-label label_text">          Pay Against Delivery <RequiredStar />
+<div className="col-12 col-lg-6 mt-2">
+  <div className="mb-3">
+    <label htmlFor="payAgainstDelivery" className="form-label label_text">
+      Pay Against Delivery <RequiredStar />
+    </label>
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="^\d{1,3}$"
+      maxLength={3}
+      className="form-control rounded-0"
+      id="payAgainstDelivery"
+      name="payAgainstDelivery"
+      onChange={handleChange}
+      value={projects?.payAgainstDelivery}
+      required
+    />
+  </div>
+</div>
 
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        pattern="[0-9]*"
-                                                        maxLength={3}
-                                                        inputMode="numeric"
-                                                        className="form-control rounded-0"
-                                                        id="payAgainstDelivery"
-                                                        name="payAgainstDelivery"
-                                                        onChange={handleChange}
-                                                        value={projects?.payAgainstDelivery}
-                                                        aria-describedby="mobileNoHelp"
-                                                        required
-                                                    />
+<div className="col-12 col-lg-6 mt-2">
+  <div className="mb-3">
+    <label htmlFor="payAfterCompletion" className="form-label label_text">
+      Pay After Completion <RequiredStar />
+    </label>
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="^\d{1,3}$"
+      maxLength={3}
+      className="form-control rounded-0"
+      id="payAfterCompletion"
+      name="payAfterCompletion"
+      onChange={handleChange}
+      value={projects?.payAfterCompletion}
+      required
+    />
+  </div>
+</div>
 
-                                                </div>
-                                            </div>
+<div className="col-12 col-lg-6 mt-2">
+  <div className="mb-3">
+    <label htmlFor="retention" className="form-label label_text">
+      Retention (%) <RequiredStar />
+    </label>
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="^\d{1,3}$"
+      maxLength={3}
+      className="form-control rounded-0"
+      id="retention"
+      name="retention"
+      value={retention}
+      readOnly
+      style={{ backgroundColor: '#f8f9fa' }}
+      required
+    />
+  </div>
+</div>
 
-                                            <div className="col-12 col-lg-6 mt-2" >
-                                                <div className="mb-3">
-                                                    <label for="payfterCompletion" className="form-label label_text">     Pay After Completion <RequiredStar />
-                                                    </label>
-                                                    <input
-                                                        type="text"
-                                                        pattern="[0-9]*"
-                                                        maxLength={3}
-                                                        inputMode="numeric"
-                                                        className="form-control rounded-0"
-                                                        id="payAfterCompletion"
-                                                        name="payAfterCompletion"
-                                                        onChange={handleChange}
-                                                        value={projects?.payAfterCompletion}
-                                                        aria-describedby="secemailHelp"
-                                                        required
-                                                    />
 
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                     <div className="col-12  mt-2">
@@ -593,8 +601,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         name="state"
                                                         onChange={handleAddressChange}
                                                         value={address.state}
-                                                        maxLength="30"
-                                                        pattern="^[a-zA-Z\s]*$"
+                                                        maxLength={50}                                                        pattern="^[a-zA-Z\s]*$"
                                                         required
                                                     />
                                                 </div>
@@ -608,7 +615,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         placeholder="City"
                                                         id="city"
                                                         name="city"
-                                                        maxLength={40}
+                                                        maxLength={50}
                                                         pattern="^[a-zA-Z\s]{2,40}$"
                                                         onChange={handleAddressChange}
                                                         value={address.city}
@@ -626,7 +633,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         placeholder="Country"
                                                         id="country"
                                                         name="country"
-                                                        maxLength={40}
+                                                        maxLength={50}
                                                         onChange={handleAddressChange}
                                                         value={address.country}
                                                         pattern="^[a-zA-Z\s]{2,40}$"
@@ -642,7 +649,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         className="textarea_edit col-12"
                                                         id="add"
                                                         name="add"
-                                                        maxLength={50}
+                                                        maxLength={500}
                                                         placeholder="House NO., Building Name, Road Name, Area, Colony"
                                                         onChange={handleAddressChange}
                                                         value={address.add}
@@ -668,22 +675,24 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                             </label>
 
                                         </div>
-                                        <button type="button" onClick={viewFile}  >View</button>
+                                      <button type="button" className="btn btn-outline-dark" onClick={viewFile}>View</button>
                                     </div>
-                                    <div className="col-12 col-lg-6 mt-2">
+                            <div className="col-12 col-lg-12 mt-2">
   <div className="mb-3">
     <label htmlFor="remark" className="form-label label_text">
       Remark
     </label>
-    <input
+    <textarea
       type="text"
-      className="form-control rounded-0"
+      className="textarea_edit col-12"
       id="remark"
       name="remark"
       onChange={handleChange}
-      maxLength={50}
+      maxLength={1000}
+      placeholder="Enter a Remark..."
       value={projects?.remark || ""}
       aria-describedby="secemailHelp"
+      row='2'
     />
   </div>
 </div>

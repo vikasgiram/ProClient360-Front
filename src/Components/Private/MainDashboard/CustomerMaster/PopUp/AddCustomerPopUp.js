@@ -179,7 +179,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                         type="text"
                         className="form-control rounded-0"
                         id="FullName"
-                        maxLength={50}
+                        maxLength={300}
                         value={custName}
                         onChange={handleCustNameChange}
                         aria-describedby="nameHelp"

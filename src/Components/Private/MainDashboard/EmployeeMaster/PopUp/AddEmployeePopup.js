@@ -195,7 +195,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="text"
-                        maxLength={30}
+                        maxLength={100}
                         value={name}
                         onChange={handleNameChange}
                         className="form-control rounded-0 uppercase-inputs"
@@ -265,7 +265,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
                       </label>
                       <input
                         type="email"
-                        maxLength={40}
+                        maxLength={50}
                         placeholder="Enter a Email...."
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -368,7 +368,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
                             className="form-control rounded-0"
                             id="password"
                             placeholder="Password...."
-                            maxLength={40}
+                            maxLength={50}
                             required
                           />
                           <button
@@ -396,7 +396,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
                             className="form-control rounded-0"
                             id="ConfirmPassword"
                             placeholder="Confirm Password...."
-                            maxLength={40}
+                            maxLength={50}
                             required
                           />
                           <button

@@ -144,7 +144,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                         type="text"
                         className="form-control rounded-0"
                         id="FullName"
-                        maxLength={40}
+                        maxLength={300}
                         placeholder="Update a Full Name.... "
                         name="custName"
                         value={customer.custName}
@@ -163,7 +163,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                       <input
                         type="email"
                         name="email"
-                        maxLength={40}
+                        maxLength={50}
                         placeholder="Update a Email...."
                         className="form-control rounded-0"
                         id="Email"
@@ -193,6 +193,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             type="text"
                             className="form-control rounded-0"
                             id="ContactPerson1"
+                            maxLength={100}
                             name="customerContactPersonName1"
                             onChange={handleChange}
                             value={customer.customerContactPersonName1}
@@ -240,6 +241,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
 
                             className="form-control rounded-0"
                             id="ContactPerson2"
+                            maxLength={100}
                             name="customerContactPersonName2"
                             onChange={handleChange}
                             value={customer.customerContactPersonName2}

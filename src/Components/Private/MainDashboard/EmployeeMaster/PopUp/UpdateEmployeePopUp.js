@@ -115,7 +115,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedEmp }) => {
                       <input
                         name="name"
                         type="text"
-                        maxLength={40}
+                        maxLength={100}
                         placeholder="Update a Full Name...."
                         value={employee.name}
                         onChange={handleChange}
@@ -177,7 +177,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedEmp }) => {
                       <input
                         type="email"
                         name="email"
-                        maxLength={40}
+                        maxLength={50}
                         placeholder="Update a Email...."
                         value={employee.email}
                         onChange={handleChange}
@@ -262,6 +262,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedEmp }) => {
                           className="form-control rounded-0 border-0"
                           id="HourlyRate"
                           placeholder="eg. 10,000"
+                          maxLength={10}
                           aria-label="Hourly Rate"
                           required
                         />
