@@ -327,7 +327,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                         onChange={(e) => setDetails(e.target.value)}
                         className="form-control rounded-0"
                         id="name"
-                        maxLength={500}
+                        maxLength={300}
                         aria-describedby="emailHelp"
                         required
                       ></textarea>
