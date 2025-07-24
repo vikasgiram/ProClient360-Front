@@ -202,7 +202,7 @@ export const ServiceMasterGrid = () => {
                         <thead>
                           <tr className="th_border">
                             <th>Sr. No</th>
-                            <th className="align_left_td width_tdd">Complaint</th>
+                            <th className="align_left_td width_tdd" style={{ width: "4rem" }} >Complaint</th>
                             <th className="align_left_td width_tdd">Client</th>
                             <th className="align_left_td width_tdd">Product</th>
                             <th className="align_left_td width_tdd">Priority</th>
@@ -217,7 +217,7 @@ export const ServiceMasterGrid = () => {
                             data.services.map((service, index) => (
                               <tr className="border my-4" key={service._id}>
                                 <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
-                                <td className="align_left_td width_tdd">{service?.ticket?.details}</td>
+                                <td className="align_left_td width_tdd wrap-text-of-col">{service?.ticket?.details}</td>
                                 <td className="align_left_td width_tdd">{service?.ticket?.client?.custName}</td>
                                 <td className="align_left_td width_tdd">{service?.ticket?.product}</td>
                                 <td className="align_left_td width_tdd">{service.priority}</td>

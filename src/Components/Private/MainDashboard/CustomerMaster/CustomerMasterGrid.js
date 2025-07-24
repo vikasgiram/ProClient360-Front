@@ -192,7 +192,7 @@ export const CustomerMasterGrid = () => {
                             customers.map((customer, index) => (
                               <tr className="border my-4" key={customer._id}>
                                 <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                                <td className="align_left_td td_width">{customer.custName}</td>
+                                <td className="align_left_td td_width wrap-text-of-col">{customer.custName}</td>
                                 <td>{customer.email}</td>
                                 <td>{customer.phoneNumber1}</td>
                                 <td>{customer.GSTNo}</td>

@@ -210,8 +210,7 @@ export const EmployeeMyServiceMasterGrid = () => {
                                   {index + 1 + (pagination.currentPage - 1) * itemsPerPage}
                                 </td>
                                 <td
-                                  className="align_left_td width_tdd"
-                                  style={{ width: "20%" }}
+                                  className="align_left_td width_tdd wrap-text-of-col"
                                 >
                                   {service.ticket?.details || "N/A"}
                                 </td>
