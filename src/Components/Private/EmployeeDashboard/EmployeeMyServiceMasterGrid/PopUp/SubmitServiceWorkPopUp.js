@@ -23,8 +23,8 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate}) => {
   const [status, setStatus] = useState("");
   const [action, setAction] = useState("");
   const [stuckReason, setStuckReason] = useState("");
-  const [startTime, setStartTime] = useState();
-  const [endTime, setEndTime] = useState();
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
   const [previousActions, setPreviousActions] = useState([]);
 
   const [responsibleParty, setResponsibleParty] = useState("");
@@ -156,11 +156,14 @@ useEffect(() => {
         return;
       }
     }
-    if (status!=='Stuck' && startTime === "" || startTime === "") {
+    if (status!=='Stuck' && startTime === null || endTime === null) {
       return toast.error("Please select Date and Time");
     }
-    if (status!=='Stuck' && action === "") {
+    if (status!=='Stuck' && action === "" ) {
       return toast.error("Please enter Action");
+    }
+    if (status === "Inprogress" && workComplete === "") {
+      return toast.error("Please enter Work Complete Percentage");
     }
 
     const actionData = {
@@ -169,6 +172,7 @@ useEffect(() => {
       startTime,
       endTime,
       stuckReason,
+      completeLevel: workComplete,
       action,
     };
 
@@ -182,7 +186,7 @@ useEffect(() => {
       handleUpdate();
       FetchPreviousActions();
     } else {
-      toast.error(data.error);
+      toast.error(data?.error);
     }
   };
 
@@ -491,7 +495,7 @@ useEffect(() => {
                           onChange={(e) => setStartTime(e.target.value)}
                           value={startTime}
                           aria-describedby="statusHelp"
-                          required
+                          required="true"
                         />
                       </div>
 
@@ -506,7 +510,7 @@ useEffect(() => {
                           onChange={(e) => setEndTime(e.target.value)}
                           value={endTime}
                           aria-describedby="statusHelp"
-                          required
+                          required="true"
                         />
                       </div>
                     </div>
