@@ -15,9 +15,7 @@ import { DepartmentMasterGrid } from "./Components/Private/MainDashboard/Departm
 import { DesignationMasterGird } from "./Components/Private/MainDashboard/DesignationMaster/DesignationMasterGrid";
 import { TaskSheetMaster } from "./Components/Private/MainDashboard/TaskSheetMaster/TaskSheetMaster";
 import { ForgotPassword } from "./Components/Public/ForgotPassword";
-import { ChangePassword } from "./Components/Public/ChangePassword";
 import { Mailsentsuccessfully } from "./Components/Public/Mailsentsuccessfully";
-import { ForgotPasswordConfirm } from "./Components/Public/ForgotPasswordConfirm";
 import AdminMainDashboard from "./Components/Private/AdminDashboard/AdminMainDashboard";
 import EmployeeMainDashboard from "./Components/Private/EmployeeDashboard/EmployeeMainDashboard";
 import { EmployeeTaskGrid } from "./Components/Private/EmployeeDashboard/EmployeeTaskGrid/EmployeeTaskGrid";
@@ -42,6 +40,8 @@ import { EmployeeFeedbackMasterGrid } from "./Components/Private/EmployeeDashboa
 import ProtectedRoute from "./utils/ProtectedRoute";
 
 import LeadApis from "./Components/Private/MainDashboard/LeadApisMaster/LeadApis";
+import { ChangePassword } from "./Components/Public/ChangePassword";
+import { ForgotPasswordConfirm } from "./Components/Public/ForgotPasswordConfirm";
 const AllRoutes = () => {
 
 const {user} = useContext(UserContext);

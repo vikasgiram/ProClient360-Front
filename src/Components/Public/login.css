@@ -1,4 +1,4 @@
-/* .nmmc_blue_bg {
+.nmmc_blue_bg {
     background-color: white;
 }
 
@@ -150,16 +150,14 @@
 
 .mail_sent_size{
     width: 140px;
-} */
+}
 
 
 /* --------------------------------------new login css------------------------------------------------------------- */
 
-   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+   /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); */
         
-        * {
-            font-family: 'Inter', sans-serif;
-        }
+        
         
         .floating-icon {
             animation: float 6s ease-in-out infinite;
@@ -249,5 +247,131 @@
             100% {
                 transform: translateY(-100px) translateX(100px);
                 opacity: 0;
+            }
+        }
+
+        .btn{
+            width: 120px !important;
+        }
+
+
+
+        /* *************************mail sent csss ****************** */
+
+          .body {
+          font-family: "Poppins", "Comfortaa", sans-serif !important;
+            background: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999 !important;
+        }
+
+        .containern {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .check-circle {
+            width: 80px;
+            height: 80px;
+            background: #10b981;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.5s ease-out 0.2s both;
+        }
+
+        .checkmarks {
+            width: 32px;
+            height: 32px;
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            animation: draw 0.8s ease-out 0.5s both;
+        }
+
+        .title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+            animation: slideUp 0.5s ease-out 0.8s both;
+        }
+
+        .message {
+            font-size: 1rem;
+            color: #6b7280;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            animation: slideUp 0.5s ease-out 1s both;
+        }
+
+        .buttonn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            animation: slideUp 0.5s ease-out 1.2s both;
+        }
+
+        .button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes draw {
+            0% {
+                stroke-dasharray: 0 100;
+            }
+            100% {
+                stroke-dasharray: 100 100;
+            }
+        }
+
+        @keyframes slideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
             }
         }

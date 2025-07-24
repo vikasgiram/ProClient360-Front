@@ -48,7 +48,7 @@ export const LogIn = () => {
       const data = await loginUser(username, password, fcmToken);
       // console.log(username,password);
       setUser(data);
-      if(data.newUser===true){
+      if (data.newUser === true) {
         toast.success("Please complete your profile to continue.");
         navigation("/ChangePassword");
         console.log("New user, redirecting to ChangePassword");
@@ -216,9 +216,9 @@ export const LogIn = () => {
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     {/* <Icon /> */}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                      viewBox="0 0 16 16">
-                      <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v.217l-8 4.8-8-4.8V4zm0 1.383v6.634l5.803-3.483L0 5.383zM6.761 9.197l-6.52 3.912A2 2 0 0 0 2 14h12a2 2 0 0 0 1.758-0.891l-6.52-3.912-0.738 0.444a1 1 0 0 1-1.002 0l-0.738-0.444zM10.197 8.534L16 12.017V5.383l-5.803 3.15z" />
+                    <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                     </svg>
 
                   </div>
@@ -236,9 +236,8 @@ export const LogIn = () => {
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     {/* <Icon /> */}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                      viewBox="0 0 24 24">
-                      <path d="M17 8h-1V6a4 4 0 1 0-8 0v2H7c-1.1 0-2 .9-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10c0-1.1-.9-2-2-2zm-5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-9H9V6a3 3 0 1 1 6 0v2z" />
+                    <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                     </svg>
 
 
@@ -279,12 +278,13 @@ export const LogIn = () => {
                 </button>
 
                 <div className="text-center">
-                  <p className="text-gray-600">
-                    Don't have an account?{' '}
-                    <button type="button" className="btn text-blue-600 hover:text-blue-800 font-semibold" onClick={showSignUp}>
-                      Sign up
-                    </button>
-                  </p>
+                  <span className="text-gray-600 cursor-pointer">
+                    Privacy policy
+                  </span>
+                  <span className="mx-2">|</span>
+                  <span className="text-gray-600 cursor-pointer">
+                    Tearms & Conditions
+                  </span>
                 </div>
               </form>
             </div>
