@@ -156,7 +156,7 @@ useEffect(() => {
         return;
       }
     }
-    if (status!=='Stuck' && startTime === null || endTime === null) {
+    else if (status!=='Stuck' && startTime === null || endTime === null) {
       return toast.error("Please select Date and Time");
     }
     if (status!=='Stuck' && action === "" ) {
