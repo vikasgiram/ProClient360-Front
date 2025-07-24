@@ -11,7 +11,7 @@ export const Mailsentsuccessfully = () => {
 
     return (
         <>
-            <div className="pt-3 bg-white " style={{ height: "100vh" }}>
+            {/* <div className="pt-3 bg-white " style={{ height: "100vh" }}>
                 <div className=" mx-auto row  center">
                     <div className="col-12  col-md-5  mt-md-0 col-lg-7 mx-auto    ">
                         <div className="row shadow p-lg-5 rounded px-lg-2">
@@ -39,6 +39,24 @@ export const Mailsentsuccessfully = () => {
 
                         </div>
                     </div>
+                </div>
+            </div> */}
+            
+
+            <div className="body">
+                <div class="containern">
+                    <div class="check-circle">
+                        <svg class="checkmarks" viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                        </svg>
+                    </div>
+
+                    <h1 class="title">Mail Sent Successfully</h1>
+                    <p class="message">Your message has been delivered successfully.</p>
+
+                    <button onClick={() => navigation('/')} class="buttonn" onclick="alert('Ready for next message!')">
+                        Continue
+                    </button>
                 </div>
             </div>
         </>

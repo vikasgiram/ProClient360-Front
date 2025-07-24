@@ -1099,7 +1099,7 @@ nav.sidebar .nav-item.menu-space {
   width: 100%;
   font-weight: bold !important;
   height: 60px;
-  font-family: "Roboto", sans-serif !important;
+  /* font-family: "Roboto", sans-serif !important; */
 }
 
 .side_icon_fs{
@@ -2259,7 +2259,7 @@ overflow: hidden;
 .Switch {
   margin: 4px 15px;
   font-size: 14px;
-  font-family: "Arial, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue";
+  /* font-family: "Arial, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue"; */
   display: flex;
   justify-content: center;
   align-items: center;
