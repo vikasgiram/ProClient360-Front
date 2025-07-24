@@ -59,10 +59,10 @@ const ViewFeedbackPopUp = ({ closePopUp, selectedFeedback }) => {
                       <p className="fw-bold mt-3">Product:</p>{" "}
                       {Feedback.ticket.product}
                     </h6>
-                    <h6>
+                    {/* <h6>
                       {" "}
                       <p className="fw-bold mt-3">Zone:</p> {Feedback.zone}
-                    </h6>
+                    </h6> */}
                     <h6>
                       {" "}
                       <p className="fw-bold mt-3">Feedback Type:</p>{" "}

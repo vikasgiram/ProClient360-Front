@@ -82,10 +82,10 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                       <p className="fw-bold mt-3">Product:</p>{" "}
                       {service.ticket.product}
                     </h6>
-                    <h6>
+                    {/* <h6>
                       {" "}
                       <p className="fw-bold mt-3">Zone:</p> {service.zone}
-                    </h6>
+                    </h6> */}
                     <h6>
                       <p className="fw-bold mt-3">Service Type:</p>{" "}
                       {service.serviceType}
