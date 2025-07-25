@@ -85,15 +85,11 @@ const deleteEmployee = async (employeeId) => {
     });
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return alert(data.error);
-    }
-
-    return toast.success("Employee Deleted");
+    return data;
   } catch (error) {
     console.error(error);
-    toast.error(error.response.data.error);  }
+    return error.response.data;
+  }
 };
 
 const getEmployeeDashboard = async () => {

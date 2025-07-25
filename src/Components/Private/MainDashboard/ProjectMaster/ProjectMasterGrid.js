@@ -83,11 +83,11 @@ export const ProjectMasterGrid = () => {
 
   const handelDeleteClick = async () => {
     const data = await deleteProject(selectedId);
-    if (data) {
+    if (data?.success) {
       handelDeleteClosePopUpClick();
-      return toast.success("Project Deleted successfully...");
+      return toast.success(data?.message);
     }
-    toast.error(data.error);
+    toast.error(data?.error);
   };
 
   useEffect(() => {
@@ -95,7 +95,7 @@ export const ProjectMasterGrid = () => {
       try {
         setLoading(true);
         const data = await getProjects(pagination.currentPage, itemsPerPage, filters);
-        if (data) {
+        if (data?.success) {
           setProject(data.projects || []);
           setPagination(data.pagination || {
             currentPage: 1,
@@ -105,6 +105,8 @@ export const ProjectMasterGrid = () => {
             hasNextPage: false,
             hasPrevPage: false,
           });
+        } else{
+          toast(data?.error);
         }
       } catch (error) {
         console.error("Error fetching projects:", error);

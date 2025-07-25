@@ -90,7 +90,12 @@ export const MarketingMasterGrid = () => {
     try {
       if (actionData) {
         console.log("Updating lead with ID:", id, "and data:", actionData);
-        await assignLead(id, actionData);
+        const data = await assignLead(id, actionData);
+        if (data?.success) {
+          toast.success(data?.message);
+        } else {
+          toast.error(data?.error);
+        }
         refetch();
       } 
     } catch (error) {

@@ -103,7 +103,8 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
     setLoading(true);
     try {
       toast.loading("Updating Service...")
-      const result = await updateService(service._id, service);toast.dismiss()
+      const result = await updateService(service._id, service);
+      toast.dismiss();
       if (result) {
         handleUpdate(service._id, service); // Call handleUpdateSubmit
         closePopUp(); // Close the popup

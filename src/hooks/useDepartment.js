@@ -81,19 +81,11 @@ const deleteDepartment = async (departmentId) => {
     
     const data = response.data;
     
-    if (response.status !== 200) {
-      const errorMessage = data.error || "Failed to delete department";
-      toast.error(errorMessage);
-      return { success: false, error: errorMessage };
-    }
-    
-    return { success: true, message: "Department deleted successfully" };
+    return data;
     
   } catch (error) {
     console.error("Error deleting department:", error);
-    const errorMessage = error.response?.data?.error || "Failed to delete department";
-    toast.error(errorMessage);
-    return { success: false, error: errorMessage };
+    return error.response?.data;
   }
 };
 

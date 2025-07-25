@@ -54,7 +54,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
       toast.loading("Updating Ticket...")
       const data = await updateTicket(ticket._id, ticket);
       toast.dismiss()
-      if(data.success){
+      if(data?.success){
         toast.success(data.message);
         handleUpdate();
       }else{

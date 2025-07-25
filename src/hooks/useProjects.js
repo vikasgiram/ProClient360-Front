@@ -122,15 +122,10 @@ const deleteProject = async (Id) => {
     });
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return alert(data.error);
-    }
-
     return data;
   } catch (error) {
     console.error(error);
-    toast.error(error.response.data.error);
+    return error?.response?.data;
   }
 };
 

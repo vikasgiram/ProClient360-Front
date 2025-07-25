@@ -25,7 +25,6 @@ export const SalesMasterGrid = () => {
   const [showLeadPopUp, setShowLeadPopUp] = useState(false);
   
   const [selectedLead, setSelectedLead] = useState(null); 
-  const [activeSource, setActiveSource] = useState(null);
 
   const [deletePopUpShow, setDeletePopUpShow] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
@@ -46,26 +45,6 @@ export const SalesMasterGrid = () => {
   const {submitEnquiry} = useSubmitEnquiry();
   const { createLead } = useCreateLead();
 
-  const calculateTodayCount = () => {
-  
-    if (data?.leadCounts?.todayCount !== undefined) {
-      return data.leadCounts.todayCount;
-    }
-    
-
-    if (!data?.leads || data.leads.length === 0) return 0;
-    
-    const today = new Date();
-    const todayDateString = today.toISOString().split('T')[0]; 
-    
-    return data.leads.filter(lead => {
-      const leadDate = new Date(lead.createdAt);
-      const leadDateString = leadDate.toISOString().split('T')[0];
-      return leadDateString === todayDateString;
-    }).length;
-  };
-
-  const actualTodayCount = calculateTodayCount();
 
   useEffect(() => {
     if (data) {
@@ -125,7 +104,12 @@ export const SalesMasterGrid = () => {
   const handleUpdateSubmit = async (id, enquiryData) => {
     try {
       if (enquiryData) {
-        await submitEnquiry(id, enquiryData);
+        const data = await submitEnquiry(id, enquiryData);
+        if (data?.success) {
+          toast.success(data?.message);
+        } else {
+          toast.error(data?.error);
+        }
         refetch();
       }
     } catch (error) {
@@ -152,13 +136,12 @@ export const SalesMasterGrid = () => {
     toast.loading("Adding lead...");
     const data = await createLead(leadData);
     console.log("Lead Data:", data);
+    toast.dismiss();
     if (data?.success) {
-      toast.dismiss();
       toast.success(data?.message || "Lead added successfully!");
       handleCloseAddModal();
       refetch();
     }else{
-      toast.dismiss();
       toast.error(data?.error || "Failed to add lead");
     }
   };

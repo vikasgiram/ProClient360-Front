@@ -60,14 +60,11 @@ const deleteCustomer = async (Id) => {
     });
     const data = response.data;
 
-    if (data.error) {
-      return toast.error(data.error);
-    }
-
-    toast.success("Customer Deleted sucessfully...");
+    return data;
   } catch (error) {
     console.log(error.response.data);
-    toast.error(error.response.data.error);  }
+    return error.response.data.error;
+  }
 };
 
 export { getCustomers, createCustomer, updateCustomer, deleteCustomer };
