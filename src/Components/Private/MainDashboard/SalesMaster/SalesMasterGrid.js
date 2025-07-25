@@ -13,6 +13,7 @@ import UpdateSalesPopUp from "./PopUp/UpdateSalesPopUp";
 import useMyLeads from "../../../../hooks/leads/useMyLeads";
 import useSubmitEnquiry from "../../../../hooks/leads/useSubmitEnquiry";
 import useCreateLead from "../../../../hooks/leads/useCreateLead";
+import useDeleteLead from "../../../../hooks/leads/useDeleteLead";
 
 export const SalesMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -45,6 +46,8 @@ export const SalesMasterGrid = () => {
   const {submitEnquiry} = useSubmitEnquiry();
   const { createLead } = useCreateLead();
 
+  const { deleteLead } = useDeleteLead();
+
 
   useEffect(() => {
     if (data) {
@@ -73,12 +76,19 @@ export const SalesMasterGrid = () => {
   
   const handleDeleteConfirm = async () => {
     if(!selectedLeadId) return;
-    try {
+    try { 
       console.log("Deleting lead with ID:", selectedLeadId);
-      toast.success("Lead deleted successfully!");
-      setDeletePopUpShow(false);
-      setSelectedLeadId(null);
-      refetch(); 
+      toast.loading("Deleting lead...");
+      const data = await deleteLead(selectedLeadId);
+      toast.dismiss();
+      if(data?.success){
+        toast.success("Lead deleted successfully!");
+        setDeletePopUpShow(false);
+        setSelectedLeadId(null);
+        refetch(); 
+      } else {
+        toast.error(data?.error || "Failed to delete lead");
+      }
     } catch (error) {
       toast.error("Failed to delete lead");
     }
@@ -286,6 +296,7 @@ export const SalesMasterGrid = () => {
                                                    <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
                                               </span>
                                             }
+
 
                                              {/* View Button */}
                                             {/* <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
