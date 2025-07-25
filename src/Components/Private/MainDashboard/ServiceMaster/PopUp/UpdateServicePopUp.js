@@ -71,7 +71,10 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
   };
 
   const handleSelectChange = (selectedOptions) => {
-    if (selectedOptions) {
+  if (selectedOptions) {
+    // Check if it's an array (multi-select) or single object (single-select)
+    if (Array.isArray(selectedOptions)) {
+      // Multi-select mode
       const newEmployees = selectedOptions.map(option => option.employee);
       setSelectedEmployees(newEmployees);
       setService((prevService) => ({
@@ -79,13 +82,26 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
         allotTo: newEmployees,
       }));
     } else {
-      setSelectedEmployees([]);
-      setService((prevService) => ({
-        ...prevService,
-        allotTo: [],
-      }));
+      const newEmployee = selectedOptions.employee;
+      const isAlreadySelected = selectedEmployees.some(emp => emp._id === newEmployee._id);
+      
+      if (!isAlreadySelected) {
+        const updatedEmployees = [...selectedEmployees, newEmployee];
+        setSelectedEmployees(updatedEmployees);
+        setService((prevService) => ({
+          ...prevService,
+          allotTo: updatedEmployees,
+        }));
+      }
     }
-  };
+  } else {
+    setSelectedEmployees([]);
+    setService((prevService) => ({
+      ...prevService,
+      allotTo: [],
+    }));
+  }
+};
 
   const handleRemoveEmployee = (id) => {
     const updatedSelectedEmployees = selectedEmployees.filter(
@@ -227,7 +243,6 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
                       placeholder="Search and select employees..."
                       noOptionsMessage={() => empLoading ? 'Loading...' : 'No employees'}
                       closeMenuOnSelect={false}
-                      isMulti={true}
                       hideSelectedOptions={false}
                     />
                   </div>
