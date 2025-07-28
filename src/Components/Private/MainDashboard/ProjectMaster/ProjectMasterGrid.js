@@ -195,13 +195,13 @@ export const ProjectMasterGrid = () => {
                           {project.length > 0 ? (
                             project.map((project, index) => (
                               <tr className="border my-4" key={project._id}>
-                                <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                <td className="w-10">{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
                                 <td className="align_left_td td_width wrap-text-of-col">{project.name}</td>
                                 <td className="wrap-text-of-col">{project.custId?.custName || "N/A"}</td>
-                                <td>{formatDate(project.startDate)}</td>
-                                <td>{formatDate(project.endDate)}</td>
-                                <td>{project.projectStatus}</td>
-                                <td>
+                                <td className="w-20">{formatDate(project.startDate)}</td>
+                                <td className="w-20">{formatDate(project.endDate)}</td>
+                                <td className="w-20">{project.projectStatus}</td>
+                                <td className="w-20">
                                   {user?.permissions?.includes("viewTaskSheet") || user?.user==='company'?(
                                   <i
                                     onClick={() => {
@@ -211,7 +211,7 @@ export const ProjectMasterGrid = () => {
                                   ></i>
                                   ):null}
                                 </td>
-                                <td>
+                                <td className="w-20">
                                 {user?.permissions?.includes("updateProject") || user?.user==='company'?(
                                   <span onClick={() => handleUpdate(project)} className="update">
                                     <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>

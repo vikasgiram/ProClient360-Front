@@ -13,6 +13,7 @@ const EyeIcon = ({ isOpen }) => (
 const AddCompanyPopup = ({ handleAdd }) => {
   const [name, setName] = useState("");
   const [mobileNo, setMobileNo] = useState("");
+  const [landlineNo, setLandlineNo] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -224,18 +225,39 @@ const AddCompanyPopup = ({ handleAdd }) => {
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label htmlFor="MobileNumber" className="form-label label_text">
-                        Mobile Number <RequiredStar />
+                        Contact Number <RequiredStar />
                       </label>
                       <input
                         type="tel"
                         id="MobileNumber"
-                        placeholder="Enter Mobile Number...."
+                        placeholder="Enter Contact Number...."
                         className="form-control rounded-0"
                         maxLength={10}
                         value={mobileNo}
                         onChange={(e) => {
                           const onlyDigits = e.target.value.replace(/\D/g, '');
                           setMobileNo(onlyDigits);
+                        }}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
+                      <label htmlFor="MobileNumber" className="form-label label_text">
+                        Landline No/Support No <RequiredStar />
+                      </label>
+                      <input
+                        type="tel"
+                        id="MobileNumber"
+                        placeholder="Enter Landline No/Support No..."
+                        className="form-control rounded-0"
+                        maxLength={13}
+                        value={landlineNo}
+                        onChange={(e) => {
+                          const onlyDigits = e.target.value.replace(/\D/g, '');
+                          setLandlineNo(onlyDigits);
                         }}
                         required
                       />

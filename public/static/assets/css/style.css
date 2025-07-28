@@ -2870,12 +2870,10 @@ width: 65% !important;
   
 }
 
-
 .wrap-text-of-col{
-  max-width: 6rem; 
+  max-width: 10rem; 
   white-space: normal;
   word-wrap: break-word; 
   text-overflow: ellipsis; 
   overflow: hidden;
- 
 }
