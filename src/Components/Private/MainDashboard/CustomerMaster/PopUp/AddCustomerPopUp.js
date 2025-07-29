@@ -76,9 +76,6 @@ const AddCustomerPopUp = ({ handleAdd }) => {
     if (billingAddress.pincode.length !== 6 || billingAddress.pincode < 0) {
       return toast.error("Enter valid Pincode");
     }
-    if (GSTNo && GSTNo.length !== 15) {
-      return toast.error("GST should be 15 characters long");
-    }
     if (!validator.isMobilePhone(phoneNumber1, 'any', { strictMode: false }) || phoneNumber2
       && !validator.isMobilePhone(phoneNumber2, 'any', { strictMode: false })) {
       return toast.error("Please enter valid 10-digit phone numbers.");
@@ -134,9 +131,10 @@ const AddCustomerPopUp = ({ handleAdd }) => {
 
   const handleGSTChange = (e) => {
     const value = e.target.value.toUpperCase();
-    if (/^[A-Z0-9]*$/.test(value) && value.length <= 15) {
-      setGSTNo(value);
-    }
+    // if (/^[A-Z0-9]*$/.test(value) && value.length <= 15) {
+    //   setGSTNo(value);
+    // }
+    setGSTNo(value);
   };
 
   return (
@@ -505,7 +503,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="">
                       <label htmlFor="GSTNumber" className="form-label label_text">
-                        GST Number
+                        GST Number <RequiredStar /> [If not available, put NA]
                       </label>
                       <input
                         type="text"
@@ -515,6 +513,9 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                         onChange={handleGSTChange}
                         value={GSTNo}
                         aria-describedby="emailHelp"
+                        required
+                        placeholder="Enter GST Number"
+                        minLength={2}
                       />
                     </div>
                   </div>
