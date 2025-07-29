@@ -67,12 +67,15 @@ export const TaskMasterGrid = () => {
     }
 
     const handelDeleteClick = async () => {
-        toast.loading("Deleting Task.....")
+        toast.loading("Deleting Task...")
         const data = await deleteTask(selectedId);
         toast.dismiss()
-        if (data) {
+        if (data?.success) {
             handelDeleteClosePopUpClick();
             setCurrentPage(1); // Reset to page 1 after deletion
+            toast.success(data?.message);
+        }else {
+            toast.error(data?.error);
         }
 
     };
@@ -83,7 +86,7 @@ export const TaskMasterGrid = () => {
             try {
                 setLoading(true);
                 const data = await getTask(currentPage, itemsPerPage, search);
-                if (data.success) {
+                if (data?.success) {
                     setTasks(data.task || []);
                     setPagination(data.pagination || {
                         currentPage: 1,
@@ -94,7 +97,7 @@ export const TaskMasterGrid = () => {
                         hasPrevPage: false,
                     });
                 } else {
-                    toast(data.error);
+                    toast(data?.error);
                 }
             } catch (error) {
                 console.error("Error fetching tasks:", error);

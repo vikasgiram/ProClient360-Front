@@ -134,8 +134,14 @@ export const TaskSheetMaster = () => {
         {
           label: 'Yes',
           onClick: async () => {
-            await deleteTaskSheet(task.id);
+            const data = await deleteTaskSheet(task.id);
             setTasks(tasks.filter((t) => t.id !== task.id));
+            if( data?.success) {
+              toast.success(data?.message);
+            } else {
+              toast.error(data?.error);
+            }
+            
           }
         },
         {

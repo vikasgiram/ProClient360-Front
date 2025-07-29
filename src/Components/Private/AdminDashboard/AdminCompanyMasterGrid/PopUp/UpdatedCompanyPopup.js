@@ -198,6 +198,63 @@ const UpdatedCompanyPopup = ({ handleUpdate, selectedCompany }) => {
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
+                      <label htmlFor="MobileNumber" className="form-label label_text">
+                        Contact Number <RequiredStar />
+                      </label>
+                      <input
+                        type="tel"
+                        id="MobileNumber"
+                        name="mobileNo"
+                        placeholder="Enter Contact Number...."
+                        className="form-control rounded-0"
+                        maxLength={10}
+                        value={company.mobileNo}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
+                      <label htmlFor="MobileNumber" className="form-label label_text">
+                        Landline No/Support No <RequiredStar />
+                      </label>
+                      <input
+                        type="tel"
+                        name="landlineNo"
+                        id="landlineNo"
+                        placeholder="Enter Landline No/Support No..."
+                        className="form-control rounded-0"
+                        maxLength={13}
+                        value={company.landlineNo}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
+                      <label htmlFor="Email" className="form-label label_text">
+                        Email <RequiredStar />
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        maxLength={50}
+                        placeholder="Enter Email...."
+                        value={company.email}
+                        onChange={handleChange}
+                        className="form-control rounded-0"
+                        id="Email"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
                       {/* <label htmlFor="subDate" className="form-label label_text">Subscription  End Date
                       </label>
                       <input

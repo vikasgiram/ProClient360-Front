@@ -13,6 +13,8 @@ import useAssignLead from "../../../../hooks/leads/useAssignLead";
 import { formatDate } from "../../../../utils/formatDate";
 import AddLeadMaster from "../SalesMaster/PopUp/AddLeadMaster";
 import useCreateLead from "../../../../hooks/leads/useCreateLead";
+import useDeleteLead from "../../../../hooks/leads/useDeleteLead";
+import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 
 
 export const MarketingMasterGrid = () => {
@@ -33,6 +35,9 @@ export const MarketingMasterGrid = () => {
 
   const [selectedLead, setSelectedLead] = useState(null);
 
+  const [selectedLeadId, setSelectedLeadId] = useState(null);
+  const [deletePopUpShow, setDeletePopUpShow] = useState(false);
+
   const { user } = useContext(UserContext);
   const [filters, setFilters] = useState({ date: null, source: null });
   const [pagination, setPagination] = useState({
@@ -48,6 +53,8 @@ export const MarketingMasterGrid = () => {
   const { data, loading, error, refetch } = useLeads(pagination.currentPage, itemsPerPage, filters);
   const {assignLead } = useAssignLead();
   const { createLead } = useCreateLead();
+
+  const { deleteLead } = useDeleteLead();
 
   useEffect(() => {
     if (data) {
@@ -67,6 +74,31 @@ export const MarketingMasterGrid = () => {
   const handleUpdate = (lead = null) => {
     setSelectedLead(lead);
     setUpdatePopUpShow(true);
+  };
+
+  const handleDelete = (leadId) => {
+    setSelectedLeadId(leadId);
+    setDeletePopUpShow(true);
+  };
+
+    const handleDeleteConfirm = async () => {
+    if(!selectedLeadId) return;
+    try { 
+      console.log("Deleting lead with ID:", selectedLeadId);
+      toast.loading("Deleting lead...");
+      const data = await deleteLead(selectedLeadId);
+      toast.dismiss();
+      if(data?.success){
+        toast.success("Lead deleted successfully!");
+        setDeletePopUpShow(false);
+        setSelectedLeadId(null);
+        refetch(); 
+      } else {
+        toast.error(data?.error || "Failed to delete lead");
+      }
+    } catch (error) {
+      toast.error("Failed to delete lead");
+    }
   };
 
 
@@ -90,7 +122,14 @@ export const MarketingMasterGrid = () => {
     try {
       if (actionData) {
         console.log("Updating lead with ID:", id, "and data:", actionData);
-        await assignLead(id, actionData);
+        toast.loading("Assigning lead...");
+        const data = await assignLead(id, actionData);
+        toast.dismiss();
+        if (data?.success) {
+          toast.success(data?.message);
+        } else {
+          toast.error(data?.error);
+        }
         refetch();
       } 
     } catch (error) {
@@ -228,11 +267,11 @@ export const MarketingMasterGrid = () => {
                                       <i className="mx-1 fa-solid fa-share cursor-pointer"></i>
                                     </span>
                                   }
-                                  {/* {(user?.permissions?.includes('deleteLead') || user?.user === 'company' && lead.SOURCE==='Direct' ) &&
-                                              <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
-                                                  <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
-                                              </span>
-                                            } */}
+                                  {( lead.SOURCE==='Direct' &&( user?.permissions?.includes('deleteLead') || user?.user === 'company')) &&
+                                    <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
+                                          <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
+                                    </span>
+                                  }
 
                                   {/* View Button */}
                                   <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
@@ -365,6 +404,14 @@ export const MarketingMasterGrid = () => {
        {addpop && (
           <AddLeadMaster onAddLead={handleAddLeadSubmit} onClose={handleCloseAddModal} />
         )}
+        {deletePopUpShow && (
+        <DeletePopUP
+          message={"Are you sure you want to delete this lead?"}
+          heading={"Delete Lead"}
+          cancelBtnCallBack={() => setDeletePopUpShow(false)}
+          confirmBtnCallBack={handleDeleteConfirm}
+        />
+      )}
 
 
       {detailsServicePopUp && selectedLead && (

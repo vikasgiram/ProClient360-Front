@@ -66,8 +66,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
       !billingAddress.state ||
       !billingAddress.city ||
       !billingAddress.add ||
-      !zone ||
-      !GSTNo
+      !zone
     ) {
       return toast.error("Please fill all fields");
     }
@@ -77,7 +76,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
     if (billingAddress.pincode.length !== 6 || billingAddress.pincode < 0) {
       return toast.error("Enter valid Pincode");
     }
-    if (GSTNo.length !== 15) {
+    if (GSTNo && GSTNo.length !== 15) {
       return toast.error("GST should be 15 characters long");
     }
     if (!validator.isMobilePhone(phoneNumber1, 'any', { strictMode: false }) || phoneNumber2
@@ -506,7 +505,7 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="">
                       <label htmlFor="GSTNumber" className="form-label label_text">
-                        GST Number <RequiredStar />
+                        GST Number
                       </label>
                       <input
                         type="text"
@@ -516,7 +515,6 @@ const AddCustomerPopUp = ({ handleAdd }) => {
                         onChange={handleGSTChange}
                         value={GSTNo}
                         aria-describedby="emailHelp"
-                        required
                       />
                     </div>
                   </div>

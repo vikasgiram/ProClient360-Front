@@ -6,13 +6,13 @@ import { logout } from "../../../../hooks/useAuth";
 import NotificationPanel from "./NotificationPanel";
 
 export const Header = (props) => {
-	const { toggle, isopen} = props
+	const { toggle, isopen } = props
 	const [sticky, setSticky] = useState(false)
 
 	const { user, setUser } = useContext(UserContext);
 
 	const [showNotification, setShowNotification] = useState(false);
-	
+
 	const change = () => {
 		const scrollValue = document.documentElement.scrollTop
 		if (scrollValue > 50) {
@@ -30,32 +30,32 @@ export const Header = (props) => {
 		side.classList.toggle("visible")
 	}
 
-	document.addEventListener("click", function(event) {
-    const side = document.getElementById("userdata");
-    const toggleButton = document.getElementById("profileDropdown");
+	document.addEventListener("click", function (event) {
+		const side = document.getElementById("userdata");
+		const toggleButton = document.getElementById("profileDropdown");
 
-    if (toggleButton?.contains(event.target) === false && side?.contains(event.target) === false) {
-        side?.classList.add("visible");
-        side?.classList.remove("hidden1");
-    }
-});
+		if (toggleButton?.contains(event.target) === false && side?.contains(event.target) === false) {
+			side?.classList.add("visible");
+			side?.classList.remove("hidden1");
+		}
+	});
 	// function toggleuser(event) {
-		// 	// 	event.stopPropagation(); // Prevent click from propagating to document
-		// 	// 	const side = document.getElementById("userdata");
-		// 	// 	side.classList.toggle("hidden1");
-		// 	// 	side.classList.toggle("visible");
-		// 	// }
-			
-		// 	// document.addEventListener("click", function (event) {
-		// 	// 	const side = document.getElementById("userdata");
-		// 	// 	const toggleButton = document.getElementById("profileDropdown");
-			
-		// 	// 	// If the click is outside the dropdown and the toggle button, hide the dropdown
-		// 	// 	if (!toggleButton.contains(event.target) && !side.contains(event.target)) {
-		// 	// 		side.classList.add("visible");
-		// 	// 		side.classList.remove("hidden1");
-		// 	// 	}
-		// 	// });
+	// 	// 	event.stopPropagation(); // Prevent click from propagating to document
+	// 	// 	const side = document.getElementById("userdata");
+	// 	// 	side.classList.toggle("hidden1");
+	// 	// 	side.classList.toggle("visible");
+	// 	// }
+
+	// 	// document.addEventListener("click", function (event) {
+	// 	// 	const side = document.getElementById("userdata");
+	// 	// 	const toggleButton = document.getElementById("profileDropdown");
+
+	// 	// 	// If the click is outside the dropdown and the toggle button, hide the dropdown
+	// 	// 	if (!toggleButton.contains(event.target) && !side.contains(event.target)) {
+	// 	// 		side.classList.add("visible");
+	// 	// 		side.classList.remove("hidden1");
+	// 	// 	}
+	// 	// });
 
 	window.addEventListener("scroll", change)
 
@@ -89,17 +89,15 @@ export const Header = (props) => {
 					>
 						<span className="icon-menu"></span>
 					</button>
-					<div className="nav_swaraj_slogon">
-						<span className="nav_slogon_heading ms-2 header_fontsize" >
-							Project Management System
-						</span>
+					<div className="nav_swaraj_slogon pl-3">
+						<img src="./static/assets/img/nav/Proclient360_RedPink.png" className="Header_Logo" alt="img not found" srcSet="" />
 					</div>
 
 					<ul className="navbar-nav navbar-nav-right">
 
-					<li className="fa-solid fa-bell pointer-cursor" onClick={handleNotification}>
-							{showNotification }
-						
+						<li className="fa-solid fa-bell pointer-cursor" onClick={handleNotification}>
+							{showNotification}
+
 						</li>
 
 
@@ -112,7 +110,7 @@ export const Header = (props) => {
 								data-toggle="dropdown"
 								id="profileDropdown"
 							>
-							<img src={user.profilePic || "/static/assets/img/nav/man.png"} alt="profile" />
+								<img src={user.profilePic || "/static/assets/img/nav/man.png"} alt="profile" />
 
 								<i
 									className="align-self-center ml-1"
@@ -125,7 +123,7 @@ export const Header = (props) => {
 								aria-labelledby="profileDropdown"
 							>
 
-								<Link to={user.user==='employee'?'/UserProfile':'#'} className="dropdown-item">
+								<Link to={user.user === 'employee' ? '/UserProfile' : '#'} className="dropdown-item">
 									<div className="drop_item_one my-1">
 										{/* {user.name} */}
 										{user ? user.name : "Guest"}
@@ -140,19 +138,19 @@ export const Header = (props) => {
 									</div>
 								</Link>
 
-								{user.user === 'company'?
+								{user.user === 'company' ?
 									<Link to="/LeadApis" className="dropdown-item">
 										<div className="drop_item_one my-1">
 											Lead APIs
 										</div>
 									</Link>
-								: null}
+									: null}
 
 								<Link to="/" className="dropdown-item" onClick={handleLogout}>
 
 									<div className="drop_item_two my-1">
 										<i className="text-danger mr-2" >
-										<i className="fa-solid fa-power-off"></i> Log Out
+											<i className="fa-solid fa-power-off"></i> Log Out
 										</i>
 
 									</div>
@@ -166,10 +164,10 @@ export const Header = (props) => {
 
 			</nav>
 
-			{showNotification ?(
+			{showNotification ? (
 				<NotificationPanel
-				closePopUp={handleNotification}
-			/>) : null}
+					closePopUp={handleNotification}
+				/>) : null}
 
 		</div>
 	);

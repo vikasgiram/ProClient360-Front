@@ -20,25 +20,12 @@ const useAssignLead = () => {
       });
 
       const responseData = response.data;
-      if (responseData.error) {
-        setError(responseData.error);
-        setData(null);
-        toast.error(responseData.error);
-        return null;
-      }
-      if(responseData.success){
-        toast.success(responseData.message || 'Lead assigned successfully');
-      }
 
-      setData(responseData);
-      setError(null);
       return responseData;
     } catch (err) {
-      const errorMessage = err.response?.data?.error || 'Failed to update Lead';
-      setError(errorMessage);
+      setError(err.response?.data?.error || 'Failed to update Lead');
       setData(null);
-      toast.error(errorMessage);
-      return null;
+      return err.response?.data;
     } finally {
       setLoading(false);
     }

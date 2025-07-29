@@ -60,12 +60,12 @@ export const DepartmentMasterGrid = () => {
     toast.loading("Deleting Department.....")
     const data = await deleteDepartment(selectedId);
     toast.dismiss()
-    if (data) {
+    if (data?.success) {
       handelDeleteClosePopUpClick();
       setCurrentPage(1); // Reset to page 1 after deletion
-      return toast.success("Department Deleted successfully...");
-    }
-    toast.error(data.error);
+      return toast?.success(data.message);
+    }else
+      toast?.error(data.error);
   };
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export const DepartmentMasterGrid = () => {
       try {
         setLoading(true);
         const data = await getDepartment(currentPage, itemsPerPage, search); 
-        if (data.success) {
+        if (data?.success) {
           setDepartments(data.departments || []);
           setPagination(data.pagination || {
             currentPage: 1,
@@ -84,7 +84,7 @@ export const DepartmentMasterGrid = () => {
             hasPrevPage: false,
           });
         } else {
-          toast.error(data.error || "Failed to fetch departments");
+          toast(data.error);
         }
       } catch (error) {
         console.error("Error fetching departments:", error);

@@ -88,10 +88,13 @@ export const ServiceMasterGrid = () => {
   };
 
   const handelDeleteClick = async () => {
-    const result = await deleteService(selectedId);
-    if (result) {
+    const data = await deleteService(selectedId);
+    if (data?.success) {
       setdeletePopUpShow(false);
       setPagination((prev) => ({ ...prev, currentPage: 1 })); // Refresh list
+      toast.success(data?.message);
+    } else {
+      toast.error(data?.error);
     }
   };
 

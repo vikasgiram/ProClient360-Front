@@ -30,9 +30,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
   const [deptHasMore, setDeptHasMore] = useState(true);
   const [deptLoading, setDeptLoading] = useState(false);
   const [deptSearch, setDeptSearch] = useState("");
-
   const [designations, setDesignations] = useState([]);
-
   const [name, setName] = useState("");
   const [mobileNo, setMobileNo] = useState("");
   const [email, setEmail] = useState("");
@@ -169,7 +167,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
           backgroundColor: "#00000090",
         }}
       >
-        <div className="modal-dialog addemp" style={{maxWidth:"1000px"}}>
+        <div className="modal-dialog addemp" style={{ minWidth: "40%" }}>
           <div className="modal-content p-3">
             <form onSubmit={handleEmployeeAdd}>
               <div className="modal-header pt-0">
@@ -188,7 +186,6 @@ const AddEmployeePopup = ({ handleAdd }) => {
               </div>
               <div className="modal-body">
                 <div className="row modal_body_height">
-
                   <div className="col-12">
                     <div className="mb-3">
                       <label htmlFor="name" className="form-label label_text">

@@ -1,3 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Eczar:wght@400;500&display=swap');
+
+
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap'); */
+
+
+.loginbody_text{
+      font-family: "Poppins", "Comfortaa", sans-serif !important;
+}
+
 .nmmc_blue_bg {
     background-color: white;
 }
@@ -6,36 +16,38 @@
     color: #dd6101 !important;
 }
 
-.Web_fontsize{
+.Web_fontsize {
     font-size: 16px !important;
 }
 
-.main_heading_color{
+.main_heading_color {
     color: #196393 !important;
 }
 
-.shadow_css{
+.shadow_css {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
-.heading_fontsize{
+.heading_fontsize {
     text-align: start;
     font-size: 24px !important;
     font-weight: 500 !important;
 
 }
 
-.purpule_color{
+.purpule_color {
     color: #196393 !important;
 }
 
 .logo_in_circle {
     width: 40%;
 }
-.logo_in_circle{
+
+.logo_in_circle {
     width: 150px;
 }
-.f7{
+
+.f7 {
     font-size: 14px !important;
 }
 
@@ -82,11 +94,13 @@
     background-repeat: no-repeat;
     background-size: cover;
 }
-.btn_submit{
+
+.btn_submit {
     background-color: #023f7c;
     color: white;
-    
+
 }
+
 .Center_item_img {
     display: flex !important;
     justify-content: center !important;
@@ -110,7 +124,7 @@
     }
 }
 
-.center{
+.center {
     height: 60vh;
     width: 55vw !important;
     display: flex !important;
@@ -122,7 +136,7 @@
 }
 
 @media screen and (max-width: 800px) {
-    .center{
+    .center {
         height: 70vh;
         width: 90vw !important;
         display: flex !important;
@@ -131,247 +145,281 @@
         background-repeat: no-repeat;
         margin-top: 4%;
     }
-  }
+}
 
-.bg-img{
+.bg-img {
     background: url(../../../public/static/assets/img/Login/login_pms.jpg);
     background-size: 100% 100%;
-    
+
 }
-.all_bg{
+
+.all_bg {
     background: url(../../../public/static/assets/img/Login/login.jpg);
     background-size: 100% 100%;
 
 }
 
-.login_text{
+.login_text {
     color: #023f7c !important;
 }
 
-.mail_sent_size{
+.mail_sent_size {
     width: 140px;
 }
 
 
 /* --------------------------------------new login css------------------------------------------------------------- */
 
-   /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); */
-        
-        
-        
-        .floating-icon {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .floating-icon:nth-child(2) {
-            animation-delay: -2s;
-        }
-        
-        .floating-icon:nth-child(3) {
-            animation-delay: -4s;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-20px) rotate(5deg); }
-            66% { transform: translateY(-10px) rotate(-3deg); }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        
-        @keyframes slideIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .wave {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
-            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-            animation: waveMove 8s ease-in-out infinite;
-        }
-        
-        @keyframes waveMove {
-            0%, 100% { clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%); }
-            50% { clip-path: polygon(0 0, 100% 0, 100% 90%, 0 95%); }
-        }
-        
-        .btn-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .btn-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-        }
-        
-        .input-focus {
-            transition: all 0.3s ease;
-        }
-        
-        .input-focus:focus {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
-        }
-        
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(59, 130, 246, 0.6);
-            border-radius: 50%;
-            animation: particleFloat 12s linear infinite;
-        }
-        
-        @keyframes particleFloat {
-            0% {
-                transform: translateY(100vh) translateX(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) translateX(100px);
-                opacity: 0;
-            }
-        }
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); */
 
-        .btn{
+
+
+.floating-icon {
+    animation: float 6s ease-in-out infinite;
+}
+
+.floating-icon:nth-child(2) {
+    animation-delay: -2s;
+}
+
+.floating-icon:nth-child(3) {
+    animation-delay: -4s;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    33% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+
+    66% {
+        transform: translateY(-10px) rotate(-3deg);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.wave {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    animation: waveMove 8s ease-in-out infinite;
+}
+
+@keyframes waveMove {
+
+    0%,
+    100% {
+        clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    }
+
+    50% {
+        clip-path: polygon(0 0, 100% 0, 100% 90%, 0 95%);
+    }
+}
+
+.btn-hover {
+    transition: all 0.3s ease;
+}
+
+.btn-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+.input-focus {
+    transition: all 0.3s ease;
+}
+
+.input-focus:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(59, 130, 246, 0.6);
+    border-radius: 50%;
+    animation: particleFloat 12s linear infinite;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-100px) translateX(100px);
+        opacity: 0;
+    }
+}
+
+/* .btn{
             width: 120px !important;
-        }
+        } */
 
 
 
-        /* *************************mail sent csss ****************** */
+/* *************************mail sent csss ****************** */
 
-          .body {
-          font-family: "Poppins", "Comfortaa", sans-serif !important;
-            background: #f8fafc;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999999 !important;
-        }
+.body {
+    font-family: "Poppins", "Comfortaa", sans-serif !important;
+    background: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999 !important;
+}
 
-        .containern {
-            background: white;
-            border-radius: 16px;
-            padding: 3rem;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            animation: fadeInUp 0.6s ease-out;
-        }
+.containern {
+    background: white;
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: fadeInUp 0.6s ease-out;
+}
 
-        .check-circle {
-            width: 80px;
-            height: 80px;
-            background: #10b981;
-            border-radius: 50%;
-            margin: 0 auto 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: scaleIn 0.5s ease-out 0.2s both;
-        }
+.check-circle {
+    width: 80px;
+    height: 80px;
+    background: #10b981;
+    border-radius: 50%;
+    margin: 0 auto 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: scaleIn 0.5s ease-out 0.2s both;
+}
 
-        .checkmarks {
-            width: 32px;
-            height: 32px;
-            stroke: white;
-            stroke-width: 3;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            animation: draw 0.8s ease-out 0.5s both;
-        }
+.checkmarks {
+    width: 32px;
+    height: 32px;
+    stroke: white;
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw 0.8s ease-out 0.5s both;
+}
 
-        .title {
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 0.75rem;
-            animation: slideUp 0.5s ease-out 0.8s both;
-        }
+.title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+    animation: slideUp 0.5s ease-out 0.8s both;
+}
 
-        .message {
-            font-size: 1rem;
-            color: #6b7280;
-            line-height: 1.5;
-            margin-bottom: 2rem;
-            animation: slideUp 0.5s ease-out 1s both;
-        }
+.message {
+    font-size: 1rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    animation: slideUp 0.5s ease-out 1s both;
+}
 
-        .buttonn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            animation: slideUp 0.5s ease-out 1.2s both;
-        }
+.buttonn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    animation: slideUp 0.5s ease-out 1.2s both;
+}
 
-        .button:hover {
-            background: #2563eb;
-            transform: translateY(-1px);
-        }
+.button:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
 
-        @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
 
-        @keyframes scaleIn {
-            0% {
-                transform: scale(0);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-        @keyframes draw {
-            0% {
-                stroke-dasharray: 0 100;
-            }
-            100% {
-                stroke-dasharray: 100 100;
-            }
-        }
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+    }
 
-        @keyframes slideUp {
-            0% {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes draw {
+    0% {
+        stroke-dasharray: 0 100;
+    }
+
+    100% {
+        stroke-dasharray: 100 100;
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+.logo_new {
+    width: 80px;
+}
+
+.Header_Logo {
+    width: 7vw;
+}
