@@ -115,10 +115,11 @@ const AddEmployeePopup = ({ handleAdd }) => {
     if (/[a-zA-Z]/.test(mobileNo)) {
       return toast.error("Phone number should not contain alphabets");
     }
-    const phoneRegex = /^\d+$/;
-    if (!phoneRegex.test(mobileNo)) {
-      return toast.error("Phone number must only contain digits (0-9).");
-    }
+    
+    // const phoneRegex = /^\d+$/;
+    // if (!phoneRegex.test(mobileNo)) {
+    //   return toast.error("Phone number must only contain digits (0-9).");
+    // }
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {

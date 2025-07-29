@@ -55,8 +55,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
   const { name, value } = e.target;
 
   if (name === "name") {
-    const regex = /^[A-Za-z\s]*$/;
-    if (!regex.test(value)) return; // ignore invalid input
+    
   }
 
   setFormData({

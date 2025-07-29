@@ -179,6 +179,9 @@ export const ForgotPassword = () => {
 
               
               </form>
+
+               <a onClick={() => navigation('/')}> <i className="fa-solid fa-angle-left mt-5 text-center"></i>  Back to Login page</a>
+
             </div>
             <div className="lg:hidden text-center mt-8 slide-in" style={{ animationDelay: '0.5s' }}>
               <h1 className="text-3xl font-bold text-gray-800">
