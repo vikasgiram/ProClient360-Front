@@ -240,7 +240,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
                   <div className="col-12 col-lg-6 mt-2" >
                     <div className="mb-3">
-                      <label for="purchaseOrderValue" className="form-label label_text">     Purchase Order Value (Rs) <RequiredStar />
+                      <label for="purchaseOrderValue" className="form-label label_text">     Purchase Order Value (Rs) <RequiredStar /> [Without GST]
                       </label>
                       <input
                         type="text"
