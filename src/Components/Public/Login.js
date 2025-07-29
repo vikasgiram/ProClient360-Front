@@ -130,7 +130,7 @@ export const LogIn = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden relative font-[Inter]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden relative font-[Inter] loginbody_text">
       <div className="absolute inset-0 wave"></div>
       {[...Array(9)].map((_, i) => (
         <div
@@ -145,8 +145,8 @@ export const LogIn = () => {
           {/* Left Side */}
           <div className="hidden lg:block relative">
             <div className="text-center space-y-8">
-              <h1 className="text-5xl font-bold text-gray-800 slide-in" style={{ animationDelay: '0.2s' }}>
-                Manage Projects <span className="text-blue-600">Smartly</span>
+              <h1 className="text-4xl font-bold text-gray-700 slide-in" style={{ animationDelay: '0.2s' }}>
+                Manage Projects <span className="text-blue-600 ">Smartly</span>
               </h1>
               <p className="text-xl text-gray-600 slide-in" style={{ animationDelay: '0.4s' }}>
                 Streamline your workflow, boost productivity, and deliver projects on time.
@@ -176,9 +176,12 @@ export const LogIn = () => {
           <div className="w-full max-w-md mx-auto">
             <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 slide-in" style={{ animationDelay: '0.3s' }}>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
-                  <DashboardIcon />
-                </div>
+              
+                 <img
+                        src={ "./static/assets/img/Proclient360_Originalon.svg"}
+                        className="logo_new mx-auto mb-2"
+                        alt="logo"
+                    />
                 <h2 className="text-3xl font-bold text-gray-800">Welcome Back</h2>
                 <p className="text-gray-600 mt-2">Sign in to your ProjectFlow account</p>
               </div>
@@ -210,8 +213,6 @@ export const LogIn = () => {
                     <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                     </svg>
-
-
                   </div>
                   <input
                     type='password'
@@ -223,8 +224,6 @@ export const LogIn = () => {
                     className="input-focus w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-gray-50/50"
                   />
                 </div>
-
-
 
                 <div className="flex items-center justify-between">
                   <label className="flex items-center">
@@ -245,7 +244,6 @@ export const LogIn = () => {
                   ) : (
                     " Sign In"
                   )}
-
                 </button>
 
                 <div className="text-center">

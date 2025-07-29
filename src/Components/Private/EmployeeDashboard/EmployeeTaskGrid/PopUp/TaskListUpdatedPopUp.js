@@ -244,7 +244,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                                   <th className="text-center">Action</th>
                                   <th className="text-center">Action By</th>
                                   <th className="text-center">Start Date</th>
-                                  <th className="text-center">End Time</th>
+                                  <th className="text-center">End Date</th>
                                   <th className="text-center">Completed</th>
                                   <th className="text-center">Edit</th>
                                 </tr>

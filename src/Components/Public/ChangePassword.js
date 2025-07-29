@@ -53,17 +53,17 @@ export const ChangePassword = () => {
   };
 
 
-const onTogglePasswordCurrent = () => {
-  setShowPassword(prev => ({ ...prev, current: !prev.current }));
-};
+  const onTogglePasswordCurrent = () => {
+    setShowPassword(prev => ({ ...prev, current: !prev.current }));
+  };
 
-const onTogglePasswordNew = () => {
-  setShowPassword(prev => ({ ...prev, new: !prev.new }));
-};
+  const onTogglePasswordNew = () => {
+    setShowPassword(prev => ({ ...prev, new: !prev.new }));
+  };
 
-const onTogglePasswordConfirm = () => {
-  setShowPassword(prev => ({ ...prev, confirm: !prev.confirm }));
-};
+  const onTogglePasswordConfirm = () => {
+    setShowPassword(prev => ({ ...prev, confirm: !prev.confirm }));
+  };
 
 
 
@@ -122,7 +122,7 @@ const onTogglePasswordConfirm = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden relative font-[Inter]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden relative font-[Inter] loginbody_text">
       <div className="absolute inset-0 wave"></div>
       {[...Array(9)].map((_, i) => (
         <div
@@ -276,8 +276,8 @@ const onTogglePasswordConfirm = () => {
                       type={showPassword.confirm ? 'text' : 'password'}
                       className="input-focus w-full pl-12 pr-12 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-gray-50/50"
                       placeholder='Confirm Password'
-                     value={confirmPass}
-                       onChange={(e) => {setConfirmPass(e.target.value)}}
+                      value={confirmPass}
+                      onChange={(e) => { setConfirmPass(e.target.value) }}
                       onFocus={() => setIsFocused(true)}
                       onBlur={() => setIsFocused(false)}
                       required
@@ -316,7 +316,7 @@ const onTogglePasswordConfirm = () => {
 
               </form>
 
-                  <a onClick={() => navigation('/')}> <i className="fa-solid fa-angle-left mt-5 text-center"></i>  Back to Home page</a>
+              <a className="cursor-pointer" onClick={() => navigation('/')}> <i className="fa-solid fa-angle-left mt-5 text-center "></i>  Back to Home page</a>
             </div>
             <div className="lg:hidden text-center mt-8 slide-in" style={{ animationDelay: '0.5s' }}>
               <h1 className="text-3xl font-bold text-gray-800">

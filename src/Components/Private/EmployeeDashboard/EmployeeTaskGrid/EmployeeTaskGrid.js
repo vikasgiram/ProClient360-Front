@@ -468,10 +468,9 @@ export const EmployeeTaskGrid = () => {
                                         
                                             </div>
                                         )}
-
-                                        {pagination.totalProjects === 0 && !loading && (
+                                        {/* {pagination.totalProjects === 0 && !loading && (
                                             <div className="text-center my-3 text-muted">No projects found.</div>
-                                        )}
+                                        )} */}
                                     </>
                                 )}
                             </div>

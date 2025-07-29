@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "././login.css";
 import toast from "react-hot-toast";
@@ -8,7 +8,7 @@ import { forgetPassword } from "../../hooks/useAuth";
 export const ForgotPassword = () => {
   const navigation = useNavigate();
 
- 
+
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -75,13 +75,13 @@ export const ForgotPassword = () => {
     </svg>
   );
 
- 
+
 
 
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden relative font-[Inter]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden relative font-[Inter] loginbody_text">
       <div className="absolute inset-0 wave"></div>
       {[...Array(9)].map((_, i) => (
         <div
@@ -96,7 +96,7 @@ export const ForgotPassword = () => {
           {/* Left Side */}
           <div className="hidden lg:block relative">
             <div className="text-center space-y-8">
-              <h1 className="text-5xl font-bold text-gray-800 slide-in" style={{ animationDelay: '0.2s' }}>
+              <h1 className="text-4xl font-bold text-gray-800 slide-in" style={{ animationDelay: '0.2s' }}>
                 Manage Password <span className="text-blue-600">Securly</span>
               </h1>
               <p className="text-xl text-gray-600 slide-in" style={{ animationDelay: '0.4s' }}>
@@ -177,8 +177,11 @@ export const ForgotPassword = () => {
 
                 </button>
 
-              
+
               </form>
+
+               <a onClick={() => navigation('/')}> <i className="fa-solid fa-angle-left mt-5 text-center"></i>  Back to Login page</a>
+
             </div>
             <div className="lg:hidden text-center mt-8 slide-in" style={{ animationDelay: '0.5s' }}>
               <h1 className="text-3xl font-bold text-gray-800">
