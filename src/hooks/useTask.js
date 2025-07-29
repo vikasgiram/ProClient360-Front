@@ -71,15 +71,11 @@ const deleteTask = async (Id) => {
     });
     const data = response.data;
 
-    if (data.error) {
-      console.error(data.error);
-      return toast.error(data.error);
-    }
-    toast.success("Task Deleted Successfuly...");
     return data;
   } catch (error) {
     console.error(error);
-    toast.error(error.response.data.error); }
+    return error?.response?.data;
+  }
 };
 
 export { getTask,  createTask, updateTask, deleteTask };

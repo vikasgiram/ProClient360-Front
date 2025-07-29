@@ -20,23 +20,14 @@ const useUpdateService = () => {
       });
 
       const responseData = response.data;
-      if (responseData.error) {
-        setError(responseData.error);
-        setData(null);
-        toast.error(responseData.error);
-        return null;
-      }
-
+      
       setData(responseData);
       setError(null);
-      toast.success('Service Updated successfully');
       return responseData;
     } catch (err) {
-      const errorMessage = err.response?.data?.error || 'Failed to update service';
-      setError(errorMessage);
+      setError(err?.response?.data?.error || 'An error occurred while updating the service');
       setData(null);
-      toast.error(errorMessage);
-      return null;
+      return err?.response?.data;
     } finally {
       setLoading(false);
     }

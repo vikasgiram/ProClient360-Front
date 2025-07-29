@@ -6,14 +6,6 @@ import { createAction, getAllActions } from "../../../../../hooks/useAction";
 import { updateAction } from "../../../../../hooks/useAction";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 
-
-
-//work for tommorow
-//Task status not present in Action API 
-// make a function for update Actions
-// make logic for if edit icon is comming then create task will gone automatic
-
-
 const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [taskLevel, setTaskLevel] = useState(selectedTask?.taskLevel);
@@ -27,7 +19,6 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   const [editAction, setEditAction] = useState(""); //editAction used for for  update as parameter 
   const [addAction, setAddAction] = useState(true);
   
-
   console.log(selectedTask, "selected task");
 
   const handleStatusChange = (status) => {
@@ -36,25 +27,18 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
     if (status === "completed") {
       setTaskLevel(100);
     }
-    else if (status=== "inprocess" || status === "stuck") { 
-
+    else if (status === "inprocess" || status === "stuck") { 
       setTaskLevel((prev) => (parseInt(prev) < 100 ? prev : ""));
-  } else {
-    setTaskLevel("");
-  }
-};
+    } else {
+      setTaskLevel("");
+    }
+  };
 
   const toggleVisibility = async () => {
     const res = await getAllActions(selectedTask._id);
     setActionHistory(res?.actions);
-    // console.log("all actions",res);
     setIsVisible(!isVisible);
   };
-
-if (new Date(startTime) >= new Date(endTime)) {
-  return toast.error("Start Time must be earlier than End Time");
-}
-
 
   const handelTaskUpdate = async (event) => {
     event.preventDefault();
@@ -78,6 +62,11 @@ if (new Date(startTime) >= new Date(endTime)) {
     if (!/^[a-zA-Z0-9\s.,;:!?'"()\-]+$/.test(action)) {
       return toast.error("Special characters are not allowed in action");
     }
+    
+    if (new Date(startTime) >= new Date(endTime)) {
+      return toast.error("Start time must be before end time");
+    }
+
     const data = {
       task: selectedTask?._id,
       action,
@@ -89,7 +78,6 @@ if (new Date(startTime) >= new Date(endTime)) {
     };
 
     try {
-      // console.log("action Data:",data);
       await createAction(data);
       handleUpdateTask();
     } catch (error) {
@@ -103,49 +91,63 @@ if (new Date(startTime) >= new Date(endTime)) {
     setAddAction(false);
   }
 
-  const handleEditTask = async (event) => {
-  const { name, value } = event.target;
+  const handleEditTask = (event) => {
+    const { name, value } = event.target;
 
-  if (name === "taskStatus") {
-    if (value === "completed") {
-      setEditAction((prevAction) => ({
-        ...prevAction,
-        taskStatus: value,
-        complated: "100",
-      }));
-    } else {
-      setEditAction((prevAction) => ({
-        ...prevAction,
-        taskStatus: value,
-        complated: "",
-      }));
-    }
-    return;
-  }
-
-  if (name === "complated") {
-    if (editAction.taskStatus !== "completed") {
-      if (/^\d{0,2}$/.test(value)) {
+    if (name === "taskStatus") {
+      if (value === "completed") {
         setEditAction((prevAction) => ({
           ...prevAction,
-          complated: value,
+          taskStatus: value,
+          complated: "100",
+        }));
+      } else {
+        setEditAction((prevAction) => ({
+          ...prevAction,
+          taskStatus: value,
+          complated: "",
         }));
       }
+      return;
     }
-    return;
-  }
 
-  // Default
-  setEditAction((prevAction) => ({
-    ...prevAction,
-    [name]: value,
-  }));
-};
+    if (name === "complated") {
+      if (editAction.taskStatus !== "completed") {
+        if (value === "" || /^\d{1,2}$/.test(value)) {
+          if (value === "" || parseInt(value) <= 100) {
+            setEditAction((prevAction) => ({
+              ...prevAction,
+              complated: value,
+            }));
+          }
+        }
+      }
+      return;
+    }
 
-
+    setEditAction((prevAction) => ({
+      ...prevAction,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
+    if (!editAction.action || !editAction.startTime || !editAction.endTime || 
+        !editAction.complated || !editAction.taskStatus) {
+      return toast.error("Please fill all required fields");
+    }
+    
+    if (editAction.complated > 100) {
+      return toast.error("Completed level should be less than or equal to 100");
+    }
+    
+    // Validate dates for edit
+    if (new Date(editAction.startTime) >= new Date(editAction.endTime)) {
+      return toast.error("Start time must be before end time");
+    }
+
     try {
       await updateAction(editAction._id, editAction);
       handleUpdateTask();
@@ -153,9 +155,6 @@ if (new Date(startTime) >= new Date(endTime)) {
       toast.error(error);
     }
   }
-  // console.log("editAction", editAction);
-
-
 
   return (
     <>
@@ -169,9 +168,7 @@ if (new Date(startTime) >= new Date(endTime)) {
       >
         <div className="modal-dialog modal-xl modal_widthhh" >
           <div className="modal-content p-3">
-            <form
-            // onSubmit={handleEmpUpdate}
-            >
+            <form>
               <div className="modal-header pt-0">
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                   {selectedTask?.taskName?.name}
@@ -236,9 +233,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                    </button>
                   </div>
 
-
                   {isVisible && (
-
                     <div className="  bg-white ms-1 rounded p-lg-3">
                       <div className="col-12" style={{ maxWidth: '55vw', width: '55vw' }}>
                         <div className="shadow_custom ">
@@ -250,7 +245,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                                   <th className="text-center">Action By</th>
                                   <th className="text-center">Start Date</th>
                                   <th className="text-center">End Time</th>
-                                  <th className="text-center">Complated</th>
+                                  <th className="text-center">Completed</th>
                                   <th className="text-center">Edit</th>
                                 </tr>
                               </thead>
@@ -259,7 +254,6 @@ if (new Date(startTime) >= new Date(endTime)) {
                                 {actionHistory &&
                                   actionHistory.map((action, index) => (
                                     <tr className="text-center" key={action?._id} >
-
                                       <td>{action?.action}</td>
                                       <td>{action?.actionBy?.name}</td>
                                       <td>{formatDateforTaskUpdate(action?.startTime)}</td>
@@ -269,37 +263,23 @@ if (new Date(startTime) >= new Date(endTime)) {
                                         actionHistory.length - 1 && (
                                           <button
                                             type="button"
-                                            onClick={() =>
-                                              editTask(action)
-                                              // console.log(action._id,"action id")
-
-                                            }
+                                            onClick={() => editTask(action)}
                                           >
                                             <i className="fa-solid fa-pen-to-square"></i>
                                           </button>
                                         )}</td>
                                     </tr>
                                   ))}
-
                               </tbody>
-
                             </table>
                           </div>
                         </div>
                       </div>
                     </div>
-
-
-
-
-
-
-
-
                   )}
                 </div>
 
-                  {/* //for edit the actions */}
+                  {/* for edit the actions */}
                   {forEdit ? (
                     <div className="row modal_body_height mt-2">
                       <div className="col-12 col-lg-12 ">
@@ -349,7 +329,7 @@ if (new Date(startTime) >= new Date(endTime)) {
                             htmlFor="endTime"
                             className="form-label label_text"
                           >
-                            Process End Dates  <RequiredStar/>
+                            Process End Date <RequiredStar/>
                           </label>
                           <input
                             type="datetime-local"
@@ -374,15 +354,12 @@ if (new Date(startTime) >= new Date(endTime)) {
                           id="taskStatus"
                           name="taskStatus"
                           className="form-select"
-
                           onChange={handleEditTask}
                           value={editAction?.taskStatus}
                           required
                         >
-                          {/* {console.log("editAction.taskStatus", editAction.taskStatus)}; */}
-
                           <option value="">Select Status</option>
-                          <option value="inprocess">Inproccess</option>
+                          <option value="inprocess">In Process</option>
                           <option value="completed">Completed</option>
                           <option value="stuck">Stuck</option>
                         </select>
@@ -409,7 +386,6 @@ if (new Date(startTime) >= new Date(endTime)) {
                              readOnly={editAction.taskStatus === "completed"} 
                              required
                             />
-
                             <span
                               className="input-group-text rounded-0 bg-white border-0"
                               id="basic-addon1"
@@ -457,11 +433,9 @@ if (new Date(startTime) >= new Date(endTime)) {
                         </div>
                       </div>
                     </div>
-                  ) : " "}
+                  ) : ""}
 
                   {selectedTask?.taskLevel !== 100 && addAction && (
-
-
                     <div className="row modal_body_height mt-2">
                       <div className="col-12 col-lg-12 ">
                         <div className="md-3">
@@ -501,7 +475,6 @@ if (new Date(startTime) >= new Date(endTime)) {
                             value={startTime}
                             className="form-control rounded-0"
                             id="processStartDate"
-                             
                           />
                         </div>
                       </div>
@@ -514,24 +487,14 @@ if (new Date(startTime) >= new Date(endTime)) {
                           >
                             Process End Date   <RequiredStar/>
                           </label>
-                          {/* <input
+                          <input
                             type="datetime-local"
                             name="processEndDate"
                             onChange={(e) => setEndTime(e.target.value)}
                             value={endTime}
-                            min={new Date().toISOString().slice(0, 16)}
                             className="form-control rounded-0"
                             id="processEndDate"
-                          /> */}
-
-  <input
-  type="datetime-local"
-  name="processEndDate"
-  onChange={(e) => setEndTime(e.target.value)}
-  value={endTime}
-  className="form-control rounded-0"
-  id="processEndDate"
-/>
+                          />
                         </div>
                       </div>
 
@@ -540,18 +503,17 @@ if (new Date(startTime) >= new Date(endTime)) {
                           htmlFor="projectStatus"
                           className="form-label label_text"
                         >
-                          Status          <RequiredStar/>
+                          Status <RequiredStar/>
                         </label>
                         <select
                           id="projectStatus"
                           name="projectStatus"
                           className="form-select"
-                          // onChange={(e) => setTaskStatus(e.target.value)}
                           onChange={(e) => handleStatusChange(e.target.value)}
                           value={taskStatus}
                         >
                           <option value="">Select Status</option>
-                          <option value="inprocess">Inproccess</option>
+                          <option value="inprocess">In Process</option>
                           <option value="completed">Completed</option>
                           <option value="stuck">Stuck</option>
                         </select>
@@ -560,30 +522,33 @@ if (new Date(startTime) >= new Date(endTime)) {
                       <div className="col-12 col-lg-3 mt-2">
                         <div className="">
                           <label
-                            htmlFor="processEndDate"
+                            htmlFor="completedLevel"
                             className="form-label label_text"
                           >
-                            Completed Level       <RequiredStar/>
+                            Completed Level <RequiredStar/>
                           </label>
                           <div className="input-group border mb-3">
-                          <input
-                           type="text"
-                           name="hourlyRate"
-                           maxLength={2}
-                           onChange={(e) => {
-                           const value = e.target.value;
-                           if (taskStatus !== "completed" && /^\d{1,2}$/.test(value)) {
-                           setTaskLevel(value);
-                           }
-                          }}
-                          value={taskLevel}
-                          className="form-control rounded-0 border-0"
-                          id="HourlyRate"
-                          placeholder="eg. 65 %"
-                          aria-label="Hourly Rate"
-                          readOnly={taskStatus === "completed"}
-                          />
-
+                            <input
+                              type="text"
+                              name="completedLevel"
+                              maxLength={3}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                // Allow empty string or valid numbers (including during deletion)
+                                if (taskStatus !== "completed" && (value === "" || /^\d{1,3}$/.test(value))) {
+                                  // Additional check to ensure value doesn't exceed 100
+                                  if (value === "" || parseInt(value) <= 100) {
+                                    setTaskLevel(value);
+                                  }
+                                }
+                              }}
+                              value={taskLevel}
+                              className="form-control rounded-0 border-0"
+                              id="completedLevel"
+                              placeholder="eg. 65 %"
+                              aria-label="Completed Level"
+                              readOnly={taskStatus === "completed"}
+                            />
                             <span
                               className="input-group-text rounded-0 bg-white border-0"
                               id="basic-addon1"
@@ -596,13 +561,13 @@ if (new Date(startTime) >= new Date(endTime)) {
 
                       <div className="col-12 col-lg-12">
                         <div className="mb-3">
-                          <label htmlFor="name" className="form-label label_text">
+                          <label htmlFor="remarkField" className="form-label label_text">
                             Remark
                           </label>
                           <textarea
                             className="textarea_edit col-12"
-                            id=""
-                            name=""
+                            id="remarkField"
+                            name="remarkField"
                             placeholder="Remark ..."
                             maxLength={300}
                             rows="2"

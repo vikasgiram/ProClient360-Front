@@ -103,12 +103,12 @@ export const DesignationMasterGird = () => {
     toast.loading("Deleting Designation...")
     const data = await deleteDesignation(selectedId);
     toast.dismiss()
-    if (data.success) {
+    if (data?.success) {
       handelDeleteClosePopUpClick();
       setCurrentPage(1); // Reset to page 1 after deletion
-      return toast.success("Designation Deleted successfully...");
+      return toast.success(data?.message);
     }
-    toast.error(data.error);
+    toast.error(data?.error);
   };
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export const DesignationMasterGird = () => {
       try {
         setLoading(true);
         const data = await getAllDesignations(currentPage, itemsPerPage, selectedDeptFilter?.value || "");
-        if (data.success) {
+        if (data?.success) {
           setDesignation(data.designations || []);
           setPagination(data.pagination || {
             currentPage: 1,

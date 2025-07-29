@@ -83,11 +83,11 @@ export const ProjectMasterGrid = () => {
 
   const handelDeleteClick = async () => {
     const data = await deleteProject(selectedId);
-    if (data) {
+    if (data?.success) {
       handelDeleteClosePopUpClick();
-      return toast.success("Project Deleted successfully...");
+      return toast.success(data?.message);
     }
-    toast.error(data.error);
+    toast.error(data?.error);
   };
 
   useEffect(() => {
@@ -95,7 +95,7 @@ export const ProjectMasterGrid = () => {
       try {
         setLoading(true);
         const data = await getProjects(pagination.currentPage, itemsPerPage, filters);
-        if (data) {
+        if (data?.success) {
           setProject(data.projects || []);
           setPagination(data.pagination || {
             currentPage: 1,
@@ -105,6 +105,8 @@ export const ProjectMasterGrid = () => {
             hasNextPage: false,
             hasPrevPage: false,
           });
+        } else{
+          toast(data?.error);
         }
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -193,13 +195,13 @@ export const ProjectMasterGrid = () => {
                           {project.length > 0 ? (
                             project.map((project, index) => (
                               <tr className="border my-4" key={project._id}>
-                                <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
-                                <td className="align_left_td td_width text-wrap">{project.name}</td>
-                                <td>{project.custId?.custName || "N/A"}</td>
-                                <td>{formatDate(project.startDate)}</td>
-                                <td>{formatDate(project.endDate)}</td>
-                                <td>{project.projectStatus}</td>
-                                <td>
+                                <td className="w-10">{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                <td className="align_left_td td_width wrap-text-of-col">{project.name}</td>
+                                <td className="wrap-text-of-col">{project.custId?.custName || "N/A"}</td>
+                                <td className="w-20">{formatDate(project.startDate)}</td>
+                                <td className="w-20">{formatDate(project.endDate)}</td>
+                                <td className="w-20">{project.projectStatus}</td>
+                                <td className="w-20">
                                   {user?.permissions?.includes("viewTaskSheet") || user?.user==='company'?(
                                   <i
                                     onClick={() => {
@@ -209,7 +211,7 @@ export const ProjectMasterGrid = () => {
                                   ></i>
                                   ):null}
                                 </td>
-                                <td>
+                                <td className="w-20">
                                 {user?.permissions?.includes("updateProject") || user?.user==='company'?(
                                   <span onClick={() => handleUpdate(project)} className="update">
                                     <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>

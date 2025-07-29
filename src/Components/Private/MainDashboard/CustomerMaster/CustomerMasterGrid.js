@@ -56,9 +56,14 @@ export const CustomerMasterGrid = () => {
   };
 
   const handelDeleteClick = async () => {
-    await deleteCustomer(selectedId);
+    const data = await deleteCustomer(selectedId);
+    if (data?.success) {
+      toast.success(data?.message);
+    } else {
+      toast.error(data?.error);
+    }
     setdeletePopUpShow(false);
-    setCurrentPage(1); // Reset to page 1 after deletion
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -66,7 +71,7 @@ export const CustomerMasterGrid = () => {
       try {
         setLoading(true);
         const data = await getCustomers(currentPage, itemsPerPage, search);
-        if (data.success) {
+        if (data?.success) {
           setCustomers(data.customers || []);
           setPagination(data.pagination || {
             currentPage: 1,
@@ -191,8 +196,8 @@ export const CustomerMasterGrid = () => {
                           {customers.length > 0 ? (
                             customers.map((customer, index) => (
                               <tr className="border my-4" key={customer._id}>
-                                <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                                <td className="align_left_td td_width">{customer.custName}</td>
+                                <td className="w-10">{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                                <td className="align_left_td td_width wrap-text-of-col">{customer.custName}</td>
                                 <td>{customer.email}</td>
                                 <td>{customer.phoneNumber1}</td>
                                 <td>{customer.GSTNo}</td>

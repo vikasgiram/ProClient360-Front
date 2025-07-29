@@ -2817,9 +2817,6 @@ width: 65% !important;
   text-align: start !important;
 }
 
-.td_width{
-  width: 10px !important;
-}
 
 .width_tdd{
   width: 30% !important;
@@ -2871,6 +2868,22 @@ width: 65% !important;
 .department {
   max-width: 800px;
   
+}
+
+.wrap-text-of-col{
+  max-width: 10rem; 
+  white-space: normal;
+  word-wrap: break-word; 
+  text-overflow: ellipsis; 
+  overflow: hidden;
+}
+
+.wrap-text-of-col{
+  max-width: 10rem; 
+  white-space: normal;
+  word-wrap: break-word; 
+  text-overflow: ellipsis; 
+  overflow: hidden;
 }
 
 

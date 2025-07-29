@@ -87,7 +87,6 @@ const AddProjectPopup = ({ handleAdd }) => {
     event.preventDefault();
     setLoading(!loading);
     const formData = new FormData();
-    formData.append('POCopy', POCopy);
 
     if (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion) > 100) {
       setLoading(false);
@@ -156,8 +155,9 @@ const AddProjectPopup = ({ handleAdd }) => {
     if (file) {
 
       if (file.size > 2 * 1024 * 1024) {
+        setPOCopy();
+        e.target.value = ""; 
         return toast.error("File must be less than 2MB");
-
       }
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -312,7 +312,7 @@ const AddProjectPopup = ({ handleAdd }) => {
 
                   <div className="col-12 col-lg-6 mt-2" >
                     <div className="mb-3">
-                      <label htmlFor="ProjectEndDate" className="form-label label_text">Project End Date <RequiredStar />
+                      <label htmlFor="ProjectEndDate" className="form-label label_text">Project End Date <RequiredStar /> [Expected]
                       </label>
                       <input
                         onChange={(e) => setEndDate(e.target.value)}
@@ -547,13 +547,10 @@ const AddProjectPopup = ({ handleAdd }) => {
                     </div>
                   </div>
 
-
-
-
                   <div className="col-12 col-lg-6 mt-2" >
 
                     <div className="mb-3">
-                      <label for="PurchaseOrderCopy" className="form-label label_text">     Purchase Order Copy <RequiredStar />
+                      <label for="PurchaseOrderCopy" className="form-label label_text">Purchase Order Copy <RequiredStar />[PDF only, max 2MB]
 
                       </label>
                       <input type="file" className="form-control rounded-0" id="PurchaseOrderCopy" aria-describedby="secemailHelp"

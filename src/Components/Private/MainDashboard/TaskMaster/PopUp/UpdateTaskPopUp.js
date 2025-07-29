@@ -20,10 +20,10 @@ const[task,setTask]=useState(selectedTask);
       return
     }
     try {
-      toast.loading("Updating Task.....")
+      toast.loading("Updating Task...")
       const data = await updateTask(task._id,task);
       toast.dismiss()
-      if(data.success){
+      if(data?.success){
         toast.success(data.message);
         handleUpdate();
       }else{

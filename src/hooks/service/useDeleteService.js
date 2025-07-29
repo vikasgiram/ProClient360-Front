@@ -20,23 +20,15 @@ const useDeleteService = () => {
       });
 
       const responseData = response.data;
-      if (responseData.error) {
-        setError(responseData.error);
-        setData(null);
-        toast.error(responseData.error);
-        return null;
-      }
+      
 
       setData(responseData);
       setError(null);
-      toast.success('Service Deleted successfully');
       return responseData;
     } catch (err) {
-      const errorMessage = err.response?.data?.error || 'Failed to delete service';
-      setError(errorMessage);
+      setError(err.response?.data?.error || 'Failed to delete service');
       setData(null);
-      toast.error(errorMessage);
-      return null;
+      return err.response?.data;
     } finally {
       setLoading(false);
     }

@@ -13,7 +13,7 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
   const [loading, setLoading] = useState(false);
   const [serviceType, setServiceType] = useState();
   const [priority, setPriority] = useState();
-  const [zone, setZone] = useState();
+  // const [zone, setZone] = useState();
   const [allotmentDate, setAllotmentDate] = useState();
   const [workMode, setWorkMode] = useState();
   const [ticket] = useState(selectedTicket);
@@ -61,7 +61,7 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
       serviceType,
       ticket,
       priority,
-      zone,
+      // zone,
       allotmentDate,
       allotTo: selectedEmployee?.value,
       workMode,
@@ -145,7 +145,7 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                     </div>
                   </div>
 
-                  <div className="col-12 col-lg-6 mt-2">
+                  {/* <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label
                         for="Department"
@@ -166,7 +166,7 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                         <option value={"West"}>West</option>
                       </select>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">

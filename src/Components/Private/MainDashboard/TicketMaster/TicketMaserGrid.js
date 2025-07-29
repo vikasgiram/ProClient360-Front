@@ -68,9 +68,10 @@ export const TicketMasterGrid = () => {
 
     try {
       setLoading(true);
+      toast.loading("Deleting Ticket...");
       const data = await deleteTicket(selectedId);
-
-      if (data.success) {
+      toast.dismiss();
+      if (data?.success) {
         toast.success(data.message || "Ticket deleted successfully.");
         const pageToFetch =
           tickets.length === 1 && pagination.currentPage > 1
@@ -130,7 +131,7 @@ export const TicketMasterGrid = () => {
           itemsPerPage,
           search
         );
-        if (data.success) {
+        if (data?.success) {
           setTickets(data.tickets || []);
           setPagination(
             data.pagination || {
@@ -144,7 +145,7 @@ export const TicketMasterGrid = () => {
           );
         }
         else {
-          toast(data.message);
+          toast(data?.message);
         }
       } catch (error) {
         console.error("Error fetching tickets:", error);
@@ -282,7 +283,7 @@ export const TicketMasterGrid = () => {
                                 <td className="align_left_td">
                                   {ticket?.client?.custName || "N/A"}
                                 </td>
-                                <td className="align_left_td width_tdd">
+                                <td className="align_left_td width_tdd wrap-text-of-col">
                                   {ticket?.details}
                                 </td>
                                 <td>{ticket?.product}</td>

@@ -59,11 +59,11 @@ export const EmployeeMasterGrid = () => {
     toast.loading("Deleting Employee...")
     const data = await deleteEmployee(selectedId);
     toast.dismiss()
-    if (data) {
+    if (data?.success) {
       handelDeleteClosePopUpClick();
-      return toast.success("Employee Deleted successfully...");
-  }
-    toast.error(data.error);
+      return toast.success(data?.message);
+    }
+    toast.error(data?.error);
   };
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export const EmployeeMasterGrid = () => {
       try {
         setLoading(true);
         const data = await getEmployees(pagination.currentPage, itemsPerPage, search);
-        if (data.success) {
+        if (data?.success) {
           setEmployees(data.employees || []);
           setPagination(data.pagination || {
             currentPage: 1,
