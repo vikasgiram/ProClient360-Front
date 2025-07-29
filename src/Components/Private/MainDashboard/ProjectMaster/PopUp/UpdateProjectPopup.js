@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Select from "react-select";
 import { getCustomers } from "../../../../../hooks/useCustomer";
 import { updateProject } from "../../../../../hooks/useProjects";
 import { formatDateforupdate } from "../../../../../utils/formatDate";
@@ -6,16 +7,29 @@ import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { getAddress } from "../../../../../hooks/usePincode";
 
+const PAGE_SIZE = 15;
+
 const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
 
     // console.log(selectedProject,"selectedProject");
 
 
-    const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [searchText, setSearchText] = useState("");
 
     const [retention, setRetention] =  useState(0);
+
+    // Customer dropdown state
+    const [custOptions, setCustOptions] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState(
+        selectedProject?.custId ? { 
+            value: selectedProject.custId._id, 
+            label: selectedProject.custId.custName 
+        } : null
+    );
+    const [custPage, setCustPage] = useState(1);
+    const [custHasMore, setCustHasMore] = useState(true);
+    const [custLoading, setCustLoading] = useState(false);
+    const [custSearch, setCustSearch] = useState("");
 
     const [projects, setProjects] = useState({
         ...selectedProject,
@@ -50,18 +64,32 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
             fetchData();
     }, [address.pincode]);
 
+    // Fetch customers with pagination & search
+    const loadCustomers = useCallback(async (page, search) => {
+        if (custLoading || !custHasMore) return;
+        setCustLoading(true);
+        const data = await getCustomers(page, PAGE_SIZE, search);
 
+        if (data.error) {
+            toast.error(data.error || 'Failed to load customers');
+            setCustLoading(false);
+            return;
+        }
+
+        const newOpts = (data.customers || []).map(c => ({ value: c._id, label: c.custName }));
+        setCustOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+        setCustHasMore(newOpts.length === PAGE_SIZE);
+        setCustLoading(false);
+        setCustPage(page + 1);
+    }, [custLoading, custHasMore]);
+
+    // Initial & search-triggered load (reset on search)
     useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            if (searchText.trim() !== "" && searchText.length > 2) {
-                fetchCustomers(searchText);
-            } else {
-                setCustomers([]); // empty when no input
-            }
-        }, 500); // debounce API call by 500ms
-
-        return () => clearTimeout(delayDebounce);
-    }, [searchText]);
+        setCustPage(1);
+        setCustHasMore(true);
+        setCustOptions([]);
+        loadCustomers(1, custSearch);
+    }, [custSearch]);
 
     
 
@@ -82,15 +110,6 @@ useEffect(() => {
         }));
     }
 }, [projects.advancePay, projects.payAgainstDelivery, projects.payAfterCompletion]);
-
-
-    const fetchCustomers = async () => {
-        const data = await getCustomers(1, 15, searchText);
-        if (data) {
-            setCustomers(data.customers || []);
-        }
-    };
-
 
 
     const handleChange = (event) => {
@@ -139,6 +158,7 @@ useEffect(() => {
         }
 
         if (name === "custId") {
+            setSelectedCustomer({ value: value, label: event.target.options[event.target.selectedIndex].text });
             setProjects((prev) => ({
                 ...prev,
                 custId: { _id: value },
@@ -197,15 +217,16 @@ useEffect(() => {
 
     const updatedProject = {
         ...projects,
+        custId: selectedCustomer?.value,
         retention: retention,
         Address: {
             ...address
         },
     }
     
-    if (!updatedProject.name || !updatedProject.custId || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion) {
+    if (!updatedProject.name || !selectedCustomer || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion) {
         setLoading(false);
-        console.log(updatedProject, "updateProject");
+        return toast.error("Please fill all required fields");
     }
     if (Number(updatedProject.advancePay) + Number(updatedProject.payAgainstDelivery) + Number(updatedProject.payAfterCompletion) > 100) {
         setLoading(false);
@@ -281,33 +302,23 @@ useEffect(() => {
                                             <label htmlFor="customerSearch" className="form-label label_text">
                                                 Customer Name <RequiredStar />
                                             </label>
-
-                                            {/* Search input */}
-                                            <input
-                                                type="text"
-                                                className="form-control mb-2"
-                                                id="customerSearch"
-                                                maxLength={40}
-                                                placeholder="Type to search customer..."
-                                                value={searchText}
-                                                onChange={(e) => setSearchText(e.target.value)}
+                                            <Select
+                                                options={custOptions}
+                                                value={selectedCustomer}
+                                                onChange={opt => {
+                                                    setSelectedCustomer(opt);
+                                                    setProjects(prev => ({
+                                                        ...prev,
+                                                        custId: { _id: opt?.value, custName: opt?.label }
+                                                    }));
+                                                }}
+                                                onInputChange={val => setCustSearch(val)}
+                                                onMenuScrollToBottom={() => loadCustomers(custPage, custSearch)}
+                                                isLoading={custLoading}
+                                                placeholder="Search and select customer..."
+                                                noOptionsMessage={() => custLoading ? 'Loading...' : 'No customers'}
+                                                closeMenuOnSelect={true}
                                             />
-
-                                            {/* Select dropdown */}
-                                            <select
-                                                className="form-select rounded-0"
-                                                name="custId"
-                                                value={projects?.custId?._id || ''}
-                                                onChange={handleChange}
-                                            >
-                                                <option value={projects?.custId?._id || ''}>
-                                                    {projects?.custId?.custName || 'Select Customer'}</option>
-                                                {customers.map((cust) => (
-                                                    <option key={cust._id} value={cust._id}>
-                                                        {cust.custName}
-                                                    </option>
-                                                ))}
-                                            </select>
                                         </div>
                                     </div>
 

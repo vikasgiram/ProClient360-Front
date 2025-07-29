@@ -146,6 +146,13 @@ const AddCompanyPopup = ({ handleAdd }) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
+      const maxSize = 1 * 1024 * 1024;
+
+      if (file.size > maxSize) {
+      toast.error("File size must be less than or equal to 1MB.");
+      e.target.value = ""; 
+      return;
+    }
       reader.onloadend = () => {
         setLogo(reader.result);
       };
@@ -348,7 +355,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label htmlFor="LOGO" className="form-label label_text">
-                        Logo <RequiredStar />
+                        Logo <RequiredStar /> [Max size: 1MB]
                       </label>
                       <input
                         type="file"
