@@ -224,10 +224,22 @@ useEffect(() => {
         },
     }
     
-    if (!updatedProject.name || !selectedCustomer || !updatedProject.purchaseOrderDate || !updatedProject.purchaseOrderNo || !updatedProject.purchaseOrderValue || !updatedProject.category || !updatedProject.startDate || !updatedProject.endDate || !updatedProject.advancePay || !updatedProject.payAgainstDelivery || !updatedProject.payAfterCompletion) {
-        setLoading(false);
-        return toast.error("Please fill all required fields");
-    }
+    if (
+  !updatedProject.name ||
+  !selectedCustomer ||
+  !updatedProject.purchaseOrderDate ||
+  !updatedProject.purchaseOrderNo ||
+  !updatedProject.purchaseOrderValue ||
+  !updatedProject.category ||
+  !updatedProject.startDate ||
+  !updatedProject.endDate ||
+  updatedProject.advancePay === "" || updatedProject.advancePay === null || updatedProject.advancePay === undefined ||
+  updatedProject.payAgainstDelivery === "" || updatedProject.payAgainstDelivery === null || updatedProject.payAgainstDelivery === undefined ||
+  updatedProject.payAfterCompletion === "" || updatedProject.payAfterCompletion === null || updatedProject.payAfterCompletion === undefined
+) {
+  setLoading(false);
+  return toast.error("Please fill all required fields");
+}
     if (Number(updatedProject.advancePay) + Number(updatedProject.payAgainstDelivery) + Number(updatedProject.payAfterCompletion) > 100) {
         setLoading(false);
         return toast.error("Sum of  Advance Payment,Pay Against Delivery,and Pay After Completion cannot exceed 100%");
