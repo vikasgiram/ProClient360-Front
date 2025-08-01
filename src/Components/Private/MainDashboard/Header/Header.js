@@ -1,6 +1,7 @@
 
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { UserContext } from "../../../../context/UserContext";
 import { logout } from "../../../../hooks/useAuth";
 import NotificationPanel from "./NotificationPanel";
@@ -63,9 +64,14 @@ export const Header = (props) => {
 
 	const handleLogout = async () => {
 		try {
-			await logout();
-			setUser(null);
-			navigate("/");
+			const data = await logout();
+			if(data?.success) {
+				toast.success(data?.message);
+				setUser(null);
+				navigate("/");
+			} else {
+				toast.error(data?.error);
+			}
 		} catch (error) {
 			console.error(error);
 		}

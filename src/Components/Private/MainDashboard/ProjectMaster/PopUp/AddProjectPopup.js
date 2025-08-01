@@ -85,28 +85,26 @@ const AddProjectPopup = ({ handleAdd }) => {
 
   const handleProjectAdd = async (event) => {
     event.preventDefault();
-    setLoading(!loading);
     const formData = new FormData();
 
     if (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion) > 100) {
-      setLoading(false);
       return toast.error("The total percentage cannot exceed 100%.");
     }
 
     if (purchaseOrderValue <= 0) {
-      setLoading(false);
       return toast.error("Purchase order value should be greater than 0");
     }
 
     if (Address.pincode.length !== 6 || Address.pincode < 0) {
       return toast.error("Enter valid Pincode");
     }
+    if(!Address.add || !Address.city || !Address.state || !Address.country) {
+      return toast.error("Please fill all address fields");
+    }
     if (!POCopy) {
-      setLoading(false);
       return toast.error("Please upload POCopy");
     }
     if (startDate > endDate) {
-      setLoading(false);
       return toast.error("Start date should be less than end date");
     }
 
@@ -126,6 +124,7 @@ const AddProjectPopup = ({ handleAdd }) => {
     formData.append('POCopy', POCopy);
     formData.append('retention', retention);
 
+    setLoading(true);
     toast.loading("Creating Project...")
     const data = await createProject(formData);
     toast.dismiss()

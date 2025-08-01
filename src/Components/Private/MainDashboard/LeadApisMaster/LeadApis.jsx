@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import TradeIndiaApiKeyInput from './TradeIndia';
 import IndiaMartWebhookInfo from './IndiaMart';
 import { sendTradeIndiaApiKey } from '../../../../hooks/leadApis';
@@ -9,7 +9,7 @@ import { Sidebar } from '../Sidebar/Sidebar';
 const LeadApis = () => {
 
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
    const [isopen, setIsOpen] = useState(false);
     const toggle = () => {
       setIsOpen(!isopen);
