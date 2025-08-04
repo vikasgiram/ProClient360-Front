@@ -171,6 +171,11 @@ const ViewSalesLeadPopUp = ({ closePopUp, selectedLead }) => {
                   </h6>
 
                   <h6 className="mt-3">
+                    <p className="fw-bold d-inline">Assigned To: </p>
+                    {selectedLead?.assignedTo?.name || "None"}
+                  </h6>
+
+                  <h6 className="mt-3">
                     <p className="fw-bold d-inline">Status: </p>
                     {selectedLead?.STATUS || "-"}
                   </h6>

@@ -53,16 +53,12 @@ export const logout = async ()=>{
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
-    if (res.status === 200) {
-      // Clear the token from localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('fcmToken');
-      console.log('Logout successful:', res.data.message);
+    const data = res.data;
 
-  }
+    return data;
   } catch (error) {
-    console.error(error.response.data);
-    toast.error(error.response.data.error);
+    console.error(error);
+    return error?.response?.data || { error: error?.message };
   }
 
 };
