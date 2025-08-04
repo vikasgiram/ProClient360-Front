@@ -253,7 +253,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label htmlFor="MobileNumber" className="form-label label_text">
-                        Landline No/Support No <RequiredStar />
+                        Landline No/Support No
                       </label>
                       <input
                         type="tel"
@@ -266,7 +266,7 @@ const AddCompanyPopup = ({ handleAdd }) => {
                           const onlyDigits = e.target.value.replace(/\D/g, '');
                           setLandlineNo(onlyDigits);
                         }}
-                        required
+                      
                       />
                     </div>
                   </div>

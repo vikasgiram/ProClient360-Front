@@ -51,19 +51,20 @@ export function formatDateforupdateSubcription(dateString) {
 export function formatDateforTaskUpdate(dateString) {
   /**
    * Format a date string from ISO 8601 to HH:MM:SS DD-MM-YY
+   * Uses the exact time from the ISO string without timezone conversion
    */
   const date = new Date(dateString);
   
-  // Get hours, minutes, and seconds
-  const hours = String(date.getHours()).padStart(2, '0'); // Pad with leading zero if needed
-  const minutes = String(date.getMinutes()).padStart(2, '0'); // Pad with leading zero if needed
-  const seconds = String(date.getSeconds()).padStart(2, '0'); // Pad with leading zero if needed
+  // Get UTC components (these match the ISO string regardless of local timezone)
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
   
-  const day = String(date.getDate()).padStart(2, '0'); // Pad with leading zero if needed
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, pad with leading zero
-  const year = date.getFullYear().toString().slice(-2); // Get last two digits of the year
+  // Get local date components (or use UTC if you prefer)
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = String(date.getFullYear()).slice(-2);
   
-  return `${hours}:${minutes}:${seconds} ${day}-${month}-${year}`;
+  return `${hours}:${minutes} ${day}-${month}-${year}`;
 }
 
 export function formatDateforEditAction(dateString) {

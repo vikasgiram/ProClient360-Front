@@ -158,25 +158,26 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                       />
 
                       <select
-                        className="form-select rounded-0"
-                        id="custName"
-                        name="client"
-                        aria-label="Default select example"
-                        onChange={handleChange}
-                        required
-                      >
-                        <option hidden>
-                          {ticket?.client?._id
-                            ? "Select Client"
-                            : "No Client Selected"}
-                        </option>
-                        {customers &&
-                          customers.map((cust) => (
-                            <option key={cust._id} value={cust._id}>
-                              {cust.custName}
-                            </option>
-                          ))}
-                      </select>
+  className="form-select rounded-0"
+  id="custName"
+  name="client"
+  aria-label="Default select example"
+  onChange={handleChange}
+  value={ticket?.client?._id || ""}
+  required
+>
+  <option value="" hidden>
+    {ticket?.client?.custName
+      ? ticket.client.custName
+      : "Select Client"}
+  </option>
+  {customers &&
+    customers.map((cust) => (
+      <option key={cust._id} value={cust._id}>
+        {cust.custName}
+      </option>
+    ))}
+</select>
                     </div>
                   </div>
                   <div className="col-12  mt-2">
