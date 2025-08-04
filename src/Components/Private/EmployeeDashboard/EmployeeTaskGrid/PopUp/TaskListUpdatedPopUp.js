@@ -166,8 +166,9 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
           backgroundColor: "#00000090",
         }}
       >
-        <div className="modal-dialog modal-xl modal_widthhh" >
-          <div className="modal-content p-3">
+        {/* Only responsive changes: removed fixed widths, added responsive classes */}
+        <div className="modal-dialog modal-xl w-100" style={{ maxWidth: '90vw', margin: '1rem auto' }}>
+          <div className="modal-content p-3" style={{ maxHeight: '95vh', overflowY: 'auto' }}>
             <form>
               <div className="modal-header pt-0">
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
@@ -220,8 +221,9 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                   </Steps>
                 </span>
 
-                <div className="row modal_body_height mt-2 " style={{ maxWidth: '60vw', width: '60vw' }}>                 
-                   <div className="col-20 col-lg-20 align-items-center">
+                {/* Responsive changes: removed fixed widths */}
+                <div className="row modal_body_height mt-2">                 
+                   <div className="col-12 align-items-center">
 
                   <div className="d-flex justify-content-end mt-3">
                    <button type="button" className={`btn btn-sm rounded-0 add_button px-4 me-3 text-white ${
@@ -234,32 +236,33 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                   </div>
 
                   {isVisible && (
-                    <div className="  bg-white ms-1 rounded p-lg-3">
-                      <div className="col-12" style={{ maxWidth: '55vw', width: '55vw' }}>
-                        <div className="shadow_custom ">
+                    <div className="bg-white ms-1 rounded p-lg-3">
+                      {/* Responsive changes: removed table scrollbar to avoid double scrolling */}
+                      <div className="col-12">
+                        <div className="shadow_custom">
                           <div className="table-responsive">
-                            <table className="table align-items-center table-flush" >
-                              <thead className="thead-light" >
-                                <tr >
-                                  <th className="text-center">Action</th>
-                                  <th className="text-center">Action By</th>
-                                  <th className="text-center">Start Date</th>
-                                  <th className="text-center">End Date</th>
-                                  <th className="text-center">Completed</th>
-                                  <th className="text-center">Edit</th>
+                            <table className="table align-items-center table-flush">
+                              <thead className="thead-light">
+                                <tr>
+                                  <th className="text-center" style={{ minWidth: '150px' }}>Action</th>
+                                  <th className="text-center" style={{ minWidth: '120px' }}>Action By</th>
+                                  <th className="text-center" style={{ minWidth: '140px' }}>Start Date</th>
+                                  <th className="text-center" style={{ minWidth: '140px' }}>End Date</th>
+                                  <th className="text-center" style={{ minWidth: '100px' }}>Completed</th>
+                                  <th className="text-center" style={{ minWidth: '80px' }}>Edit</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {console.log("actionHistory", actionHistory)}
                                 {actionHistory &&
                                   actionHistory.map((action, index) => (
-                                    <tr className="text-center" key={action?._id} >
-                                      <td>{action?.action}</td>
+                                    <tr className="text-center" key={action?._id}>
+                                      <td style={{ wordBreak: 'break-word', maxWidth: '200px' }}>{action?.action}</td>
                                       <td>{action?.actionBy?.name}</td>
                                       <td>{formatDateforTaskUpdate(action?.startTime)}</td>
                                       <td>{formatDateforTaskUpdate(action?.endTime)}</td>
                                       <td>{action?.complated}%</td>
-                                      <td>  {index ===
+                                      <td>{index ===
                                         actionHistory.length - 1 && (
                                           <button
                                             type="button"
@@ -303,7 +306,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         </div>
                       </div>
 
-                      <div className="col-12 col-lg-3 mt-2">
+                      <div className="col-12 col-md-6 col-lg-3 mt-2">
                         <div className="mb-3">
                           <label
                             htmlFor="startTime"
@@ -323,7 +326,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         </div>
                       </div>
 
-                      <div className="col-12 col-lg-3 mt-2">
+                      <div className="col-12 col-md-6 col-lg-3 mt-2">
                         <div className="mb-3">
                           <label
                             htmlFor="endTime"
@@ -343,7 +346,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         </div>
                       </div>
 
-                      <div className="col-12 col-lg-3 mt-2">
+                      <div className="col-12 col-md-6 col-lg-3 mt-2">
                         <label
                           htmlFor="taskStatus"
                           className="form-label label_text"
@@ -365,7 +368,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         </select>
                       </div>
 
-                      <div className="col-12 col-lg-3 mt-2">
+                      <div className="col-12 col-md-6 col-lg-3 mt-2">
                         <div className="">
                           <label
                             htmlFor="complated"
@@ -458,7 +461,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         </div>
                       </div>
 
-                      <div className="col-12 col-lg-3 mt-2">
+                      <div className="col-12 col-md-6 col-lg-3 mt-2">
                         <div className="mb-3">
                           <label
                             htmlFor="processStartDate"
@@ -479,7 +482,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         </div>
                       </div>
 
-                      <div className="col-12 col-lg-3 mt-2">
+                      <div className="col-12 col-md-6 col-lg-3 mt-2">
                         <div className="mb-3">
                           <label
                             htmlFor="processEndDate"
@@ -498,7 +501,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         </div>
                       </div>
 
-                      <div className="col-12 col-lg-3 mt-2">
+                      <div className="col-12 col-md-6 col-lg-3 mt-2">
                         <label
                           htmlFor="projectStatus"
                           className="form-label label_text"
@@ -519,7 +522,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         </select>
                       </div>
 
-                      <div className="col-12 col-lg-3 mt-2">
+                      <div className="col-12 col-md-6 col-lg-3 mt-2">
                         <div className="">
                           <label
                             htmlFor="completedLevel"
