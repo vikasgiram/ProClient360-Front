@@ -313,8 +313,8 @@ export const EmployeeTaskGrid = () => {
 
                                                             return (
                                                                 <tr className="border my-4" key={project._id}>
-                                                                    <td>{ index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
-                                                                    <td className="align_left_td td_width">{project.name}</td>
+                                                                    <td className="w-3">{ index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                                                    <td className="align_left_td td_width wrap-text-of-col">{project.name}</td>
                                                                     <td>{project.custId?.custName || "N/A"}</td>
                                                                     <td>{project.projectStatus}</td>
                                                                     <td>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import toast from "react-hot-toast";
 import { formatDate, formatDateforTaskUpdate, formatDateforEditAction } from "../../../../../utils/formatDate";
 import { Steps } from "rsuite";
@@ -14,10 +14,16 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   const [action, setAction] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [actionHistory, setActionHistory] = useState();
+  const [actionHistory, setActionHistory] = useState([]);
   const [forEdit, setForEdit] = useState(false);
   const [editAction, setEditAction] = useState(""); //editAction used for for  update as parameter 
   const [addAction, setAddAction] = useState(true);
+  
+  // Pagination state for infinite scroll
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const tableContainerRef = useRef(null);
   
   console.log(selectedTask, "selected task");
 
@@ -34,9 +40,57 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
     }
   };
 
+  // Function to load actions with pagination
+  const loadActions = useCallback(async (page = 1, isInitial = false) => {
+    try {
+      if (isInitial) {
+        setIsLoadingMore(false);
+      } else {
+        setIsLoadingMore(true);
+      }
+      
+      const res = await getAllActions(selectedTask._id, page, 10);
+      
+      if (res?.actions && res.actions.length > 0) {
+        if (isInitial) {
+          setActionHistory(res.actions);
+        } else {
+          setActionHistory(prev => [...prev, ...res.actions]);
+        }
+        
+        // Check if there are more pages
+        const hasMore = res.pagination ? res.pagination.hasNextPage : false;
+        setHasMoreData(hasMore);
+        setCurrentPage(page);
+      } else {
+        setHasMoreData(false);
+      }
+    } catch (error) {
+      console.error("Error loading actions:", error);
+      toast.error("Failed to load actions");
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [selectedTask._id]);
+
+  // Function to handle scroll and load more data
+  const handleScroll = useCallback(async (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    
+    // Check if user has scrolled to bottom (with small buffer)
+    if (scrollHeight - scrollTop <= clientHeight + 5 && hasMoreData && !isLoadingMore) {
+      await loadActions(currentPage + 1, false);
+    }
+  }, [hasMoreData, isLoadingMore, currentPage, loadActions]);
+
   const toggleVisibility = async () => {
-    const res = await getAllActions(selectedTask._id);
-    setActionHistory(res?.actions);
+    if (!isVisible) {
+      // Reset pagination state when opening
+      setCurrentPage(1);
+      setHasMoreData(true);
+      setActionHistory([]);
+      await loadActions(1, true);
+    }
     setIsVisible(!isVisible);
   };
 
@@ -79,6 +133,13 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
     try {
       await createAction(data);
+      // Refresh action history if visible
+      if (isVisible) {
+        setCurrentPage(1);
+        setHasMoreData(true);
+        setActionHistory([]);
+        await loadActions(1, true);
+      }
       handleUpdateTask();
     } catch (error) {
       toast.error(error);
@@ -150,6 +211,13 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
     try {
       await updateAction(editAction._id, editAction);
+      // Refresh action history after edit
+      if (isVisible) {
+        setCurrentPage(1);
+        setHasMoreData(true);
+        setActionHistory([]);
+        await loadActions(1, true);
+      }
       handleUpdateTask();
     } catch (error) {
       toast.error(error);
@@ -229,17 +297,35 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                    }`}
                    onClick={toggleVisibility}
                    >
-                   {isVisible ? 'x' : 'Show More...'}
+                   {isVisible ? 'Hide History' : 'Show Action History'}
                    </button>
                   </div>
 
                   {isVisible && (
                     <div className="  bg-white ms-1 rounded p-lg-3">
                       <div className="col-12" style={{ maxWidth: '55vw', width: '55vw' }}>
+                        <div className="mb-2">
+                          <small className="text-muted">
+                            <i className="fa-solid fa-info-circle me-1"></i>
+                            Scroll down to load more actions
+                          </small>
+                        </div>
                         <div className="shadow_custom ">
-                          <div className="table-responsive">
+                          <div 
+                            className="table-responsive"
+                            ref={tableContainerRef}
+                            onScroll={handleScroll}
+                            style={{ 
+                              maxHeight: '400px', 
+                              overflowY: 'auto',
+                              border: '1px solid #dee2e6',
+                              borderRadius: '0.375rem',
+                              scrollbarWidth: 'thin',
+                              scrollbarColor: '#6c757d #f8f9fa'
+                            }}
+                          >
                             <table className="table align-items-center table-flush" >
-                              <thead className="thead-light" >
+                              <thead className="thead-light sticky-top" style={{ backgroundColor: '#f8f9fa' }}>
                                 <tr >
                                   <th className="text-center">Action</th>
                                   <th className="text-center">Action By</th>
@@ -259,7 +345,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                                       <td>{formatDateforTaskUpdate(action?.startTime)}</td>
                                       <td>{formatDateforTaskUpdate(action?.endTime)}</td>
                                       <td>{action?.complated}%</td>
-                                      <td>  {index ===
+                                      <td> {index ===
                                         actionHistory.length - 1 && (
                                           <button
                                             type="button"
@@ -270,6 +356,30 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                                         )}</td>
                                     </tr>
                                   ))}
+                                {isLoadingMore && (
+                                  <tr>
+                                    <td colSpan="6" className="text-center py-3">
+                                      <div className="spinner-border spinner-border-sm" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                      </div>
+                                      <span className="ms-2">Loading more actions...</span>
+                                    </td>
+                                  </tr>
+                                )}
+                                {!hasMoreData && actionHistory.length > 0 && (
+                                  <tr>
+                                    <td colSpan="6" className="text-center py-2 text-muted">
+                                      <small>No more actions to load</small>
+                                    </td>
+                                  </tr>
+                                )}
+                                {actionHistory.length === 0 && !isLoadingMore && (
+                                  <tr>
+                                    <td colSpan="6" className="text-center py-3">
+                                      No actions found
+                                    </td>
+                                  </tr>
+                                )}
                               </tbody>
                             </table>
                           </div>

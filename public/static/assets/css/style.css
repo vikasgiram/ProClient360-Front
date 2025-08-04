@@ -2878,22 +2878,6 @@ width: 65% !important;
   overflow: hidden;
 }
 
-.wrap-text-of-col{
-  max-width: 10rem; 
-  white-space: normal;
-  word-wrap: break-word; 
-  text-overflow: ellipsis; 
-  overflow: hidden;
-}
-
-
-
-
-
-
-
-
-
 
 
 /* **********************profile css************* */

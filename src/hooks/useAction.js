@@ -4,9 +4,9 @@ import toast from 'react-hot-toast';
 const baseUrl= process.env.REACT_APP_API_URL;
 const url=baseUrl+"/api/action";
 
-const getAllActions = async (taskId) => {
+const getAllActions = async (taskId, page = 1, limit = 10) => {
   try {
-    const response = await axios.get(`${url}/${taskId}`, {
+    const response = await axios.get(`${url}/${taskId}?page=${page}&limit=${limit}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
