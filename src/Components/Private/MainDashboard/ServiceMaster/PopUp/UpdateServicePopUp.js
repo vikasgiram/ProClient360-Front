@@ -19,8 +19,10 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
   const [empLoading, setEmpLoading] = useState(false);
   const [empSearch, setEmpSearch] = useState("");
   
-
-  
+  // Single selected employee state
+  const [selectedEmployee, setSelectedEmployee] = useState(
+    selectedService?.allotTo?.[0] || null
+  );
 
   // Use the useUpdateService hook
   const { updateService, loading: updateLoading, error: updateError } = useUpdateService();
@@ -36,7 +38,11 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
       return;
     }
 
-    const newOpts = (data.employees || []).map(e => ({ value: e._id, label: e.name, employee: e }));
+    const newOpts = (data.employees || []).map(e => ({ 
+      value: e._id, 
+      label: e.name, 
+      employee: e 
+    }));
     setEmpOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
     setEmpHasMore(newOpts.length === PAGE_SIZE);
     setEmpLoading(false);
@@ -51,15 +57,10 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
     loadEmployees(1, empSearch);
   }, [empSearch]);
 
-  // Initialize selectedEmployees
-  const [selectedEmployees, setSelectedEmployees] = useState(
-    selectedService?.allotTo || []
-  );
-
-  // Update selectedEmployees when selectedService changes
+  // Update selectedEmployee when selectedService changes
   useEffect(() => {
     setService(selectedService || {});
-    setSelectedEmployees(selectedService?.allotTo || []);
+    setSelectedEmployee(selectedService?.allotTo?.[0] || null);
   }, [selectedService]);
 
   const handleChange = (event) => {
@@ -70,48 +71,22 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
     }));
   };
 
-  const handleSelectChange = (selectedOptions) => {
-  if (selectedOptions) {
-    // Check if it's an array (multi-select) or single object (single-select)
-    if (Array.isArray(selectedOptions)) {
-      // Multi-select mode
-      const newEmployees = selectedOptions.map(option => option.employee);
-      setSelectedEmployees(newEmployees);
+  // Handle single employee selection
+  const handleSelectChange = (selectedOption) => {
+    if (selectedOption) {
+      const newEmployee = selectedOption.employee;
+      setSelectedEmployee(newEmployee);
       setService((prevService) => ({
         ...prevService,
-        allotTo: newEmployees,
+        allotTo: [newEmployee],
       }));
     } else {
-      const newEmployee = selectedOptions.employee;
-      const isAlreadySelected = selectedEmployees.some(emp => emp._id === newEmployee._id);
-      
-      if (!isAlreadySelected) {
-        const updatedEmployees = [...selectedEmployees, newEmployee];
-        setSelectedEmployees(updatedEmployees);
-        setService((prevService) => ({
-          ...prevService,
-          allotTo: updatedEmployees,
-        }));
-      }
+      setSelectedEmployee(null);
+      setService((prevService) => ({
+        ...prevService,
+        allotTo: [],
+      }));
     }
-  } else {
-    setSelectedEmployees([]);
-    setService((prevService) => ({
-      ...prevService,
-      allotTo: [],
-    }));
-  }
-};
-
-  const handleRemoveEmployee = (id) => {
-    const updatedSelectedEmployees = selectedEmployees.filter(
-      (emp) => emp._id !== id
-    );
-    setSelectedEmployees(updatedSelectedEmployees);
-    setService((prevService) => ({
-      ...prevService,
-      allotTo: updatedSelectedEmployees,
-    }));
   };
 
   const handleServiceUpdate = async (event) => {
@@ -135,180 +110,174 @@ const UpdateServicePopup = ({ handleUpdate, selectedService, closePopUp }) => {
   const formattedDate = formatDateforupdate(service?.allotmentDate);
 
   return (
-  <>
-    <form onSubmit={handleServiceUpdate}>
-      <div
-        className="modal fade show"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          backgroundColor: "#00000090",
-        }}
-      >
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content p-3">
-            <div className="modal-header pt-0">
-              <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-                Update Service
-              </h5>
-              <button
-                onClick={closePopUp}
-                type="button"
-                className="close px-3"
-                style={{ marginLeft: "auto" }}
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="row modal_body_height">
-                <div className="col-12 col-lg-6 mt-2">
-                  <div className="mb-3">
-                    <label htmlFor="serviceType" className="form-label label_text">
-                      Service Type <RequiredStar />
-                    </label>
-                    <select
-                      className="form-select rounded-0"
-                      id="serviceType"
-                      name="serviceType"
-                      value={service.serviceType || ""}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Select Service Type</option>
-                      <option value="AMC">AMC</option>
-                      <option value="One Time">One Time</option>
-                      <option value="Warranty">Warranty</option>
-                    </select>
+    <>
+      <form onSubmit={handleServiceUpdate}>
+        <div
+          className="modal fade show"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            backgroundColor: "#00000090",
+          }}
+        >
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content p-3">
+              <div className="modal-header pt-0">
+                <h5 className="card-title fw-bold" id="exampleModalLongTitle">
+                  Update Service
+                </h5>
+                <button
+                  onClick={closePopUp}
+                  type="button"
+                  className="close px-3"
+                  style={{ marginLeft: "auto" }}
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="row modal_body_height">
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
+                      <label htmlFor="serviceType" className="form-label label_text">
+                        Service Type <RequiredStar />
+                      </label>
+                      <select
+                        className="form-select rounded-0"
+                        id="serviceType"
+                        name="serviceType"
+                        value={service.serviceType || ""}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Select Service Type</option>
+                        <option value="AMC">AMC</option>
+                        <option value="One Time">One Time</option>
+                        <option value="Warranty">Warranty</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
 
-                <div className="col-12 col-lg-6 mt-2">
-                  <div className="mb-3">
-                    <label htmlFor="priority" className="form-label label_text">
-                      Priority <RequiredStar />
-                    </label>
-                    <select
-                      className="form-select rounded-0"
-                      id="priority"
-                      name="priority"
-                      value={service.priority || ""}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Select Priority</option>
-                      <option value="High">High</option>
-                      <option value="Medium">Mid</option>
-                      <option value="Low">Low</option>
-                    </select>
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
+                      <label htmlFor="priority" className="form-label label_text">
+                        Priority <RequiredStar />
+                      </label>
+                      <select
+                        className="form-select rounded-0"
+                        id="priority"
+                        name="priority"
+                        value={service.priority || ""}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Select Priority</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Mid</option>
+                        <option value="Low">Low</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
 
-  
-               <div className="col-12 col-lg-6 mt-2">
-                  <div className="mb-3">
-                    <label htmlFor="allotmentDate" className="form-label label_text">
-                      Allotment Date <RequiredStar />
-                    </label>
-                    <input
-                      onChange={handleChange}
-                      value={formattedDate || ""}
-                      type="date"
-                      className="form-control rounded-0"
-                      id="allotmentDate"
-                      name="allotmentDate"
-                      // min={new Date().toISOString().split("T")[0]} 
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
+                      <label htmlFor="allotmentDate" className="form-label label_text">
+                        Allotment Date <RequiredStar />
+                      </label>
+                      <input
+                        onChange={handleChange}
+                        value={formattedDate || ""}
+                        type="date"
+                        className="form-control rounded-0"
+                        id="allotmentDate"
+                        name="allotmentDate"
                         min={!service?._id ? new Date().toISOString().split("T")[0] : undefined}
-
-                      required
-                    />
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
 
-
-                <div className="col-12 col-lg-6 mt-2">
-                  <div className="mb-3">
-                    <label htmlFor="employeeSelect" className="form-label label_text">
-                      Allocated to <RequiredStar />
-                    </label>
-                    <Select
-                      options={empOptions}
-                      value={empOptions.filter(option => 
-                        selectedEmployees.some(emp => emp._id === option.value)
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
+                      <label htmlFor="employeeSelect" className="form-label label_text">
+                        Allocated to <RequiredStar />
+                      </label>
+                      <Select
+                        options={empOptions}
+                        value={
+                          empOptions.find(
+                            (option) => selectedEmployee && selectedEmployee._id === option.value
+                          ) || null
+                        }
+                        onChange={handleSelectChange}
+                        onInputChange={val => setEmpSearch(val)}
+                        onMenuScrollToBottom={() => loadEmployees(empPage, empSearch)}
+                        isLoading={empLoading}
+                        placeholder="Search and select employee..."
+                        noOptionsMessage={() => empLoading ? 'Loading...' : 'No employees'}
+                        isClearable
+                        required
+                      />
+                    </div>
+                    <div>
+                      {selectedEmployee && (
+                        <div>
+                          <span>{selectedEmployee.name}</span>
+                          <button
+                            className="btn btn-outline-danger btn-sm ms-2"
+                            onClick={() => handleSelectChange(null)}
+                            type="button"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       )}
-                      onChange={handleSelectChange}
-                      onInputChange={val => setEmpSearch(val)}
-                      onMenuScrollToBottom={() => loadEmployees(empPage, empSearch)}
-                      isLoading={empLoading}
-                      placeholder="Search and select employees..."
-                      noOptionsMessage={() => empLoading ? 'Loading...' : 'No employees'}
-                      closeMenuOnSelect={false}
-                      hideSelectedOptions={false}
-                    />
+                    </div>
                   </div>
-                  <div>
-                    {selectedEmployees.length > 0 && (
-                      <ul>
-                        {selectedEmployees.map((emp) => (
-                          <li key={emp._id}>
-                            {emp.name}
-                            <button
-                              className="btn btn-outline-danger btn-sm ms-2"
-                              onClick={() => handleRemoveEmployee(emp._id)}
-                              type="button"
-                            >
-                              Remove
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
 
-                <div className="col-12 col-lg-6 mt-2">
-                  <div className="mb-3">
-                    <label htmlFor="workMode" className="form-label label_text">
-                      Workmode <RequiredStar />
-                    </label>
-                    <select
-                      className="form-select rounded-0"
-                      id="workMode"
-                      name="workMode"
-                      value={service.workMode || ""}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Select Workmode</option>
-                      <option value="Onsite">Onsite</option>
-                      <option value="Remote">Remote</option>
-                    </select>
+                  <div className="col-12 col-lg-6 mt-2">
+                    <div className="mb-3">
+                      <label htmlFor="workMode" className="form-label label_text">
+                        Workmode <RequiredStar />
+                      </label>
+                      <select
+                        className="form-select rounded-0"
+                        id="workMode"
+                        name="workMode"
+                        value={service.workMode || ""}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Select Workmode</option>
+                        <option value="Onsite">Onsite</option>
+                        <option value="Remote">Remote</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
 
-                <div className="row">
-                  <div className="col-12 pt-3 mt-2">
-                    <button
-                      type="submit"
-                      disabled={loading || updateLoading}
-                      className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
-                    >
-                      {loading || updateLoading ? "Submitting..." : "Update"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={closePopUp}
-                      className="w-80 btn addbtn rounded-0 Cancel_button m-2 px-4"
-                    >
-                      Cancel
-                    </button>
+                  <div className="row">
+                    <div className="col-12 pt-3 mt-2">
+                      <button
+                        type="submit"
+                        disabled={loading || updateLoading}
+                        className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
+                      >
+                        {loading || updateLoading ? "Submitting..." : "Update"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={closePopUp}
+                        className="w-80 btn addbtn rounded-0 Cancel_button m-2 px-4"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
       </form>
     </>
   );
