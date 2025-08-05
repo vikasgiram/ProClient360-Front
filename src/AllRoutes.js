@@ -37,11 +37,12 @@ import { MarketingMasterGrid } from "./Components/Private/MainDashboard/Marketin
 
 import { EmployeeMyServiceMasterGrid } from "./Components/Private/EmployeeDashboard/EmployeeMyServiceMasterGrid/EmployeeMyServiceMasterGrid";
 import { EmployeeFeedbackMasterGrid } from "./Components/Private/EmployeeDashboard/EmployeesFeedbackMasterGrid/EmployeeFeedbackMasterGrid";
-import ProtectedRoute from "./utils/ProtectedRoute";
+import AutoLoggedIn from "./utils/AutoLoggedIn";
 
 import LeadApis from "./Components/Private/MainDashboard/LeadApisMaster/LeadApis";
 import { ChangePassword } from "./Components/Public/ChangePassword";
 import { ForgotPasswordConfirm } from "./Components/Public/ForgotPasswordConfirm";
+import ProtectRoute from "./utils/ProtectRoute";
 const AllRoutes = () => {
 
 const {user} = useContext(UserContext);
@@ -50,37 +51,29 @@ const {user} = useContext(UserContext);
         <>
             <Router>
                 <Routes>
-                    <Route exact path="/" element={<ProtectedRoute  Component={LogIn} />} />
+                    <Route exact path="/" element={<AutoLoggedIn  Component={LogIn} />} />
                     <Route exact path="/ForgotPassword" element={<ForgotPassword />} />
                     <Route exact path="/Mailsentsuccessfully" element={<Mailsentsuccessfully />} />
                     <Route exact path="/ResetPassword/:id/:token" element={<ForgotPasswordConfirm />} />
                     <Route exact path="/feedback/:id" element={<Feedback />} />
-                    
-                    {user ? (
-                    <>
-                        <Route exact path="/ChangePassword" element={<ChangePassword />} />
-                        <Route exact path="/UserProfile" element={<UserProfile />} />
-                    </>
-                    ):null}
 
-                    {user?.user==='company' || user?.user==='employee' ?(
-                        <>
-                            <Route exact path="/CustomerMasterGrid" element={<CustomerMasterGrid />} />
-                            <Route exact path="/EmployeeMasterGrid" element={<EmployeeMasterGrid />} />
-                            <Route exact path="/ServiceMasterGrid" element={<ServiceMasterGrid />} />
-                            <Route exact path="/TaskMasterGrid" element={<TaskMasterGrid />} />
-                            <Route exact path="/TicketMasterGrid" element={<TicketMasterGrid />} />
-                            <Route exact path="/ProjectMasterGrid" element={<ProjectMasterGrid />} />
-                            <Route exact path="/DepartmentMasterGrid" element={<DepartmentMasterGrid />} />
-                            <Route exact path="/DesignationMasterGird" element={<DesignationMasterGird />} /> 
-                            <Route exact path="/project/:id" element={<TaskSheetMaster />} />
 
-                            <Route exact path="/SalesMasterGrid" element={<SalesMasterGrid />} />
+                    <Route exact path="/ChangePassword" element={<ProtectRoute Component={ChangePassword} />} />
+                    <Route exact path="/UserProfile" element={<ProtectRoute Component={UserProfile} />} />
+            
+                    <Route exact path="/CustomerMasterGrid" element={<ProtectRoute Component={CustomerMasterGrid} />} />
+                    <Route exact path="/EmployeeMasterGrid" element={<ProtectRoute Component={EmployeeMasterGrid} />} />
+                    <Route exact path="/ServiceMasterGrid" element={<ProtectRoute Component={ServiceMasterGrid} />} />
+                    <Route exact path="/TaskMasterGrid" element={<ProtectRoute Component={TaskMasterGrid} />} />
+                    <Route exact path="/TicketMasterGrid" element={<ProtectRoute Component={TicketMasterGrid} />} />
+                    <Route exact path="/ProjectMasterGrid" element={<ProtectRoute Component={ProjectMasterGrid} />} />
+                    <Route exact path="/DepartmentMasterGrid" element={<ProtectRoute Component={DepartmentMasterGrid} />} />
+                    <Route exact path="/DesignationMasterGird" element={<ProtectRoute Component={DesignationMasterGird} />} />
+                    <Route exact path="/project/:id" element={<ProtectRoute Component={TaskSheetMaster} />} />
 
-                            <Route exact path="/MarketingMasterGrid" element={<MarketingMasterGrid />} />
-                        </>
-                        
-                    ):null}
+                    <Route exact path="/SalesMasterGrid" element={<ProtectRoute Component={SalesMasterGrid} />} />
+
+                    <Route exact path="/MarketingMasterGrid" element={<ProtectRoute Component={MarketingMasterGrid} />} />
 
                     {/* Company */}
 

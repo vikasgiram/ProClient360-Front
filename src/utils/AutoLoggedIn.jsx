@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { useContext } from "react";
 
-const ProtectedRoute = ({Component}) => {
+const AutoLoggedIn = ({Component}) => {
   const { user } = useContext(UserContext);
   if(!Component){
     return null;
@@ -24,4 +24,4 @@ const ProtectedRoute = ({Component}) => {
 
 }
 
-export default ProtectedRoute;
+export default AutoLoggedIn;

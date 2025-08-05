@@ -160,7 +160,7 @@ export const ProjectMasterGrid = () => {
                         </select>
                       </div>
 
-                      {user?.permissions?.includes("createProject") || user?.user==='company' ? (
+                      {user?.permissions?.includes("createProject") ? (
                       <div className="col-4 col-lg-4 ms-auto">
                           <button
                             onClick={handleAdd}
@@ -184,6 +184,7 @@ export const ProjectMasterGrid = () => {
                             <th>Sr. No</th>
                             <th className="align_left_td td_width">Name</th>
                             <th>Customer Name</th>
+                            <th>Created By</th>
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Status</th>
@@ -198,6 +199,7 @@ export const ProjectMasterGrid = () => {
                                 <td className="w-10">{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
                                 <td className="align_left_td td_width wrap-text-of-col">{project.name}</td>
                                 <td className="wrap-text-of-col">{project.custId?.custName || "N/A"}</td>
+                                <td className="w-30">{project.createdBy?.name || "Unknown"}</td>
                                 <td className="w-20">{formatDate(project.startDate)}</td>
                                 <td className="w-20">{formatDate(project.endDate)}</td>
                                 <td className="w-20">{project.projectStatus}</td>

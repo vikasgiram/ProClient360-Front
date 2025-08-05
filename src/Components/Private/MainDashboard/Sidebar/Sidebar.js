@@ -227,23 +227,21 @@ export const Sidebar = ({ isopen, active }) => {
                         </li>
                     ) : null}
 
-                    {user?.permissions?.includes("viewProject") || user?.user === 'company' ? (
-                        <li
-                            title="Project Master"
-                            className={active === "ProjectMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
-                            <Link to='/ProjectMasterGrid' className="nav-link ">
-                                <i className="fa-solid fa-list-check ps-3 side_icon_fs"></i>
+                    <li
+                        title="Project Master"
+                        className={active === "ProjectMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+                        <Link to='/ProjectMasterGrid' className="nav-link ">
+                            <i className="fa-solid fa-list-check ps-3 side_icon_fs"></i>
 
 
-                                <span
-                                    className="menu-title_m"
-                                    style={{ display: isopen ? "" : "none" }}
-                                >
-                                    Project Master
-                                </span>
-                            </Link>
-                        </li>
-                    ) : null}
+                            <span
+                                className="menu-title_m"
+                                style={{ display: isopen ? "" : "none" }}
+                            >
+                                Project Master
+                            </span>
+                        </Link>
+                    </li>
 
                     {user?.permissions?.includes("viewDepartment") || user?.user === 'company' ? (
                         <li title="Department Master"
