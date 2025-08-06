@@ -66,7 +66,7 @@ export const AssignInproccessSection = ({
                             <th className="text-center">
                               <div className="media align-items-center">
                                 <div className="media-body">
-                                  <span className="mb-0 text-sm w-40 text-wrap">
+                                  <span className="mb-0 text-sm w-40 text-wrap ">
                                     {task.taskName.name}
                                   </span>
                                 </div>

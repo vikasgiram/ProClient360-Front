@@ -26,9 +26,9 @@ const getFeedback = async (page, limit) => {
    }
 };
 
-const getRemaningFeedback = async (page, limit) => {
+const getRemaningFeedback = async (page, limit, search) => {
   try {
-    const response = await axios.get(`${url}/remaningFeedbacks?page=${page}&limit=${limit}`,{
+    const response = await axios.get(`${url}/remaningFeedbacks?page=${page}&limit=${limit}&q=${search}`,{
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

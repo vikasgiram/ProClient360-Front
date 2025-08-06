@@ -19,6 +19,7 @@ export const EmployeeFeedbackMasterGrid = () => {
     const [selectedFeedback, setSelectedFeedback] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
+    const [search, setSearch] = useState("");
 
     const [feedbacks, setFeedbacks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -32,57 +33,40 @@ export const EmployeeFeedbackMasterGrid = () => {
         hasPrevPage: false
     });
 
-    const fetchData = async (pageToFetch) => {
+    const fetchData = async () => {
         try {
             setLoading(true);
-            const data = await getRemaningFeedback(
-                pageToFetch,
-                itemsPerPage,
-                searchText
-            );
+            const data = await getRemaningFeedback(currentPage, itemsPerPage, search);
 
-            if (data && data.feedbacks) {
-                setFeedbacks(data.feedbacks);
-
-                if (data.pagination) {
-                    const apiCurrentPage = typeof data.pagination.currentPage === 'number' ? data.pagination.currentPage : pageToFetch;
-                    setPagination({
-                        ...data.pagination,
-                        currentPage: apiCurrentPage,
-                        totalFeedbacks: data.pagination.totalFeedbacks || data.pagination.totalDocs || 0
-                    });
-                    if (currentPage !== apiCurrentPage) {
-                        setCurrentPage(apiCurrentPage);
-                    }
-                } else {
-                    const totalFeedbacks = data.totalFeedbacks || data.totalDocs || data.feedbacks.length;
-                    const totalPages = Math.ceil(totalFeedbacks / itemsPerPage);
-                    setPagination({
-                        currentPage: pageToFetch,
-                        totalPages: totalPages,
-                        totalFeedbacks: totalFeedbacks,
-                        limit: itemsPerPage,
-                        hasNextPage: pageToFetch < totalPages,
-                        hasPrevPage: pageToFetch > 1
-                    });
-                }
+            if(data.success){
+                setFeedbacks(data.services);
+                setPagination({
+                    currentPage: data.currentPage,
+                    totalPages: data.totalPages,
+                    totalFeedbacks: data.totalRecords,
+                    limit: data.limit,
+                    hasNextPage: data.hasNextPage,
+                    hasPrevPage: data.hasPrevPage
+                });
             } else {
+                toast(data.error || "Failed to fetch feedback.");
                 setFeedbacks([]);
-                setPagination({ currentPage: pageToFetch, totalPages: 0, totalFeedbacks: 0, limit: itemsPerPage, hasNextPage: false, hasPrevPage: false });
+                setPagination({ currentPage, totalPages: 0, totalFeedbacks: 0, limit: itemsPerPage, hasNextPage: false, hasPrevPage: false });
             }
+            
         } catch (error) {
             console.error("Error fetching feedback:", error);
             toast.error("Failed to fetch feedback.");
             setFeedbacks([]);
-            setPagination({ currentPage: pageToFetch, totalPages: 0, totalFeedbacks: 0, limit: itemsPerPage, hasNextPage: false, hasPrevPage: false });
+            setPagination({ currentPage, totalPages: 0, totalFeedbacks: 0, limit: itemsPerPage, hasNextPage: false, hasPrevPage: false });
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchData(currentPage);
-    }, [currentPage, UpdatePopUpShow, searchText]);
+        fetchData();
+    }, [currentPage, UpdatePopUpShow, search]);
 
     const handleViewFeedback = (feedback) => {
         setSelectedFeedback(feedback);
@@ -94,34 +78,26 @@ export const EmployeeFeedbackMasterGrid = () => {
         setUpdatePopUpShow(!UpdatePopUpShow);
     };
 
-    const handlePageChange = (pageNumber) => {
-        if (pageNumber >= 1 && pageNumber <= pagination.totalPages) {
-            setCurrentPage(pageNumber);
-        } else if (pageNumber < 1) {
-            setCurrentPage(1);
-        } else if (pageNumber > pagination.totalPages) {
-            setCurrentPage(pagination.totalPages);
-        }
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
     };
 
-    const handleSearchChange = (e) => {
-        setSearchText(e.target.value);
+    const handleOnSearchSubmit = (event) => {
+        event.preventDefault();
+        console.log("Search text:", searchText);
+        setSearch(searchText);
         setCurrentPage(1);
     };
 
-    const maxPageButtons = 5;
+    // Pagination button rendering logic
+    const maxPageButtons = 5; // Maximum number of page buttons to display
     const halfMaxButtons = Math.floor(maxPageButtons / 2);
-    let startPage = Math.max(1, pagination.currentPage - halfMaxButtons);
+    let startPage = Math.max(1, currentPage - halfMaxButtons);
     let endPage = Math.min(pagination.totalPages, startPage + maxPageButtons - 1);
 
-    if (pagination.totalPages > maxPageButtons && endPage - startPage + 1 < maxPageButtons) {
+    // Adjust startPage if endPage is at the totalPages
+    if (endPage - startPage + 1 < maxPageButtons) {
         startPage = Math.max(1, endPage - maxPageButtons + 1);
-    }
-    if (pagination.totalPages <= maxPageButtons){
-        startPage = 1;
-        endPage = pagination.totalPages;
-    } else if (startPage === 1 && endPage - startPage + 1 < maxPageButtons) {
-         endPage = Math.min(pagination.totalPages, startPage + maxPageButtons - 1);
     }
 
     const pageButtons = [];
@@ -149,15 +125,17 @@ export const EmployeeFeedbackMasterGrid = () => {
                                     <div className="col-12 col-lg-6">
                                         <div className="row g-2 justify-content-end align-items-center">
                                             <div className="col-sm-8 col-md-7 col-lg-6">
-                                                <div className="form position-relative">
-                                                    <i className="fa fa-search position-absolute" style={{ top: '10px', left: '10px', color: '#aaa' }}></i>
-                                                    <input
-                                                        type="text"
-                                                        value={searchText}
-                                                        onChange={handleSearchChange}
-                                                        className="form-control form-input bg-transparant ps-4"
-                                                        placeholder="Search Client, Person, Product..."
-                                                    />
+                                                <div className="form">
+                                                    <i className="fa fa-search"></i>
+                                                    <form onSubmit={handleOnSearchSubmit}>
+                                                        <input
+                                                            type="text"
+                                                            value={searchText}
+                                                            onChange={(e) => setSearchText(e.target.value)}
+                                                            className="form-control form-input bg-transparant"
+                                                            placeholder="Search Client, Person, Product..."
+                                                        />
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
@@ -185,7 +163,7 @@ export const EmployeeFeedbackMasterGrid = () => {
                                                     {feedbacks && feedbacks.length > 0 ? (
                                                         feedbacks.map((feedback, index) => (
                                                             <tr className="border my-4" key={feedback._id}>
-                                                                <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                                                <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                                                                 <td className="align_left_td">{feedback.ticket?.client?.custName || 'N/A'}</td>
                                                                 <td className="align_left_td">{feedback.ticket?.contactPerson || 'N/A'}</td>
                                                                 <td className="align_left_td">{feedback.ticket?.contactNumber || 'N/A'}</td>
@@ -214,19 +192,51 @@ export const EmployeeFeedbackMasterGrid = () => {
                                     </div>
                                 </div>
 
-                                {pagination.totalPages > 1 && (
-                                    <div className="pagination-container text-center my-3">
-                                        <button disabled={!pagination.hasPrevPage} onClick={() => handlePageChange(1)} className="btn btn-dark btn-sm me-2" aria-label="First Page" title="First Page">First</button>
-                                        <button disabled={!pagination.hasPrevPage} onClick={() => handlePageChange(pagination.currentPage - 1)} className="btn btn-dark btn-sm me-2" aria-label="Previous Page" title="Previous Page">Previous</button>
-                                        {startPage > 1 && <span className="mx-2">...</span>}
-                                        {pageButtons.map((page) => (
-                                            <button key={page} onClick={() => handlePageChange(page)} className={`btn btn-sm me-1 ${ pagination.currentPage === page ? "btn-primary" : "btn-dark" }`} aria-label={`Go to page ${page}`} aria-current={pagination.currentPage === page ? "page" : undefined}>{page}</button>
-                                        ))}
-                                        {endPage < pagination.totalPages && <span className="mx-2">...</span>}
-                                        <button disabled={!pagination.hasNextPage} onClick={() => handlePageChange(pagination.currentPage + 1)} className="btn btn-dark btn-sm ms-1 me-2" aria-label="Next Page" title="Next Page">Next</button>
-                                        <button disabled={!pagination.hasNextPage} onClick={() => handlePageChange(pagination.totalPages)} className="btn btn-dark btn-sm" aria-label="Last Page" title="Last Page">Last</button>
-                                    </div>
-                                )}
+                                <div className="pagination-container text-center my-3 sm">
+                                    <button
+                                        disabled={!pagination.hasPrevPage}
+                                        onClick={() => handlePageChange(1)}
+                                        className="btn btn-dark btn-sm me-2"
+                                    >
+                                        First
+                                    </button>
+                                    <button
+                                        disabled={!pagination.hasPrevPage}
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        className="btn btn-dark btn-sm me-2"
+                                    >
+                                        Previous
+                                    </button>
+                                    {startPage > 1 && <span className="mx-2">...</span>}
+
+                                    {pageButtons.map((page) => (
+                                        <button
+                                            key={page}
+                                            onClick={() => handlePageChange(page)}
+                                            className={`btn btn-sm me-1 ${ 
+                                                pagination.currentPage === page ? "btn-primary" : "btn-dark"
+                                            }`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+
+                                    {endPage < pagination.totalPages && <span className="mx-2">...</span>}
+                                    <button
+                                        disabled={!pagination.hasNextPage}
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        className="btn btn-dark btn-sm me-2"
+                                    >
+                                        Next
+                                    </button>
+                                    <button
+                                        disabled={!pagination.hasNextPage}
+                                        onClick={() => handlePageChange(pagination.totalPages)}
+                                        className="btn btn-dark btn-sm"
+                                    >
+                                        Last
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -237,7 +247,7 @@ export const EmployeeFeedbackMasterGrid = () => {
                 <EmployeeUpdateFeedbackPopUp
                     selectedFeedback={selectedFeedback}
                     handleUpdate={handleUpdate}
-                    onSuccess={() => fetchData(currentPage)}
+                    onSuccess={() => fetchData()}
                 />
             )}
             {detailsServicePopUp && selectedFeedback && (
