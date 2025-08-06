@@ -253,10 +253,10 @@ export const MarketingMasterGrid = () => {
                               <tr key={lead._id}>
                                 <td >{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
                                 <td>{lead?.SOURCE}</td>
-                                <td className="wrap-text-of-col">{lead?.SENDER_NAME}</td>
-                                <td className="wrap-text-of-col">{lead?.SENDER_COMPANY}</td>
-                                <td>{lead?.QUERY_PRODUCT_NAME}</td>
-                                <td>{lead?.SENDER_EMAIL}</td>
+                                <td className="wrap-text-of-col">{lead?.SENDER_NAME || "Not available."}</td>
+                                <td className="wrap-text-of-col">{lead?.SENDER_COMPANY || "Not available."}</td>
+                                <td>{lead?.QUERY_PRODUCT_NAME || "Not available."}</td>
+                                <td>{lead?.SENDER_EMAIL || "Not available."}</td>
                                 <td>{formatDate(lead?.createdAt)}</td>
                                 {/* <td>{leads.STATUS}</td> */}
                                 <td>

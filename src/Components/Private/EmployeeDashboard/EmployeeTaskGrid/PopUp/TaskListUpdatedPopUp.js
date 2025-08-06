@@ -25,7 +25,6 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const tableContainerRef = useRef(null);
   
-  console.log(selectedTask, "selected task");
 
   const handleStatusChange = (status) => {
     setTaskStatus(status);
@@ -71,7 +70,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [selectedTask._id]);
+  }, [selectedTask?._id]);
 
   // Function to handle scroll and load more data
   const handleScroll = useCallback(async (e) => {

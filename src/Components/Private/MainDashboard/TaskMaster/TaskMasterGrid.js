@@ -210,9 +210,9 @@ export const TaskMasterGrid = () => {
                                                </thead>
                                                 <tbody className="broder my-4">
                                                     {currentData && currentData.map((task, index) => (
-                                                        <tr className="border my-4" key={task._id}>
-                                                            <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                                                            <td className="align_left_td td_width">{task.name}</td>
+                                                        <tr className="border" key={task._id}>
+                                                            <td className="w-10">{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                                                            <td className="align_left_td td_width w-50 text-wrap">{task.name}</td>
 
                                                             <td>
                                                                 {user?.permissions?.includes('updateTask') || user.user === 'company' ? (

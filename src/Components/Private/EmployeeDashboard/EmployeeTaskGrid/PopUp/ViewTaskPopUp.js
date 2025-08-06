@@ -71,6 +71,7 @@ const ViewTaskPopUp = ({ handleViewTask, selectedId }) => {
                           <th>Task Name</th>
                           <th>Start Date</th>
                           <th>End Date</th>
+                          <th>Remarks</th>
                           <th>Status</th>
                           <th>Action</th>
                         </tr>
@@ -78,11 +79,12 @@ const ViewTaskPopUp = ({ handleViewTask, selectedId }) => {
                           {tasks && tasks.length > 0 ? (
                             tasks.map((task, index) => (
                               <tr className="border my-4" key={task.id}>
-                                <td>{index + 1}</td>
-                                <td>{task.taskName.name}</td>
-                                <td>{formatDate(task.startDate)}</td>
-                                <td>{formatDate(task.endDate)}</td>
-                                <td>{task.taskStatus}</td>
+                                <td className="w-10">{index + 1}</td>
+                                <td className="text-wrap">{task.taskName.name}</td>
+                                <td className="w-20">{formatDate(task.startDate)}</td>
+                                <td className="w-20">{formatDate(task.endDate)}</td>
+                                <td className="w-30">{task.remark||"N/A"}</td>
+                                <td className="w-20">{task.taskStatus}</td>
                                 <td>
                                   <span
                                     onClick={

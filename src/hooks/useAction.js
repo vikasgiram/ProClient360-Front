@@ -16,7 +16,8 @@ const getAllActions = async (taskId, page = 1, limit = 10) => {
     return data;
   } catch (error) {
     console.error(error);
-    toast.error(error.response.data.message);  }
+    return error?.response?.data;
+  }
 };
 
 
