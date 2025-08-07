@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 
 const baseUrl= process.env.REACT_APP_API_URL;
 
-export const loginUser = async (username, password, fcmToken) => {
+export const loginUser = async (username, password, fcmToken, tokenCF) => {
     try {
 
     if(username===undefined|| password === undefined){
@@ -12,7 +12,8 @@ export const loginUser = async (username, password, fcmToken) => {
     const res = await axios.post(`${baseUrl}/api/login`, {
       email: username,
       password: password,
-      fcmToken: fcmToken
+      fcmToken: fcmToken,
+      tokenCF: tokenCF
     });
 
     if (res.data.success) {

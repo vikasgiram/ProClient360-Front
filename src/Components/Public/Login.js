@@ -1,5 +1,6 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Turnstile, { useTurnstile } from "react-turnstile";
 import "././login.css";
 import toast from "react-hot-toast";
 import { loginUser } from "../../hooks/useAuth";
@@ -12,6 +13,7 @@ export const LogIn = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [tokenCF, setTokenCF] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { setUser } = useContext(UserContext);
@@ -41,20 +43,20 @@ export const LogIn = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("login details: " + username + " " + password);
     const fcmToken = localStorage.getItem("fcmToken");
     setLoading(true);
     try {
-      const data = await loginUser(username, password, fcmToken);
+   
+      const data = await loginUser(username, password, fcmToken, tokenCF);
       // console.log(username,password);
       setUser(data);
       if (data.newUser === true) {
         toast.success("Please complete your profile to continue.");
         navigation("/ChangePassword");
-        console.log("New user, redirecting to ChangePassword");
       }
       else if (data.user === "employee" || data.user === "company") {
         navigation("/MainDashboard");
+        toast.success("Welcome back " + data?.name);
       } else if (data.user === "admin") {
         navigation("/AdminMainDashboard");
       }
@@ -260,13 +262,32 @@ export const LogIn = () => {
 
                 </div>
 
+                <div className="relative">
+                  <Turnstile
+                    sitekey='0x4AAAAAABpMCbyANmHy1Yyb'
+                    onSuccess={(token) => {
+                      setTokenCF(token);
+                    }}
+                    onExpire={() => setTokenCF("")}
+                    onError={() => setTokenCF("")}
+                    theme="light"
+                    refreshExpired='auto'
+                    size="flexible"
+                    style={{width:'385px',}}
+                  />
+                </div>
+
                 <div className="flex items-center justify-between">
                   <label className="flex items-center">
                   </label>
                   <button type="button" className="text-sm text-blue-600 hover:text-blue-800" onClick={showForgotPassword}>Forgot password?</button>
                 </div>
 
-                <button type="submit" className="btn-hover w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-2xl font-semibold text-lg shadow-lg d-flex align-items-center justify-content-center">
+                <button 
+                  type="submit" 
+                  className="btn-hover w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-2xl font-semibold text-lg shadow-lg d-flex align-items-center justify-content-center"
+                  disabled={loading || !tokenCF}
+                >
                   {loading ? (
                     <span className="loader"
                       style={{

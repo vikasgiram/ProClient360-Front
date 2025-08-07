@@ -16,6 +16,7 @@ const LeadApis = () => {
     };
 
   const handleTradeIndiaApiKey = async (tradeIndiaConfig) => {
+    setLoading(true);
     try {
       const data = await sendTradeIndiaApiKey({ tradeIndiaConfig });
       if (data?.success) {
@@ -27,6 +28,8 @@ const LeadApis = () => {
     } catch (error) {
       toast?.error('An error occurred while sending API key');
       console.error('Error sending API key:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,163 +66,112 @@ const LeadApis = () => {
                 paddingTop: "170px"
               }}
             >
-              <div className="content-wrapper" style={{ width: "100%", flex: "none" }}>
-                <div className="container-fluid">
-                  <div className="row justify-content-center">
-                    <div className="col-lg-10 col-xl-8">
-                      
-                      <div className="accordion" id="leadApiAccordion">
+              <div className="w-full px-6 py-8">
+                {/* Page Header */}
+                <div className="mb-8">
+                  <h1 className="text-3xl font-bold text-gray-800 mb-2">Lead API Configuration</h1>
+                  <p className="text-gray-600">Configure your lead generation APIs to automatically capture leads from various platforms</p>
+                </div>
 
-                        {/* TradeIndia */}
-                        <div className="accordion-item border rounded-3 mb-3 shadow">
-                          <h2 className="accordion-header">
-                            <button
-                              className="accordion-button bg-light"
-                              type="button"
-                              data-bs-toggle="collapse"
-                              data-bs-target="#tradeIndiaCollapse"
-                              aria-expanded="true"
-                              aria-controls="tradeIndiaCollapse"
-                              style={{ 
-                                paddingTop: "14px", 
-                                paddingBottom: "14px", 
-                                fontSize: "0.95rem", 
-                                lineHeight: "2.2" 
-                              }}
-                            >
-                              <i className="bi bi-gear-fill text-primary me-3"></i>
-                              <div>
-                                <strong>TradeIndia API Configuration</strong>
-                                <div className="small text-muted mt-1">Configure your TradeIndia API key and settings</div>
-                              </div>
-                            </button>
-                          </h2>
-
-                          <div
-                            id="tradeIndiaCollapse"
-                            className="accordion-collapse collapse show"
-                            data-bs-parent="#leadApiAccordion"
-                          >
-                            <div className="accordion-body bg-white" style={{ textAlign: 'left' }}>
-                              <div className="row">
-                                <div className="col-lg-6">
-                                  <div className="trade-india-form-wrapper">
-                                    <React.Suspense fallback={<div className="text-center p-3">Loading TradeIndia form...</div>}>
-                                      <TradeIndiaApiKeyInput onApiKeySubmit={handleTradeIndiaApiKey} />
-                                    </React.Suspense>
-                                  </div>
-                                </div>
-
-                                <div className="col-lg-6">
-                                  <div className="ps-lg-4">
-                                    <h5 className="mb-3 text-primary">How to get TradeIndia Credentials</h5>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 1.</strong> Prepare a Business Plan</h6>
-                                      <p className="text-muted small">The export trade procedure in India involves several stages.</p>
-                                    </div>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 2.</strong> Product and Market Research</h6>
-                                      <p className="text-muted small">The export trade procedure in India involves several stages.</p>
-                                    </div>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 3.</strong> Legal and Compliance Registration</h6>
-                                      <p className="text-muted small">The export trade procedure in India involves several stages.</p>
-                                    </div>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 4.</strong> Market Identification and Analysis</h6>
-                                      <p className="text-muted small">The export trade procedure in India involves several stages.</p>
-                                    </div>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 5.</strong> Payment Terms and Order Fulfillment</h6>
-                                      <p className="text-muted small">The export trade procedure in India involves several stages.</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                {/* API Cards Container */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                  
+                  {/* TradeIndia Configuration Card */}
+                  <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300">
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                      <div className="flex items-center">
+                        <div className="bg-white bg-opacity-20 rounded-lg p-2 mr-3">
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
                         </div>
-
-                        {/* IndiaMart */}
-                        <div className="accordion-item border rounded-3 mb-3 shadow-sm">
-                          <h2 className="accordion-header">
-                            <button
-                              className="accordion-button collapsed bg-light"
-                              type="button"
-                              data-bs-toggle="collapse"
-                              data-bs-target="#indiaMartCollapse"
-                              aria-expanded="false"
-                              aria-controls="indiaMartCollapse"
-                              style={{ 
-                                paddingTop: "14px", 
-                                paddingBottom: "14px", 
-                                fontSize: "0.95rem", 
-                                lineHeight: "2.2" 
-                              }}
-                            >
-                              <i className="bi bi-webhook text-success me-3"></i>
-                              <div>
-                                <strong>IndiaMart Webhook Information</strong>
-                                <div className="small text-muted mt-1">View and manage your IndiaMart webhook settings</div>
-                              </div>
-                            </button>
-                          </h2>
-
-                          <div
-                            id="indiaMartCollapse"
-                            className="accordion-collapse collapse"
-                            data-bs-parent="#leadApiAccordion"
-                          >
-                            <div className="accordion-body bg-white" style={{ textAlign: 'left' }}>
-                              <div className="row">
-                                <div className="col-lg-6">
-                                  <div className="indiamart-webhook-wrapper">
-                                    <React.Suspense fallback={<div className="text-center p-3">Loading IndiaMart info...</div>}>
-                                      <IndiaMartWebhookInfo />
-                                    </React.Suspense>
-                                  </div>
-                                </div>
-
-                                <div className="col-lg-6">
-                                  <div className="ps-lg-4">
-                                    <h5 className="mb-3 text-success">How to get IndiaMart Credentials</h5>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 1.</strong> Setup Webhook URL</h6>
-                                      <p className="text-muted small">Configure your webhook endpoint to receive IndiaMart leads.</p>
-                                    </div>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 2.</strong> Verify Authentication</h6>
-                                      <p className="text-muted small">Ensure your authentication credentials are properly configured.</p>
-                                    </div>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 3.</strong> Test Connection</h6>
-                                      <p className="text-muted small">Verify that your webhook is receiving data correctly.</p>
-                                    </div>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 4.</strong> Configure Lead Processing</h6>
-                                      <p className="text-muted small">Set up your lead processing and notification systems.</p>
-                                    </div>
-
-                                    <div className="mb-3">
-                                      <h6><strong>Step 5.</strong> Monitor and Maintain</h6>
-                                      <p className="text-muted small">Regularly monitor webhook status and maintain the integration.</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                        <div>
+                          <h2 className="text-xl font-semibold text-white">TradeIndia API</h2>
+                          <p className="text-blue-100 text-sm">Configure your TradeIndia credentials</p>
                         </div>
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <TradeIndiaApiKeyInput onApiKeySubmit={handleTradeIndiaApiKey} loading={loading} />
+                    </div>
+                  </div>
 
+                  {/* IndiaMart Webhook Card */}
+                  <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300">
+                    <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+                      <div className="flex items-center">
+                        <div className="bg-white bg-opacity-20 rounded-lg p-2 mr-3">
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-semibold text-white">IndiaMart Webhook</h2>
+                          <p className="text-green-100 text-sm">Your webhook URL for lead integration</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <IndiaMartWebhookInfo />
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Help Section */}
+                <div className="mt-12 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-8 border border-gray-200">
+                  <div className="text-center mb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-2">Need Help?</h3>
+                    <p className="text-gray-600 max-w-2xl mx-auto">
+                      Follow our step-by-step guides to configure your lead APIs correctly and start capturing leads automatically from your preferred platforms.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-800 flex items-center">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                        TradeIndia Setup Guide
+                      </h4>
+                      <div className="space-y-3 text-sm text-gray-600">
+                        <div className="flex items-start">
+                          <span className="font-medium text-blue-600 mr-2">1.</span>
+                          <span>Login to your TradeIndia account and navigate to API settings</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="font-medium text-blue-600 mr-2">2.</span>
+                          <span>Generate your API credentials (User ID, Profile ID, API Key)</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="font-medium text-blue-600 mr-2">3.</span>
+                          <span>Enter the credentials in the form above and submit</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-gray-800 flex items-center">
+                        <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                        IndiaMart Webhook Setup
+                      </h4>
+                      <div className="space-y-3 text-sm text-gray-600">
+                        <div className="flex items-start">
+                          <span className="font-medium text-green-600 mr-2">1.</span>
+                          <span>Copy the webhook URL provided above</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="font-medium text-green-600 mr-2">2.</span>
+                          <span>Login to your IndiaMart account and go to webhook settings</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="font-medium text-green-600 mr-2">3.</span>
+                          <span>Paste the URL and activate the webhook integration</span>
+                        </div>
                       </div>
                     </div>
                   </div>
