@@ -105,10 +105,7 @@ const TradeIndiaApiKeyInput = ({ onApiKeySubmit, loading }) => {
               placeholder="Enter your API Key"
               value={form.apiKey}
               onChange={(e) => {
-                const value = e.target.value;
-                if (/^\d{0,100}$/.test(value)) {
-                  handleChange(e);
-                }
+                setForm((prev) => ({ ...prev, apiKey: e.target.value }));
               }}
               className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-sm placeholder-gray-400"
               required
