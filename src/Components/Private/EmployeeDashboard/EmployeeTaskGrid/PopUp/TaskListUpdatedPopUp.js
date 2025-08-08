@@ -225,6 +225,24 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
   return (
     <>
+    
+     <style>
+        {`
+          .hidden-scrollbar::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+          }
+
+          .hidden-scrollbar::-webkit-scrollbar-thumb {
+            background: transparent;
+          }
+          .hidden-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}
+      </style>
+
       <div
         className="modal fade show"
         style={{
@@ -313,16 +331,16 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                         </div>
                         <div className="shadow_custom ">
                           <div 
-                            className="table-responsive"
+                            className="table-responsive hidden-scrollbar"
                             ref={tableContainerRef}
                             onScroll={handleScroll}
                             style={{ 
                               maxHeight: '400px', 
                               overflowY: 'auto',
                               border: '1px solid #dee2e6',
-                              borderRadius: '0.375rem',
-                              scrollbarWidth: 'thin',
-                              scrollbarColor: '#6c757d #f8f9fa'
+                              borderRadius: '0.375rem'
+                              // scrollbarWidth: 'thin',
+                              // scrollbarColor: '#6c757d #f8f9fa'
                             }}
                           >
                             <table className="table align-items-center table-flush" >
