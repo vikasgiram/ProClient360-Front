@@ -18,6 +18,8 @@ export const LogIn = () => {
 
   const { setUser } = useContext(UserContext);
 
+  const turnstile = useTurnstile();
+
   const requestNotificationPermission = async () => {
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
@@ -64,6 +66,8 @@ export const LogIn = () => {
 
     } catch (error) {
       console.error(error);
+      turnstile.reset();
+      setTokenCF('');
       toast.error("Something Went Wrong...");
     }
     finally {
