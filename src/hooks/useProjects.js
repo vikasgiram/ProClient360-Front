@@ -52,11 +52,12 @@ const createProject = async (projectData) => {
     // console.log("project Data in api", projectData);
     const response = await axios.post(`${url}`, projectData,{
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
 
     });
-    const data = response.data;
+    const data = response.data; 
     return data;
   } catch (error) {
     console.error(error.response.data);
