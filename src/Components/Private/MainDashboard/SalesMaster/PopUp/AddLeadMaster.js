@@ -13,6 +13,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     company: '',
     subject: '',
     products: '',
+    sources: '',  
     message: '',
     status: 'enquiry',
     value: '',
@@ -25,14 +26,12 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }
   });
 
-  const products = ['surveillance System', 'Access Control System', 'TurnKey Project', 'Alleviz', 'CafeLive', 'WorksJoy', 'WorksJoy Blu', 'Fire Alarm System', 'Fire Hydrant System', 'IDS', 'AI Face Machines', 'Entrance Automation', 'Guard Tour System', 'Home Automation', 'IP PA and Communication System', 'CRM'];
+  const [showCustomSource, setShowCustomSource] = useState(false);
+  const [customSource, setCustomSource] = useState('');
 
+  const products = ['surveillance System', 'Access Control System', 'TurnKey Project', 'Alleviz', 'CafeLive', 'WorksJoy', 'WorksJoy Blu', 'Fire Alarm System', 'Fire Hydrant System', 'IDS', 'AI Face Machines', 'Entrance Automation', 'Guard Tour System', 'Home Automation', 'IP PA and Communication System', 'CRM', 'Security Systems'];
 
-  // const handleInputChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData(prev => ({ ...prev, [name]: value }));
-  // };
-
+  const sources = ['Indiamart', 'TradeIndia','Google','JustDial', 'Facebook', 'LinkedIn', 'Twitter', 'YouTube', 'WhatsApp', 'Referral', 'Email Campaign', 'Cold Call', 'Website','Walk-In', 'Direct', 'Other']; 
 
   const handleAddressChange = (e) => {
     const { name, value } = e.target;
@@ -50,28 +49,33 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }));
   };
 
-
   const handleInputChange = (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
 
-  if (name === "name") {
-    
-  }
+    if (name === "sources") {
+      if (value === "Other") {
+        setShowCustomSource(true);
+        setFormData(prev => ({ ...prev, [name]: '' }));
+      } else {
+        setShowCustomSource(false);
+        setCustomSource('');
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
 
-  setFormData({
-    ...formData,
-    [name]: value,
-  });
-};
-
-
-
+  const handleCustomSourceChange = (e) => {
+    const value = e.target.value;
+    setCustomSource(value);
+    setFormData(prev => ({ ...prev, sources: value }));
+  };
 
   const handlePincodeChange = async (e) => {
     const pincode = e.target.value;
 
     if (/^\d{0,6}$/.test(pincode)) {
-
       handleAddressChange(e);
 
       if (pincode.length === 6) {
@@ -113,13 +117,13 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
       subject,
       company,
       products,
+      sources,  
       message,
       address
     } = formData;
 
-
-    if (!name || !company || !contact || !products || !address.pincode || !address.add) {
-      toast.error('Please fill in all required fields, including Pincode and full address.');
+    if (!name || !company || !contact || !products || !address.pincode || !address.add || !sources) {
+      toast.error('Please fill in all required fields, including Pincode, full address, and source.');
       return;
     }
 
@@ -135,12 +139,12 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
       SENDER_PINCODE: address.pincode,
       SENDER_COUNTRY_ISO: address.country,
       QUERY_PRODUCT_NAME: products,
+      QUERY_SOURCES_NAME: sources,  
       QUERY_MESSAGE: message || ""
     };
 
     onAddLead(mappedData);
   };
-
 
   return (
     <>
@@ -219,7 +223,35 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       {products.map(product => <option key={product} value={product}>{product}</option>)}
                     </select>
                   </div>
-
+                  
+                  <div className='col-md-6'>
+                    <label htmlFor="sources" className="form-label">Sources<RequiredStar /></label>
+                    <select 
+                      id="sources" 
+                      className="form-select" 
+                      name="sources" 
+                      value={formData.sources === customSource ? "Other" : formData.sources} 
+                      onChange={handleInputChange}
+                      style={{ width: '100%', height: '35px' }}
+                      required
+                    >
+                      <option value="">Select Sources....</option>
+                      {sources.map(source => <option key={source} value={source}>{source}</option>)}
+                    </select>
+                    
+                    {showCustomSource && (
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter custom source"
+                          value={customSource}
+                          onChange={handleCustomSourceChange}
+                          required
+                        />
+                      </div>
+                    )}
+                  </div>
 
                   <div className="col-md-6">
                     <label htmlFor="message" className="form-label">Message</label>
@@ -230,11 +262,10 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       placeholder="Enter a Message...."
                       value={formData.message}
                       onChange={handleInputChange}
-                      style={{ width: '201%', height: '100px' }}
+                      style={{ width: '100%', height: '100px' }}
                       maxLength={500}
                     />
                   </div>
-
 
                   <div className="col-12">
                     <div className="row border rounded p-3 m-1" style={{ backgroundColor: '#FAF6F6' }}>
