@@ -167,7 +167,7 @@ const AddEmployeePopup = ({ handleAdd }) => {
           backgroundColor: "#00000090",
         }}
       >
-        <div className="modal-dialog addemp" style={{ minWidth: "40%" }}>
+        <div className="modal-dialog addemp" style={{ minWidth: "44%" }}>
           <div className="modal-content p-3">
             <form onSubmit={handleEmployeeAdd}>
               <div className="modal-header pt-0">

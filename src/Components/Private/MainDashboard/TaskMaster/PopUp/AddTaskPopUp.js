@@ -42,7 +42,7 @@ const AddTaskPopUp = ({ handleAdd, cancelBtnCallBack }) => {
                 }}
             >
                 <div className="modal-dialog modal-md">
-                    <div className="modal-content taskbar p-3" style={{width:'121%', height:'330px', padding:'3rem'}}>
+                    <div className="modal-content taskbar p-3" style={{width:'160%', height:'330px', padding:'3rem', marginLeft:'-8rem'}}>
                         <div className="modal-header pt-0">
                             <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                                 Create New Task

@@ -9,11 +9,9 @@ const PAGE_SIZE = 10;
 
 const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
-
   const [loading, setLoading] = useState(false);
   const [serviceType, setServiceType] = useState();
   const [priority, setPriority] = useState();
-  // const [zone, setZone] = useState();
   const [allotmentDate, setAllotmentDate] = useState();
   const [workMode, setWorkMode] = useState();
   const [ticket] = useState(selectedTicket);
@@ -38,7 +36,15 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
       return;
     }
 
-    const newOpts = (data.employees || []).map(e => ({ value: e._id, label: e.name }));
+    // UPDATED: Include mobile number in the options
+    const newOpts = (data.employees || []).map(e => ({ 
+      value: e._id, 
+      label: e.name,
+      mobile: e.mobileNo || e.mobile || e.contactNumber, // Get mobile with fallbacks
+      email: e.email,
+      employeeData: e // Store full employee data
+    }));
+    
     setEmpOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
     setEmpHasMore(newOpts.length === PAGE_SIZE);
     setEmpLoading(false);
@@ -53,20 +59,23 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
     loadEmployees(1, empSearch);
   }, [empSearch]);
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const serviceData = {
       serviceType,
       ticket,
       priority,
-      // zone,
       allotmentDate,
       allotTo: selectedEmployee?.value,
       workMode,
-      // completionDate
+      // ADDED: Include selected employee data for email purposes
+      selectedEmployeeData: {
+        name: selectedEmployee?.label,
+        mobile: selectedEmployee?.mobile,
+        email: selectedEmployee?.email
+      }
     };
+    
     if (!serviceType || !ticket || !priority || !allotmentDate || !selectedEmployee?.value || !workMode) {
       return toast.error("Please fill all the fields");
     }
@@ -76,36 +85,28 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
       toast.success(data.message);
       setLoading(false);
       handleAddService();
-    }else
+    } else {
       toast.error(data.error || "Failed to add service");
-
+    }
   }
 
   return (
     <>
-
       <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
         <div className="modal-dialog modal-lg">
           <div className="modal-content p-3">
             <form onSubmit={handleSubmit}>
               <div className="modal-header pt-0">
-
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-
                   Assign Service
-                  {/* Forward */}
                 </h5>
-
               </div>
               <div className="modal-body">
                 <div className="row modal_body_height">
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label
-                        for="Department"
-                        className="form-label label_text"
-                      >
+                      <label htmlFor="Department" className="form-label label_text">
                         Service Type <RequiredStar />
                       </label>
                       <select
@@ -114,7 +115,8 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                         aria-label="Default select example"
                         onChange={(e) => setServiceType(e.target.value)}
                         required
-                      ><option >Select Service Type</option>
+                      >
+                        <option>Select Service Type</option>
                         <option value={"AMC"}>AMC</option>
                         <option value={"One Time"}>One time</option>
                         <option value={"Warranty"}>Warranty</option>
@@ -122,13 +124,9 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                     </div>
                   </div>
 
-
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label
-                        for="Department"
-                        className="form-label label_text"
-                      >
+                      <label htmlFor="Department" className="form-label label_text">
                         Priority <RequiredStar />
                       </label>
                       <select
@@ -137,7 +135,8 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                         aria-label="Default select example"
                         onChange={(e) => setPriority(e.target.value)}
                         required
-                      ><option >Select Priority</option>
+                      >
+                        <option>Select Priority</option>
                         <option value={"High"}>High</option>
                         <option value={"Medium"}>Mid</option>
                         <option value={"Low"}>Low</option>
@@ -145,37 +144,14 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                     </div>
                   </div>
 
-                  {/* <div className="col-12 col-lg-6 mt-2">
-                    <div className="mb-3">
-                      <label
-                        for="Department"
-                        className="form-label label_text"
-                      >
-                        Zone <RequiredStar />
-                      </label>
-                      <select
-                        className="form-select rounded-0"
-                        id=""
-                        aria-label="Default select example"
-                        onChange={(e) => setZone(e.target.value)}
-                        required
-                      ><option >Select Zone</option>
-                        <option value={"South"}>South</option>
-                        <option value={"North"}>North</option>
-                        <option value={"East"}>East</option>
-                        <option value={"West"}>West</option>
-                      </select>
-                    </div>
-                  </div> */}
-
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label htmlFor="purchaseOrderDate" className="form-label label_text">
                         Allotment Date <RequiredStar />
                       </label>
                       <input
-                        onChange={(e) => setAllotmentDate(e.target.value)} // Handles date input change
-                        value={allotmentDate} // Prepopulate value from state
+                        onChange={(e) => setAllotmentDate(e.target.value)}
+                        value={allotmentDate}
                         type="date"
                         className="form-control rounded-0"
                         id="purchaseOrderDate"
@@ -187,11 +163,8 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label
-                        for="Department"
-                        className="form-label label_text"
-                      >
-                        Allocated to  <RequiredStar />
+                      <label htmlFor="Department" className="form-label label_text">
+                        Allocated to <RequiredStar />
                       </label>
                       <Select
                         options={empOptions}
@@ -203,16 +176,22 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                         placeholder="Search and select employee..."
                         noOptionsMessage={() => empLoading ? 'Loading...' : 'No employees'}
                         closeMenuOnSelect={true}
+
+                        // ADDED: Custom option display to show mobile 
+                        
+                        // formatOptionLabel={(option) => (
+                        //   <div>
+                        //     <div style={{ fontWeight: 'bold' }}>{option.label}</div>
+                        //     {option.mobile && <div style={{ fontSize: '12px', color: '#666' }}>Mobile: {option.mobile}</div>}
+                        //   </div>
+                        // )}
                       />
                     </div>
                   </div>
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label
-                        for="Department"
-                        className="form-label label_text"
-                      >
+                      <label htmlFor="Department" className="form-label label_text">
                         Workmode <RequiredStar />
                       </label>
                       <select
@@ -221,24 +200,19 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                         aria-label="Default select example"
                         onChange={(e) => setWorkMode(e.target.value)}
                         required
-                      ><option >Select Workmode</option>
+                      >
+                        <option>Select Workmode</option>
                         <option value={"Onsite"}>Onsite</option>
                         <option value={"Remote"}>Remote</option>
-
                       </select>
                     </div>
                   </div>
-
-
-
 
                   <div className="row">
                     <div className="col-12 pt-3 mt-2">
                       <button
                         type="submit"
-                        // onClick={handleServiceAdd}
                         disabled={loading}
-
                         className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
                       >
                         {!loading ? "Add" : "Submitting..."}
@@ -246,9 +220,9 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                       <button
                         type="button"
                         onClick={handleAddService}
-                        className="w-80  btn addbtn rounded-0 Cancel_button m-2 px-4" >
+                        className="w-80  btn addbtn rounded-0 Cancel_button m-2 px-4"
+                      >
                         Cancel
-
                       </button>
                     </div>
                   </div>
@@ -258,8 +232,8 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
           </div>
         </div>
       </div>
-
-    </>);
+    </>
+  );
 }
 
 export default AddServicePopup;
