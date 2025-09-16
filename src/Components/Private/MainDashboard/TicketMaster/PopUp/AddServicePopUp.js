@@ -3,12 +3,10 @@ import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { createService } from "../../../../../hooks/useService";
 import { getEmployees } from "../../../../../hooks/useEmployees";
 import Select from "react-select";
-
 import toast from "react-hot-toast";
 const PAGE_SIZE = 10;
 
 const AddServicePopup = ({ handleAddService, selectedTicket }) => {
-
   const [loading, setLoading] = useState(false);
   const [serviceType, setServiceType] = useState();
   const [priority, setPriority] = useState();
@@ -18,41 +16,42 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
   // Employee dropdown state
   const [empOptions, setEmpOptions] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [empPage, setEmpPage] = useState(1);
   const [empHasMore, setEmpHasMore] = useState(true);
   const [empLoading, setEmpLoading] = useState(false);
   const [empSearch, setEmpSearch] = useState("");
 
   // Fetch employees with pagination & search
-  const loadEmployees = useCallback(async (page, search) => {
-    if (empLoading || !empHasMore) return;
-    setEmpLoading(true);
-    const data = await getEmployees(page, PAGE_SIZE, search);
+  const loadEmployees = useCallback(
+    async (page, search) => {
+      if (empLoading || !empHasMore) return;
+      setEmpLoading(true);
+      const data = await getEmployees(page, PAGE_SIZE, search);
 
-    if (data.error) {
-      toast.error(data.error || 'Failed to load employees');
+      if (data.error) {
+        toast.error(data.error || "Failed to load employees");
+        setEmpLoading(false);
+        return;
+      }
+
+      const newOpts = (data.employees || []).map((e) => ({
+        value: e._id,
+        label: e.name,
+        mobile: e.mobileNo || e.mobile || e.contactNumber,
+        email: e.email,
+        employeeData: e,
+      }));
+
+      setEmpOptions((prev) => (page === 1 ? newOpts : [...prev, ...newOpts]));
+      setEmpHasMore(newOpts.length === PAGE_SIZE);
       setEmpLoading(false);
-      return;
-    }
+      setEmpPage(page + 1);
+    },
+    [empLoading, empHasMore]
+  );
 
-    // UPDATED: Include mobile number in the options
-    const newOpts = (data.employees || []).map(e => ({ 
-      value: e._id, 
-      label: e.name,
-      mobile: e.mobileNo || e.mobile || e.contactNumber, // Get mobile with fallbacks
-      email: e.email,
-      employeeData: e // Store full employee data
-    }));
-    
-    setEmpOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
-    setEmpHasMore(newOpts.length === PAGE_SIZE);
-    setEmpLoading(false);
-    setEmpPage(page + 1);
-  }, [empLoading, empHasMore]);
-
-  // Initial & search-triggered load (reset on search)
-  useEffect(() => {
+    useEffect(() => {
     setEmpPage(1);
     setEmpHasMore(true);
     setEmpOptions([]);
@@ -61,58 +60,65 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const serviceData = {
       serviceType,
       ticket,
       priority,
       allotmentDate,
-      allotTo: selectedEmployee?.value,
+      allotTo: selectedEmployees.map((emp) => emp.value),
       workMode,
-      // ADDED: Include selected employee data for email purposes
-      selectedEmployeeData: {
-        name: selectedEmployee?.label,
-        mobile: selectedEmployee?.mobile,
-        email: selectedEmployee?.email
-      }
+      selectedEmployeesData: selectedEmployees.map((emp) => ({
+        name: emp.label,
+      })),
     };
-    
-    if (!serviceType || !ticket || !priority || !allotmentDate || !selectedEmployee?.value || !workMode) {
+
+    if (
+      !serviceType ||
+      !ticket ||
+      !priority ||
+      !allotmentDate ||
+      selectedEmployees.length === 0 ||
+      !workMode
+    ) {
       return toast.error("Please fill all the fields");
     }
 
     const data = await createService(serviceData);
-    if(data?.success){
+    if (data?.success) {
       toast.success(data.message);
       setLoading(false);
       handleAddService();
     } else {
       toast.error(data.error || "Failed to add service");
     }
-  }
+  };
 
   return (
     <>
-      <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
+      <div
+        className="modal fade show"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: "#00000090",
+        }}
+      >
         <div className="modal-dialog modal-lg">
           <div className="modal-content p-3">
             <form onSubmit={handleSubmit}>
               <div className="modal-header pt-0">
-                <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-                  Assign Service
-                </h5>
+                <h5 className="card-title fw-bold">Assign Service</h5>
               </div>
               <div className="modal-body">
                 <div className="row modal_body_height">
-
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label htmlFor="Department" className="form-label label_text">
+                      <label className="form-label label_text">
                         Service Type <RequiredStar />
                       </label>
                       <select
                         className="form-select rounded-0"
-                        id=""
-                        aria-label="Default select example"
                         onChange={(e) => setServiceType(e.target.value)}
                         required
                       >
@@ -126,13 +132,11 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label htmlFor="Department" className="form-label label_text">
+                      <label className="form-label label_text">
                         Priority <RequiredStar />
                       </label>
                       <select
                         className="form-select rounded-0"
-                        id=""
-                        aria-label="Default select example"
                         onChange={(e) => setPriority(e.target.value)}
                         required
                       >
@@ -146,7 +150,7 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label htmlFor="purchaseOrderDate" className="form-label label_text">
+                      <label className="form-label label_text">
                         Allotment Date <RequiredStar />
                       </label>
                       <input
@@ -154,8 +158,6 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
                         value={allotmentDate}
                         type="date"
                         className="form-control rounded-0"
-                        id="purchaseOrderDate"
-                        aria-describedby="dateHelp"
                         min={new Date().toISOString().split("T")[0]}
                       />
                     </div>
@@ -163,41 +165,42 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label htmlFor="Department" className="form-label label_text">
+                      <label className="form-label label_text">
                         Allocated to <RequiredStar />
                       </label>
                       <Select
+                        isMulti
                         options={empOptions}
-                        value={selectedEmployee}
-                        onChange={opt => setSelectedEmployee(opt)}
-                        onInputChange={val => setEmpSearch(val)}
-                        onMenuScrollToBottom={() => loadEmployees(empPage, empSearch)}
+                        value={selectedEmployees}
+                        onChange={(opts) => setSelectedEmployees(opts || [])}
+                        onInputChange={(val) => setEmpSearch(val)}
+                        onMenuScrollToBottom={() =>
+                          loadEmployees(empPage, empSearch)
+                        }
                         isLoading={empLoading}
-                        placeholder="Search and select employee..."
-                        noOptionsMessage={() => empLoading ? 'Loading...' : 'No employees'}
-                        closeMenuOnSelect={true}
-
-                        // ADDED: Custom option display to show mobile 
-                        
-                        // formatOptionLabel={(option) => (
-                        //   <div>
-                        //     <div style={{ fontWeight: 'bold' }}>{option.label}</div>
-                        //     {option.mobile && <div style={{ fontSize: '12px', color: '#666' }}>Mobile: {option.mobile}</div>}
-                        //   </div>
-                        // )}
+                        placeholder="Search and select employees..."
+                        noOptionsMessage={() =>
+                          empLoading ? "Loading..." : "No employees"
+                        }
+                        closeMenuOnSelect={false}
+                        formatOptionLabel={(option) => (
+                          <div>
+                            <div style={{ fontWeight: "bold" }}>
+                              {option.label}
+                            </div>
+                          </div>
+                        )}
                       />
                     </div>
                   </div>
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
-                      <label htmlFor="Department" className="form-label label_text">
+                      <label className="form-label label_text">
                         Workmode <RequiredStar />
                       </label>
                       <select
                         className="form-select rounded-0"
-                        id=""
-                        aria-label="Default select example"
                         onChange={(e) => setWorkMode(e.target.value)}
                         required
                       >
@@ -234,6 +237,6 @@ const AddServicePopup = ({ handleAddService, selectedTicket }) => {
       </div>
     </>
   );
-}
+};
 
 export default AddServicePopup;

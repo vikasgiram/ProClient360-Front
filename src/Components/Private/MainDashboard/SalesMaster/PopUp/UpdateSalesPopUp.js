@@ -8,7 +8,6 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
     return null;
   }
 
-
   const formatDate = (dateString) => {  
     if (!dateString) return "N/A";
     try {
@@ -96,6 +95,8 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
         <h6 className="mt-3"><p className="fw-bold d-inline">Completion: </p>{selectedLead?.complated || "0"}%</h6>
         <h6 className="mt-3"><p className="fw-bold d-inline">Quotation Amount: </p>₹{selectedLead?.quotation || " "}</h6>
         <h6 className="mt-3"><p className="fw-bold d-inline">Next Follow-up Date: </p>{formatDate(selectedLead?.nextFollowUpDate) || "Not set"}</h6>
+        <h6 className="mt-3"><p className="fw-bold d-inline">Remark: </p>{selectedLead?.rem || " "}</h6>
+
       </div>
 
       <div className="col-12 mt-2">
@@ -127,7 +128,8 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     date: '', 
     completion: '', 
     status: '', 
-    quotation: ''
+    quotation: '',
+    rem: ''
   });
 
   const useUpdate = useUpdateLead();
@@ -139,7 +141,8 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
         date: selectedLead?.actionDetails?.followUpDate || selectedLead?.nextFollowUpDate || '',
         completion: selectedLead?.complated?.toString() || selectedLead?.actionDetails?.completionPercentage?.toString() || '0',
         status: selectedLead.status || selectedLead?.STATUS || '',
-        quotation: selectedLead?.quotation?.toString() || selectedLead?.actionDetails?.quotation?.toString() || '0'
+        quotation: selectedLead?.quotation?.toString() || selectedLead?.actionDetails?.quotation?.toString() || '0',
+        rem: selectedLead?.rem || selectedLead?.actionDetails?.rem || ''
       });
     }
   }, [selectedLead]);
@@ -154,7 +157,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
         }
       }
     } else if (name === 'quotation') {
-    
       if (/^\d*\.?\d*$/.test(value)) {
         setActionData(prev => ({ ...prev, [name]: value }));
       }
@@ -186,6 +188,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       complated: actionData.completion ? parseFloat(actionData.completion) : 0,
       nextFollowUpDate: actionData.date ? new Date(actionData.date).toISOString() : null,
       quotation: actionData.quotation ? parseFloat(actionData.quotation) : 0,
+      rem: actionData.rem || ''
     };
 
     console.log("Updated Form Data:", updatedFormData);
@@ -294,6 +297,19 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                       value={actionData.date || ''} 
                       onChange={handleActionChange} 
                       required 
+                    />
+                  </div>
+
+                  <div className="col-12">
+                    <label htmlFor="remark" className="form-label fw-bold">Remark</label>
+                    <textarea 
+                      id="rem" 
+                      name="rem"
+                      className="form-control" 
+                      placeholder="Enter your remarks here..." 
+                      rows="3"
+                      value={actionData.rem} 
+                      onChange={handleActionChange}
                     />
                   </div>
                 </div>
