@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
-import { createTicket } from "../../../../../hooks/useTicket"
+import { createTicket } from "../../../../../hooks/useTicket";
 import { getCustomers } from "../../../../../hooks/useCustomer";
 import { getAddress } from "../../../../../hooks/usePincode";
 import Select from "react-select";
-
-
 
 const PAGE_SIZE = 15;
 
@@ -29,7 +27,7 @@ const AddTicketPopup = ({ handleAdd }) => {
     country: "",
     pincode: "",
     state: ""
-  })
+  });
 
   // Load customers with pagination and search
   const loadCustomers = useCallback(async (page = 1, search = "") => {
@@ -64,7 +62,8 @@ const AddTicketPopup = ({ handleAdd }) => {
       Address,
       contactPersonEmail
     };
-    if (!client || !details || !product || !contactPerson || !contactNumber || !source || !Address) {
+    
+    if (!client || !details || !product || !contactPerson || !contactNumber || !source || !Address.add || !Address.pincode) {
       return toast.error("Please fill all fields");
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactPersonEmail)) {
@@ -76,67 +75,86 @@ const AddTicketPopup = ({ handleAdd }) => {
     if (/[a-zA-Z]/.test(contactNumber)) {
       return toast.error("Phone number should not contain alphabets");
     }
-    toast.loading("Creating Ticket...")
+    
+    toast.loading("Creating Ticket...");
     const data = await createTicket(ticketData);
-    toast.dismiss()
-    if (data.success){
+    toast.dismiss();
+    
+    if (data.success) {
       handleAdd();
       toast.success(data?.message);
-    }else{
+    } else {
       toast.error(data?.error || "Failed to create ticket");
     }
   };
 
-
-
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getAddress(Address.pincode);
+      if (Address.pincode && Address.pincode.length === 6) {
+        const data = await getAddress(Address.pincode);
 
-      if (data !== "Error") {
-        setAddress(prevAddress => ({
-          ...prevAddress,
-          state: data.state,
-          city: data.city,
-          country: data.country
-        }));
+        if (data) {
+          setAddress(prevAddress => ({
+            ...prevAddress,
+            state: data.state,
+            city: data.city,
+            country: data.country
+          }));
+        } else {
+          // Reset other fields if pincode is invalid
+          setAddress(prevAddress => ({
+            ...prevAddress,
+            state: "",
+            city: "",
+            country: ""
+          }));
+        }
       }
     };
-    if (Address.pincode >= 6)
-      fetchData();
+    
+    fetchData();
   }, [Address.pincode]);
 
-
-  //  create a new seperate validations function
-
+  // Validation functions
   const handlePincodeChange = (e) => {
     const value = e.target.value;
     if (/^\d{0,6}$/.test(value)) {
-      setAddress({ ...Address, pincode: value });
+      setAddress(prevAddress => ({ 
+        ...prevAddress, 
+        pincode: value 
+      }));
     }
   };
-
 
   const handleStateChange = (e) => {
     const value = e.target.value;
     if (/^[a-zA-Z\s]*$/.test(value)) {
-      setAddress({ ...Address, state: value })
+      setAddress(prevAddress => ({ 
+        ...prevAddress, 
+        state: value 
+      }));
     }
-  }
+  };
 
   const handleCityChange = (e) => {
     const value = e.target.value;
     if (/^[a-zA-Z\s]*$/.test(value)) {
-      setAddress({ ...Address, city: value });
+      setAddress(prevAddress => ({ 
+        ...prevAddress, 
+        city: value 
+      }));
     }
   };
 
   const handleCountryChange = (e) => {
     const value = e.target.value;
     if (/^[a-zA-Z\s]*$/.test(value)) {
-      setAddress({ ...Address, country: value })
+      setAddress(prevAddress => ({ 
+        ...prevAddress, 
+        country: value 
+      }));
     }
-  }
+  };
 
   const handleContactPersonName = (e) => {
     const value = e.target.value;
@@ -151,7 +169,6 @@ const AddTicketPopup = ({ handleAdd }) => {
       setContactNumber(value);
     }
   };
-
 
   return (
     <>
@@ -169,7 +186,6 @@ const AddTicketPopup = ({ handleAdd }) => {
               <div className="modal-header pt-0">
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                   Create New Ticket
-                  {/* Forward */}
                 </h5>
                 <button
                   onClick={() => handleAdd()}
@@ -230,7 +246,8 @@ const AddTicketPopup = ({ handleAdd }) => {
                       />
                     </div>
                   </div>
-                  <div className="col-12  mt-2">
+                  
+                  <div className="col-12 mt-2">
                     <div className="row border mt-4 bg-gray mx-auto">
                       <div className="col-12 mb-3">
                         <span className="AddressInfo">Address <RequiredStar /></span>
@@ -243,10 +260,8 @@ const AddTicketPopup = ({ handleAdd }) => {
                             maxLength={6}
                             className="form-control rounded-0"
                             placeholder="Pincode"
-                            id="exampleInputEmail1"
                             value={Address.pincode}
                             onChange={handlePincodeChange}
-                            aria-describedby="emailHelp"
                           />
                         </div>
                       </div>
@@ -257,11 +272,9 @@ const AddTicketPopup = ({ handleAdd }) => {
                             type="text"
                             className="form-control rounded-0"
                             placeholder="State"
-                            id="exampleInputEmail1"
                             maxLength={50}
                             onChange={handleStateChange}
                             value={Address.state}
-                            aria-describedby="emailHelp"
                           />
                         </div>
                       </div>
@@ -273,11 +286,8 @@ const AddTicketPopup = ({ handleAdd }) => {
                             maxLength={50}
                             className="form-control rounded-0"
                             placeholder="City"
-                            id="exampleInputEmail1"
                             onChange={handleCityChange}
-                            // onChange={(e) => setAddress({ ...Address, city: e.target.value })}
                             value={Address.city}
-                            aria-describedby="emailHelp"
                           />
                         </div>
                       </div>
@@ -289,10 +299,8 @@ const AddTicketPopup = ({ handleAdd }) => {
                             maxLength={50}
                             className="form-control rounded-0"
                             placeholder="Country"
-                            id="exampleInputEmail1"
                             onChange={handleCountryChange}
                             value={Address.country}
-                            aria-describedby="emailHelp"
                           />
                         </div>
                       </div>
@@ -301,11 +309,12 @@ const AddTicketPopup = ({ handleAdd }) => {
                         <div className="mb-3">
                           <textarea
                             className="textarea_edit col-12"
-                            id=""
-                            name=""
                             maxLength={500}
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
-                            onChange={(e) => setAddress({ ...Address, add: e.target.value })}
+                            onChange={(e) => setAddress(prevAddress => ({ 
+                              ...prevAddress, 
+                              add: e.target.value 
+                            }))}
                             value={Address.add}
                             rows="2"
                           ></textarea>
@@ -317,7 +326,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                   <div className="col-12">
                     <div className="mb-3">
                       <label
-                        for="clientName"
+                        htmlFor="complaintDetails"
                         className="form-label label_text"
                       >
                         Complaint Details <RequiredStar />
@@ -326,9 +335,8 @@ const AddTicketPopup = ({ handleAdd }) => {
                         value={details}
                         onChange={(e) => setDetails(e.target.value)}
                         className="form-control rounded-0"
-                        id="name"
+                        id="complaintDetails"
                         maxLength={300}
-                        aria-describedby="emailHelp"
                         required
                       ></textarea>
                     </div>
@@ -337,35 +345,34 @@ const AddTicketPopup = ({ handleAdd }) => {
                   <div className="col-12">
                     <div className="mb-3">
                       <label
-                        for="clientName"
+                        htmlFor="product"
                         className="form-label label_text"
                       >
                         Product <RequiredStar />
                       </label>
                       <select
                         className="form-select rounded-0"
-                        id=""
-                        aria-label="Default select example"
+                        id="product"
                         onChange={(e) => setProduct(e.target.value)}
                         required
                       >
-                        <option value=" ">Select Product</option>
-                        <option value={"Surveillance System"}>Surveillance System</option>
-                        <option value={"Access Control System"}>Access Control System</option>
-                        <option value={"Turnkey Project"}>Turnkey Project</option>
-                        <option value={"Alleviz"}>Alleviz</option>
-                        <option value={"CafeLive"}>CafeLive</option>
-                        <option value={"WorksJoy"}>WorksJoy</option>
-                        <option value={"WorksJoy Blu"}>WorksJoy Blu</option>
-                        <option value={"Fire Alarm System"}>Fire Alarm System</option>
-                        <option value={"Fire Hydrant System"}>Fire Hydrant System</option>
-                        <option value={"IDS"}>IDS</option>
-                        <option value={"AI Face Machines"}>AI Face Machines</option>
-                        <option value={"Entrance Automation"}>Entrance Automation</option>
-                        <option value={"Guard Tour System"}>Guard Tour System</option>
-                        <option value={"Home Automation"}>Home Automation</option>
-                        <option value={"IP PA and Communication System"}>IP PA and Communication System</option>
-                        <option value={"CRM"}>CRM</option>
+                        <option value="">Select Product</option>
+                        <option value="Surveillance System">Surveillance System</option>
+                        <option value="Access Control System">Access Control System</option>
+                        <option value="Turnkey Project">Turnkey Project</option>
+                        <option value="Alleviz">Alleviz</option>
+                        <option value="CafeLive">CafeLive</option>
+                        <option value="WorksJoy">WorksJoy</option>
+                        <option value="WorksJoy Blu">WorksJoy Blu</option>
+                        <option value="Fire Alarm System">Fire Alarm System</option>
+                        <option value="Fire Hydrant System">Fire Hydrant System</option>
+                        <option value="IDS">IDS</option>
+                        <option value="AI Face Machines">AI Face Machines</option>
+                        <option value="Entrance Automation">Entrance Automation</option>
+                        <option value="Guard Tour System">Guard Tour System</option>
+                        <option value="Home Automation">Home Automation</option>
+                        <option value="IP PA and Communication System">IP PA and Communication System</option>
+                        <option value="CRM">CRM</option>
                       </select>
                     </div>
                   </div>
@@ -390,7 +397,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label
-                        for="Department"
+                        htmlFor="email"
                         className="form-label label_text"
                       >
                         Contact Person Email <RequiredStar />
@@ -402,7 +409,6 @@ const AddTicketPopup = ({ handleAdd }) => {
                         onChange={(e) => setContactPersonEmail(e.target.value)}
                         className="form-control rounded-0"
                         id="email"
-                        aria-describedby="emailHelp"
                         required
                       />
                     </div>
@@ -411,7 +417,7 @@ const AddTicketPopup = ({ handleAdd }) => {
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label
-                        for="Designation"
+                        htmlFor="contactNumber"
                         className="form-label label_text"
                       >
                         Contact Person No. <RequiredStar />
@@ -420,11 +426,9 @@ const AddTicketPopup = ({ handleAdd }) => {
                         type="text"
                         maxLength={10}
                         value={contactNumber}
-                        // onChange={(e) => setContactNumber(e.target.value)}
                         onChange={contactPersonNumber}
                         className="form-control rounded-0"
-                        id="name"
-                        aria-describedby="emailHelp"
+                        id="contactNumber"
                         required
                       />
                     </div>
@@ -433,42 +437,39 @@ const AddTicketPopup = ({ handleAdd }) => {
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label
-                        for="Department"
+                        htmlFor="source"
                         className="form-label label_text"
                       >
                         Complaint Source <RequiredStar />
                       </label>
                       <select
                         className="form-select rounded-0"
-                        id=""
-                        aria-label="Default select example"
+                        id="source"
                         onChange={(e) => setSource(e.target.value)}
                         required
-                      ><option >Select Source</option>
-                        <option value={"Email"}>Email</option>
-                        <option value={"Call"}>Call</option>
-                        <option value={"WhatsApp"}>WhatsApp</option>
-                        <option value={"SMS"}>SMS</option>
-                        <option value={"Direct"}>Direct</option>
+                      >
+                        <option value="">Select Source</option>
+                        <option value="Email">Email</option>
+                        <option value="Call">Call</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="SMS">SMS</option>
+                        <option value="Direct">Direct</option>
                       </select>
                     </div>
                   </div>
-
-
 
                   <div className="row">
                     <div className="col-12 pt-3 mt-2">
                       <button
                         type="submit"
-                        onClick={handleEmployeeAdd}
-                        className="w-80 btn addbtn rounded-0 add_button   m-2 px-4"
+                        className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
                       >
                         Add
                       </button>
                       <button
                         type="button"
                         onClick={handleAdd}
-                        className="w-80  btn addbtn rounded-0 Cancel_button m-2 px-4"
+                        className="w-80 btn addbtn rounded-0 Cancel_button m-2 px-4"
                       >
                         Cancel
                       </button>
