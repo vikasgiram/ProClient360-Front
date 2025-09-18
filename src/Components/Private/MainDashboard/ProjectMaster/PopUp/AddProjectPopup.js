@@ -23,6 +23,7 @@ const AddProjectPopup = ({ handleAdd }) => {
   const [POCopy, setPOCopy] = useState("");
   const [loading, setLoading] = useState(false);
   const [retention, setRetention] = useState(0);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
 
   // Customer dropdown state
   const [custOptions, setCustOptions] = useState([]);
@@ -42,14 +43,55 @@ const AddProjectPopup = ({ handleAdd }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getAddress(Address.pincode);
-      if (data !== "Error") {
-        setAddress(data);
+      if (Address.pincode && Address.pincode.length === 6) {
+        setIsLoadingAddress(true);
+        try {
+          const data = await getAddress(Address.pincode);
+
+          if (data && data !== "Error") {
+            setAddress(prevAddress => ({
+              ...prevAddress,
+              state: data.state || "",
+              city: data.city || "",
+              country: data.country || ""
+            }));
+          } else {
+            // Clear other fields if pincode is invalid
+            setAddress(prevAddress => ({
+              ...prevAddress,
+              state: "",
+              city: "",
+              country: ""
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching address:", error);
+          setAddress(prevAddress => ({
+            ...prevAddress,
+            state: "",
+            city: "",
+            country: ""
+          }));
+        } finally {
+          setIsLoadingAddress(false);
+        }
+      } else if (Address.pincode.length < 6) {
+        // Clear fields when pincode is incomplete
+        setAddress(prevAddress => ({
+          ...prevAddress,
+          state: "",
+          city: "",
+          country: ""
+        }));
       }
     };
-    if (Address.pincode.length === 6) {
+    
+    // Add debounce to avoid too many API calls
+    const timeoutId = setTimeout(() => {
       fetchData();
-    }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [Address.pincode]);
 
   // Fetch customers with pagination & search
@@ -168,6 +210,47 @@ const AddProjectPopup = ({ handleAdd }) => {
         setPOCopy(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  // Address field handlers
+  const handlePincodeChange = (e) => {
+    const value = e.target.value;
+    if (/^\d{0,6}$/.test(value)) {
+      setAddress(prevAddress => ({
+        ...prevAddress,
+        pincode: value,
+      }));
+    }
+  };
+
+  const handleStateChange = (e) => {
+    const value = e.target.value;
+    if (/^[A-Za-z\s]*$/.test(value)) {
+      setAddress(prevAddress => ({ 
+        ...prevAddress, 
+        state: value 
+      }));
+    }
+  };
+
+  const handleCityChange = (e) => {
+    const value = e.target.value;
+    if (/^[A-Za-z\s]*$/.test(value)) {
+      setAddress(prevAddress => ({ 
+        ...prevAddress, 
+        city: value 
+      }));
+    }
+  };
+
+  const handleCountryChange = (e) => {
+    const value = e.target.value;
+    if (/^[A-Za-z\s]*$/.test(value)) {
+      setAddress(prevAddress => ({ 
+        ...prevAddress, 
+        country: value 
+      }));
     }
   };
 
@@ -414,21 +497,18 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <input
                           type="text"
                           className="form-control rounded-0"
-                          placeholder="Pincode"
-                          id="pincode"
-                          name="pincode"
-                          maxLength="6"
-                          pattern="[0-9]*"
-                          inputMode="numeric"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (/^\d{0,6}$/.test(value)) {
-                              setAddress({ ...Address, pincode: value });
-                            }
-                          }}
+                          placeholder="Enter 6-digit Pincode"
+                          maxLength={6}
+                          onChange={handlePincodeChange}
                           value={Address.pincode}
                           required
                         />
+                        {isLoadingAddress && (
+                          <small className="text-info">Loading address details...</small>
+                        )}
+                        {Address.pincode.length === 6 && !isLoadingAddress && !Address.state && (
+                          <small className="text-danger">Invalid pincode or no data found</small>
+                        )}
                       </div>
                     </div>
 
@@ -439,16 +519,11 @@ const AddProjectPopup = ({ handleAdd }) => {
                           maxLength={50}
                           className="form-control rounded-0"
                           placeholder="State"
-                          id="state"
-                          name="state"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (/^[A-Za-z\s]*$/.test(value)) {
-                              setAddress({ ...Address, state: value });
-                            }
-                          }}
+                          onChange={handleStateChange}
                           value={Address.state}
-                          aria-describedby="emailHelp"
+                          style={{ 
+                            backgroundColor: Address.state && !isLoadingAddress ? '#f8f9fa' : 'white' 
+                          }}
                           required
                         />
                       </div>
@@ -461,16 +536,11 @@ const AddProjectPopup = ({ handleAdd }) => {
                           maxLength={50}
                           className="form-control rounded-0"
                           placeholder="City"
-                          id="city"
-                          name="city"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (/^[A-Za-z\s]*$/.test(value)) {
-                              setAddress({ ...Address, city: value });
-                            }
-                          }}
+                          onChange={handleCityChange}
                           value={Address.city}
-                          aria-describedby="emailHelp"
+                          style={{ 
+                            backgroundColor: Address.city && !isLoadingAddress ? '#f8f9fa' : 'white' 
+                          }}
                           required
                         />
                       </div>
@@ -483,16 +553,11 @@ const AddProjectPopup = ({ handleAdd }) => {
                           maxLength={50}
                           className="form-control rounded-0"
                           placeholder="Country"
-                          id="country"
-                          name="country"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (/^[A-Za-z\s]*$/.test(value)) {
-                              setAddress({ ...Address, country: value });
-                            }
-                          }}
+                          onChange={handleCountryChange}
                           value={Address.country}
-                          aria-describedby="emailHelp"
+                          style={{ 
+                            backgroundColor: Address.country && !isLoadingAddress ? '#f8f9fa' : 'white' 
+                          }}
                           required
                         />
                       </div>
@@ -502,11 +567,12 @@ const AddProjectPopup = ({ handleAdd }) => {
                       <div className="mb-3">
                         <textarea
                           className="textarea_edit col-12"
-                          id="address"
                           maxLength={500}
-                          name="add"
                           placeholder="House NO., Building Name, Road Name, Area, Colony"
-                          onChange={(e) => setAddress({ ...Address, add: e.target.value })}
+                          onChange={(e) => setAddress(prevAddress => ({ 
+                            ...prevAddress, 
+                            add: e.target.value 
+                          }))}
                           value={Address.add}
                           rows="2"
                           required
