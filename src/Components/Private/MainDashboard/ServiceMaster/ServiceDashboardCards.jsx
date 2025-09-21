@@ -1,4 +1,4 @@
-const ServiceDashboardCards = ({totalServiceCount, inprogressServiceCount, pendingServiceCount, stuckServiceCount }) => {
+const ServiceDashboardCards = ({totalServiceCount, completeServiceCount, inprogressServiceCount, pendingServiceCount, stuckServiceCount }) => {
   return (
     <div className="row bg-white p-2 m-1 border rounded">
       <div className="col-12 py-1">
@@ -22,7 +22,23 @@ const ServiceDashboardCards = ({totalServiceCount, inprogressServiceCount, pendi
             </div>
           </div> 
      
-
+            <div className="col-12 col-md-3 pb-3 cursor-pointer">
+            <div className="p-4 background_style"   style={{backgroundColor:"#E5F5E5"}}>
+              <div className="row">
+                <div className="col-9">
+                  <h6 className="text-dark card_heading">
+                    Completed Services
+                  </h6>
+                  <h2 className="pt-2 fw-bold card_count">
+                    {completeServiceCount}
+                  </h2>
+                </div>
+                <div className="col-3 d-flex align-items-center justify-content-center">
+                  <img src="./static/assets/img/checked.png" className="img_opacity all_card_img_size" alt="" />
+                </div>
+              </div>
+            </div>
+          </div>
           
           <div className="col-12 col-md-3 pb-3 cursor-pointer">
             <div className="p-4 background_style pinkcolor">

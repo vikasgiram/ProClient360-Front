@@ -10,9 +10,6 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
   const [service, setService] = useState(selectedService);
   const [previousActions, setPreviousActions] = useState([]);
 
-  // const formattedPurchaseOrderDate = formatDateforupdate(projects?.purchaseOrderDate);
-  // const formattedStartDate = formatDateforupdate(projects?.startDate);
-
   useEffect(() => {
     const FetchPreviousActions = async () => {
       try {
@@ -109,6 +106,9 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                     {service.workMode}
                     <p className="fw-bold mt-3"> Created At: </p>
                     {formatDateforupdate(service.ticket.date)}
+                    {/* Add Work Complete Percentage */}
+                    <p className="fw-bold mt-3">Work Complete(%): </p>
+                    {service.complateLevel || 0}%
                   </div>
 
                   {service.status === "Stuck" ? <div className="col-12">
@@ -138,6 +138,8 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                           <th scope="col">Action By</th>
                           <th scope="col">Start Time</th>
                           <th scope="col">End Time</th>
+                          {/* Add Work Complete column */}
+                          <th scope="col">%</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -155,6 +157,8 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                             <td>{action?.actionBy?.name}</td>
                             <td>{formatDate(action?.startTime)}</td>
                             <td>{formatDate(action?.endTime)}</td>
+                            {/* Add Work Complete data */}
+                            <td>{action?.complateLevel || 0}%</td>
                           </tr>
                         ))}
                       </tbody>

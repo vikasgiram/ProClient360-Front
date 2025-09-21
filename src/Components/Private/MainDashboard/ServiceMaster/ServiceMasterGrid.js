@@ -146,6 +146,7 @@ export const ServiceMasterGrid = () => {
                   inprogressServiceCount={data?.statusCounts?.Inprogress || 0}
                   pendingServiceCount={data?.statusCounts?.Pending || 0}
                   stuckServiceCount={data?.statusCounts?.Stuck || 0}
+                  completeServiceCount={data?.statusCounts?.Completed || 0}
                 />
 
                 <div className="col-12 col-lg-6 ms-auto text-end me-2">

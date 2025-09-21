@@ -45,8 +45,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate}) => {
 
   const [showInfo, setShowInfo] = useState(false);
 
-  const [workComplete, setWorkComplete] = useState('');
-
+const [workComplete, setWorkComplete] = useState(selectedService.complateLevel || '');
 
   // Load departments with pagination and search
   const loadDepartments = useCallback(async (page = 1, search = "") => {
@@ -173,11 +172,13 @@ useEffect(() => {
       startTime,
       endTime,
       stuckReason,
-      completeLevel: workComplete,
+      complateLevel: workComplete,
       action,
     };
 
     // console.log(employees);
+
+
     toast.loading("Create Service Action...")
     const data = await createServiceAction(actionData);
     // console.log(selectedService._id,data);
@@ -275,6 +276,8 @@ useEffect(() => {
                         {selectedService.workMode}
                         <p className="fw-bold mt-3"> Created At: </p>
                         {formatDateforupdate(selectedService.ticket.date)}
+                        <p className="fw-bold mt-3">Work Complete(%): </p>
+                        {selectedService.complateLevel}
                       </div>
                     </div>
                   )}

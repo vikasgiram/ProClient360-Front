@@ -459,7 +459,17 @@ useEffect(() => {
                                                 <option value="Guard Tour System">Guard Tour System</option>
                                                 <option value="Home Automation">Home Automation</option>
                                                 <option value="IP PA and Communication System">IP PA and Communication System</option>
-                                                <option value="CRMS">CRMS</option>
+                                                <option value="CRM">CRM</option>
+                                                <option value="KMS">KMS</option>
+                                                <option value="VMS">VMS</option>
+                                                <option value="Boom Barriers System">Boom Barriers System</option>
+                                                <option value="Tripod System">Tripod System</option>
+                                                <option value="Flap Barriers System">Flap Barriers System</option>
+                                                <option value="EPBX System">EPBX System</option>
+                                                <option value="CMS">CMS</option>
+                                                <option value="Lift Eliviter System">Lift Eliviter System</option>
+                                                <option value="AV6">AV6</option>    
+                                                <option value="Walky Talky System">Walky Talky System</option>
                                             </select>
                                         </div>
                                     </div>
