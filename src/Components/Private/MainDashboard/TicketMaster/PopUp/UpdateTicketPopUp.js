@@ -362,6 +362,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         <option value="Lift Eliviter System">Lift Eliiter System</option>
                         <option value="AV6">AV6</option>
                         <option value="Walky Talky System">Walky Talky System</option>
+                        <option value="Device Management System">Device Management System</option>
                       </select>
                     </div>
                   </div>
