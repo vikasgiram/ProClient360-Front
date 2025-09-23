@@ -657,7 +657,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate}) => {
                         <label htmlFor="action" className="form-label label_text">
                           Action & Progress {status !== "Stuck" && <RequiredStar />}
                         </label>
-                        <textarea
+                        <textarea 
                           type="textarea"
                           className="form-control rounded-0"
                           id="action"
