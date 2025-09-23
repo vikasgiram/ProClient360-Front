@@ -9,6 +9,137 @@ import toast from "react-hot-toast";
 const ViewServicePopUp = ({ closePopUp, selectedService }) => {
   const [service, setService] = useState(selectedService);
   const [previousActions, setPreviousActions] = useState([]);
+  const [currentCompletionLevel, setCurrentCompletionLevel] = useState(0);
+
+  // Extract completion percentage from action text if not in complateLevel field
+  const extractCompletionFromAction = (action) => {
+    // First check if complateLevel exists and is valid
+    if (action.complateLevel !== undefined && action.complateLevel !== null && action.complateLevel !== '' && action.complateLevel !== 0) {
+      const level = parseInt(action.complateLevel);
+      return (level >= 0 && level <= 100) ? level : 0;
+    }
+    
+    // If not, try to extract from action text
+    const actionText = (action.action || '').toLowerCase().trim();
+    
+    if (!actionText) return 0;
+    
+    // Pattern 1: Look for "X percent" or "X %" anywhere in text
+    const percentPatterns = [
+      /(\d+)\s*percent/gi,
+      /(\d+)\s*%/gi,
+      /(\d+)\s*per\s*cent/gi
+    ];
+    
+    for (const pattern of percentPatterns) {
+      const matches = actionText.match(pattern);
+      if (matches) {
+        // Get all numbers and return the highest one (most likely the completion)
+        const numbers = matches.map(match => {
+          const num = parseInt(match.match(/\d+/)[0]);
+          return (num >= 0 && num <= 100) ? num : 0;
+        }).filter(num => num > 0);
+        
+        if (numbers.length > 0) {
+          return Math.max(...numbers);
+        }
+      }
+    }
+    
+    // Pattern 2: Check for completion keywords and extract associated numbers
+    const completionKeywords = ['completed', 'complete', 'done', 'finished', 'progress'];
+    const hasCompletionKeyword = completionKeywords.some(keyword => actionText.includes(keyword));
+    
+    if (hasCompletionKeyword) {
+      // Look for any number near completion keywords
+      const numberMatch = actionText.match(/(\d+)/);
+      if (numberMatch) {
+        const num = parseInt(numberMatch[1]);
+        if (num >= 0 && num <= 100) {
+          return num;
+        }
+      }
+      
+      // If just says "completed" or "work completed", treat as 100%
+      if (actionText.match(/^(work\s+)?(completed|complete|done|finished)$/)) {
+        return 100;
+      }
+    }
+    
+    // Pattern 3: Check if it's just a number (like "20", "77", etc.)
+    const justNumberMatch = actionText.match(/^\d+$/);
+    if (justNumberMatch) {
+      const num = parseInt(actionText);
+      if (num >= 0 && num <= 100) {
+        return num;
+      }
+    }
+    
+    // Pattern 4: Look for fractions like "3/4" and convert to percentage
+    const fractionMatch = actionText.match(/(\d+)\s*\/\s*(\d+)/);
+    if (fractionMatch) {
+      const numerator = parseInt(fractionMatch[1]);
+      const denominator = parseInt(fractionMatch[2]);
+      if (denominator > 0) {
+        const percentage = Math.round((numerator / denominator) * 100);
+        return (percentage >= 0 && percentage <= 100) ? percentage : 0;
+      }
+    }
+    
+    // Pattern 5: Look for words like "half", "quarter", etc.
+    const wordToPercent = {
+      'half': 50,
+      'quarter': 25,
+      'three quarter': 75,
+      'three-quarter': 75,
+      'full': 100,
+      'complete': 100
+    };
+    
+    for (const [word, percent] of Object.entries(wordToPercent)) {
+      if (actionText.includes(word)) {
+        return percent;
+      }
+    }
+    
+    // Pattern 6: Advanced number extraction with context
+    const advancedPatterns = [
+      /work\s+(\d+)/i,
+      /(\d+)\s+work/i,
+      /progress\s+(\d+)/i,
+      /(\d+)\s+progress/i,
+      /level\s+(\d+)/i,
+      /(\d+)\s+level/i
+    ];
+    
+    for (const pattern of advancedPatterns) {
+      const match = actionText.match(pattern);
+      if (match) {
+        const num = parseInt(match[1]);
+        if (num >= 0 && num <= 100) {
+          return num;
+        }
+      }
+    }
+    
+    return 0;
+  };
+
+  // Calculate current completion level from service and previous actions
+  const calculateCurrentCompletion = () => {
+    let latestCompletion = parseInt(service.complateLevel) || 0;
+    
+    if (previousActions && previousActions.length > 0) {
+      // Extract completion percentages from all actions
+      const completionLevels = previousActions.map(action => extractCompletionFromAction(action));
+      
+      // Get the highest completion level
+      const maxCompletion = Math.max(latestCompletion, ...completionLevels);
+      latestCompletion = maxCompletion;
+    }
+    
+    setCurrentCompletionLevel(latestCompletion);
+  };
 
   useEffect(() => {
     const FetchPreviousActions = async () => {
@@ -25,11 +156,16 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        toast.dismiss();
       }
     };
 
     FetchPreviousActions();
   }, [selectedService._id]);
+
+  useEffect(() => {
+    calculateCurrentCompletion();
+  }, [service, previousActions]);
 
   const formattedDate = formatDateforupdate(service?.allotmentDate);
 
@@ -106,9 +242,9 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                     {service.workMode}
                     <p className="fw-bold mt-3"> Created At: </p>
                     {formatDateforupdate(service.ticket.date)}
-                    {/* Add Work Complete Percentage */}
+                    {/* Updated Work Complete Percentage with computed value */}
                     <p className="fw-bold mt-3">Work Complete(%): </p>
-                    {service.complateLevel || 0}%
+                    <span className="badge bg-primary">{currentCompletionLevel}%</span>
                   </div>
 
                   {service.status === "Stuck" ? <div className="col-12">
@@ -138,29 +274,70 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                           <th scope="col">Action By</th>
                           <th scope="col">Start Time</th>
                           <th scope="col">End Time</th>
-                          {/* Add Work Complete column */}
-                          <th scope="col">%</th>
+                          {/* Updated % column */}
+                          <th scope="col">Progress</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {previousActions.map((action, index) => (
-                          <tr key={action._id}>
-                            <td>{index + 1}</td>
-                            <td
-                              className="text-start text-wrap w-100"
-                              style={{
-                                maxWidth: "22rem",
-                              }}
-                            >
-                              {action?.action}
-                            </td>
-                            <td>{action?.actionBy?.name}</td>
-                            <td>{formatDate(action?.startTime)}</td>
-                            <td>{formatDate(action?.endTime)}</td>
-                            {/* Add Work Complete data */}
-                            <td>{action?.complateLevel || 0}%</td>
-                          </tr>
-                        ))}
+                        {previousActions.map((action, index) => {
+                          const completionPercent = extractCompletionFromAction(action);
+                          return (
+                            <tr key={action._id}>
+                              <td>{index + 1}</td>
+                              <td
+                                className="text-start text-wrap w-100"
+                                style={{
+                                  maxWidth: "22rem",
+                                }}
+                              >
+                                {action?.action}
+                              </td>
+                              <td>{action?.actionBy?.name}</td>
+                              <td>{formatDate(action?.startTime)}</td>
+                              <td>{formatDate(action?.endTime)}</td>
+                              <td>
+                                <div className="d-flex flex-column align-items-center">
+                                  {completionPercent > 0 ? (
+
+      <span className={`badge mb-1 ${
+
+        completionPercent >= 100 ? 'bg-success' :
+
+        completionPercent >= 75 ? 'bg-primary' :
+
+        completionPercent >= 50 ? 'bg-warning' : 
+
+        completionPercent > 0 ? 'bg-info' : 'bg-secondary'
+
+      }`}>
+
+        {completionPercent}%
+
+      </span>
+
+    ) : (
+
+      <span className="text-muted">-</span>
+
+    )}
+                                  {completionPercent > 0 && (
+                                    <div className="progress" style={{ width: '60px', height: '4px' }}>
+                                      <div 
+                                        className={`progress-bar ${
+                                          completionPercent >= 100 ? 'bg-success' :
+                                          completionPercent >= 75 ? 'bg-primary' :
+                                          completionPercent >= 50 ? 'bg-warning' : 'bg-info'
+                                        }`}
+                                        role="progressbar"
+                                        style={{ width: `${completionPercent}%` }}
+                                      ></div>
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
