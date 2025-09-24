@@ -1,6 +1,5 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Turnstile, { useTurnstile } from "react-turnstile";
 import "././login.css";
 import toast from "react-hot-toast";
 import { loginUser } from "../../hooks/useAuth";
@@ -13,7 +12,6 @@ export const LogIn = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [tokenCF, setTokenCF] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { setUser } = useContext(UserContext);
@@ -46,9 +44,8 @@ export const LogIn = () => {
     const fcmToken = localStorage.getItem("fcmToken");
     setLoading(true);
     try {
-   
-      const data = await loginUser(username, password, fcmToken, tokenCF);
-      // console.log(username,password);
+      // Updated to not include tokenCF
+      const data = await loginUser(username, password, fcmToken);
       setUser(data);
       if (data.newUser === true) {
         toast.success("Please complete your profile to continue.");
@@ -60,8 +57,6 @@ export const LogIn = () => {
       } else if (data.user === "admin") {
         navigation("/AdminMainDashboard");
       }
-
-
     } catch (error) {
       console.error(error);
       toast.error("Something Went Wrong...");
@@ -70,7 +65,6 @@ export const LogIn = () => {
       setLoading(false);
     }
   };
-
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -85,8 +79,6 @@ export const LogIn = () => {
     });
   }, []);
 
-
-
   const showForgotPassword = () => {
     navigation('/ForgotPassword')
   };
@@ -94,9 +86,6 @@ export const LogIn = () => {
   const showSignUp = () => {
     alert('Demo: Sign Up\n\nIn a real application, this would redirect to a registration page.');
   };
-
-
-
 
   const DashboardIcon = () => (
     <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -128,34 +117,19 @@ export const LogIn = () => {
     </svg>
   );
 
-  // Eye icons for password visibility toggle
-
   const EyeIcon = () => (
-
     <svg className="w-5 h-5 text-dark" fill="currentColor" viewBox="0 0 20 20">
-
       <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-
       <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-
     </svg>
-
   );
-
 
   const EyeOffIcon = () => (
-
     <svg className="w-5 h-5 text-dark" fill="currentColor" viewBox="0 0 20 20">
-
       <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
-
       <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-
     </svg>
-
   );
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden relative font-[Inter] loginbody_text">
@@ -204,12 +178,11 @@ export const LogIn = () => {
           <div className="w-full max-w-md mx-auto">
             <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 slide-in" style={{ animationDelay: '0.3s' }}>
               <div className="text-center mb-8">
-              
-                 <img
-                        src={ "./static/assets/img/Proclient360_Originalon.svg"}
-                        className="logo_new mx-auto mb-2"
-                        alt="logo"
-                    />
+                <img
+                  src={ "./static/assets/img/Proclient360_Originalon.svg"}
+                  className="logo_new mx-auto mb-2"
+                  alt="logo"
+                />
                 <h2 className="text-3xl font-bold text-gray-800">Welcome Back</h2>
                 <p className="text-gray-600 mt-2">Sign in to your ProjectFlow account</p>
               </div>
@@ -217,12 +190,10 @@ export const LogIn = () => {
 
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    {/* <Icon /> */}
                     <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                       <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                     </svg>
-
                   </div>
                   <input
                     type='email'
@@ -237,7 +208,6 @@ export const LogIn = () => {
 
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    {/* <Icon /> */}
                     <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                     </svg>
@@ -252,29 +222,13 @@ export const LogIn = () => {
                     className="input-focus w-full pl-12 pr-4 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-gray-50/50"
                   />
 
-                   <button
+                  <button
                     type="button"
                     className="absolute inset-y-0 right-0 pr-4 flex items-center"
                     onClick={toggleShowPassword}
                   >
                     {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
-
-                </div>
-
-                <div className="relative">
-                  <Turnstile
-                    sitekey='0x4AAAAAABpMCbyANmHy1Yyb'
-                    onSuccess={(token) => {
-                      setTokenCF(token);
-                    }}
-                    onExpire={() => setTokenCF("")}
-                    onError={() => setTokenCF("")}
-                    theme="light"
-                    refreshExpired='auto'
-                    size="flexible"
-                    style={{width:'385px',}}
-                  />
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -286,17 +240,17 @@ export const LogIn = () => {
                 <button 
                   type="submit" 
                   className="btn-hover w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-2xl font-semibold text-lg shadow-lg d-flex align-items-center justify-content-center"
-                  disabled={loading || !tokenCF}
+                  disabled={loading}
                 >
                   {loading ? (
                     <span className="loader"
                       style={{
                         height: "5px",
                         width: "5px",
-                        position: 'relative', // Make button position relative to position loader
+                        position: 'relative',
                         margin: "10px 0px 5px -225px"
                       }}
-                    ></span> // Use your existing loader styles
+                    ></span>
                   ) : (
                     " Sign In"
                   )}
@@ -324,5 +278,4 @@ export const LogIn = () => {
       </div>
     </div>
   );
-
 };
