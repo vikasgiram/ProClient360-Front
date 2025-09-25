@@ -324,7 +324,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate}) => {
 
     actionData = {
       service: selectedService._id,
-      actionStatus: status,
+      status,
       startTime,
       endTime,
       stuckReason,
