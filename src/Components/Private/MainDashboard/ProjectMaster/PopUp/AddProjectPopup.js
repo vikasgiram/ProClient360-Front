@@ -369,7 +369,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                       <option value="CRM">CRM</option>
                       <option value="KMS">KMS</option>
                       <option value="VMS">VMS</option>
-                      <option value="Boom Barriers System">Boom Barrier System</option>  
+                      <option value="Boom Barrier System">Boom Barrier System</option>  
                       <option value="Tripod System">Tripod System</option>
                       <option value="Flap Barriers System">Flap Barrier System</option>
                       <option value="EPBX System">EPBX System</option>
