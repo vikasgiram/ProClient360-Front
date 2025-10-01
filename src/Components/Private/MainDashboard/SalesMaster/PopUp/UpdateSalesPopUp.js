@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { RequiredStar } from '../../../RequiredStar/RequiredStar';
 import useUpdateLead from '../../../../../hooks/leads/useUpdateLead';
@@ -108,18 +108,24 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
 };
 
 const actionOptions = [
-    '1. Requirement Understanding',
-    '2. Site Visit',
-    '3. Online Demo',
-    '4. Proof of Concept (POC)',
-    '5. Documentation & Planning',
-    '6. Quotation Submission',
-    '7. Quotation Discussion',
-    '8. Follow-Up Call',
-    '9. Negotiation Call',
-    '10. Negotiation Meetings',
-    '11. Deal Status'
+    '1. Call Not Connect/ Callback',
+    '2. Requirement Understanding',
+    '3. Site Visit',
+    '4. Online Demo',
+    '5. Proof of Concept (POC)',
+    '6. Documentation & Planning',
+    '7. Quotation Submission',
+    '8. Quotation Discussion',
+    '9. Follow-Up Call',
+    '10. Negotiation Call',
+    '11. Negotiation Meetings',
+    '12. Deal Status',
+    '13. Won',
+    '14. Lost'
 ];
+
+// Define steps that should automatically set completion to 100%
+const finalSteps = ['13. Won', '14. Lost'];
 
 const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
   const [showInfo, setShowInfo] = useState(isCompany);
@@ -131,6 +137,9 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     quotation: '',
     rem: ''
   });
+  
+  // State for previous actions history
+  const [previousActions, setPreviousActions] = useState([]);
 
   const useUpdate = useUpdateLead();
 
@@ -144,12 +153,76 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
         quotation: selectedLead?.quotation?.toString() || selectedLead?.actionDetails?.quotation?.toString() || '0',
         rem: selectedLead?.rem || selectedLead?.actionDetails?.rem || ''
       });
+      
+      // Initialize previous actions from multiple possible sources
+      let actions = [];
+      
+      // Check for previousActions in selectedLead
+      if (selectedLead.previousActions && selectedLead.previousActions.length > 0) {
+        actions = [...selectedLead.previousActions];
+      } 
+      // Check for actionHistory in selectedLead
+      else if (selectedLead.actionHistory && selectedLead.actionHistory.length > 0) {
+        actions = [...selectedLead.actionHistory];
+      }
+      
+      // If no history exists, create initial action from current lead data
+      if (actions.length === 0) {
+        const initialAction = {
+          _id: 'initial-' + Date.now(),
+          status: selectedLead.status || selectedLead?.STATUS || 'Pending',
+          step: selectedLead.step || 'Initial',
+          nextFollowUpDate: selectedLead.nextFollowUpDate || null,
+          rem: selectedLead.rem || '',
+          completion: selectedLead.complated || 0,
+          quotation: selectedLead.quotation || 0,
+          createdAt: selectedLead.createdAt || new Date().toISOString(),
+          actionBy: {
+            name: selectedLead.assignedTo?.name || "System"
+          }
+        };
+        actions.push(initialAction);
+      }
+      
+      // Sort actions by creation date to ensure chronological order
+      actions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      
+      setPreviousActions(actions);
     }
   }, [selectedLead]);
 
   const handleActionChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'completion') {
+    
+    if (name === 'actionType') {
+      // If a final step is selected, automatically set completion to 100%
+      const isFinalStep = finalSteps.includes(value);
+      setActionData(prev => ({ 
+        ...prev, 
+        [name]: value,
+        completion: isFinalStep ? '100' : prev.completion
+      }));
+      
+      // Also update status if it's a final step
+      if (isFinalStep) {
+        if (value === '13. Won') {
+          setActionData(prev => ({ 
+            ...prev, 
+            [name]: value,
+            completion: '100',
+            status: 'Won'
+          }));
+        } else if (value === '14. Lost') {
+          setActionData(prev => ({ 
+            ...prev, 
+            [name]: value,
+            completion: '100',
+            status: 'Lost'
+          }));
+        }
+      }
+    } 
+    else if (name === 'completion') {
       if (/^\d{0,3}(\.\d{0,2})?$/.test(value)) {
         const num = parseFloat(value);
         if (value === "" || (num >= 0 && num <= 100)) {
@@ -167,10 +240,26 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
 
   const handleActionSubmit = (e) => {
     e.preventDefault();
-    const isQuotationRequired = actionData.actionType === '6. Quotation Submission';
+    const isQuotationRequired = actionData.actionType === '7. Quotation Submission';
     
-    if (!actionData.status || !actionData.actionType || !actionData.date || !actionData.completion || 
-        (isQuotationRequired && !actionData.quotation)) {
+    // Validation based on status
+    let requiredFields = ['status', 'actionType'];
+    
+    if (actionData.status !== 'Lost' && actionData.status !== 'Won') {
+      requiredFields.push('date');
+    }
+    
+    if (actionData.status !== 'Lost') {
+      requiredFields.push('completion');
+    }
+    
+    if (isQuotationRequired) {
+      requiredFields.push('quotation');
+    }
+    
+    const hasEmptyRequiredField = requiredFields.some(field => !actionData[field]);
+    
+    if (hasEmptyRequiredField) {
       toast.error('Please fill in all required fields.');
       return;
     }
@@ -193,9 +282,36 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
 
     console.log("Updated Form Data:", updatedFormData);
 
+    // Create new action object for history
+    const newAction = {
+      _id: Date.now().toString(), // Generate a temporary ID
+      status: actionData.status,
+      step: actionData.actionType,
+      nextFollowUpDate: actionData.date,
+      rem: actionData.rem || '',
+      completion: actionData.completion ? parseFloat(actionData.completion) : 0,
+      quotation: actionData.quotation ? parseFloat(actionData.quotation) : 0,
+      actionBy: {
+        name: "Current User" // Replace with actual user info if available
+      },
+      createdAt: new Date().toISOString()
+    };
+
+    // Add to previous actions
+    const updatedPreviousActions = [...previousActions, newAction];
+    // Sort by creation date to maintain chronological order
+    updatedPreviousActions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    setPreviousActions(updatedPreviousActions);
+    
+    // Include previous actions in the update
+    const formDataWithHistory = {
+      ...updatedFormData,
+      previousActions: updatedPreviousActions
+    };
+
     //api call to store updated data
-    useUpdate.updateLead(selectedLead?._id, updatedFormData);
-    onUpdate(selectedLead._id, updatedFormData);
+    useUpdate.updateLead(selectedLead?._id, formDataWithHistory);
+    onUpdate(selectedLead._id, formDataWithHistory);
 
     onClose();
   };
@@ -220,106 +336,131 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
               </div>
             </div>
 
-            {!isCompany&&<button
-              type="button"
-              className="btn btn-sm rounded-0 btn-outline-success d-flex align-items-center ms-auto me-4 justify-content-end"
-              onClick={() => setShowInfo(!showInfo)}
-            >
-              {showInfo ? "Hide Info" : "Show Info"}
-            </button>}
+            {!isCompany && (
+              <button
+                type="button"
+                className="btn btn-sm rounded-0 btn-outline-success d-flex align-items-center ms-auto me-4 justify-content-end"
+                onClick={() => setShowInfo(!showInfo)}
+              >
+                {showInfo ? "Hide Info" : "Show Info"}
+              </button>
+            )}
 
             <div className="modal-body" style={{ maxHeight: '45vh', overflowY: 'auto' }}>
               {showInfo && <LeadInfoView selectedLead={selectedLead} actionData={actionData} />}
-              {!isCompany && (<div className={`text-muted border-top pb-2 mb-3 ${showInfo ? 'pt-3 mt-4' : 'pt-0 mt-0'}`}>
-                <h5>
-                  Work Data
-                </h5>
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <label htmlFor="status" className="form-label fw-bold">Status<RequiredStar /></label>
-                    <select id="status" className="form-select bg_edit" name="status" onChange={handleActionChange} value={actionData.status} required>
-                      <option value="" disabled>-- Select a status --</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Ongoing">Ongoing</option>
-                      <option value="Won">Won</option>
-                      <option value="Lost">Lost</option>
-                    </select>
-                  </div>
+              
+              {!isCompany && (
+                <>
+                  <div className={`text-muted border-top pb-2 mb-3 ${showInfo ? 'pt-3 mt-4' : 'pt-0 mt-0'}`}>
+                    <h5>Work Data</h5>
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <label htmlFor="status" className="form-label fw-bold">Status<RequiredStar /></label>
+                        <select 
+                          id="status" 
+                          className="form-select bg_edit" 
+                          name="status" 
+                          onChange={handleActionChange} 
+                          value={actionData.status} 
+                          required
+                        >
+                          <option value="" disabled>-- Select a status --</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Ongoing">Ongoing</option>
+                          <option value="Won">Won</option>
+                          <option value="Lost">Lost</option>
+                        </select>
+                      </div>
 
-                  <div className="col-md-6">
-                    <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar /></label>
-                    <select id="actionType" name="actionType" className="form-select" value={actionData.actionType} onChange={handleActionChange} required>
-                      <option value="" disabled>-- Select an action --</option>
-                      {actionOptions.map((action, index) => (
-                        <option key={index} value={action}>{action}</option>
-                      ))}
-                    </select>
-                  </div>            
+                      <div className="col-md-6">
+                        <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar /></label>
+                        <select 
+                          id="actionType" 
+                          name="actionType" 
+                          className="form-select" 
+                          value={actionData.actionType} 
+                          onChange={handleActionChange} 
+                          required
+                        >
+                          <option value="" disabled>-- Select an action --</option>
+                          {actionOptions.map((action, index) => (
+                            <option key={index} value={action}>{action}</option>
+                          ))}
+                        </select>
+                      </div>            
 
-                  <div className="col-md-6">
-                    <label htmlFor="completion" className="form-label fw-bold">Completion (%)<RequiredStar /></label>
-                    <input 
-                      type="text" 
-                      className="form-control" 
-                      id="completion" 
-                      name="completion" 
-                      placeholder="Enter work completion %" 
-                      maxLength={6} 
-                      value={actionData.completion} 
-                      onChange={handleActionChange} 
-                      required 
-                    />
-                  </div>
+                      {/* Hide completion field when status is Lost */}
+                      {actionData.status !== 'Lost' && (
+                        <div className="col-md-6">
+                          <label htmlFor="completion" className="form-label fw-bold">Completion (%)<RequiredStar /></label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            id="completion" 
+                            name="completion" 
+                            placeholder="Enter work completion %" 
+                            maxLength={6} 
+                            value={actionData.completion} 
+                            onChange={handleActionChange} 
+                            required={actionData.status !== 'Lost'}
+                          />
+                        </div>
+                      )}
 
-                  {actionData.actionType === '6. Quotation Submission' && (
-                    <div className="col-md-6">
-                      <label htmlFor="quotation" className="form-label fw-bold">Quotation Amount (₹)<RequiredStar /></label>
-                      <input 
-                        type="text" 
-                        className="form-control" 
-                        id="quotation" 
-                        name="quotation" 
-                        placeholder="Enter quotation amount" 
-                        value={actionData.quotation}
-                        onChange={handleActionChange} 
-                        required 
-                      />
+                      {/* Show quotation field when Quotation Submission is selected */}
+                      {actionData.actionType === '7. Quotation Submission' && (
+                        <div className="col-md-6">
+                          <label htmlFor="quotation" className="form-label fw-bold">Quotation Amount (₹)<RequiredStar /></label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            id="quotation" 
+                            name="quotation" 
+                            placeholder="Enter quotation amount" 
+                            value={actionData.quotation}
+                            onChange={handleActionChange} 
+                            required 
+                          />
+                        </div>
+                      )}
+
+                      {/* Hide next follow-up date when status is Won or Lost */}
+                      {actionData.status !== 'Won' && actionData.status !== 'Lost' && (
+                        <div className="col-md-6">
+                          <label htmlFor="date" className="form-label fw-bold">Next Follow-up Date<RequiredStar /></label>
+                          <input 
+                            id="date" 
+                            type="datetime-local" 
+                            className="form-control bg_edit" 
+                            name="date" 
+                            value={actionData.date || ''} 
+                            onChange={handleActionChange} 
+                            required={actionData.status !== 'Won' && actionData.status !== 'Lost'}
+                          />
+                        </div>
+                      )}
+
+                      <div className="col-12">
+                        <label htmlFor="remark" className="form-label fw-bold">Remark</label>
+                        <textarea 
+                          id="rem" 
+                          name="rem"
+                          className="form-control" 
+                          placeholder="Enter your remarks here..." 
+                          rows="3"
+                          value={actionData.rem} 
+                          onChange={handleActionChange}
+                        />
+                      </div>
                     </div>
-                  )}
-
-                  <div className="col-md-6">
-                    <label htmlFor="date" className="form-label fw-bold">Next Follow-up Date<RequiredStar /></label>
-                    <input 
-                      id="date" 
-                      type="datetime-local" 
-                      className="form-control bg_edit" 
-                      name="date" 
-                      value={actionData.date || ''} 
-                      onChange={handleActionChange} 
-                      required 
-                    />
                   </div>
-
-                  <div className="col-12">
-                    <label htmlFor="remark" className="form-label fw-bold">Remark</label>
-                    <textarea 
-                      id="rem" 
-                      name="rem"
-                      className="form-control" 
-                      placeholder="Enter your remarks here..." 
-                      rows="3"
-                      value={actionData.rem} 
-                      onChange={handleActionChange}
-                    />
-                  </div>
-                </div>
-            
+                </>
+              )}
+            </div>
 
             <div className="modal-footer border-0 justify-content-start mt-3">
               <button type="submit" className="btn addbtn rounded-0 add_button px-4">Submit</button>
               <button type="button" onClick={onClose} className="btn addbtn rounded-0 Cancel_button px-4">Cancel</button>
-            </div>
-            </div>)}
             </div>
           </form>
         </div>
