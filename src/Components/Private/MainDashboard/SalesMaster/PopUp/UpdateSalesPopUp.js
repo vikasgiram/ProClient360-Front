@@ -121,7 +121,8 @@ const actionOptions = [
     '11. Negotiation Meetings',
     '12. Deal Status',
     '13. Won',
-    '14. Lost'
+    '14. Lost',
+    '15. Not Feasible'
 ];
 
 // Define steps that should automatically set completion to 100%
@@ -143,8 +144,10 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
 
   const useUpdate = useUpdateLead();
 
+  // Initialize or update previous actions when selectedLead changes
   useEffect(() => {
     if (selectedLead) {
+      // Set form data based on selected lead
       setActionData({
         actionType: selectedLead?.actionDetails?.step || selectedLead?.step || '',
         date: selectedLead?.actionDetails?.followUpDate || selectedLead?.nextFollowUpDate || '',
@@ -301,6 +304,8 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     const updatedPreviousActions = [...previousActions, newAction];
     // Sort by creation date to maintain chronological order
     updatedPreviousActions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    
+    // Update the state with the new actions list
     setPreviousActions(updatedPreviousActions);
     
     // Include previous actions in the update
@@ -314,6 +319,17 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     onUpdate(selectedLead._id, formDataWithHistory);
 
     onClose();
+  };
+
+  // Helper function to format dates for display
+  const formatDateForDisplay = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('en-IN', options);
+    } catch (error) {
+      return dateString;
+    }
   };
 
   return (
@@ -457,6 +473,39 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                 </>
               )}
             </div>
+
+            {/* Action History Table */}
+            {previousActions.length > 0 && (
+              <div className="px-3">
+                <h6 className="text-muted border-bottom pb-2 mb-3">Action History</h6>
+                <div className="table-responsive" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                  <table className="table table-sm table-hover">
+                    <thead className="sticky-top bg-light">
+                      <tr>
+                        <th scope="col" className="text-center">Sr.No</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Steps</th>
+                        <th scope="col" className="text-center">Completion</th>
+                        <th scope="col">Next Follow-up Date</th>
+                        <th scope="col">Remark</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {previousActions.map((action, index) => (
+                        <tr key={action._id || index}>
+                          <td className="text-center">{index + 1}</td>
+                          <td>{action.status}</td>
+                          <td>{action.step}</td>
+                          <td className="text-center">{action.completion}%</td>
+                          <td>{formatDateForDisplay(action.nextFollowUpDate)}</td>
+                          <td>{action.rem}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             <div className="modal-footer border-0 justify-content-start mt-3">
               <button type="submit" className="btn addbtn rounded-0 add_button px-4">Submit</button>
