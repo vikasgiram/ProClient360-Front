@@ -472,6 +472,11 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                   </div>
                 </>
               )}
+
+                <div className="modal-footer border-0 justify-content-start mt-3">
+              <button type="submit" className="btn addbtn rounded-0 add_button px-4">Submit</button>
+              <button type="button" onClick={onClose} className="btn addbtn rounded-0 Cancel_button px-4">Cancel</button>
+            </div>
             </div>
 
             {/* Action History Table */}
@@ -487,7 +492,8 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         <th scope="col">Steps</th>
                         <th scope="col" className="text-center">Completion</th>
                         <th scope="col">Next Follow-up Date</th>
-                        <th scope="col">Remark</th>
+                        <th scope="col">Remark</th> 
+                        <th scope="col">Quotation</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -499,6 +505,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                           <td className="text-center">{action.completion}%</td>
                           <td>{formatDateForDisplay(action.nextFollowUpDate)}</td>
                           <td>{action.rem}</td>
+                          <td>{action.quotation}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -507,10 +514,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
               </div>
             )}
 
-            <div className="modal-footer border-0 justify-content-start mt-3">
-              <button type="submit" className="btn addbtn rounded-0 add_button px-4">Submit</button>
-              <button type="button" onClick={onClose} className="btn addbtn rounded-0 Cancel_button px-4">Cancel</button>
-            </div>
           </form>
         </div>
       </div>
