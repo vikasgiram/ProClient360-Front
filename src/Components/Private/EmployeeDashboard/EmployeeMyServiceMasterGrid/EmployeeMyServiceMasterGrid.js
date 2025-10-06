@@ -34,33 +34,34 @@ export const EmployeeMyServiceMasterGrid = () => {
     currentPage: 1,
     totalPages: 0,
     totalServices: 0,
-    limit: 20,
+    limit: 10,
     hasNextPage: false,
     hasPrevPage: false,
   });
 
-  const itemsPerPage = 20;
+  const itemsPerPage = 10;
 
   // Use hooks
   const { data, loading, error } = useMyServices(pagination.currentPage, itemsPerPage, filters);
   const { deleteService, loading: deleteLoading } = useDeleteService();
 
   // Update state with fetched data
-  useEffect(() => {
-    if (data) {
-      setPagination(data.pagination || {
-        currentPage: 1,
-        totalPages: 0,
-        totalServices: 0,
-        limit: itemsPerPage,
-        hasNextPage: false,
-        hasPrevPage: false,
-      });
-    }
-    if (error) {
-      toast.error(error);
-    }
-  }, [data, error]);
+// Update state with fetched data
+useEffect(() => {
+  if (data && data.pagination) {
+    setPagination({
+      currentPage: data.pagination.currentPage,
+      totalPages: data.pagination.totalPages,
+      totalServices: data.pagination.totalRecords,
+      limit: data.pagination.limit,
+      hasNextPage: data.pagination.hasNextPage,
+      hasPrevPage: data.pagination.hasPrevPage,
+    });
+  }
+  if (error) {
+    toast.error(error);
+  }
+}, [data, error]);
 
   // Event Handlers
   const handlePageChange = (page) => {

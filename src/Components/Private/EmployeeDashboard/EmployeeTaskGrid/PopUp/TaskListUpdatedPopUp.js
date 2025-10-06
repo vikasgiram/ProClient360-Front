@@ -322,7 +322,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
                   {isVisible && (
                     <div className="  bg-white ms-1 rounded p-lg-3">
-                      <div className="col-12" style={{ maxWidth: '55vw', width: '55vw' }}>
+                      <div className="col-12" style={{ maxWidth: '100vw', width: '84vw' }}>
                         <div className="mb-2">
                           <small className="text-muted">
                             <i className="fa-solid fa-info-circle me-1"></i>
