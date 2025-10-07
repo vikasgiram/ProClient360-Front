@@ -12,7 +12,7 @@ import Select from "react-select";
 import { useParams, useNavigate } from "react-router-dom";
 import { getTaskSheet, createTaskSheet, deleteTaskSheet } from "../../../../hooks/useTaskSheet";
 import toast from "react-hot-toast";
-import { getTask } from "../../../../hooks/useTask";
+import { getTask, getAllTasksForDropdown } from "../../../../hooks/useTask"; // UPDATED IMPORT
 import { getEmployees } from "../../../../hooks/useEmployees";
 // Removed department import
 import AddTaskPopUp from "../TaskMaster/PopUp/AddTaskPopUp";
@@ -192,11 +192,12 @@ export const TaskSheetMaster = () => {
     fetchData();
   }, [id, renderPage]);
 
+  // UPDATED useEffect - Fetch all tasks for dropdown
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getTask();
+        const data = await getAllTasksForDropdown(); // CHANGED THIS LINE
         if (data) {
           setTaskDropDown(data.task || []);
         }
@@ -340,25 +341,13 @@ export const TaskSheetMaster = () => {
                             ))}
                           <option value="AddNewTask" >-- Add New Task --</option>
                         </select>
-                        {/* <button
-                          onClick={() => {
-                            handleAddTaskName();
-                          }}
-                          type="button"
-                          className="btn adbtn btn-success px-4 me-sm-4 mx-auto"
-                        >
-                          {" "}
-                          <i className="fa-solid fa-plus" 
-                        
-                          ></i> Add Task
-                        </button> */}
                       </div>
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3">
                       <div className="mb-3">
                         <label
-                          for="startDate"
+                          htmlFor="startDate"
                           className="form-label label_text"
                         >
                           Start Date <RequiredStar/>
@@ -377,7 +366,7 @@ export const TaskSheetMaster = () => {
 
                     <div className="col-12 col-md-6 col-lg-3">
                       <div className="mb-3">
-                        <label for="endDate" className="form-label label_text">
+                        <label htmlFor="endDate" className="form-label label_text">
                           End Date <RequiredStar/>
                         </label>
                         <input
@@ -445,7 +434,7 @@ export const TaskSheetMaster = () => {
                     <div className="col-12 col-md-6 col-lg-3">
                       <div className="mb-3">
                         <label
-                          for="ProjectName"
+                          htmlFor="ProjectName"
                           className="form-label label_text"
                         >
                           Remark
@@ -572,7 +561,7 @@ export const TaskSheetMaster = () => {
 
                                   <tbody>
                                     {forTask && forTask.map((action) => (
-                                      <tr className="text-center" >
+                                      <tr className="text-center" key={action._id}>
                                         <td>{action.action}</td>
                                         <td>{action.actionBy.name}</td>
                                         <td>{formatDateforEditAction(action.startTime)}</td>
@@ -603,7 +592,7 @@ export const TaskSheetMaster = () => {
                                     ))}
 
                                   </tbody>
-                                ) : (<h6 style={{ marginLeft: "450px" }}>No Action performed....</h6>)}
+                                ) : (<tbody><tr><td colSpan="5"><h6 className="text-center">No Action performed....</h6></td></tr></tbody>)}
                               </table>
                             </div>
                           </div>

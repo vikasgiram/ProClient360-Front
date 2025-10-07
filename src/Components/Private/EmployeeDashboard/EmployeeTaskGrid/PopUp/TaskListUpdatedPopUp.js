@@ -225,7 +225,6 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
   return (
     <>
-    
      <style>
         {`
           .hidden-scrollbar::-webkit-scrollbar {
@@ -240,6 +239,24 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
             -ms-overflow-style: none;
             scrollbar-width: none;
           }
+          
+          .table td {
+            max-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          
+          .table td:first-child {
+            white-space: normal;
+            word-wrap: break-word;
+          }
+          
+          @media (max-width: 768px) {
+            .table {
+              font-size: 0.8rem;
+            }
+          }
         `}
       </style>
 
@@ -251,8 +268,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
           backgroundColor: "#00000090",
         }}
       >
-        {/* Only responsive changes: removed fixed widths, added responsive classes */}
-        <div className="modal-dialog modal-xl w-100" style={{ maxWidth: '90vw', margin: '1rem auto' }}>
+        <div className="modal-dialog modal-xl w-100" style={{ maxWidth: '95vw', margin: '1rem auto' }}>
           <div className="modal-content p-3" style={{ maxHeight: '95vh', overflowY: 'auto' }}>
             <form>
               <div className="modal-header pt-0">
@@ -306,7 +322,6 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                   </Steps>
                 </span>
 
-                {/* Responsive changes: removed fixed widths */}
                 <div className="row modal_body_height mt-2">                 
                    <div className="col-12 align-items-center">
 
@@ -321,37 +336,36 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                   </div>
 
                   {isVisible && (
-                    <div className="  bg-white ms-1 rounded p-lg-3">
-                      <div className="col-12" style={{ maxWidth: '100vw', width: '84vw' }}>
+                    <div className="bg-white ms-1 rounded p-lg-3">
+                      <div className="col-12" style={{ maxWidth: '100%', overflowX: 'hidden' }}>
                         <div className="mb-2">
                           <small className="text-muted">
                             <i className="fa-solid fa-info-circle me-1"></i>
                             Scroll down to load more actions
                           </small>
                         </div>
-                        <div className="shadow_custom ">
+                        <div className="shadow_custom">
                           <div 
                             className="table-responsive hidden-scrollbar"
                             ref={tableContainerRef}
                             onScroll={handleScroll}
                             style={{ 
                               maxHeight: '400px', 
+                              overflowX: 'auto',
                               overflowY: 'auto',
                               border: '1px solid #dee2e6',
                               borderRadius: '0.375rem'
-                              // scrollbarWidth: 'thin',
-                              // scrollbarColor: '#6c757d #f8f9fa'
                             }}
                           >
-                            <table className="table align-items-center table-flush" >
-                              <thead className="thead-light sticky-top" style={{ backgroundColor: '#f8f9fa' }}>
-                                <tr >
-                                  <th className="text-center">Action</th>
-                                  <th className="text-center">Action By</th>
-                                  <th className="text-center">Start Date</th>
-                                  <th className="text-center">End Date</th>
-                                  <th className="text-center">Completed</th>
-                                  <th className="text-center">Edit</th>
+                            <table className="table align-items-center table-flush table-bordered">
+                              <thead className="thead-light sticky-top bg-light">
+                                <tr>
+                                  <th className="text-center w-25">Action</th>
+                                  <th className="text-center w-15">Action By</th>
+                                  <th className="text-center w-15">Start Date</th>
+                                  <th className="text-center w-15">End Date</th>
+                                  <th className="text-center w-10">Completed</th>
+                                  <th className="text-center w-10">Edit</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -359,20 +373,22 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                                 {actionHistory &&
                                   actionHistory.map((action, index) => (
                                     <tr className="text-center" key={action?._id}>
-                                      <td style={{ wordBreak: 'break-word', maxWidth: '200px' }}>{action?.action}</td>
-                                      <td>{action?.actionBy?.name}</td>
-                                      <td>{formatDateforTaskUpdate(action?.startTime)}</td>
-                                      <td>{formatDateforTaskUpdate(action?.endTime)}</td>
+                                      <td className="text-break">{action?.action}</td>
+                                      <td className="text-truncate">{action?.actionBy?.name}</td>
+                                      <td className="text-nowrap">{formatDateforTaskUpdate(action?.startTime)}</td>
+                                      <td className="text-nowrap">{formatDateforTaskUpdate(action?.endTime)}</td>
                                       <td>{action?.complated}%</td>
-                                      <td>  {index ===
-                                        actionHistory.length - 1 && (
+                                      <td>
+                                        {index === actionHistory.length - 1 && (
                                           <button
                                             type="button"
                                             onClick={() => editTask(action)}
+                                            className="btn btn-sm btn-link p-0"
                                           >
                                             <i className="fa-solid fa-pen-to-square"></i>
                                           </button>
-                                        )}</td>
+                                        )}
+                                      </td>
                                     </tr>
                                   ))}
                                 {isLoadingMore && (

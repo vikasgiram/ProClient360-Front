@@ -30,6 +30,28 @@ const getTask = async (page = 1, limit = 20, search = "") => {
   }
 };
 
+// ADD THIS NEW FUNCTION
+const getAllTasksForDropdown = async () => {
+  try {
+    const response = await axios.get(`${url}?limit=1000`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    const data = response.data;
+
+    if (data.error) {
+      console.error(data.error);
+      return toast.error(data.error);
+    }
+
+    return data;
+  } catch (error) {
+    console.error(error?.response?.data);
+    return error?.response?.data;
+  }
+};
+
 const createTask = async (taskData) => {
   try {
     const response = await axios.post(`${url}`, taskData,{
@@ -78,4 +100,5 @@ const deleteTask = async (Id) => {
   }
 };
 
-export { getTask,  createTask, updateTask, deleteTask };
+// UPDATE EXPORT - ADD getAllTasksForDropdown
+export { getTask, getAllTasksForDropdown, createTask, updateTask, deleteTask };
