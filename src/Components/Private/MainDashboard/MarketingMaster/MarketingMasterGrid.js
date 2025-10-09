@@ -239,10 +239,10 @@ export const MarketingMasterGrid = () => {
                           <tr className="th_border">
                             <th>Sr.No</th>
                             <th>Sources</th>
-                            <th>Contact Name</th>
-                            <th>Company Name</th>
-                            <th>Product</th>
-                            <th>Email</th>
+                            <th className="align_left_td td_width">Company Name</th>
+                            <th className="align_left_td td_width">Contact Name</th>
+                            <th className="align_left_td td_width">Product</th>
+                            <th>Mobile</th>
                             <th>Date</th>
                             <th>Action</th>
                           </tr>
@@ -253,10 +253,10 @@ export const MarketingMasterGrid = () => {
                               <tr key={lead._id}>
                                 <td >{(pagination.currentPage - 1) * itemsPerPage + index + 1}</td>
                                 <td>{lead?.SOURCE}</td>
-                                <td className="wrap-text-of-col">{lead?.SENDER_NAME || "Not available."}</td>
-                                <td className="wrap-text-of-col">{lead?.SENDER_COMPANY || "Not available."}</td>
-                                <td>{lead?.QUERY_PRODUCT_NAME || "Not available."}</td>
-                                <td>{lead?.SENDER_EMAIL || "Not available."}</td>
+                                <td className="align_left_td td_width wrap-text-of-col">{lead?.SENDER_COMPANY || "Not available."}</td>
+                                <td className="align_left_td td_width wrap-text-of-col">{lead?.SENDER_NAME || "Not available."}</td>
+                                <td className="align_left_td td_width wrap-text-of-col">{lead?.QUERY_PRODUCT_NAME || "Not available."}</td>
+                                <td>{lead?.SENDER_MOBILE || "Not available."}</td>
                                 <td>{formatDate(lead?.createdAt)}</td>
                                 {/* <td>{leads.STATUS}</td> */}
                                 <td>

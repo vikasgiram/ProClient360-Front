@@ -263,7 +263,7 @@ export const SalesMasterGrid = () => {
                                         <th>Contact Name</th>
                                         <th>Company Name</th>
                                         <th>Product</th>
-                                        <th>Email</th>
+                                        <th>Mobile</th>
                                         <th>Date</th>
                                         <th>Status</th>
                                         <th>Action</th>
@@ -278,7 +278,7 @@ export const SalesMasterGrid = () => {
                                         <td>{lead.SENDER_NAME||"Not available."}</td>
                                         <td>{lead.SENDER_COMPANY||"Not available."}</td>
                                         <td>{lead.QUERY_PRODUCT_NAME||"Not available."}</td>
-                                        <td>{lead.SENDER_EMAIL||"Not available."}</td>
+                                        <td>{lead.SENDER_MOBILE||"Not available."}</td>
                                         <td>{formatDateforTaskUpdate(lead.nextFollowUpDate || lead.createdAt)}</td>
                                         <td>
                                             <span className={handleBgColor(lead.STATUS)}>{lead.STATUS}</span>

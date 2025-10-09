@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  formatDate,
-  formatDateforupdate,
-} from "../../../utils/formatDate";
+import { formatDate } from "../../../utils/formatDate";
 import { getAllServiceActions } from "../../../hooks/useServiceAction";
 import toast from "react-hot-toast";
 
@@ -167,8 +164,6 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
     calculateCurrentCompletion();
   }, [service, previousActions]);
 
-  const formattedDate = formatDateforupdate(service?.allotmentDate);
-
   return (
     <>
       <div
@@ -184,7 +179,6 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
             <div className="modal-header pt-0">
               <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                 Service Details
-                {/* Forward */}
               </h5>
               <button
                 onClick={() => closePopUp()}
@@ -201,26 +195,19 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
 
                   <div className="col-sm- col-md col-lg">
                     <h6>
-                      {" "}
-                      <p className="fw-bold ">Complaint:</p>{" "}
+                      <p className="fw-bold ">Complaint:</p>
                       {service?.ticket?.details || "-"}
                     </h6>
                     <h6>
-                      {" "}
-                      <p className="fw-bold mt-3 ">Client:</p>{" "}
+                      <p className="fw-bold mt-3 ">Client:</p>
                       {service?.ticket?.client?.custName}
                     </h6>
                     <h6>
-                      {" "}
-                      <p className="fw-bold mt-3">Product:</p>{" "}
+                      <p className="fw-bold mt-3">Product:</p>
                       {service.ticket.product}
                     </h6>
-                    {/* <h6>
-                      {" "}
-                      <p className="fw-bold mt-3">Zone:</p> {service.zone}
-                    </h6> */}
                     <h6>
-                      <p className="fw-bold mt-3">Service Type:</p>{" "}
+                      <p className="fw-bold mt-3">Service Type:</p>
                       {service.serviceType}
                     </h6>
 
@@ -231,7 +218,7 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                   </div>
                   <div className="col-sm- col-md col-lg">
                     <p className="fw-bold"> Allotment Date: </p>
-                    {formatDateforupdate(service.allotmentDate)}
+                    {formatDate(service.allotmentDate)}
                     <p className="fw-bold mt-3"> Allocated to: </p>
                     {service.allotTo.map((item, index) => item.name).join(', ')}
                     <p className="fw-bold mt-3"> Status: </p>
@@ -241,8 +228,7 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                     <p className="fw-bold mt-3"> Work Mode: </p>
                     {service.workMode}
                     <p className="fw-bold mt-3"> Created At: </p>
-                    {formatDateforupdate(service.ticket.date)}
-                    {/* Updated Work Complete Percentage with computed value */}
+                    {formatDate(service.ticket.date)}
                     <p className="fw-bold mt-3">Work Complete(%): </p>
                     <span className="badge bg-primary">{currentCompletionLevel}%</span>
                   </div>
@@ -274,7 +260,6 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                           <th scope="col">Action By</th>
                           <th scope="col">Start Time</th>
                           <th scope="col">End Time</th>
-                          {/* Updated % column */}
                           <th scope="col">Progress</th>
                         </tr>
                       </thead>
@@ -298,28 +283,17 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                               <td>
                                 <div className="d-flex flex-column align-items-center">
                                   {completionPercent > 0 ? (
-
-      <span className={`badge mb-1 ${
-
-        completionPercent >= 100 ? 'bg-success' :
-
-        completionPercent >= 75 ? 'bg-primary' :
-
-        completionPercent >= 50 ? 'bg-warning' : 
-
-        completionPercent > 0 ? 'bg-info' : 'bg-secondary'
-
-      }`}>
-
-        {completionPercent}%
-
-      </span>
-
-    ) : (
-
-      <span className="text-muted">-</span>
-
-    )}
+                                    <span className={`badge mb-1 ${
+                                      completionPercent >= 100 ? 'bg-success' :
+                                      completionPercent >= 75 ? 'bg-primary' :
+                                      completionPercent >= 50 ? 'bg-warning' : 
+                                      completionPercent > 0 ? 'bg-info' : 'bg-secondary'
+                                    }`}>
+                                      {completionPercent}%
+                                    </span>
+                                  ) : (
+                                    <span className="text-muted">-</span>
+                                  )}
                                   {completionPercent > 0 && (
                                     <div className="progress" style={{ width: '60px', height: '4px' }}>
                                       <div 

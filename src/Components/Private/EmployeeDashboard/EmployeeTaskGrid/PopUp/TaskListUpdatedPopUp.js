@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import toast from "react-hot-toast";
-import { formatDate, formatDateforTaskUpdate, formatDateforEditAction } from "../../../../../utils/formatDate";
+import { formatDate, formatDateforEditAction } from "../../../../../utils/formatDate";
 import { Steps } from "rsuite";
 import { createAction, getAllActions } from "../../../../../hooks/useAction";
 import { updateAction } from "../../../../../hooks/useAction";
@@ -375,8 +375,8 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                                     <tr className="text-center" key={action?._id}>
                                       <td className="text-break">{action?.action}</td>
                                       <td className="text-truncate">{action?.actionBy?.name}</td>
-                                      <td className="text-nowrap">{formatDateforTaskUpdate(action?.startTime)}</td>
-                                      <td className="text-nowrap">{formatDateforTaskUpdate(action?.endTime)}</td>
+                                      <td className="text-nowrap">{formatDate(action?.startTime)}</td>
+                                      <td className="text-nowrap">{formatDate(action?.endTime)}</td>
                                       <td>{action?.complated}%</td>
                                       <td>
                                         {index === actionHistory.length - 1 && (

@@ -194,8 +194,8 @@ useEffect(() => {
                         <thead>
                           <tr className="th_border">
                             <th>Sr. No</th>
+                            <th className="align_left_td td_width">Customer Name</th>
                             <th className="align_left_td td_width">Complaint</th>
-                            <th className="align_left_td td_width">Client</th>
                             <th>Product</th>
                             <th>Priority</th>
                             <th>Allotment Date</th>
@@ -210,13 +210,13 @@ useEffect(() => {
                                 <td>
                                   {index + 1 + (pagination.currentPage - 1) * itemsPerPage}
                                 </td>
+                                <td className="align_left_td width_tdd wrap-text-of-col">
+                                  {service.ticket?.client?.custName || "N/A"}
+                                </td>
                                 <td
                                   className="align_left_td width_tdd wrap-text-of-col"
                                 >
                                   {service.ticket?.details || "N/A"}
-                                </td>
-                                <td className="align_left_td">
-                                  {service.ticket?.client?.custName || "N/A"}
                                 </td>
                                 <td>{service.ticket?.product || "N/A"}</td>
                                 <td>{service.priority || "N/A"}</td>

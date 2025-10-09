@@ -260,7 +260,7 @@ export const TicketMasterGrid = () => {
                         <thead>
                           <tr className="th_border">
                             <th>Sr. No</th>
-                            <th className="align_left_td">Client Name</th>
+                            <th className="align_left_td">Customer Name</th>
                             <th className="align_left_td width_tdd">
                               Complaint Details
                             </th>

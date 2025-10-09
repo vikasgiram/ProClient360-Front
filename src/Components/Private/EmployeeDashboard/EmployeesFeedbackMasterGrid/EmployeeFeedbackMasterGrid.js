@@ -149,13 +149,13 @@ export const EmployeeFeedbackMasterGrid = () => {
                                                 <thead>
                                                     <tr className="th_border" >
                                                         <th>Sr. No</th>
-                                                        <th className="align_left_td">Client</th>
+                                                        <th className="align_left_td">Client Name</th>
                                                         <th className="align_left_td">Contact Person</th>
                                                         <th className="align_left_td">Contact No</th>
                                                         <th className="align_left_td">Product</th>
                                                         <th>Allotment Date</th>
                                                         <th>Completion Date</th>
-                                                        <th>Alloted to</th>
+                                                        <th>Assign to</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -173,7 +173,7 @@ export const EmployeeFeedbackMasterGrid = () => {
                                                                 <td>{feedback.allotTo?.map(person => person.name).join(', ') || 'N/A'}</td>
                                                                 <td>
                                                                     <span onClick={() => handleUpdate(feedback)} className="update me-2" style={{cursor: 'pointer'}} title="Update Feedback">
-                                                                        <i className="fa-solid fa-pen text-success"></i>
+                                                                        <i class="fa-solid fa-star text-warning"></i>
                                                                     </span>
                                                                     <span onClick={() => handleViewFeedback(feedback)} className="view" style={{cursor: 'pointer'}} title="View Feedback">
                                                                         <i className="fa-solid fa-eye text-primary"></i>

@@ -1,18 +1,14 @@
 import { useState } from "react";
-import { formatDateforupdate } from "../../../../../utils/formatDate";
+import { formatDate } from "../../../../../utils/formatDate";
 
 const ViewFeedbackPopUp = ({ closePopUp, selectedFeedback }) => {
   const [Feedback, setService] = useState(selectedFeedback);
   console.log("Feedback", Feedback);
 
-  // const formattedPurchaseOrderDate = formatDateforupdate(projects?.purchaseOrderDate);
-  // const formattedStartDate = formatDateforupdate(projects?.startDate);
   const hasRemarks =
-  selectedFeedback &&
-  selectedFeedback.remarks &&
-  selectedFeedback.remarks.length > 0;
-  const formattedDate = formatDateforupdate(Feedback?.allotmentDate);
-  const formattedDate1 = formatDateforupdate(Feedback?.actualCompletionDate);
+    selectedFeedback &&
+    selectedFeedback.remarks &&
+    selectedFeedback.remarks.length > 0;
 
   return (
     <>
@@ -29,7 +25,6 @@ const ViewFeedbackPopUp = ({ closePopUp, selectedFeedback }) => {
             <div className="modal-header pt-0">
               <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                 Feedback Details
-                {/* Forward */}
               </h5>
               <button
                 onClick={() => closePopUp()}
@@ -45,75 +40,67 @@ const ViewFeedbackPopUp = ({ closePopUp, selectedFeedback }) => {
                 <div className="row">
                   <div className="col-sm- col-md col-lg">
                     <h6>
-                      {" "}
-                      <p className="fw-bold ">Complaint:</p>{" "}
-                      {Feedback?.ticket?.details || "-" }
+                      <p className="fw-bold ">Complaint:</p>
+                      {Feedback?.ticket?.details || "-"}
                     </h6>
                     <h6>
-                      {" "}
-                      <p className="fw-bold mt-3 ">Client:</p>{" "}
+                      <p className="fw-bold mt-3 ">Client:</p>
                       {Feedback?.ticket?.client?.custName}
                     </h6>
                     <h6>
-                      {" "}
-                      <p className="fw-bold mt-3">Product:</p>{" "}
+                      <p className="fw-bold mt-3">Product:</p>
                       {Feedback.ticket.product}
                     </h6>
-                    {/* <h6>
-                      {" "}
-                      <p className="fw-bold mt-3">Zone:</p> {Feedback.zone}
-                    </h6> */}
                     <h6>
-                      {" "}
-                      <p className="fw-bold mt-3">Feedback Type:</p>{" "}
+                      <p className="fw-bold mt-3">Feedback Type:</p>
                       {Feedback.serviceType}
-                      <p className="fw-bold mt-3"> Actual Completion Date: </p>
-                    {formatDateforupdate(Feedback.actualCompletionDate)}
+                      <p className="fw-bold mt-3">Actual Completion Date:</p>
+                      {formatDate(Feedback.actualCompletionDate)}
                     </h6>
                   </div>
                   <div className="col-sm- col-md col-lg">
-                    <p className="fw-bold"> Allotment Date: </p>
-                    {formatDateforupdate(Feedback.allotmentDate)}
-                    <p className="fw-bold mt-3"> Allocated to: </p>
+                    <p className="fw-bold">Allotment Date:</p>
+                    {formatDate(Feedback.allotmentDate)}
+                    <p className="fw-bold mt-3">Assign Engineer:</p>
                     {Feedback.allotTo[0].name || Feedback.allotTo[1].name}
-                    <p className="fw-bold mt-3"> Status: </p>
+                    <p className="fw-bold mt-3">Status:</p>
                     {Feedback.status}
-                    <p className="fw-bold mt-3"> Priority: </p>
+                    <p className="fw-bold mt-3">Priority:</p>
                     {Feedback.priority}
-                    <p className="fw-bold mt-3"> Work Mode: </p>
+                    <p className="fw-bold mt-3">Work Mode:</p>
                     {Feedback.workMode}
-                    <p className="fw-bold mt-3"> Created At: </p>
-                    {formatDateforupdate(Feedback.ticket.date)}
-                    <p className="fw-bold mt-3"> Completion Date: </p>
-                    {formatDateforupdate(Feedback.completionDate)}
-                    
+                    <p className="fw-bold mt-3">Created At:</p>
+                    {formatDate(Feedback.ticket.date)}
+                    <p className="fw-bold mt-3">Completion Date:</p>
+                    {formatDate(Feedback.completionDate)}
                   </div>
                 </div>
               </div>
-              {hasRemarks ? (<>
-                    <h6 className="mt-3"> Past Actions</h6>
-                    <table className="table table-bordered">
-                      <thead className="thead-light">
-                        <tr>
-                          <th scope="col">Sr. No</th>
-                          <th scope="col">Action</th>
+              {hasRemarks ? (
+                <>
+                  <h6 className="mt-3">Past Actions</h6>
+                  <table className="table table-bordered">
+                    <thead className="thead-light">
+                      <tr>
+                        <th scope="col">Sr. No</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedFeedback.remarks.map((remark, index) => (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>{remark}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {selectedFeedback.remarks.map((remark, index) => (
-                          <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{remark}</td>{" "}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    </>
-                  ) : (
-                    <div className="alert alert-warning" role="alert">
-                      No remarks available.
-                    </div>
-                  ) }
+                      ))}
+                    </tbody>
+                  </table>
+                </>
+              ) : (
+                <div className="alert alert-warning" role="alert">
+                  No remarks available.
+                </div>
+              )}
             </div>
           </div>
         </div>

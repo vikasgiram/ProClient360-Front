@@ -297,9 +297,9 @@ export const EmployeeTaskGrid = () => {
                                             <thead>
                                                 <tr className="th_border" >
                                                         <th style={commonThStyle}>Sr. No</th>
-                                                        <th style={commonThStyle}>Project Name</th>
-                                                        <th style={commonThStyle}>Customer Name</th>
-                                                        <th style={commonThStyle}>Project Status</th>
+                                                        <th className="align_left_td td_width">Customer Name</th>
+                                                        <th className="align_left_td td_width">Project Name</th>
+                                                        <th>Project Status</th>
                                                         <th style={commonThStyle}>Finish Date</th>
                                                         <th style={commonThStyle}></th>
                                                         <th style={commonThStyle}>Tasks</th>
@@ -314,8 +314,8 @@ export const EmployeeTaskGrid = () => {
                                                             return (
                                                                 <tr className="border my-4" key={project._id}>
                                                                     <td className="w-3">{ index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                                                    <td className="align_left_td td_width wrap-text-of-col">{project.custId?.custName || "N/A"}</td>
                                                                     <td className="align_left_td td_width wrap-text-of-col">{project.name}</td>
-                                                                    <td>{project.custId?.custName || "N/A"}</td>
                                                                     <td>{project.projectStatus}</td>
                                                                     <td>
                                                                         {formatDate(project.endDate)}

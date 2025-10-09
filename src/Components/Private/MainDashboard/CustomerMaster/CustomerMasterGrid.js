@@ -185,8 +185,8 @@ export const CustomerMasterGrid = () => {
                         <thead>
                           <tr className="th_border">
                             <th>Sr. No</th>
-                            <th className="align_left_td td_width">Name</th>
-                            <th>Email</th>
+                            <th className="align_left_td td_width">Customer Name</th>
+                            <th className="align_left_td td_width">Email</th>
                             <th>Phone</th>
                             <th>GST No</th>
                             <th>Action</th>
@@ -198,7 +198,7 @@ export const CustomerMasterGrid = () => {
                               <tr className="border my-4" key={customer._id}>
                                 <td className="w-10">{index + 1 + (currentPage - 1) * itemsPerPage}</td>
                                 <td className="align_left_td td_width wrap-text-of-col">{customer.custName}</td>
-                                <td>{customer.email}</td>
+                                <td className="align_left_td td_width wrap-text-of-col">{customer.email}</td>
                                 <td>{customer.phoneNumber1}</td>
                                 <td>{customer.GSTNo}</td>
                                 <td>

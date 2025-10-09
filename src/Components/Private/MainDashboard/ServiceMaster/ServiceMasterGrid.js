@@ -132,7 +132,7 @@ export const ServiceMasterGrid = () => {
               <div className="content-wrapper ps-3 ps-md-0 pt-3">
                 <div className="row px-2 py-1">
                   <div className="col-12 col-lg-4">
-                    <h5 className="text-white py-2">Service Master</h5>
+                    <h5 className="text-white py-2">Service Dashboard</h5>
                   </div>
                 </div>
 
@@ -205,13 +205,13 @@ export const ServiceMasterGrid = () => {
                       <table className="table table-striped table-class" id="table-id">
                         <thead>
                           <tr className="th_border">
-                            <th>Sr. No</th>
+                            <th>Sr. No</th>                            
+                            <th className="align_left_td width_tdd">Customer Name</th>
                             <th className="align_left_td width_tdd" style={{ width: "4rem" }} >Complaint</th>
-                            <th className="align_left_td width_tdd">Client</th>
                             <th className="align_left_td width_tdd">Product</th>
                             <th className="align_left_td width_tdd">Priority</th>
                             <th>Allotment Date</th>
-                            <th>Allocated to</th>
+                            <th>Assign to</th>
                             <th>Status</th>
                             <th>Action</th>
                           </tr>
@@ -221,8 +221,8 @@ export const ServiceMasterGrid = () => {
                             data.services.map((service, index) => (
                               <tr className="border my-4" key={service._id}>
                                 <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
-                                <td className="align_left_td width_tdd wrap-text-of-col">{service?.ticket?.details}</td>
                                 <td className="align_left_td width_tdd">{service?.ticket?.client?.custName}</td>
+                                <td className="align_left_td width_tdd wrap-text-of-col">{service?.ticket?.details}</td>                            
                                 <td className="align_left_td width_tdd">{service?.ticket?.product}</td>
                                 <td className="align_left_td width_tdd">{service.priority}</td>
                                 <td>{formatDate(service.allotmentDate)}</td>
