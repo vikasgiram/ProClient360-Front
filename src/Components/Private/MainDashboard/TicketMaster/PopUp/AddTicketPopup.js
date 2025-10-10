@@ -357,7 +357,11 @@ const AddTicketPopup = ({ handleAdd }) => {
                         required
                       >
                         <option value="">Select Product</option>
-                        <option value="Surveillance System">Surveillance System</option>
+                        <option value="CCTV System">CCTV System</option>
+                        <option value="TA System">TA System</option>
+                        <option value="Hajeri">Hajeri</option>
+                        <option value="SmartFace">SmartFace</option>
+                        <option value="ZKBioSecurity">ZKBioSecurity</option>
                         <option value="Access Control System">Access Control System</option>
                         <option value="Turnkey Project">Turnkey Project</option>
                         <option value="Alleviz">Alleviz</option>

@@ -316,8 +316,20 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         required
                       >
                         <option hidden>{ticket?.product}</option>
-                        <option value={"Surveillance System"}>
-                          Surveillance System
+                        <option value={"CCTV System"}>
+                          CCTV System
+                        </option>
+                        <option value={"TA System"}>
+                          TA System
+                        </option>
+                        <option value={"Hajeri"}>
+                          Hajeri
+                        </option>
+                        <option value={"SmartFace"}>
+                          SmartFace
+                        </option>
+                        <option value={"ZKBioSecurity"}>
+                          ZKBioSecurity
                         </option>
                         <option value={"Access Control System"}>
                           Access Control System
