@@ -20,7 +20,7 @@ const AddTicketPopup = ({ handleAdd }) => {
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
   const [isLoadingCustomerAddress, setIsLoadingCustomerAddress] = useState(false);
 
-  // Customer dropdown state (similar to AddProjectPopup)
+  // Customer dropdown state
   const [custOptions, setCustOptions] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [custPage, setCustPage] = useState(1);
@@ -90,7 +90,7 @@ const AddTicketPopup = ({ handleAdd }) => {
     return () => clearTimeout(timeoutId);
   }, [Address.pincode]);
 
-  // Fetch customers with pagination & search (similar to AddProjectPopup)
+  // Fetch customers with pagination & search
   const loadCustomers = useCallback(async (page, search) => {
     if (custLoading || !custHasMore) return;
     setCustLoading(true);
@@ -232,7 +232,7 @@ const AddTicketPopup = ({ handleAdd }) => {
     }
   };
 
-  // Validation functions (keep your existing ones)
+  // Validation functions
   const handlePincodeChange = (e) => {
     const value = e.target.value;
     if (/^\d{0,6}$/.test(value)) {
@@ -448,71 +448,6 @@ const AddTicketPopup = ({ handleAdd }) => {
                     </div>
                   </div>
 
-                  <div className="col-12">
-                    <div className="mb-3">
-                      <label
-                        htmlFor="complaintDetails"
-                        className="form-label label_text"
-                      >
-                        Complaint Details <RequiredStar />
-                      </label>
-                      <textarea
-                        value={details}
-                        onChange={(e) => setDetails(e.target.value)}
-                        className="form-control rounded-0"
-                        id="complaintDetails"
-                        maxLength={300}
-                        required
-                      ></textarea>
-                    </div>
-                  </div>
-
-                  <div className="col-12">
-                    <div className="mb-3">
-                      <label
-                        htmlFor="product"
-                        className="form-label label_text"
-                      >
-                        Product <RequiredStar />
-                      </label>
-                      <select
-                        className="form-select rounded-0"
-                        id="product"
-                        onChange={(e) => setProduct(e.target.value)}
-                        required
-                      >
-                        <option value="">Select Product</option>
-                        <option value="Surveillance System">Surveillance System</option>
-                        <option value="Access Control System">Access Control System</option>
-                        <option value="Turnkey Project">Turnkey Project</option>
-                        <option value="Alleviz">Alleviz</option>
-                        <option value="CafeLive">CafeLive</option>
-                        <option value="WorksJoy">WorksJoy</option>
-                        <option value="WorksJoy Blu">WorksJoy Blu</option>
-                        <option value="Fire Alarm System">Fire Alarm System</option>
-                        <option value="Fire Hydrant System">Fire Hydrant System</option>
-                        <option value="IDS">IDS</option>
-                        <option value="AI Face Machines">AI Face Machines</option>
-                        <option value="Entrance Automation">Entrance Automation</option>
-                        <option value="Guard Tour System">Guard Tour System</option>
-                        <option value="Home Automation">Home Automation</option>
-                        <option value="IP PA and Communication System">IP PA and Communication System</option>
-                        <option value="CRM">CRM</option>
-                        <option value="KMS">KMS</option>
-                        <option value="VMS">VMS</option>
-                        <option value="PMS">PMS</option>
-                        <option value="Boom Barrier System">Boom Barrier System</option> 
-                        <option value="Tripod System">Tripod System</option>
-                        <option value="Flap Barriers System">Flap Barrier System</option>
-                        <option value="EPBX System">EPBX System</option>
-                        <option value="CMS">CMS</option>
-                        <option value="Lift Eliviter System">Lift Eliviter System</option>
-                        <option value="AV6">AV6</option>
-                        <option value="Walky Talky System">Walky Talky System</option>
-                        <option value="Device Management System">Device Management System</option>
-                      </select>
-                    </div>
-                  </div>
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label htmlFor="ContactPerson" className="form-label label_text">
@@ -592,7 +527,6 @@ const AddTicketPopup = ({ handleAdd }) => {
                     </div>
                   </div>
 
-
                   <div className="col-12">
                     <div className="mb-3">
                       <label
@@ -662,7 +596,6 @@ const AddTicketPopup = ({ handleAdd }) => {
                       ></textarea>
                     </div>
                   </div>
-
 
                   <div className="row">
                     <div className="col-12 pt-3 mt-2">

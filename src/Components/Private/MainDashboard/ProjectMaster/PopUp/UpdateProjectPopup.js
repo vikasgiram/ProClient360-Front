@@ -106,7 +106,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
     const handleChange = (event) => {
         const { name, value } = event.target;
 
-        // Handle numeric fields - removed payment terms from this handler
+        // Handle numeric fields
         if (["purchaseOrderValue", "completeLevel", "purchaseOrderNo"].includes(name)) {
             const numericValue = value.replace(/\D/g, "");
             const maxLength = {
@@ -223,7 +223,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                 setLoading(false);
                 return toast.error("Completion Certificate is required for completed projects");
             }
-            // Removed warrantyCertificate validation as it's no longer required
             if (!updatedProject.warrantyStartDate) {
                 setLoading(false);
                 return toast.error("Warranty Start Date is required for completed projects");
@@ -449,15 +448,11 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 onChange={handleChange}
                                                 value={projects?.category}
                                             >
-
                                                 <option value="CCTV System">CCTV System</option>
                                                 <option value="TA System">TA System</option>
                                                 <option value="Hajeri">Hajeri</option>
                                                 <option value="SmartFace">SmartFace</option>
                                                 <option value="ZKBioSecurity">ZKBioSecurity</option>
-
-                                                <option selected>{projects?.category}</option>
-                                                <option value="Surveillance System">Surveillance System</option>
                                                 <option value="Access Control System">Access Control System</option>
                                                 <option value="Turnkey Project">Turnkey Project</option>
                                                 <option value="Alleviz">Alleviz</option>
@@ -555,7 +550,7 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 <div className="col-12 col-lg-6 mt-2">
                                                     <div className="mb-3">
                                                         <label htmlFor="warrantyCertificate" className="form-label label_text">
-                                                            HandOver Document {/* Removed RequiredStar */}
+                                                            HandOver Document
                                                         </label>
                                                         <input
                                                             type="file"
@@ -564,7 +559,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                             name="warrantyCertificate"
                                                             onChange={handleChange}
                                                             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                            // Removed required attribute
                                                         />
                                                         {projects.warrantyCertificate && (
                                                             <button 
@@ -638,7 +632,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         onChange={handleChange}
                                                         value={projects?.advancePay}
                                                         required
-                                                        disabled  // Added disabled attribute
                                                     />
                                                 </div>
                                             </div>
@@ -657,7 +650,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         onChange={handleChange}
                                                         value={projects?.payAgainstDelivery}
                                                         required
-                                                        disabled  // Added disabled attribute
                                                     />
                                                 </div>
                                             </div>
@@ -676,7 +668,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                         onChange={handleChange}
                                                         value={projects?.payAfterCompletion}
                                                         required
-                                                        disabled  // Added disabled attribute
                                                     />
                                                 </div>
                                             </div>
@@ -829,7 +820,6 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                         <div className="col-12 pt-3 mt-2">
                                             <button
                                                 type='submit'
-                                                onClick={handleProjectUpdate}
                                                 disabled={loading}
                                                 className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
                                             >
