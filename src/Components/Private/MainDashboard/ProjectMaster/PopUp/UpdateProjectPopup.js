@@ -449,11 +449,16 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
                                                 onChange={handleChange}
                                                 value={projects?.category}
                                             >
+<<<<<<< HEAD
                                                 <option value="CCTV System">CCTV System</option>
                                                 <option value="TA System">TA System</option>
                                                 <option value="Hajeri">Hajeri</option>
                                                 <option value="SmartFace">SmartFace</option>
                                                 <option value="ZKBioSecurity">ZKBioSecurity</option>
+=======
+                                                <option selected>{projects?.category}</option>
+                                                <option value="Surveillance System">Surveillance System</option>
+>>>>>>> parent of 99ac05a (product field product add)
                                                 <option value="Access Control System">Access Control System</option>
                                                 <option value="Turnkey Project">Turnkey Project</option>
                                                 <option value="Alleviz">Alleviz</option>
