@@ -3,19 +3,17 @@ import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import toast from 'react-hot-toast';
 import AddLeadMaster from "./PopUp/AddLeadMaster";
-import { formatDateforTaskUpdate } from "../../../../utils/formatDate";
+import {  formatDateforTaskUpdate } from "../../../../utils/formatDate";
 import SalesDashboardCards from './SalesDashboardCards';
 import { UserContext } from "../../../../context/UserContext";
 
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
 import ViewSalesLeadPopUp from "../../CommonPopUp/ViewSalesLeadPopUp";
 import UpdateSalesPopUp from "./PopUp/UpdateSalesPopUp";
-import AssignSalesLeadPopUp from "./PopUp/AssignSalesLeadPopUp";
 import useMyLeads from "../../../../hooks/leads/useMyLeads";
 import useSubmitEnquiry from "../../../../hooks/leads/useSubmitEnquiry";
 import useCreateLead from "../../../../hooks/leads/useCreateLead";
 import useDeleteLead from "../../../../hooks/leads/useDeleteLead";
-import useAssignLead from "../../../../hooks/leads/useAssignLead";
 
 export const SalesMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -26,23 +24,13 @@ export const SalesMasterGrid = () => {
   const [addpop, setIsAddModalVisible] = useState(false);
   const [UpdatePopUpShow, setUpdatePopUpShow] = useState(false);
   const [showLeadPopUp, setShowLeadPopUp] = useState(false);
-  const [assignPopUpShow, setAssignPopUpShow] = useState(false);
   
   const [selectedLead, setSelectedLead] = useState(null); 
+
   const [deletePopUpShow, setDeletePopUpShow] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
 
   const { user } = useContext(UserContext);
-  
-  // Debug user permissions
-  useEffect(() => {
-    console.log('Current User:', user);
-    console.log('User Permissions:', user?.permissions);
-    console.log('Has assignLead permission:', user?.permissions?.includes('assignLead'));
-    console.log('Has updateLead permission:', user?.permissions?.includes('updateLead'));
-    console.log('Has deleteLead permission:', user?.permissions?.includes('deleteLead'));
-  }, [user]);
-
   const [filters, setFilters] = useState({ status: null, date: null, source: null });
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -55,16 +43,15 @@ export const SalesMasterGrid = () => {
   const itemsPerPage = 20;
 
   const { data, loading, error, refetch } = useMyLeads(pagination.currentPage, itemsPerPage, filters);
-  const { submitEnquiry } = useSubmitEnquiry();
+  const {submitEnquiry} = useSubmitEnquiry();
   const { createLead } = useCreateLead();
+
   const { deleteLead } = useDeleteLead();
-  const { assignLead, loading: assignLoading } = useAssignLead();
+
 
   useEffect(() => {
     if (data) {
       setPagination(prev => ({ ...prev, ...data.pagination }));
-      // Debug lead counts
-      console.log('Lead counts:', data?.leadCounts);
     }
     if (error) {
       toast.error(error.message || "An error occurred");
@@ -78,19 +65,8 @@ export const SalesMasterGrid = () => {
   };
 
   const handleUpdate = (lead = null) => {
-    // Check if lead status is Won or Lost and prevent update
-    if (lead && (lead.STATUS === 'Won' || lead.STATUS === 'Lost')) {
-      toast.error(`Cannot update a lead with status "${lead.STATUS}". This lead is already finalized.`);
-      return;
-    }
-    
     setSelectedLead(lead);
     setUpdatePopUpShow(true);
-  };
-  
-  const handleAssign = (lead = null) => {
-    setSelectedLead(lead);
-    setAssignPopUpShow(true);
   };
   
   const handleDelete = (leadId) => {
@@ -115,26 +91,6 @@ export const SalesMasterGrid = () => {
       }
     } catch (error) {
       toast.error("Failed to delete lead");
-    }
-  };
-
-  const handleAssignSubmit = async (id, assignData) => {
-    try {
-      toast.loading("Assigning lead...");
-      const data = await assignLead(id, assignData);
-      toast.dismiss();
-      
-      if (data?.success) {
-        toast.success(data?.message || "Lead assigned successfully!");
-        setAssignPopUpShow(false);
-        setSelectedLead(null);
-        refetch();
-      } else {
-        toast.error(data?.error || "Failed to assign lead");
-      }
-    } catch (error) {
-      console.error("Assign lead error:", error);
-      toast.error("Failed to assign lead");
     }
   };
 
@@ -179,6 +135,7 @@ export const SalesMasterGrid = () => {
 
   const handleChange = (filterType, value) => {
     setFilters(prevFilters => ({ ...prevFilters, [filterType]: value || null }));
+    console.log("Filters updated:", { ...filters, [filterType]: value || null });
     handlePageChange(1);
   };
 
@@ -199,9 +156,10 @@ export const SalesMasterGrid = () => {
     }
   };
 
+
   return (
     <>
-      {loading && (
+    {loading && (
         <div className="overlay">
           <span className="loader"></span>
         </div>
@@ -239,7 +197,7 @@ export const SalesMasterGrid = () => {
                         winCount={data?.leadCounts?.winCount || 0}
                         pendingCount={data?.leadCounts?.pendingCount || 0}
                         lostCount={data?.leadCounts?.lostCount || 0}
-                        todayCount={data?.leadCounts?.todaysFollowUpCount || 0}
+                        todayCount={data?.leadCounts?.todaysFollowUpCount} 
                     /> 
 
                 <div className="row align-items-center p-2 m-1">
@@ -291,73 +249,75 @@ export const SalesMasterGrid = () => {
                   </div>
                 </div>
 
-                <div className="row bg-white p-2 m-1 border rounded">
-                  <div className="col-12 py-2">
-                    <div className="table-responsive">
-                      <table className="table table-striped table-class" id="table-id">
-                        <thead>
-                          <tr className="th_border">
-                            <th>Sr.No</th>
-                            <th>Sources</th>
-                            <th className="align_left_td td_width">Company Name</th>
-                            <th className="align_left_td td_width">Contact Name</th>
-                            <th className="align_left_td td_width">Product</th>
-                            <th>Mobile</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="broder my-4">
-                          {data?.leads?.length > 0 ? (
-                            data.leads.map((lead, index) => (
-                            <tr key={lead._id}>
-                              <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
-                              <td>{lead.SOURCE}</td>
-                              <td className="align_left_td td_width">{lead.SENDER_COMPANY||"Not available."}</td>
-                              <td className="align_left_td td_width">{lead.SENDER_NAME||"Not available."}</td>
-                              <td className="align_left_td td_width">{lead.QUERY_PRODUCT_NAME||"Not available."}</td>
-                              <td>{lead.SENDER_MOBILE||"Not available."}</td>
-                              <td>{formatDateforTaskUpdate(lead.nextFollowUpDate || lead.createdAt)}</td>
-                              <td>
-                                <span className={handleBgColor(lead.STATUS)}>{lead.STATUS}</span>
-                              </td>
-                              <td>
-                                {/* Edit Button - Only show if status is not Won or Lost */}
-                                {(user?.permissions?.includes('updateLead') || user?.user === 'company') && 
-                                 lead.STATUS !== 'Won' && lead.STATUS !== 'Lost' && (
-                                  <span onClick={() => handleUpdate(lead)} title="Action Lead">
-                                    <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
-                                  </span>
-                                )}
-
-                                {/* Assign Button */}
-                                <span onClick={() => handleAssign(lead)} title="Assign Lead">
-                                  <i className="mx-1 fa-solid fa-share cursor-pointer"></i>
-                                </span>
-
-                                {/* Delete Button - Only show for Direct leads and if user has permission */}
-                                {( lead.SOURCE==='Direct' &&( user?.permissions?.includes('deleteLead') || user?.user === 'company')) &&
-                                  <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
-                                    <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
-                                  </span>
-                                }
-                              </td>
-                            </tr>
-                            ))) : (
-                            <tr>
-                              <td colSpan="9" className="text-center">
-                                No More Leads.
-                              </td>
-                            </tr>
-                            )}
-                        </tbody>
-                      </table>
+                    <div className="row align-items-center p-2 m-1">
                     </div>
-                  </div>
-                </div>
 
-                {/* Pagination - Fixed to show properly */}
+                    <div className="row bg-white p-2 m-1 border rounded">
+                        <div className="col-12 py-2">
+                            <div className="table-responsive">
+                            <table className="table table-striped table-class" id="table-id">
+                                <thead>
+                                    <tr className="th_border">
+                                        <th>Sr.No</th>
+                                        <th>Sources</th>
+                                        <th>Contact Name</th>
+                                        <th>Company Name</th>
+                                        <th>Product</th>
+                                        <th>Mobile</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="broder my-4">
+                                  {data?.leads?.length > 0 ? (
+                                    data.leads.map((lead, index) => (
+                                    <tr key={lead._id}>
+                                        <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                                        <td>{lead.SOURCE}</td>
+                                        <td>{lead.SENDER_NAME||"Not available."}</td>
+                                        <td>{lead.SENDER_COMPANY||"Not available."}</td>
+                                        <td>{lead.QUERY_PRODUCT_NAME||"Not available."}</td>
+                                        <td>{lead.SENDER_MOBILE||"Not available."}</td>
+                                        <td>{formatDateforTaskUpdate(lead.nextFollowUpDate || lead.createdAt)}</td>
+                                        <td>
+                                            <span className={handleBgColor(lead.STATUS)}>{lead.STATUS}</span>
+                                        </td>
+                                        <td>
+                                            {/* Edit Button */}
+                                            {(user?.permissions?.includes('updateLead') || user?.user === 'company')  &&
+                                                <span onClick={() => handleUpdate(lead)} title="Action Lead">
+                                                    <i className="mx-1 fa-solid fa-pen text-success cursor-pointer"></i>
+                                                </span>
+                                            }
+
+                                            {( lead.SOURCE==='Direct' &&( user?.permissions?.includes('deleteLead') || user?.user === 'company')) &&
+                                              <span onClick={() => handleDelete(lead._id)} title="Delete Lead">
+                                                   <i className="fa-solid fa-trash text-danger cursor-pointer"></i>
+                                              </span>
+                                            }
+
+
+                                             {/* View Button */}
+                                            {/* <span onClick={() => handleDetailsPopUpClick(lead)} title="View Details">
+                                                <i className="fa-solid fa-eye cursor-pointer text-primary mx-1"></i>
+                                            </span> */}
+                                        </td>
+                                    </tr>
+                                    ))) : (
+                                      <tr>
+                                        <td colSpan="9" className="text-center">
+                                          No More Leads.
+                                        </td>
+                                      </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                    </div>
+
+                  {/* add Pagination button */}
                 {!loading && pagination.totalPages > 1 && (
                   <div className="pagination-container text-center my-3">
                     <button
@@ -369,6 +329,7 @@ export const SalesMasterGrid = () => {
                     >
                       First
                     </button>
+
                     <button
                       onClick={() => handlePageChange(pagination.currentPage - 1)}
                       disabled={!pagination.hasPrevPage}
@@ -378,9 +339,11 @@ export const SalesMasterGrid = () => {
                     >
                       Previous
                     </button>
+
                     {(() => {
                       const pageNumbers = [];
                       const maxPagesToShow = 5;
+
                       if (pagination.totalPages <= maxPagesToShow) {
                         for (let i = 1; i <= pagination.totalPages; i++) {
                           pageNumbers.push(i);
@@ -399,16 +362,19 @@ export const SalesMasterGrid = () => {
                         }
                         startPage = Math.max(1, startPage);
                         endPage = Math.min(pagination.totalPages, endPage);
+
                         for (let i = startPage; i <= endPage; i++) {
                           pageNumbers.push(i);
                         }
                       }
+
                       return pageNumbers.map((number) => (
                         <button
                           key={number}
                           onClick={() => handlePageChange(number)}
-                          className={`btn btn-sm me-1 ${pagination.currentPage === number ? "btn-primary" : "btn-dark"
-                            }`}
+                          className={`btn btn-sm me-1 ${
+                            pagination.currentPage === number ? "btn-primary" : "btn-dark"
+                          }`}
                           style={{ minWidth: "35px", borderRadius: "4px" }}
                           aria-label={`Go to page ${number}`}
                           aria-current={pagination.currentPage === number ? "page" : undefined}
@@ -417,6 +383,7 @@ export const SalesMasterGrid = () => {
                         </button>
                       ));
                     })()}
+
                     <button
                       disabled={!pagination.hasNextPage}
                       onClick={() => handlePageChange(pagination.currentPage + 1)}
@@ -424,6 +391,7 @@ export const SalesMasterGrid = () => {
                     >
                       Next
                     </button>
+
                     <button
                       onClick={() => handlePageChange(pagination.totalPages)}
                       disabled={!pagination.hasNextPage}
@@ -457,17 +425,6 @@ export const SalesMasterGrid = () => {
         />
       )}
 
-      {assignPopUpShow && selectedLead && (
-        <AssignSalesLeadPopUp
-          selectedLead={selectedLead}
-          onUpdate={handleAssignSubmit}
-          onClose={() => {
-            setAssignPopUpShow(false);
-            setSelectedLead(null);
-          }}
-        />
-      )}
-
       {deletePopUpShow && (
         <DeletePopUP
           message={"Are you sure you want to delete this lead?"}
@@ -485,6 +442,12 @@ export const SalesMasterGrid = () => {
               }}
               selectedLead={selectedLead}
           />
+      )}
+    
+      {loading && (
+        <div className="overlay">
+          <span className="loader"></span>
+        </div>
       )}
     </>
   );

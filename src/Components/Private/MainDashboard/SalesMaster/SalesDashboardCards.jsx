@@ -1,20 +1,10 @@
-import React from 'react';
-
-const SalesDashboardCards = ({ 
-  allLeadsCount, 
-  ongogingCount, // Keep this as is to match the backend response
-  winCount, 
-  pendingCount, 
-  lostCount, 
-  todayCount 
-}) => {
+const SalesDashboardCards = ({allLeadsCount, ongogingCount, winCount, pendingCount, lostCount, todayCount }) => {
   return (
     <div className="row bg-white p-2 m-1 border rounded">
       <div className="col-12 py-1">
         <div className="row pt-3">
           
-          {/* All Enquiries Card */}
-          <div className="col-12 col-md-3 pb-3 cursor-pointer">
+           <div className="col-12 col-md-3 pb-3 cursor-pointer">
             <div className="p-4 background_style bg_sky">
               <div className="row">
                 <div className="col-9">
@@ -22,21 +12,17 @@ const SalesDashboardCards = ({
                     All Enquiries
                   </h6>
                   <h2 className="pt-2 fw-bold card_count demo_bottom">
-                    {allLeadsCount || 0}
+                    {allLeadsCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img 
-                    src="./static/assets/img/planning.png" 
-                    className="img_opacity all_card_img_size" 
-                    alt="All Enquiries" 
-                  />
+                  <img src="./static/assets/img/planning.png" className="img_opacity all_card_img_size" alt="img not found" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Ongoing Card */}
+          
           <div className="col-12 col-md-3 pb-3 cursor-pointer">
             <div className="p-4 background_style" style={{backgroundColor:"#F8EFDE"}}>
               <div className="row">
@@ -45,67 +31,54 @@ const SalesDashboardCards = ({
                     Ongoing
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {ongogingCount || 0}
+                    {ongogingCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img 
-                    src="./static/assets/img/process.png" 
-                    className="img_opacity all_card_img_size" 
-                    alt="Ongoing" 
-                  />
+                  <img src="./static/assets/img/process.png" className="img_opacity all_card_img_size" alt="" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Won Card */}
+
           <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style" style={{backgroundColor:"#E5F5E5"}}>
+            <div className="p-4 background_style"   style={{backgroundColor:"#E5F5E5"}}>
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">
                     Won
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {winCount || 0}
+                    {winCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img 
-                    src="./static/assets/img/winner.png" 
-                    className="img_opacity all_card_img_size" 
-                    alt="Won" 
-                  />
+                  <img src="./static/assets/img/winner.png" className="img_opacity all_card_img_size" alt="" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Lost Card */}
+
           <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style" style={{backgroundColor:"#E0E0E0"}}>
+            <div className="p-4 background_style"   style={{backgroundColor:"#E0E0E0"}}>
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">
                     Lost
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {lostCount || 0}
+                    {lostCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img 
-                    src="./static/assets/img/lost.png" 
-                    className="img_opacity all_card_img_size" 
-                    alt="Lost" 
-                  />
+                  <img src="./static/assets/img/lost.png" className="img_opacity all_card_img_size" alt="" />
                 </div>
               </div>
             </div>
           </div>
         
-          {/* Pending FollowUp Card */}
           <div className="col-12 col-md-3 pb-3 cursor-pointer">
             <div className="p-4 background_style" style={{backgroundColor: '#f8d7da'}}>
               <div className="row">
@@ -114,38 +87,31 @@ const SalesDashboardCards = ({
                     Pending FollowUp
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {pendingCount || 0}
+                    {pendingCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img 
-                    src="./static/assets/img/pending.png" 
-                    className="img_opacity all_card_img_size" 
-                    alt="Pending" 
-                  />
+                  <img src="./static/assets/img/pending.png" className="img_opacity all_card_img_size" alt="" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Today's FollowUp Card */}
+
+          
           <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style" style={{backgroundColor:"#FAFAD2"}}>
+            <div className="p-4 background_style"   style={{backgroundColor:"#FAFAD2"}}>
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">
                     Today's FollowUp
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
-                    {todayCount || 0}
+                    {todayCount}
                   </h2>
                 </div>
                 <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img 
-                    src="./static/assets/img/only-today.png" 
-                    className="img_opacity all_card_img_size" 
-                    alt="Today's FollowUp" 
-                  />
+                  <img src="./static/assets/img/only-today.png" className="img_opacity all_card_img_size" alt="" />
                 </div>
               </div>
             </div>
@@ -158,3 +124,4 @@ const SalesDashboardCards = ({
 };
 
 export default SalesDashboardCards;
+

@@ -147,7 +147,7 @@ useEffect(() => {
                           onChange={(e) => handleFilterChange("serviceType", e.target.value)}
                         >
                           <option value="">Select Service</option>
-                          <option value="CMC">CMC</option>
+                          <option value="AMC">AMC</option>
                           <option value="Warranty">Warranty</option>
                           <option value="One Time">One Time</option>
                         </select>

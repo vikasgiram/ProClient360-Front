@@ -120,7 +120,7 @@ export const EmployeeFeedbackMasterGrid = () => {
                             <div className="content-wrapper ps-3 ps-md-0 pt-3">
                                 <div className="row px-2 py-1 align-items-center">
                                     <div className="col-12 col-lg-6">
-                                        <h5 className="text-white py-2 mb-0">Feedback</h5>
+                                        <h5 className="text-white py-2 mb-0">Feedback Master</h5>
                                     </div>
                                     <div className="col-12 col-lg-6">
                                         <div className="row g-2 justify-content-end align-items-center">
@@ -155,7 +155,7 @@ export const EmployeeFeedbackMasterGrid = () => {
                                                         <th className="align_left_td">Product</th>
                                                         <th>Allotment Date</th>
                                                         <th>Completion Date</th>
-                                                        <th>Assigned to</th>
+                                                        <th>Assign to</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>

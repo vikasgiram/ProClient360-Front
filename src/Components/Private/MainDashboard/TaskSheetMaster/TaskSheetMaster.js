@@ -19,7 +19,6 @@ import AddTaskPopUp from "../TaskMaster/PopUp/AddTaskPopUp";
 import { getAllActions } from "../../../../hooks/useAction";
 import { formatDateforEditAction } from "../../../../utils/formatDate";
 import { RequiredStar } from "../../RequiredStar/RequiredStar";
-import { getProject } from "../../../../hooks/useProjects"; // Added import
 
 
 const PAGE_SIZE = 10;
@@ -71,9 +70,6 @@ export const TaskSheetMaster = () => {
   const [taskAddPopUpShow, setTaskAddPopUpShow] = useState(false);
   const [forTask, setForTask] = useState();
   const [showAction, setShowAction] = useState(false);
-  
-  // Added state for employee-task assignments
-  const [employeeTaskAssignments, setEmployeeTaskAssignments] = useState([]);
 
 
 
@@ -178,7 +174,6 @@ export const TaskSheetMaster = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true);
         const response = await getTaskSheet(id);
         // console.log(response);
 
@@ -188,87 +183,10 @@ export const TaskSheetMaster = () => {
 
         setTasks(transformedTasks);
         // console.log("Transformed tasks: ", response);
-        
-        // Extract employee-task assignments from task sheets
-        const taskSheets = response.task || [];
-        const assignments = [];
-        
-        // First, collect all unique employee IDs
-        const employeeIds = new Set();
-        taskSheets.forEach(task => {
-          if (task.employees && Array.isArray(task.employees)) {
-            task.employees.forEach(emp => {
-              const empId = typeof emp === 'object' ? emp._id : emp;
-              if (empId) employeeIds.add(empId);
-            });
-          }
-        });
-        
-        // Fetch employee details
-        if (employeeIds.size > 0) {
-          try {
-            const employeesData = await getEmployees(1, 1000, "");
-            
-            // Create a map of employee ID to employee details
-            const employeeMap = {};
-            employeesData.employees.forEach(emp => {
-              employeeMap[emp._id] = emp;
-            });
-            
-            // Build assignments array
-            taskSheets.forEach(task => {
-              if (task.employees && Array.isArray(task.employees)) {
-                task.employees.forEach(emp => {
-                  const empId = typeof emp === 'object' ? emp._id : emp;
-                  if (empId && employeeMap[empId]) {
-                    assignments.push({
-                      employeeId: empId,
-                      employeeName: employeeMap[empId].name,
-                      taskId: task._id,
-                      taskName: task.taskName.name,
-                      startDate: task.startDate,
-                      endDate: task.endDate
-                    });
-                  }
-                });
-              }
-            });
-            
-            // Group assignments by employee
-            const groupedAssignments = {};
-            assignments.forEach(assignment => {
-              if (!groupedAssignments[assignment.employeeId]) {
-                groupedAssignments[assignment.employeeId] = {
-                  employeeId: assignment.employeeId,
-                  employeeName: assignment.employeeName,
-                  tasks: []
-                };
-              }
-              groupedAssignments[assignment.employeeId].tasks.push({
-                taskId: assignment.taskId,
-                taskName: assignment.taskName,
-                startDate: assignment.startDate,
-                endDate: assignment.endDate
-              });
-            });
-            
-            // Convert to array and sort by employee name
-            const sortedAssignments = Object.values(groupedAssignments).sort((a, b) => 
-              a.employeeName.localeCompare(b.employeeName)
-            );
-            
-            setEmployeeTaskAssignments(sortedAssignments);
-          } catch (error) {
-            console.error("Error fetching employee details:", error);
-          }
-        } else {
-          setEmployeeTaskAssignments([]);
-        }
-        
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching projects: ", error);
-        setLoading(false);
       }
     };
     fetchData();
@@ -397,56 +315,6 @@ export const TaskSheetMaster = () => {
 
                         <span className="fw-light">Project Name : </span> {projectName && projectName.name + " - " + projectName?.custId?.custName}
                       </h5>
-                    </div>
-                  </div>
-
-                  {/* Added Employee Task Assignments Section */}
-                  <div className="row bg-white p-2 m-1 border rounded">
-                    <div className="col-12">
-                      <div className="mb-3">
-                        <label className="form-label label_text fw-bold">
-                          Employee Task Assignments
-                        </label>
-                        {employeeTaskAssignments.length > 0 ? (
-                          <div className="table-responsive">
-                            <table className="table table-bordered">
-                              <thead className="thead-light">
-                                <tr>
-                                  <th>Employee Name</th>
-                                  <th>Assigned Tasks</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {employeeTaskAssignments.map((assignment) => (
-                                  <tr key={assignment.employeeId}>
-                                    <td className="align-middle">
-                                      <strong>{assignment.employeeName}</strong>
-                                    </td>
-                                    <td>
-                                      <ul className="list-unstyled mb-0">
-                                        {assignment.tasks.map((task, index) => (
-                                          <li key={`${assignment.employeeId}-${task.taskId}`} className="mb-2">
-                                            <div className="d-flex justify-content-between align-items-center">
-                                              <span className="fw-medium">{task.taskName}</span>
-                                              <small className="text-muted">
-                                                {new Date(task.startDate).toLocaleDateString()} - {new Date(task.endDate).toLocaleDateString()}
-                                              </small>
-                                            </div>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        ) : (
-                          <div className="alert alert-info">
-                            No employees assigned to tasks yet
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </div>
 

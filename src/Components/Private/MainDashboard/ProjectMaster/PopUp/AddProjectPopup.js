@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import Select from "react-select";
-import { getCustomers, getCustomerById } from "../../../../../hooks/useCustomer";
+import { getCustomers } from "../../../../../hooks/useCustomer";
 import { createProject } from "../../../../../hooks/useProjects";
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { getAddress } from "../../../../../hooks/usePincode";
@@ -24,7 +24,6 @@ const AddProjectPopup = ({ handleAdd }) => {
   const [loading, setLoading] = useState(false);
   const [retention, setRetention] = useState(0);
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
-  const [isLoadingCustomerAddress, setIsLoadingCustomerAddress] = useState(false);
 
   // Customer dropdown state
   const [custOptions, setCustOptions] = useState([]);
@@ -113,61 +112,6 @@ const AddProjectPopup = ({ handleAdd }) => {
     setCustLoading(false);
     setCustPage(page + 1);
   }, [custLoading, custHasMore]);
-
-  // Handle customer selection - AUTO FETCH ADDRESS
-  const handleCustomerSelect = async (selectedOption) => {
-    setSelectedCustomer(selectedOption);
-    
-    if (selectedOption) {
-      setIsLoadingCustomerAddress(true);
-      try {
-        // Fetch customer details including address
-        const customerData = await getCustomerById(selectedOption.value);
-        
-        if (customerData && customerData.customer && customerData.customer.billingAddress) {
-          const billingAddress = customerData.customer.billingAddress;
-          setAddress({
-            pincode: billingAddress.pincode || "",
-            state: billingAddress.state || "",
-            city: billingAddress.city || "",
-            add: billingAddress.add || "",
-            country: billingAddress.country || ""
-          });
-          toast.success("Customer address loaded successfully");
-        } else {
-          setAddress({
-            pincode: "",
-            state: "",
-            city: "",
-            add: "",
-            country: ""
-          });
-          toast("No address found for this customer");
-        }
-      } catch (error) {
-        console.error("Error fetching customer address:", error);
-        toast.error("Failed to load customer address");
-        setAddress({
-          pincode: "",
-          state: "",
-          city: "",
-          add: "",
-          country: ""
-        });
-      } finally {
-        setIsLoadingCustomerAddress(false);
-      }
-    } else {
-      // Clear address if no customer selected
-      setAddress({
-        pincode: "",
-        state: "",
-        city: "",
-        add: "",
-        country: ""
-      });
-    }
-  };
 
   // Initial & search-triggered load (reset on search)
   useEffect(() => {
@@ -333,7 +277,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                     <Select
                       options={custOptions}
                       value={selectedCustomer}
-                      onChange={handleCustomerSelect}
+                      onChange={opt => setSelectedCustomer(opt)}
                       onInputChange={val => setCustSearch(val)}
                       onMenuScrollToBottom={() => loadCustomers(custPage, custSearch)}
                       isLoading={custLoading}
@@ -341,14 +285,6 @@ const AddProjectPopup = ({ handleAdd }) => {
                       noOptionsMessage={() => custLoading ? 'Loading...' : 'No customers'}
                       closeMenuOnSelect={true}
                     />
-                    {isLoadingCustomerAddress && (
-                      <small className="text-info">Loading customer address...</small>
-                    )}
-                    {selectedCustomer && !isLoadingCustomerAddress && (
-                      <small className="text-success">
-                        Customer selected: {selectedCustomer.label}
-                      </small>
-                    )}
                   </div>
                 </div>
 
@@ -435,7 +371,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                       <option value="VMS">VMS</option>
                       <option value="Boom Barrier System">Boom Barrier System</option>  
                       <option value="Tripod System">Tripod System</option>
-                      <option value="Flap Barrier System">Flap Barrier System</option>
+                      <option value="Flap Barriers System">Flap Barrier System</option>
                       <option value="EPBX System">EPBX System</option>
                       <option value="CMS">CMS</option>
                       <option value="Lift Eliviter System">Lift Eliviter System</option>
@@ -565,9 +501,6 @@ const AddProjectPopup = ({ handleAdd }) => {
                   <div className="row border mt-4 bg-gray mx-auto">
                     <div className="col-12 mb-3">
                       <span className="AddressInfo">Address <RequiredStar /></span>
-                      {isLoadingCustomerAddress && (
-                        <small className="text-info ms-2">Loading customer address...</small>
-                      )}
                     </div>
 
                     <div className="col-12 col-lg-6 mt-2">
@@ -599,6 +532,9 @@ const AddProjectPopup = ({ handleAdd }) => {
                           placeholder="State"
                           onChange={handleStateChange}
                           value={Address.state}
+                          style={{ 
+                            backgroundColor: Address.state && !isLoadingAddress ? '#f8f9fa' : 'white' 
+                          }}
                           required
                         />
                       </div>
@@ -613,6 +549,9 @@ const AddProjectPopup = ({ handleAdd }) => {
                           placeholder="City"
                           onChange={handleCityChange}
                           value={Address.city}
+                          style={{ 
+                            backgroundColor: Address.city && !isLoadingAddress ? '#f8f9fa' : 'white' 
+                          }}
                           required
                         />
                       </div>
@@ -627,6 +566,9 @@ const AddProjectPopup = ({ handleAdd }) => {
                           placeholder="Country"
                           onChange={handleCountryChange}
                           value={Address.country}
+                          style={{ 
+                            backgroundColor: Address.country && !isLoadingAddress ? '#f8f9fa' : 'white' 
+                          }}
                           required
                         />
                       </div>

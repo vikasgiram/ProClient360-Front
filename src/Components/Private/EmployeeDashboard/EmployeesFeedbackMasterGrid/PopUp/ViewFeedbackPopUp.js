@@ -61,7 +61,7 @@ const ViewFeedbackPopUp = ({ closePopUp, selectedFeedback }) => {
                   <div className="col-sm- col-md col-lg">
                     <p className="fw-bold">Allotment Date:</p>
                     {formatDate(Feedback.allotmentDate)}
-                    <p className="fw-bold mt-3">Assigned Engineer:</p>
+                    <p className="fw-bold mt-3">Assign Engineer:</p>
                     {Feedback.allotTo[0].name || Feedback.allotTo[1].name}
                     <p className="fw-bold mt-3">Status:</p>
                     {Feedback.status}

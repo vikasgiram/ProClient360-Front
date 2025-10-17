@@ -34,7 +34,6 @@ import { SalesMasterGrid } from "./Components/Private/MainDashboard/SalesMaster/
 
 import { MarketingMasterGrid } from "./Components/Private/MainDashboard/MarketingMaster/MarketingMasterGrid";
 
-import { AMCMasterGrid } from "./Components/Private/MainDashboard/AMCMaster/AMCMasterGrid";
 
 import { EmployeeMyServiceMasterGrid } from "./Components/Private/EmployeeDashboard/EmployeeMyServiceMasterGrid/EmployeeMyServiceMasterGrid";
 import { EmployeeFeedbackMasterGrid } from "./Components/Private/EmployeeDashboard/EmployeesFeedbackMasterGrid/EmployeeFeedbackMasterGrid";
@@ -75,8 +74,6 @@ const {user} = useContext(UserContext);
                     <Route exact path="/SalesMasterGrid" element={<ProtectRoute Component={SalesMasterGrid} />} />
 
                     <Route exact path="/MarketingMasterGrid" element={<ProtectRoute Component={MarketingMasterGrid} />} />
-
-                    <Route exact path="/AMCMasterGrid" element={<ProtectRoute Component={AMCMasterGrid} />} />
 
                     {/* Company */}
 

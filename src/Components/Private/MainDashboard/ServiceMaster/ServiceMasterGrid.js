@@ -210,8 +210,8 @@ export const ServiceMasterGrid = () => {
                             <th className="align_left_td width_tdd" style={{ width: "4rem" }} >Complaint</th>
                             <th className="align_left_td width_tdd">Product</th>
                             <th className="align_left_td width_tdd">Priority</th>
-                            <th>Allocated Date</th>
-                            <th>Assigned to</th>
+                            <th>Allotment Date</th>
+                            <th>Assign to</th>
                             <th>Status</th>
                             <th>Action</th>
                           </tr>
