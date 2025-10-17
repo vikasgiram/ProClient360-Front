@@ -5,6 +5,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.0",
     "axios": "^1.7.7",
+    "bson": "^6.10.4",
     "chart.js": "2.9.4",
     "firebase": "^11.2.0",
     "gantt-task-react": "^0.3.9",
