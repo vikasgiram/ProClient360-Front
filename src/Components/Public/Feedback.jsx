@@ -13,7 +13,7 @@ export default function FeedbackForm() {
     service: id,
   });
 
-  const messages = ["Terrible", "Bad", "Ok", "Good", "Amazing"];
+  const messages = ["Good", "Very Good", "Excellent", "Outstanding", "Amazing"];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

@@ -10,7 +10,7 @@ const EmployeeUpdateFeedbackPopUp = ({ handleUpdate, selectedFeedback }) => {
         submitBy: "Employee"
     });
     
-    const messages = ["Terrible", "Bad", "Ok", "Good", "Amazing"];
+    const messages = ["Good", "Very Good", "Excellent", "Outstanding", "Amazing"];
     
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -124,7 +124,7 @@ const EmployeeUpdateFeedbackPopUp = ({ handleUpdate, selectedFeedback }) => {
                         <form onSubmit={handleFeedbackUpdate}>
                             <div className="modal-header pt-0">
                                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-                                    Update Feedback
+                                    Feedback
                                 </h5>
                                 <button
                                     onClick={() => handleUpdate()}

@@ -19,6 +19,22 @@ const getCustomers = async (page=1, limit=20, search=null) => {
   }
 };
 
+// Add Function - Get customer by ID
+const getCustomerById = async (customerId) => {
+  try {
+    const response = await axios.get(`${url}/${customerId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(error?.response?.data);
+    return error?.response?.data;
+  }
+};
+
 const createCustomer = async (customerData) => {
   try {
     const response = await axios.post(`${url}`, customerData,{
@@ -33,7 +49,6 @@ const createCustomer = async (customerData) => {
     return error.response.data;
   }
 };
-
 
 const updateCustomer = async (updatedData) => {
   try {
@@ -66,4 +81,5 @@ const deleteCustomer = async (Id) => {
   }
 };
 
-export { getCustomers, createCustomer, updateCustomer, deleteCustomer };
+// UPDATE EXPORTS TO INCLUDE getCustomerById
+export { getCustomers, getCustomerById, createCustomer, updateCustomer, deleteCustomer };

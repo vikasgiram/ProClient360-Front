@@ -194,7 +194,7 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                 <div className="col-12 mt-2" style={{ minHeight: "180px" }}>
                   <div className={formData.feasibility === 'feasible' ? 'row' : 'd-none'}>
                <div className="col-12 col-lg-6 mt-2">
-               <label htmlFor="department" className="form-label label_text">Assign to Department <RequiredStar /></label>
+               <label htmlFor="department" className="form-label label_text">Assigned to Department <RequiredStar /></label>
                 <Select
                   id="department"
                   options={departments.map(dept => ({ value: dept._id, label: dept.name }))}
@@ -233,7 +233,7 @@ const AssignMarketingLeadPopUp = ({ selectedLead, onUpdate, onClose }) => {
                 />
             </div>
            <div className="col-12 col-lg-6 mt-2">
-          <label htmlFor="employee" className="form-label label_text">Assign to Employee <RequiredStar /></label>
+          <label htmlFor="employee" className="form-label label_text">Assigned to Employee <RequiredStar /></label>
          <Select
             id="employee"
             options={employeeOptions}

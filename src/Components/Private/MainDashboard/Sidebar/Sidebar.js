@@ -315,6 +315,21 @@ export const Sidebar = ({ isopen, active }) => {
                         </li>
                     ) : ('')}
 
+{user?.permissions?.includes('viewAMC') || user?.user === 'company' ? (
+    <li
+        title="AMC"
+        className={active === "AMCMasterGrid" ? " nav-item active" : "nav-item sidebar_item"}>
+        <Link to='/AMCMasterGrid' className="nav-link ">
+            <i className="fa-solid fa-arrow-up-right-dots ps-3 side_icon_fs"></i>
+            <span
+                className="menu-title_m"
+                style={{ display: isopen ? "" : "none" }}
+            >
+                AMC
+            </span>
+        </Link>
+    </li>
+) : null}
 
 
 

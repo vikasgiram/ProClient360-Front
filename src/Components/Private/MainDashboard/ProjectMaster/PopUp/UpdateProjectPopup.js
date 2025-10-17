@@ -10,13 +10,8 @@ import { getAddress } from "../../../../../hooks/usePincode";
 const PAGE_SIZE = 15;
 
 const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
-
-    // console.log(selectedProject,"selectedProject");
-
-
     const [loading, setLoading] = useState(false);
-
-    const [retention, setRetention] =  useState(0);
+    const [retention, setRetention] = useState(0);
 
     // Customer dropdown state
     const [custOptions, setCustOptions] = useState([]);
@@ -35,10 +30,12 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         ...selectedProject,
         purchaseOrderDate: selectedProject?.purchaseOrderDate,
         startDate: selectedProject?.startDate,
-        endDate: selectedProject?.endDate
-
+        endDate: selectedProject?.endDate,
+        completionCertificate: selectedProject?.completionCertificate || "",
+        warrantyCertificate: selectedProject?.warrantyCertificate || "",
+        warrantyStartDate: selectedProject?.warrantyStartDate || "",
+        warrantyMonths: selectedProject?.warrantyMonths || "",
     });
-
 
     const [address, setAddress] = useState({
         add: selectedProject?.Address?.add || "",
@@ -48,15 +45,11 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         pincode: selectedProject?.Address?.pincode || "",
     });
 
-    console.log(selectedProject?.Address);
-
-    //   console.log(selectedProject?.Address?.city,"address");
+    // Handle pincode address fetch
     useEffect(() => {
         const fetchData = async () => {
             const data = await getAddress(address.pincode);
-
             if (data !== "Error") {
-                // console.log(data);
                 setAddress(data);
             }
         };
@@ -91,72 +84,43 @@ const UpdateProjectPopup = ({ handleUpdate, selectedProject }) => {
         loadCustomers(1, custSearch);
     }, [custSearch]);
 
-    
-
-useEffect(() => {
-    const retentionValue = 100 - (Number(projects.advancePay || 0) + Number(projects.payAgainstDelivery || 0) + Number(projects.payAfterCompletion || 0));
-    if( retentionValue >= 0) {
-        setRetention(retentionValue);
-        setProjects(prev => ({
-            ...prev,
-            retention: retentionValue
-        }));
-    } else {
-        toast.error("The total percentage cannot exceed 100%.");
-        setRetention(0);
-        setProjects(prev => ({
-            ...prev,
-            retention: 0
-        }));
-    }
-}, [projects.advancePay, projects.payAgainstDelivery, projects.payAfterCompletion]);
-
+    // Calculate retention
+    useEffect(() => {
+        const retentionValue = 100 - (Number(projects.advancePay || 0) + Number(projects.payAgainstDelivery || 0) + Number(projects.payAfterCompletion || 0));
+        if (retentionValue >= 0) {
+            setRetention(retentionValue);
+            setProjects(prev => ({
+                ...prev,
+                retention: retentionValue
+            }));
+        } else {
+            toast.error("The total percentage cannot exceed 100%.");
+            setRetention(0);
+            setProjects(prev => ({
+                ...prev,
+                retention: 0
+            }));
+        }
+    }, [projects.advancePay, projects.payAgainstDelivery, projects.payAfterCompletion]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
 
-        if (name === "purchaseOrderValue") {
+        // Handle numeric fields - removed payment terms from this handler
+        if (["purchaseOrderValue", "completeLevel", "purchaseOrderNo"].includes(name)) {
             const numericValue = value.replace(/\D/g, "");
-            if (numericValue.length > 12) return;
+            const maxLength = {
+                purchaseOrderValue: 12,
+                completeLevel: 10,
+                purchaseOrderNo: 10
+            }[name];
+            
+            if (numericValue.length > maxLength) return;
             setProjects((prev) => ({ ...prev, [name]: numericValue }));
             return;
         }
 
-        if (name === "completeLevel") {
-            const numericValue = value.replace(/\D/g, "");
-            if (numericValue.length > 10) return;
-            setProjects((prev) => ({ ...prev, [name]: numericValue }));
-            return;
-        }
-
-        if (name === "purchaseOrderNo") {
-            const numericValue = value.replace(/\D/g, "");
-            if (numericValue.length > 10) return;
-            setProjects((prev) => ({ ...prev, [name]: numericValue }));
-            return;
-        }
-
-        if (name === "advancePay") {
-            const numericValue = value.replace(/\D/g, "");
-            if (numericValue.length > 3) return;
-            setProjects((prev) => ({ ...prev, [name]: numericValue }));
-            return;
-        }
-
-        if (name === "payAgainstDelivery") {
-            const numericValue = value.replace(/\D/g, "");
-            if (numericValue.length > 3) return;
-            setProjects((prev) => ({ ...prev, [name]: numericValue }));
-            return;
-        }
-
-        if (name === "payAfterCompletion") {
-            const numericValue = value.replace(/\D/g, "");
-            if (numericValue.length > 3) return;
-            setProjects((prev) => ({ ...prev, [name]: numericValue }));
-            return;
-        }
-
+        // Handle customer selection
         if (name === "custId") {
             setSelectedCustomer({ value: value, label: event.target.options[event.target.selectedIndex].text });
             setProjects((prev) => ({
@@ -166,25 +130,38 @@ useEffect(() => {
             return;
         }
 
-       if (name === "projectStatus") {
-  setProjects((prev) => ({
-    ...prev,
-    projectStatus: value,
-    completeLevel:
-      value === "Completed"
-        ? "100"
-        : prev.completeLevel < 100
-          ? prev.completeLevel
-          : "",
-  }));
-  return;
-}
+        // Handle project status change
+        if (name === "projectStatus") {
+            setProjects((prev) => ({
+                ...prev,
+                projectStatus: value,
+                completeLevel: value === "Completed" ? "100" : prev.completeLevel
+            }));
+            return;
+        }
 
+        // Handle warranty months
+        if (name === "warrantyMonths") {
+            setProjects((prev) => ({ ...prev, [name]: value }));
+            return;
+        }
+
+        // Handle file inputs
+        if (name === "completionCertificate" || name === "warrantyCertificate") {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setProjects((prev) => ({ ...prev, [name]: reader.result }));
+                };
+                reader.readAsDataURL(file);
+            }
+            return;
+        }
+
+        // Handle all other fields
         setProjects((prev) => ({ ...prev, [name]: value }));
     };
-
-
-
 
     const handleAddressChange = (e) => {
         const { name, value } = e.target;
@@ -207,100 +184,124 @@ useEffect(() => {
         }
     };
 
-
-
-
-
     const handleProjectUpdate = async (event) => {
-    event.preventDefault();
-    setLoading(!loading);
+        event.preventDefault();
+        setLoading(true);
 
-    const updatedProject = {
-        ...projects,
-        custId: selectedCustomer?.value,
-        retention: retention,
-        Address: {
-            ...address
-        },
-    }
-    
-    if (
-  !updatedProject.name ||
-  !selectedCustomer ||
-  !updatedProject.purchaseOrderDate ||
-  !updatedProject.purchaseOrderNo ||
-  !updatedProject.purchaseOrderValue ||
-  !updatedProject.category ||
-  !updatedProject.startDate ||
-  !updatedProject.endDate ||
-  updatedProject.advancePay === "" || updatedProject.advancePay === null || updatedProject.advancePay === undefined ||
-  updatedProject.payAgainstDelivery === "" || updatedProject.payAgainstDelivery === null || updatedProject.payAgainstDelivery === undefined ||
-  updatedProject.payAfterCompletion === "" || updatedProject.payAfterCompletion === null || updatedProject.payAfterCompletion === undefined
-) {
-  setLoading(false);
-  return toast.error("Please fill all required fields");
-}
-    if (Number(updatedProject.advancePay) + Number(updatedProject.payAgainstDelivery) + Number(updatedProject.payAfterCompletion) > 100) {
-        setLoading(false);
-        return toast.error("Sum of  Advance Payment,Pay Against Delivery,and Pay After Completion cannot exceed 100%");
-    }
-    if (updatedProject.startDate > updatedProject.endDate) {
-        setLoading(false);
-        return toast.error("Start Date cannot be greater than End Date");
-    }
-
-    try {
-        console.log(updatedProject,"updatedProject"); 
-        toast.loading("Updating Project...")
-        const data = await updateProject(updatedProject);
-        toast.dismiss()
-        if(data.success){
-            toast.success(data.message);
-            handleUpdate();
-        }else{
-            toast.error(data.error);
+        const updatedProject = {
+            ...projects,
+            custId: selectedCustomer?.value,
+            retention: retention,
+            Address: {
+                ...address
+            },
+            // Convert warrantyMonths to number if it exists
+            warrantyMonths: projects.warrantyMonths ? parseInt(projects.warrantyMonths) : 0
         }
-    } catch (error) {
-        toast.error(error);
-    }
-};
-    const viewFile = () => {
-        window.open(projects.POCopy);
+        
+        // Required field validation
+        if (
+            !updatedProject.name ||
+            !selectedCustomer ||
+            !updatedProject.purchaseOrderDate ||
+            !updatedProject.purchaseOrderNo ||
+            !updatedProject.purchaseOrderValue ||
+            !updatedProject.category ||
+            !updatedProject.startDate ||
+            !updatedProject.endDate ||
+            updatedProject.advancePay === "" || updatedProject.advancePay === null || updatedProject.advancePay === undefined ||
+            updatedProject.payAgainstDelivery === "" || updatedProject.payAgainstDelivery === null || updatedProject.payAgainstDelivery === undefined ||
+            updatedProject.payAfterCompletion === "" || updatedProject.payAfterCompletion === null || updatedProject.payAfterCompletion === undefined
+        ) {
+            setLoading(false);
+            return toast.error("Please fill all required fields");
+        }
+
+        // Additional validation for completed projects
+        if (updatedProject.projectStatus === "Completed") {
+            if (!updatedProject.completionCertificate) {
+                setLoading(false);
+                return toast.error("Completion Certificate is required for completed projects");
+            }
+            // Removed warrantyCertificate validation as it's no longer required
+            if (!updatedProject.warrantyStartDate) {
+                setLoading(false);
+                return toast.error("Warranty Start Date is required for completed projects");
+            }
+            if (!updatedProject.warrantyMonths) {
+                setLoading(false);
+                return toast.error("Warranty Duration is required for completed projects");
+            }
+            if (updatedProject.warrantyMonths == 0) {
+                setLoading(false);
+                return toast.error("Warranty Duration must be greater than 0");
+            }
+        }
+
+        if (Number(updatedProject.advancePay) + Number(updatedProject.payAgainstDelivery) + Number(updatedProject.payAfterCompletion) > 100) {
+            setLoading(false);
+            return toast.error("Sum of Advance Payment, Pay Against Delivery, and Pay After Completion cannot exceed 100%");
+        }
+        if (updatedProject.startDate > updatedProject.endDate) {
+            setLoading(false);
+            return toast.error("Start Date cannot be greater than End Date");
+        }
+
+        try {
+            toast.loading("Updating Project...");
+            const data = await updateProject(updatedProject);
+            toast.dismiss();
+            if (data.success) {
+                toast.success(data.message);
+                handleUpdate();
+            } else {
+                toast.error(data.error);
+            }
+        } catch (error) {
+            toast.error(error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    //   const handleFileChange = (e) => {
-    //     const file = e.target.files[0];
-    //     if (file) {
-    //       const reader = new FileReader();
-    //       reader.onloadend = () => {
+    const viewFile = (fileType) => {
+        const fileUrl = projects[fileType];
+        if (!fileUrl) {
+            toast.error("No file available");
+            return;
+        }
 
-    //       };
-    //       reader.readAsDataURL(file);
-    //     }
-
-    //   };
-    //   console.log(POCopy,"POCopy");
-
-
-    //   const formatDate = (date) => date ? format(new Date(date), 'yyyy-MM-dd') : '';
+        if (fileUrl.startsWith('data:')) {
+            // Handle base64 data
+            const newWindow = window.open();
+            newWindow.document.write(`
+                <html>
+                    <head><title>File Preview</title></head>
+                    <body style="margin:0; overflow:hidden">
+                        <iframe src="${fileUrl}" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>
+                    </body>
+                </html>
+            `);
+        } else {
+            // Handle URL
+            window.open(fileUrl, '_blank');
+        }
+    };
 
     const formattedPurchaseOrderDate = formatDateforupdate(projects?.purchaseOrderDate);
     const formattedStartDate = formatDateforupdate(projects?.startDate);
     const formattedEndDate = formatDateforupdate(projects?.endDate);
+    const formattedWarrantyStartDate = formatDateforupdate(projects?.warrantyStartDate);
 
     return (
         <>
             <form onSubmit={handleProjectUpdate}>
                 <div className="modal fade show" style={{ display: "flex", alignItems: 'center', backgroundColor: "#00000090" }}>
-
                     <div className="modal-dialog modal-lg">
                         <div className="modal-content p-3">
                             <div className="modal-header pt-0">
-
                                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-
                                     Update Project
-                                    {/* Forward */}
                                 </h5>
                                 <button onClick={() => handleUpdate()} type="button" className="close px-3" style={{ marginLeft: "auto" }}>
                                     <span aria-hidden="true">&times;</span>
@@ -308,8 +309,7 @@ useEffect(() => {
                             </div>
                             <div className="modal-body">
                                 <div className="row modal_body_height">
-                                    <div className="col-12" >
-
+                                    <div className="col-12">
                                         <div className="mb-3">
                                             <label htmlFor="customerSearch" className="form-label label_text">
                                                 Customer Name <RequiredStar />
@@ -335,12 +335,25 @@ useEffect(() => {
                                     </div>
 
                                     <div className="mb-3">
-                                        <label for="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
-                                        <textarea type="text" className="form-control rounded-0" id="ProjectName" name="name" onChange={handleChange} maxLength={1000} placeholder="Update Project Name...." value={projects.name} aria-describedby="emailHelp" ></textarea>
+                                        <label htmlFor="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
+                                        <textarea 
+                                            type="text" 
+                                            className="form-control rounded-0" 
+                                            id="ProjectName" 
+                                            name="name" 
+                                            onChange={handleChange} 
+                                            maxLength={1000} 
+                                            placeholder="Update Project Name...." 
+                                            value={projects.name} 
+                                            aria-describedby="emailHelp"
+                                        ></textarea>
                                     </div>
+
                                     <div className="col-12 col-lg-6 mt-2">
-                                        <label for="ProjectName" className="form-label label_text">Project Status <RequiredStar /></label>
-                                        <select className="form-select rounded-0" aria-label="Default select example"
+                                        <label htmlFor="projectStatus" className="form-label label_text">Project Status <RequiredStar /></label>
+                                        <select 
+                                            className="form-select rounded-0" 
+                                            aria-label="Project status"
                                             name="projectStatus"
                                             onChange={handleChange}
                                             value={projects?.projectStatus}
@@ -348,38 +361,33 @@ useEffect(() => {
                                             <option value="Upcoming">Upcoming</option>
                                             <option value="Inprocess">Inprocess</option>
                                             <option value="Completed">Completed</option>
-
                                         </select>
                                     </div>
 
-                                    <div className="col-12 col-lg-6 mt-2" >
+                                    <div className="col-12 col-lg-6 mt-2">
                                         <div className="mb-3">
-                                            <label htmlFor="completeLevel"
-                                                name="completeLevel" className="form-label label_text">Completion level <RequiredStar /></label>
+                                            <label htmlFor="completeLevel" className="form-label label_text">Completion level <RequiredStar /></label>
                                             <input
-  onChange={handleChange}
-  value={projects?.completeLevel}
-  name="completeLevel"
-  type="text"
-  placeholder="Update Completion level...."
-  inputMode="numeric"
-  pattern="^\d{1,10}$"
-  maxLength="2"
-  className="form-control rounded-0"
-  id="completeLevel"
-  aria-describedby="dateHelp"
-  required
-  disabled={projects?.projectStatus === "Completed"}
-/>
-                                                
-
+                                                onChange={handleChange}
+                                                value={projects?.completeLevel}
+                                                name="completeLevel"
+                                                type="text"
+                                                placeholder="Update Completion level...."
+                                                inputMode="numeric"
+                                                pattern="^\d{1,10}$"
+                                                maxLength="2"
+                                                className="form-control rounded-0"
+                                                id="completeLevel"
+                                                aria-describedby="dateHelp"
+                                                required
+                                                disabled={projects?.projectStatus === "Completed"}
+                                            />
                                         </div>
                                     </div>
 
-                                    <div className="col-12 col-lg-6 mt-2" >
+                                    <div className="col-12 col-lg-6 mt-2">
                                         <div className="mb-3">
-                                            <label htmlFor="purchaseOrderDate"
-                                                name="purchaseOrderDate" className="form-label label_text">Purchase Order Date <RequiredStar /></label>
+                                            <label htmlFor="purchaseOrderDate" className="form-label label_text">Purchase Order Date <RequiredStar /></label>
                                             <input
                                                 onChange={handleChange}
                                                 value={formattedPurchaseOrderDate}
@@ -391,11 +399,10 @@ useEffect(() => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="col-12 col-lg-6 mt-2" >
+
+                                    <div className="col-12 col-lg-6 mt-2">
                                         <div className="mb-3">
-                                            <label for="PurchaseOrderNumber"
-                                                name="purchaseOrderNo"
-                                                className="form-label label_text">Purchase Order Number <RequiredStar /></label>
+                                            <label htmlFor="PurchaseOrderNumber" className="form-label label_text">Purchase Order Number <RequiredStar /></label>
                                             <input
                                                 type="text"
                                                 inputMode="numeric"
@@ -410,14 +417,12 @@ useEffect(() => {
                                                 aria-describedby="emailHelp"
                                                 required
                                             />
-
-
                                         </div>
                                     </div>
-                                    <div className="col-12 col-lg-6 mt-2" >
+
+                                    <div className="col-12 col-lg-6 mt-2">
                                         <div className="mb-3">
-                                            <label for="PurchaseOrderValu" className="form-label label_text">Purchase Order Value (Rs/USD) <RequiredStar />
-                                            </label>
+                                            <label htmlFor="PurchaseOrderValue" className="form-label label_text">Purchase Order Value (Rs/USD) <RequiredStar /></label>
                                             <input
                                                 type="text"
                                                 inputMode="numeric"
@@ -425,25 +430,25 @@ useEffect(() => {
                                                 pattern="^\d{1,12}$"
                                                 className="form-control rounded-0"
                                                 name="purchaseOrderValue"
-                                                id="PurchaseOrderValu"
+                                                id="PurchaseOrderValue"
                                                 placeholder="Update Order Value...."
                                                 onChange={handleChange}
                                                 value={projects?.purchaseOrderValue}
                                                 required
                                             />
-
                                         </div>
                                     </div>
-                                    <div className="col-12 col-lg-6 mt-2" >
+
+                                    <div className="col-12 col-lg-6 mt-2">
                                         <div className="mb-3">
-                                            <label for="exampleInputEmail1" className="form-label label_text">Category of Project <RequiredStar />
-                                            </label>
-                                            <select className="form-select rounded-0" aria-label="Default select example"
+                                            <label htmlFor="category" className="form-label label_text">Category of Project <RequiredStar /></label>
+                                            <select 
+                                                className="form-select rounded-0" 
+                                                aria-label="Project category"
                                                 name="category"
                                                 onChange={handleChange}
                                                 value={projects?.category}
                                             >
-                                                <option selected>{projects?.category}</option>
                                                 <option value="CCTV System">CCTV System</option>
                                                 <option value="TA System">TA System</option>
                                                 <option value="Hajeri">Hajeri</option>
@@ -469,7 +474,7 @@ useEffect(() => {
                                                 <option value="PMS">PMS</option>
                                                 <option value="Boom Barrier System">Boom Barrier System</option>
                                                 <option value="Tripod System">Tripod System</option>
-                                                <option value="Flap Barriers System">Flap Barrier System</option>
+                                                <option value="Flap Barrier System">Flap Barrier System</option>
                                                 <option value="EPBX System">EPBX System</option>
                                                 <option value="CMS">CMS</option>
                                                 <option value="Lift Eliviter System">Lift Eliviter System</option>
@@ -479,10 +484,10 @@ useEffect(() => {
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="col-12 col-lg-6 mt-2" >
+
+                                    <div className="col-12 col-lg-6 mt-2">
                                         <div className="mb-3">
-                                            <label htmlFor="startDate" className="form-label label_text">Project Start Date <RequiredStar />
-                                            </label>
+                                            <label htmlFor="startDate" className="form-label label_text">Project Start Date <RequiredStar /></label>
                                             <input
                                                 onChange={handleChange}
                                                 name="startDate"
@@ -494,118 +499,207 @@ useEffect(() => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="col-12 col-lg-6 mt-2" >
+
+                                    <div className="col-12 col-lg-6 mt-2">
                                         <div className="mb-3">
                                             <label htmlFor="EndDate" className="form-label label_text">Project End Date <RequiredStar /></label>
                                             <input
                                                 onChange={handleChange}
-                                                value={formattedEndDate} // Make sure to handle the case where it might be undefined
+                                                value={formattedEndDate}
                                                 type="date"
-                                                name="endDate"  // Add the name attribute
+                                                name="endDate"
                                                 className="form-control rounded-0"
-                                                id="EndDate"  // Change the id to match the name for clarity
+                                                id="EndDate"
                                                 aria-describedby="dateHelp"
                                             />
                                         </div>
                                     </div>
 
+                                    {/* Completed Project Fields - Conditionally Rendered */}
+                                    {projects?.projectStatus === "Completed" && (
+                                        <div className="col-12 mt-4">
+                                            <div className="row border bg-light mx-auto p-3">
+                                                <div className="col-12 mb-3">
+                                                    <span className="SecondaryInfo fw-bold">Project Completion Details</span>
+                                                </div>
 
+                                                <div className="col-12 col-lg-6 mt-2">
+                                                    <div className="mb-3">
+                                                        <label htmlFor="completionCertificate" className="form-label label_text">
+                                                            Completion Come / Warranty Certificate <RequiredStar />
+                                                        </label>
+                                                        <input
+                                                            type="file"
+                                                            className="form-control rounded-0"
+                                                            id="completionCertificate"
+                                                            name="completionCertificate"
+                                                            onChange={handleChange}
+                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                        />
+                                                        {projects.completionCertificate && (
+                                                            <button 
+                                                                type="button" 
+                                                                className="btn btn-outline-primary btn-sm mt-2"
+                                                                onClick={() => viewFile('completionCertificate')}
+                                                            >
+                                                                View Current File
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
 
-                                    <div className="col-12  mt-2" >
+                                                <div className="col-12 col-lg-6 mt-2">
+                                                    <div className="mb-3">
+                                                        <label htmlFor="warrantyCertificate" className="form-label label_text">
+                                                            HandOver Document {/* Removed RequiredStar */}
+                                                        </label>
+                                                        <input
+                                                            type="file"
+                                                            className="form-control rounded-0"
+                                                            id="warrantyCertificate"
+                                                            name="warrantyCertificate"
+                                                            onChange={handleChange}
+                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                            // Removed required attribute
+                                                        />
+                                                        {projects.warrantyCertificate && (
+                                                            <button 
+                                                                type="button" 
+                                                                className="btn btn-outline-primary btn-sm mt-2"
+                                                                onClick={() => viewFile('warrantyCertificate')}
+                                                            >
+                                                                View Current File
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
 
+                                                <div className="col-12 col-lg-6 mt-2">
+                                                    <div className="mb-3">
+                                                        <label htmlFor="warrantyStartDate" className="form-label label_text">
+                                                            Warranty Start Date <RequiredStar />
+                                                        </label>
+                                                        <input
+                                                            onChange={handleChange}
+                                                            value={formattedWarrantyStartDate}
+                                                            type="date"
+                                                            name="warrantyStartDate"
+                                                            className="form-control rounded-0"
+                                                            id="warrantyStartDate"
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="col-12 col-lg-6 mt-2">
+                                                    <div className="mb-3">
+                                                        <label htmlFor="warrantyDuration" className="form-label label_text">
+                                                            Warranty Duration <RequiredStar />
+                                                        </label>
+                                                        <select 
+                                                            className="form-select rounded-0"
+                                                            name="warrantyMonths"
+                                                            onChange={handleChange}
+                                                            value={projects?.warrantyMonths || ""}
+                                                        >
+                                                            <option value="">Select Duration</option>
+                                                            {Array.from({ length: 40 }, (_, i) => (i + 1) * 3).map((month) => (
+                                                                <option key={month} value={month}>{month} Months</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Payment Terms Section */}
+                                    <div className="col-12 mt-2">
                                         <div className="row border bg-gray mx-auto">
                                             <div className="col-10 mb-3">
-                                                <span className="SecondaryInfo">
-                                                    Payment terms:
-
-                                                </span>
+                                                <span className="SecondaryInfo">Payment terms:</span>
                                             </div>
 
                                             <div className="col-12 col-lg-6 mt-2">
-  <div className="mb-3">
-    <label htmlFor="advancePay" className="form-label label_text">
-      Advance Payment <RequiredStar />
-    </label>
-    <input
-      type="text"
-      inputMode="numeric"
-      pattern="^\d{1,3}$"
-      maxLength={3}
-      className="form-control rounded-0"
-      id="advancePay"
-      name="advancePay"
-      onChange={handleChange}
-      value={projects?.advancePay}
-      required
-    />
-  </div>
-</div>
+                                                <div className="mb-3">
+                                                    <label htmlFor="advancePay" className="form-label label_text">Advance Payment <RequiredStar /></label>
+                                                    <input
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        pattern="^\d{1,3}$"
+                                                        maxLength={3}
+                                                        className="form-control rounded-0"
+                                                        id="advancePay"
+                                                        name="advancePay"
+                                                        onChange={handleChange}
+                                                        value={projects?.advancePay}
+                                                        required
+                                                        disabled  // Added disabled attribute
+                                                    />
+                                                </div>
+                                            </div>
 
-<div className="col-12 col-lg-6 mt-2">
-  <div className="mb-3">
-    <label htmlFor="payAgainstDelivery" className="form-label label_text">
-      Pay Against Delivery <RequiredStar />
-    </label>
-    <input
-      type="text"
-      inputMode="numeric"
-      pattern="^\d{1,3}$"
-      maxLength={3}
-      className="form-control rounded-0"
-      id="payAgainstDelivery"
-      name="payAgainstDelivery"
-      onChange={handleChange}
-      value={projects?.payAgainstDelivery}
-      required
-    />
-  </div>
-</div>
+                                            <div className="col-12 col-lg-6 mt-2">
+                                                <div className="mb-3">
+                                                    <label htmlFor="payAgainstDelivery" className="form-label label_text">Pay Against Delivery <RequiredStar /></label>
+                                                    <input
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        pattern="^\d{1,3}$"
+                                                        maxLength={3}
+                                                        className="form-control rounded-0"
+                                                        id="payAgainstDelivery"
+                                                        name="payAgainstDelivery"
+                                                        onChange={handleChange}
+                                                        value={projects?.payAgainstDelivery}
+                                                        required
+                                                        disabled  // Added disabled attribute
+                                                    />
+                                                </div>
+                                            </div>
 
-<div className="col-12 col-lg-6 mt-2">
-  <div className="mb-3">
-    <label htmlFor="payAfterCompletion" className="form-label label_text">
-      Pay After Completion <RequiredStar />
-    </label>
-    <input
-      type="text"
-      inputMode="numeric"
-      pattern="^\d{1,3}$"
-      maxLength={3}
-      className="form-control rounded-0"
-      id="payAfterCompletion"
-      name="payAfterCompletion"
-      onChange={handleChange}
-      value={projects?.payAfterCompletion}
-      required
-    />
-  </div>
-</div>
+                                            <div className="col-12 col-lg-6 mt-2">
+                                                <div className="mb-3">
+                                                    <label htmlFor="payAfterCompletion" className="form-label label_text">Pay After Completion <RequiredStar /></label>
+                                                    <input
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        pattern="^\d{1,3}$"
+                                                        maxLength={3}
+                                                        className="form-control rounded-0"
+                                                        id="payAfterCompletion"
+                                                        name="payAfterCompletion"
+                                                        onChange={handleChange}
+                                                        value={projects?.payAfterCompletion}
+                                                        required
+                                                        disabled  // Added disabled attribute
+                                                    />
+                                                </div>
+                                            </div>
 
-<div className="col-12 col-lg-6 mt-2">
-  <div className="mb-3">
-    <label htmlFor="retention" className="form-label label_text">
-      Retention (%) <RequiredStar />
-    </label>
-    <input
-      type="text"
-      inputMode="numeric"
-      pattern="^\d{1,3}$"
-      maxLength={3}
-      className="form-control rounded-0"
-      id="retention"
-      name="retention"
-      value={retention}
-      readOnly
-      style={{ backgroundColor: '#f8f9fa' }}
-      required
-    />
-  </div>
-</div>
-
-
+                                            <div className="col-12 col-lg-6 mt-2">
+                                                <div className="mb-3">
+                                                    <label htmlFor="retention" className="form-label label_text">Retention (%) <RequiredStar /></label>
+                                                    <input
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        pattern="^\d{1,3}$"
+                                                        maxLength={3}
+                                                        className="form-control rounded-0"
+                                                        id="retention"
+                                                        name="retention"
+                                                        value={retention}
+                                                        readOnly
+                                                        style={{ backgroundColor: '#f8f9fa' }}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="col-12  mt-2">
+
+                                    {/* Address Section */}
+                                    <div className="col-12 mt-2">
                                         <div className="row border mt-4 bg-gray mx-auto">
                                             <div className="col-12 mb-3">
                                                 <span className="AddressInfo">Address <RequiredStar /></span>
@@ -626,7 +720,6 @@ useEffect(() => {
                                                         value={address.pincode}
                                                         required
                                                     />
-
                                                 </div>
                                             </div>
 
@@ -640,7 +733,8 @@ useEffect(() => {
                                                         name="state"
                                                         onChange={handleAddressChange}
                                                         value={address.state}
-                                                        maxLength={50}                                                        pattern="^[a-zA-Z\s]*$"
+                                                        maxLength={50}
+                                                        pattern="^[a-zA-Z\s]*$"
                                                         required
                                                     />
                                                 </div>
@@ -660,7 +754,6 @@ useEffect(() => {
                                                         value={address.city}
                                                         required
                                                     />
-
                                                 </div>
                                             </div>
 
@@ -678,7 +771,6 @@ useEffect(() => {
                                                         pattern="^[a-zA-Z\s]{2,40}$"
                                                         required
                                                     />
-
                                                 </div>
                                             </div>
 
@@ -699,61 +791,52 @@ useEffect(() => {
                                         </div>
                                     </div>
 
-
-
-
-
-
-
-
-                                    <div className="col-12 col-lg-6 mt-2" >
-
+                                    {/* Purchase Order Copy */}
+                                    <div className="col-12 col-lg-6 mt-2">
                                         <div className="mb-3">
-                                            <label for="PurchaseOrderCopy" className="form-label label_text">     Purchase Order Copy <RequiredStar />
-
+                                            <label htmlFor="PurchaseOrderCopy" className="form-label label_text">
+                                                Purchase Order Copy <RequiredStar />
                                             </label>
-
                                         </div>
-                                      <button type="button" className="btn btn-outline-dark" onClick={viewFile}>View</button>
+                                        <button type="button" className="btn btn-outline-dark" onClick={() => viewFile('POCopy')}>View</button>
                                     </div>
-                            <div className="col-12 col-lg-12 mt-2">
-  <div className="mb-3">
-    <label htmlFor="remark" className="form-label label_text">
-      Remark
-    </label>
-    <textarea
-      type="text"
-      className="textarea_edit col-12"
-      id="remark"
-      name="remark"
-      onChange={handleChange}
-      maxLength={1000}
-      placeholder="Enter a Remark..."
-      value={projects?.remark || ""}
-      aria-describedby="secemailHelp"
-      row='2'
-    />
-  </div>
-</div>
 
+                                    {/* Remark */}
+                                    <div className="col-12 col-lg-12 mt-2">
+                                        <div className="mb-3">
+                                            <label htmlFor="remark" className="form-label label_text">Remark</label>
+                                            <textarea
+                                                type="text"
+                                                className="textarea_edit col-12"
+                                                id="remark"
+                                                name="remark"
+                                                onChange={handleChange}
+                                                maxLength={1000}
+                                                placeholder="Enter a Remark..."
+                                                value={projects?.remark || ""}
+                                                aria-describedby="secemailHelp"
+                                                rows='2'
+                                            />
+                                        </div>
+                                    </div>
 
-
-
+                                    {/* Action Buttons */}
                                     <div className="row">
                                         <div className="col-12 pt-3 mt-2">
                                             <button
                                                 type='submit'
                                                 onClick={handleProjectUpdate}
                                                 disabled={loading}
-                                                className="w-80 btn addbtn rounded-0 add_button   m-2 px-4" >
+                                                className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
+                                            >
                                                 {!loading ? "Update" : "Submitting..."}
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={handleUpdate}
-                                                className="w-80  btn addbtn rounded-0 Cancel_button m-2 px-4" >
+                                                className="w-80 btn addbtn rounded-0 Cancel_button m-2 px-4"
+                                            >
                                                 Cancel
-
                                             </button>
                                         </div>
                                     </div>
@@ -763,8 +846,8 @@ useEffect(() => {
                     </div>
                 </div>
             </form>
-
-        </>);
+        </>
+    );
 }
 
 export default UpdateProjectPopup;

@@ -182,9 +182,10 @@ export const ProjectMasterGrid = () => {
                         <thead>
                           <tr className="th_border">
                             <th>Sr. No</th>
-                            <th className="align_left_td td_width">Customer Nmae</th>
+                            <th className="align_left_td td_width">Customer Name</th>
                             <th className="align_left_td td_width">Product Name</th>
                             <th>Created By</th>
+                            <th>Created Date</th>
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Status</th>
@@ -200,6 +201,7 @@ export const ProjectMasterGrid = () => {
                                 <td className="align_left_td td_width wrap-text-of-col">{project.custId?.custName || "N/A"}</td>
                                 <td className="align_left_td td_width wrap-text-of-col">{project.name}</td>
                                 <td className="w-30">{project.createdBy?.name || "Unknown"}</td>
+                                <td className="w-20">{formatDate(project.createdAt)}</td>
                                 <td className="w-20">{formatDate(project.startDate)}</td>
                                 <td className="w-20">{formatDate(project.endDate)}</td>
                                 <td className="w-20">{project.projectStatus}</td>
@@ -229,7 +231,7 @@ export const ProjectMasterGrid = () => {
                             ))
                           ) : (
                             <tr>
-                              <td colSpan="8" className="text-center">
+                              <td colSpan="10" className="text-center">
                                 No data found
                               </td>
                             </tr>
@@ -364,4 +366,3 @@ export const ProjectMasterGrid = () => {
     </>
   );
 };
-

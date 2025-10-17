@@ -301,7 +301,7 @@ export const EmployeeTaskGrid = () => {
                                                         <th className="align_left_td td_width">Project Name</th>
                                                         <th>Project Status</th>
                                                         <th style={commonThStyle}>Finish Date</th>
-                                                        <th style={commonThStyle}></th>
+                                                        <th style={commonThStyle}>Work Status</th>
                                                         <th style={commonThStyle}>Tasks</th>
                                                     </tr>
                                                 </thead>

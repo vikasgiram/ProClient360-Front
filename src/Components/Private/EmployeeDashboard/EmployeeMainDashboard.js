@@ -86,8 +86,8 @@ function EmployeeMainDashboard() {
                                                
                                                 
                                             /> */}
-                                            <span className="Customer_fs ps-3 text-white">Avg Score |
-                                                <span className="Customer_count ms-2">44%</span></span>
+                                            <span className="Customer_fs ps-3 text-white">
+                                                <span className="Customer_count ms-2"></span></span>
                                         </span>
 
 
