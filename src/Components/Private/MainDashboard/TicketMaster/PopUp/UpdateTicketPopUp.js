@@ -317,22 +317,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                       >
                         <option hidden>{ticket?.product}</option>
                         <option value={"Surveillance System"}>
-                          Surveillance System </option>
-
-                        <option value={"CCTV System"}>
-                          CCTV System
-                        </option>
-                        <option value={"TA System"}>
-                          TA System
-                        </option>
-                        <option value={"Hajeri"}>
-                          Hajeri
-                        </option>
-                        <option value={"SmartFace"}>
-                          SmartFace
-                        </option>
-                        <option value={"ZKBioSecurity"}>
-                          ZKBioSecurity
+                          Surveillance System
                         </option>
                         <option value={"Access Control System"}>
                           Access Control System
@@ -382,6 +367,7 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                       </select>
                     </div>
                   </div>
+
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="mb-3">
                       <label
@@ -469,6 +455,104 @@ const UpdateEmployeePopUp = ({ handleUpdate, selectedTicket }) => {
                         <option value={"SMS"}>SMS</option>
                         <option value={"Direct"}>Direct</option>
                       </select>
+                    </div>
+                  </div>
+
+                  <div className="col-12">
+                    <div className="mb-3">
+                      <label for="product" className="form-label label_text">
+                        Product <RequiredStar />
+                      </label>
+                      <select
+                        className="form-select rounded-0"
+                        id="product"
+                        name="product"
+                        aria-label="Default select example"
+                        onChange={handleChange}
+                        required
+                      >
+                        <option hidden>{ticket?.product}</option>
+                        <option value={"CCTV System"}>
+                          CCTV System
+                        </option>
+                        <option value={"TA System"}>
+                          TA System
+                        </option>
+                        <option value={"Hajeri"}>
+                          Hajeri
+                        </option>
+                        <option value={"SmartFace"}>
+                          SmartFace
+                        </option>
+                        <option value={"ZKBioSecurity"}>
+                          ZKBioSecurity
+                        </option>
+                        <option value={"Access Control System"}>
+                          Access Control System
+                        </option>
+                        <option value={"Turnkey Project"}>
+                          Turnkey Project
+                        </option>
+                        <option value={"Alleviz"}>Alleviz</option>
+                        <option value={"CafeLive"}>CafeLive</option>
+                        <option value={"WorksJoy"}>WorksJoy</option>
+                        <option value={"WorksJoy Blu"}>WorksJoy Blu</option>
+                        <option value={"Fire Alarm System"}>
+                          Fire Alarm System
+                        </option>
+                        <option value={"Fire Hydrant System"}>
+                          Fire Hydrant System
+                        </option>
+                        <option value={"IDS"}>IDS</option>
+                        <option value={"AI Face Machines"}>
+                          AI Face Machines
+                        </option>
+                        <option value={"Entrance Automation"}>
+                          Entrance Automation
+                        </option>
+                        <option value={"Guard Tour System"}>
+                          Guard Tour System
+                        </option>
+                        <option value={"Home Automation"}>
+                          Home Automation
+                        </option>
+                        <option value={"IP PA and Communication System"}>
+                          IP PA and Communication System
+                        </option>
+                        <option value="CRM">CRM</option>
+                        <option value="KMS">KMS</option>
+                        <option value="VMS">VMS</option>
+                        <option value="PMS">PMS</option>
+                        <option value="Boom Barrier System">Boom Barrier System</option> 
+                        <option value="Tripod System">Tripod System</option>
+                        <option value="Flap Barrier System">Flap Barriers System</option>
+                        <option value="EPBX System">EPBX System</option>
+                        <option value="CMS">CMS</option>
+                        <option value="Lift Eliviter System">Lift Eliiter System</option>
+                        <option value="AV6">AV6</option>
+                        <option value="Walky Talky System">Walky Talky System</option>
+                        <option value="Device Management System">Device Management System</option>
+                      </select>
+                    </div>
+                  </div>
+
+                <div className="col-12">
+                    <div className="mb-3">
+                      <label for="details" className="form-label label_text">
+                        Complaint Details <RequiredStar />
+                      </label>
+                      <textarea
+                        type="text"
+                        name="details"
+                        maxLength={500}
+                        placeholder="Update a Complaint Details...."
+                        value={ticket?.details}
+                        onChange={handleChange}
+                        className="form-control rounded-0"
+                        id="details"
+                        aria-describedby="emailHelp"
+                        required
+                      ></textarea>
                     </div>
                   </div>
 

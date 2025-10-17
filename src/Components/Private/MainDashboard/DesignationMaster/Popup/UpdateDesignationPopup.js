@@ -1032,6 +1032,69 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
 </tr>
 
 
+                        <tr>
+  <td>AMC</td>
+  <td>
+    <div>
+      <label className="toggler-wrapper style-22">
+                        <input type="checkbox"
+                          id="permissions"
+                          name="createAMC"
+                          checked={designation.permissions.includes('createAMC')}
+                          onChange={(e) => handlePermissionChange('createAMC', e.target.checked)}
+                        />
+        <div className="toggler-slider">
+          <div className="toggler-knob"></div>
+        </div>
+      </label>
+    </div>
+  </td>
+  <td>
+    <div>
+      <label className="toggler-wrapper style-22">
+                        <input type="checkbox"
+                        id="permissions"
+                        name="viewAMC"
+                          checked={designation.permissions.includes('viewAMC')}
+                          onChange={(e) => handlePermissionChange('viewAMC', e.target.checked)}
+                        />
+        <div className="toggler-slider">
+          <div className="toggler-knob"></div>
+        </div>
+      </label>
+    </div>
+  </td>
+  <td>
+    <div>
+      <label className="toggler-wrapper style-22">
+                        <input type="checkbox"
+                        id="permissions"
+                        name="updateAMC"
+                          checked={designation.permissions.includes('updateAMC')}
+                          onChange={(e) => handlePermissionChange('updateAMC', e.target.checked)}
+                        />
+        <div className="toggler-slider">
+          <div className="toggler-knob"></div>
+        </div>
+      </label>
+    </div>
+  </td>
+  <td>
+    <div>
+      <label className="toggler-wrapper style-22">
+                        <input type="checkbox"
+                        id="permissions"
+                        name="deleteAMC"
+                          checked={designation.permissions.includes('deleteAMC')}
+                          onChange={(e) => handlePermissionChange('deleteAMC', e.target.checked)}
+                        />
+        <div className="toggler-slider">
+          <div className="toggler-knob"></div>
+        </div>
+      </label>
+    </div>
+  </td>
+</tr>
 
                       </tbody>
                     </table>

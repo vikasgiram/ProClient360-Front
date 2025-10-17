@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { RequiredStar } from '../../../RequiredStar/RequiredStar';
 import useUpdateLead from '../../../../../hooks/leads/useUpdateLead';
+import { ObjectId } from 'bson';
 
 const LeadInfoView = ({ selectedLead, actionData }) => {
   if (!selectedLead) {
@@ -60,15 +61,13 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
 
           {selectedLead?.SOURCE?.toLowerCase() === "linkedin" && (
             <span>
-              <img src="/static/assets/img/linkedin.png" alt="LinkedIn" style={{ height: "40px", marginLeft: "10px" }}
-              />
+              <img src="/static/assets/img/linkedin.png" alt="LinkedIn" style={{ height: "40px", marginLeft: "10px" }} />
             </span>
           )}
 
           {selectedLead?.SOURCE?.toLowerCase() === "direct" && (
             <span>
-              <img src="/static/assets/img/nav/DACCESS.png" alt="direct" style={{ height: "40px", marginLeft: "10px" }}
-              />
+              <img src="/static/assets/img/nav/DACCESS.png" alt="direct" style={{ height: "40px", marginLeft: "10px" }} />
             </span>
           )}
 
@@ -96,7 +95,6 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
         <h6 className="mt-3"><p className="fw-bold d-inline">Quotation Amount: </p>₹{selectedLead?.quotation || " "}</h6>
         <h6 className="mt-3"><p className="fw-bold d-inline">Next Follow-up Date: </p>{formatDate(selectedLead?.nextFollowUpDate) || "Not set"}</h6>
         <h6 className="mt-3"><p className="fw-bold d-inline">Remark: </p>{selectedLead?.rem || " "}</h6>
-
       </div>
 
       <div className="col-12 mt-2">
@@ -108,28 +106,24 @@ const LeadInfoView = ({ selectedLead, actionData }) => {
 };
 
 const actionOptions = [
-    '1. Call Not Connect/ Callback',
-    '2. Requirement Understanding',
-    '3. Site Visit',
-    '4. Online Demo',
-    '5. Proof of Concept (POC)',
-    '6. Documentation & Planning',
-    '7. Quotation Submission',
-    '8. Quotation Discussion',
-    '9. Follow-Up Call',
-    '10. Negotiation Call',
-    '11. Negotiation Meetings',
-    '12. Deal Status',
-    '13. Won',
-    '14. Lost',
-    '15. Not Feasible'
+  '1. Call Not Connect/ Callback',
+  '2. Requirement Understanding',
+  '3. Site Visit',
+  '4. Online Demo',
+  '5. Proof of Concept (POC)',
+  '6. Documentation & Planning',
+  '7. Quotation Submission',
+  '8. Quotation Discussion',
+  '9. Follow-Up Call',
+  '10. Negotiation Call',
+  '11. Negotiation Meetings',
+  '12. Deal Status',
+  '15. Not Feasible'
 ];
-
-// Define steps that should automatically set completion to 100%
-const finalSteps = ['13. Won', '14. Lost'];
 
 const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
   const [showInfo, setShowInfo] = useState(isCompany);
+  const [isLoading, setIsLoading] = useState(false);
   const [actionData, setActionData] = useState({
     actionType: '', 
     date: '', 
@@ -147,6 +141,13 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
   // Initialize or update previous actions when selectedLead changes
   useEffect(() => {
     if (selectedLead) {
+      // Check if lead status is Won or Lost and prevent update
+      if (selectedLead.STATUS === 'Won' || selectedLead.STATUS === 'Lost') {
+        toast.error(`Cannot update a lead with status "${selectedLead.STATUS}". This lead is already finalized.`);
+        onClose();
+        return;
+      }
+
       // Set form data based on selected lead
       setActionData({
         actionType: selectedLead?.actionDetails?.step || selectedLead?.step || '',
@@ -172,7 +173,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       // If no history exists, create initial action from current lead data
       if (actions.length === 0) {
         const initialAction = {
-          _id: 'initial-' + Date.now(),
+          _id: new ObjectId(),
           status: selectedLead.status || selectedLead?.STATUS || 'Pending',
           step: selectedLead.step || 'Initial',
           nextFollowUpDate: selectedLead.nextFollowUpDate || null,
@@ -192,37 +193,29 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       
       setPreviousActions(actions);
     }
-  }, [selectedLead]);
+  }, [selectedLead, onClose]);
 
   const handleActionChange = (e) => {
     const { name, value } = e.target;
     
-    if (name === 'actionType') {
-      // If a final step is selected, automatically set completion to 100%
-      const isFinalStep = finalSteps.includes(value);
-      setActionData(prev => ({ 
-        ...prev, 
-        [name]: value,
-        completion: isFinalStep ? '100' : prev.completion
-      }));
-      
-      // Also update status if it's a final step
-      if (isFinalStep) {
-        if (value === '13. Won') {
-          setActionData(prev => ({ 
-            ...prev, 
-            [name]: value,
-            completion: '100',
-            status: 'Won'
-          }));
-        } else if (value === '14. Lost') {
-          setActionData(prev => ({ 
-            ...prev, 
-            [name]: value,
-            completion: '100',
-            status: 'Lost'
-          }));
-        }
+    if (name === 'status') {
+      // When status changes to Won or Lost, set completion to 100 and set appropriate step
+      if (value === 'Won') {
+        setActionData(prev => ({ 
+          ...prev, 
+          [name]: value,
+          completion: '100',
+          actionType: '12. Deal Status'
+        }));
+      } else if (value === 'Lost') {
+        setActionData(prev => ({ 
+          ...prev, 
+          [name]: value,
+          completion: '100',
+          actionType: '15. Not Feasible'
+        }));
+      } else {
+        setActionData(prev => ({ ...prev, [name]: value }));
       }
     } 
     else if (name === 'completion') {
@@ -241,23 +234,28 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     }
   };
 
-  const handleActionSubmit = (e) => {
+  const handleActionSubmit = async (e) => {
     e.preventDefault();
-    const isQuotationRequired = actionData.actionType === '7. Quotation Submission';
     
     // Validation based on status
-    let requiredFields = ['status', 'actionType'];
+    let requiredFields = ['status'];
     
-    if (actionData.status !== 'Lost' && actionData.status !== 'Won') {
-      requiredFields.push('date');
-    }
-    
-    if (actionData.status !== 'Lost') {
-      requiredFields.push('completion');
-    }
-    
-    if (isQuotationRequired) {
+    // For Won status, require quotation and remark
+    if (actionData.status === 'Won') {
       requiredFields.push('quotation');
+      requiredFields.push('rem');
+    }
+    // For Lost status, require remark
+    else if (actionData.status === 'Lost') {
+      requiredFields.push('rem');
+    }
+    // For other statuses, require normal fields
+    else {
+      requiredFields.push('actionType', 'date', 'completion');
+      // Additional requirement for quotation submission
+      if (actionData.actionType === '7. Quotation Submission') {
+        requiredFields.push('quotation');
+      }
     }
     
     const hasEmptyRequiredField = requiredFields.some(field => !actionData[field]);
@@ -267,13 +265,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       return;
     }
 
-    const now = new Date();
-    const dateTime = now.toLocaleString('en-IN', {
-      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit',
-      minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata'
-    });
-
-    console.log("Action Data:", actionData);
     const updatedFormData = {
       status: actionData.status,
       step: actionData.actionType,
@@ -283,11 +274,9 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       rem: actionData.rem || ''
     };
 
-    console.log("Updated Form Data:", updatedFormData);
-
     // Create new action object for history
     const newAction = {
-      _id: Date.now().toString(), // Generate a temporary ID
+      _id: new ObjectId(),
       status: actionData.status,
       step: actionData.actionType,
       nextFollowUpDate: actionData.date,
@@ -295,7 +284,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       completion: actionData.completion ? parseFloat(actionData.completion) : 0,
       quotation: actionData.quotation ? parseFloat(actionData.quotation) : 0,
       actionBy: {
-        name: "Current User" // Replace with actual user info if available
+        name: "Current User"
       },
       createdAt: new Date().toISOString()
     };
@@ -314,11 +303,18 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       previousActions: updatedPreviousActions
     };
 
-    //api call to store updated data
-    useUpdate.updateLead(selectedLead?._id, formDataWithHistory);
-    onUpdate(selectedLead._id, formDataWithHistory);
-
-    onClose();
+    setIsLoading(true);
+    try {
+      // API call to store updated data
+      await useUpdate.updateLead(selectedLead?._id, formDataWithHistory);
+      onUpdate(selectedLead._id, formDataWithHistory);
+      toast.success('Lead updated successfully!');
+      onClose();
+    } catch (error) {
+      toast.error('Failed to update lead: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Helper function to format dates for display
@@ -388,27 +384,30 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         </select>
                       </div>
 
-                      <div className="col-md-6">
-                        <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar /></label>
-                        <select 
-                          id="actionType" 
-                          name="actionType" 
-                          className="form-select" 
-                          value={actionData.actionType} 
-                          onChange={handleActionChange} 
-                          required
-                        >
-                          <option value="" disabled>-- Select an action --</option>
-                          {actionOptions.map((action, index) => (
-                            <option key={index} value={action}>{action}</option>
-                          ))}
-                        </select>
-                      </div>            
-
-                      {/* Hide completion field when status is Lost */}
-                      {actionData.status !== 'Lost' && (
+                      {/* Show Steps field only when status is not Won or Lost */}
+                      {actionData.status !== 'Won' && actionData.status !== 'Lost' && (
                         <div className="col-md-6">
-                          <label htmlFor="completion" className="form-label fw-bold">Completion (%)<RequiredStar /></label>
+                          <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar /></label>
+                          <select 
+                            id="actionType" 
+                            name="actionType" 
+                            className="form-select" 
+                            value={actionData.actionType} 
+                            onChange={handleActionChange} 
+                            required
+                          >
+                            <option value="" disabled>-- Select an action --</option>
+                            {actionOptions.map((action, index) => (
+                              <option key={index} value={action}>{action}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Show completion field only when status is not Won or Lost */}
+                      {actionData.status !== 'Won' && actionData.status !== 'Lost' && (
+                        <div className="col-md-6">
+                          <label htmlFor="completion" className="form-label fw-bold">Status (%)<RequiredStar /></label>
                           <input 
                             type="text" 
                             className="form-control" 
@@ -418,15 +417,32 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                             maxLength={6} 
                             value={actionData.completion} 
                             onChange={handleActionChange} 
-                            required={actionData.status !== 'Lost'}
+                            required
                           />
                         </div>
                       )}
 
-                      {/* Show quotation field when Quotation Submission is selected */}
-                      {actionData.actionType === '7. Quotation Submission' && (
+                      {/* Show quotation field when status is Won */}
+                      {actionData.status === 'Won' && (
                         <div className="col-md-6">
-                          <label htmlFor="quotation" className="form-label fw-bold">Quotation Amount (₹)<RequiredStar /></label>
+                          <label htmlFor="quotation" className="form-label fw-bold">Amount Show (₹)<RequiredStar /></label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            id="quotation" 
+                            name="quotation" 
+                            placeholder="Enter quotation amount" 
+                            value={actionData.quotation}
+                            onChange={handleActionChange} 
+                            required 
+                          />
+                        </div>
+                      )}
+
+                      {/* Show quotation field when Quotation Submission is selected and status is not Won or Lost */}
+                      {actionData.status !== 'Won' && actionData.status !== 'Lost' && actionData.actionType === '7. Quotation Submission' && (
+                        <div className="col-md-6">
+                          <label htmlFor="quotation" className="form-label fw-bold">Amount Show (₹)<RequiredStar /></label>
                           <input 
                             type="text" 
                             className="form-control" 
@@ -451,13 +467,17 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                             name="date" 
                             value={actionData.date || ''} 
                             onChange={handleActionChange} 
-                            required={actionData.status !== 'Won' && actionData.status !== 'Lost'}
+                            required
                           />
                         </div>
                       )}
 
                       <div className="col-12">
-                        <label htmlFor="remark" className="form-label fw-bold">Remark</label>
+                        <label htmlFor="remark" className="form-label fw-bold">
+                          Remark
+                          {/* Make remark required for Won and Lost status */}
+                          {(actionData.status === 'Won' || actionData.status === 'Lost') && <RequiredStar />}
+                        </label>
                         <textarea 
                           id="rem" 
                           name="rem"
@@ -466,17 +486,24 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                           rows="3"
                           value={actionData.rem} 
                           onChange={handleActionChange}
+                          required={actionData.status === 'Won' || actionData.status === 'Lost'}
                         />
                       </div>
                     </div>
                   </div>
                 </>
               )}
-
-                <div className="modal-footer border-0 justify-content-start mt-3">
-              <button type="submit" className="btn addbtn rounded-0 add_button px-4">Submit</button>
-              <button type="button" onClick={onClose} className="btn addbtn rounded-0 Cancel_button px-4">Cancel</button>
             </div>
+
+            <div className="modal-footer border-0 justify-content-start mt-3">
+              <button 
+                type="submit" 
+                className="btn addbtn rounded-0 add_button px-4" 
+                disabled={isLoading}
+              >
+                {isLoading ? 'Submitting...' : 'Submit'}
+              </button>
+              <button type="button" onClick={onClose} className="btn addbtn rounded-0 Cancel_button px-4">Cancel</button>
             </div>
 
             {/* Action History Table */}
@@ -513,7 +540,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                 </div>
               </div>
             )}
-
           </form>
         </div>
       </div>

@@ -80,7 +80,6 @@ export const UserProfile = () => {
                             <div className="col-12">
                                 <div className="profile-container">
                                     <div className="row g-0">
-
                                         {/* <!-- Profile Sidebar --> */}
                                         <div className="col-12 col-lg-4">
                                             <div className="profile-sidebar p-4  text-center h-100 d-flex flex-column justify-content-center ">
