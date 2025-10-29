@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import AddAMCPopup from "./PopUp/AddAMCPopUp";
@@ -10,6 +10,10 @@ import { UserContext } from "../../../../context/UserContext";
 
 export const AMCMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
+  const [expiredCount, setExpiredCount] = useState(0);
+  const [showExpiredAlert, setShowExpiredAlert] = useState(true);
+  const alertRef = useRef(null);
+  
   const toggle = () => {
     setIsOpen(!isopen);
   };
@@ -25,6 +29,7 @@ export const AMCMasterGrid = () => {
   const [searchText, setSearchText] = useState("");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("Pending"); // Default to "Pending"
 
   const [amcs, setAMCs] = useState([]);
   const [pagination, setPagination] = useState({
@@ -71,7 +76,19 @@ export const AMCMasterGrid = () => {
   const fetchAMCs = async () => {
     try {
       setLoading(true);
-      const data = await getAMCs(pagination.currentPage, itemsPerPage, search, typeFilter);
+      console.log("Fetching AMCs with filters:", { 
+        page: pagination.currentPage, 
+        limit: itemsPerPage, 
+        search, 
+        type: typeFilter, 
+        status: statusFilter 
+      });
+      
+      // Pass statusFilter to getAMCs function
+      const data = await getAMCs(pagination.currentPage, itemsPerPage, search, typeFilter, statusFilter);
+      
+      console.log("AMC data received:", data);
+      
       if (data?.success) {
         setAMCs(data.data || []);
         setPagination(data.pagination || {
@@ -82,6 +99,13 @@ export const AMCMasterGrid = () => {
           hasNextPage: false,
           hasPrevPage: false,
         });
+        
+        // Count expired AMCs
+        const expired = data.data.filter(amc => {
+          const daysRemaining = Math.ceil((new Date(amc.amcEndDate) - new Date()) / (1000 * 60 * 60 * 24));
+          return daysRemaining < 0;
+        });
+        setExpiredCount(expired.length);
       } else {
         toast.error(data.error || "Failed to fetch AMCs");
       }
@@ -133,11 +157,11 @@ export const AMCMasterGrid = () => {
 
   useEffect(() => {
     fetchAMCs();
-  }, [pagination.currentPage, search, typeFilter]);
+  }, [pagination.currentPage, search, typeFilter, statusFilter]);
 
   useEffect(() => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
-  }, [searchText, typeFilter]);
+  }, [searchText, typeFilter, statusFilter]);
 
   const handleOnSearchSubmit = (e) => {
     e.preventDefault();
@@ -169,6 +193,17 @@ export const AMCMasterGrid = () => {
           <span className="loader"></span>
         </div>
       )}
+
+      <style>
+        {`
+          @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
+
       <div className="container-scroller">
         <div className="row background_main_all">
           <Header toggle={toggle} isopen={isopen} />
@@ -186,14 +221,21 @@ export const AMCMasterGrid = () => {
                   <div className="col-12 col-lg-6">
                     <div className="row">
                       <div className="col-12 col-lg-4">
-                        <h5 className="text-white py-2">AMC Master</h5>
+                        <h5 className="text-white py-2">
+                          AMC Master 
+                          {expiredCount > 0 && (
+                            <span className="badge bg-danger ms-2" style={{ animation: 'blink 1.5s infinite' }}>
+                              {expiredCount} Expired
+                            </span>
+                          )}
+                        </h5>
                       </div>
                     </div>
                   </div>
 
-                  <div className="col-12 col-lg-5 ms-auto">
-                    <div className="row">
-                      <div className="col-8 col-lg-5 ms-auto text-end">
+                  <div className="col-12 col-lg-6 ms-auto">
+                    <div className="row g-2">
+                      <div className="col-12 col-md-5">
                         <div className="form">
                           <i className="fa fa-search"></i>
                           <form onSubmit={handleOnSearchSubmit}>
@@ -208,7 +250,7 @@ export const AMCMasterGrid = () => {
                         </div>
                       </div>
                       
-                      <div className="col-8 col-lg-3 ms-auto text-end">
+                      <div className="col-6 col-md-2">
                         <select 
                           className="form-select bg-transparant text-white"
                           value={typeFilter}
@@ -221,18 +263,36 @@ export const AMCMasterGrid = () => {
                         </select>
                       </div>
 
+                      {/* Added Status Filter */}
+                      <div className="col-6 col-md-2">
+                        <select 
+                          className="form-select bg-transparant text-white"
+                          value={statusFilter}
+                          onChange={(e) => {
+                            console.log("Status filter changed to:", e.target.value);
+                            setStatusFilter(e.target.value);
+                          }}
+                        >
+                          <option value="">All Statuses</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Won">Won</option>
+                          <option value="Lost">Lost</option>
+                          <option value="Ongoing">Ongoing</option>
+                        </select>
+                      </div>
+
                       {user?.permissions?.includes("createAMC") || user?.user === 'company' ? (
-                        <div className="col-12 col-lg-2 ms-auto text-end me-5">
+                        <div className="col-12 col-md-3 text-end">
                           <button
                             onClick={handleAdd}
                             type="button"
-                            className="btn adbtn btn-dark"
+                            className="btn adbtn btn-dark w-100"
                           >
                             <i className="fa-solid fa-plus"></i> Add
                           </button>
                         </div>
                       ) : (
-                        ""
+                        <div className="col-12 col-md-3"></div>
                       )}
                     </div>
                   </div>
@@ -262,9 +322,13 @@ export const AMCMasterGrid = () => {
                             amcs.map((amc, index) => {
                               const duration = Math.ceil((new Date(amc.amcEndDate) - new Date(amc.amcStartDate)) / (1000 * 60 * 60 * 24));
                               const daysRemaining = Math.ceil((new Date(amc.amcEndDate) - new Date()) / (1000 * 60 * 60 * 24));
+                              const isExpired = daysRemaining < 0;
                               
                               return (
-                                <tr className="border my-4" key={amc._id}>
+                                <tr 
+                                  className={`border my-4 ${isExpired ? 'table-danger' : ''}`} 
+                                  key={amc._id}
+                                >
                                   <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
                                   <td className="align_left_td td_width">{amc?.invoiceNumber}</td>
                                   <td className="align_left_td td_width">
@@ -279,7 +343,10 @@ export const AMCMasterGrid = () => {
                                   <td className="text-end text-md-end td_width">{formatCurrency(amc?.invoiceAmount)}</td>
                                   <td className="text-end text-md-end td_width">{formatCurrency(amc?.quotationAmount)}</td>
                                   <td>{formatDate(amc?.amcStartDate)}</td>
-                                  <td>{formatDate(amc?.amcEndDate)}</td>
+                                  <td className={isExpired ? 'text-danger fw-bold' : ''}>
+                                    {formatDate(amc?.amcEndDate)}
+                                    {isExpired && <i className="fa-solid fa-circle-exclamation ms-1 text-danger"></i>}
+                                  </td>
                                   <td>
                                     <span className={`badge ${
                                       amc?.status === 'Won' ? 'bg-success' : 
@@ -310,12 +377,12 @@ export const AMCMasterGrid = () => {
                                   <td>{formatDate(amc?.nextFollowUpDate, true)}</td>
                                   <td>
                                     <span className={`badge ${
-                                      daysRemaining < 0 ? 'bg-danger' : 
+                                      isExpired ? 'bg-danger' : 
                                       daysRemaining < 30 ? 'bg-warning' : 
                                       'bg-success'
                                     }`}>
                                       {duration} days
-                                      {daysRemaining < 0 ? ' (Expired)' : 
+                                      {isExpired ? ' (Expired)' : 
                                        daysRemaining < 30 ? ` (${daysRemaining} days left)` : ''}
                                     </span>
                                   </td>

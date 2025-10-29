@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useMemo } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
 import toast from 'react-hot-toast';
@@ -43,7 +43,12 @@ export const SalesMasterGrid = () => {
     console.log('Has deleteLead permission:', user?.permissions?.includes('deleteLead'));
   }, [user]);
 
-  const [filters, setFilters] = useState({ status: null, date: null, source: null });
+  const [filters, setFilters] = useState({ 
+    status: null, 
+    date: null, 
+    source: null,
+    searchTerm: "" // Added for search functionality
+  });
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
@@ -60,9 +65,22 @@ export const SalesMasterGrid = () => {
   const { deleteLead } = useDeleteLead();
   const { assignLead, loading: assignLoading } = useAssignLead();
 
+  // State to store all leads for client-side filtering
+  const [allLeads, setAllLeads] = useState([]);
+  
   useEffect(() => {
     if (data) {
       setPagination(prev => ({ ...prev, ...data.pagination }));
+      
+      // Add new leads to allLeads array, avoiding duplicates
+      if (data.leads && data.leads.length > 0) {
+        setAllLeads(prev => {
+          const existingIds = new Set(prev.map(lead => lead._id));
+          const newLeads = data.leads.filter(lead => !existingIds.has(lead._id));
+          return [...prev, ...newLeads];
+        });
+      }
+      
       // Debug lead counts
       console.log('Lead counts:', data?.leadCounts);
     }
@@ -70,6 +88,28 @@ export const SalesMasterGrid = () => {
       toast.error(error.message || "An error occurred");
     }
   }, [data, error]);
+
+  // Reset allLeads when filters change (except searchTerm)
+  useEffect(() => {
+    if (filters.status !== null || filters.date !== null || filters.source !== null) {
+      setAllLeads([]);
+      setPagination(prev => ({ ...prev, currentPage: 1 }));
+    }
+  }, [filters.status, filters.date, filters.source]);
+
+  // Filter leads based on search term (client-side filtering)
+  const filteredLeads = useMemo(() => {
+    if (!filters.searchTerm) return allLeads;
+    
+    const searchLower = filters.searchTerm.toLowerCase();
+    return allLeads.filter(lead => 
+      (lead.SENDER_COMPANY && lead.SENDER_COMPANY.toLowerCase().includes(searchLower)) ||
+      (lead.SENDER_MOBILE && lead.SENDER_MOBILE.toLowerCase().includes(searchLower))
+    );
+  }, [allLeads, filters.searchTerm]);
+
+  // Determine if we're in search mode
+  const isSearchMode = filters.searchTerm !== "";
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= pagination.totalPages) {
@@ -109,6 +149,10 @@ export const SalesMasterGrid = () => {
         toast.success("Lead deleted successfully!");
         setDeletePopUpShow(false);
         setSelectedLeadId(null);
+        
+        // Remove deleted lead from allLeads
+        setAllLeads(prev => prev.filter(lead => lead._id !== selectedLeadId));
+        
         refetch(); 
       } else {
         toast.error(data?.error || "Failed to delete lead");
@@ -178,8 +222,16 @@ export const SalesMasterGrid = () => {
   };
 
   const handleChange = (filterType, value) => {
-    setFilters(prevFilters => ({ ...prevFilters, [filterType]: value || null }));
-    handlePageChange(1);
+    setFilters(prevFilters => ({ 
+      ...prevFilters, 
+      [filterType]: value || null 
+    }));
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value;
+    setFilters(prevFilters => ({ ...prevFilters, searchTerm }));
   };
 
   const handleOpenAddModal = () => setIsAddModalVisible(true);
@@ -197,6 +249,12 @@ export const SalesMasterGrid = () => {
     }else{
       toast.error(data?.error || "Failed to add lead");
     }
+  };
+
+  // Reset search and filters
+  const resetSearch = () => {
+    setFilters(prev => ({ ...prev, searchTerm: "" }));
+    setAllLeads([]);
   };
 
   return (
@@ -243,7 +301,37 @@ export const SalesMasterGrid = () => {
                     /> 
 
                 <div className="row align-items-center p-2 m-1">
-                  <div className="col-12 col-lg-6"></div>
+                  <div className="col-12 col-lg-6">
+                    {/* Search Bar */}
+                    <div className="input-group">
+                      <input
+                        type="text"
+                        className="form-control bg_edit"
+                        placeholder="Search by Mobile Number or Company Name....."
+                        value={filters.searchTerm || ""}
+                        onChange={handleSearchChange}
+                      />
+                      {filters.searchTerm && (
+                        <button 
+                          className="btn btn-outline-secondary" 
+                          type="button"
+                          onClick={resetSearch}
+                        >
+                          <i className="fa-solid fa-times"></i>
+                        </button>
+                      )}
+                      <button className="btn btn-dark" type="button">
+                        <i className="fa-solid fa-search"></i>
+                      </button>
+                    </div>
+                    {isSearchMode && (
+                      <div className="mt-2">
+                        <small className="text-muted">
+                          Searching through {allLeads.length} leads. {filteredLeads.length} matches found.
+                        </small>
+                      </div>
+                    )}
+                  </div>
                   <div className="col-12 col-lg-6 ms-auto text-end">
                     <div className="row g-2">
                       <div className="col">
@@ -309,10 +397,10 @@ export const SalesMasterGrid = () => {
                           </tr>
                         </thead>
                         <tbody className="broder my-4">
-                          {data?.leads?.length > 0 ? (
-                            data.leads.map((lead, index) => (
+                          {(isSearchMode ? filteredLeads : data?.leads)?.length > 0 ? (
+                            (isSearchMode ? filteredLeads : data?.leads).map((lead, index) => (
                             <tr key={lead._id}>
-                              <td>{index + 1 + (pagination.currentPage - 1) * itemsPerPage}</td>
+                              <td>{index + 1}</td>
                               <td>{lead.SOURCE}</td>
                               <td className="align_left_td td_width">{lead.SENDER_COMPANY||"Not available."}</td>
                               <td className="align_left_td td_width">{lead.SENDER_NAME||"Not available."}</td>
@@ -347,7 +435,10 @@ export const SalesMasterGrid = () => {
                             ))) : (
                             <tr>
                               <td colSpan="9" className="text-center">
-                                No More Leads.
+                                {isSearchMode ? 
+                                  "No leads found matching your search." : 
+                                  "No More Leads."
+                                }
                               </td>
                             </tr>
                             )}
@@ -357,8 +448,8 @@ export const SalesMasterGrid = () => {
                   </div>
                 </div>
 
-                {/* Pagination - Fixed to show properly */}
-                {!loading && pagination.totalPages > 1 && (
+                {/* Only show pagination when not in search mode */}
+                {!isSearchMode && !loading && pagination.totalPages > 1 && (
                   <div className="pagination-container text-center my-3">
                     <button
                       onClick={() => handlePageChange(1)}
@@ -435,6 +526,18 @@ export const SalesMasterGrid = () => {
                     </button>
                   </div>
                 )}
+                
+                {/* Show load more button when in search mode and there might be more results */}
+                {isSearchMode && !loading && pagination.hasNextPage && (
+                  <div className="text-center my-3">
+                    <button 
+                      className="btn btn-dark"
+                      onClick={() => handlePageChange(pagination.currentPage + 1)}
+                    >
+                      Load More Results
+                    </button>
+                  </div>
+                )}
                 </div>
             </div>
           </div>
@@ -487,5 +590,5 @@ export const SalesMasterGrid = () => {
           />
       )}
     </>
-  );
+  );  
 };

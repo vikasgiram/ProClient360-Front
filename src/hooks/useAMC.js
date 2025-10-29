@@ -3,8 +3,8 @@ import axios from 'axios';
 const baseUrl = process.env.REACT_APP_API_URL;
 const url = baseUrl + "/api/amc";
 
-// Get all AMCs with pagination, search, and type filter
-const getAMCs = async (page = 1, limit = 20, search = null, type = null) => {
+// Get all AMCs with pagination, search, type filter, and status filter
+const getAMCs = async (page = 1, limit = 20, search = null, type = null, status = null) => {
   try {
     let endpoint = `${url}?page=${page}&limit=${limit}`;
     
@@ -16,15 +16,22 @@ const getAMCs = async (page = 1, limit = 20, search = null, type = null) => {
       endpoint += `&type=${type}`;
     }
     
+    if (status) {
+      endpoint += `&status=${status}`;
+    }
+    
+    console.log("Making API call to:", endpoint);
+    
     const response = await axios.get(endpoint, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     }); 
     const data = response.data;
+    console.log("API response:", data);
     return data;
   } catch (error) {
-    console.error(error?.response?.data);
+    console.error("API error:", error?.response?.data);
     return error?.response?.data;
   }
 };

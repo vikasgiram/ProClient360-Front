@@ -116,7 +116,11 @@ export const Header = (props) => {
 								data-toggle="dropdown"
 								id="profileDropdown"
 							>
-								<img src={user.profilePic || "/static/assets/img/nav/man.png"} alt="profile" />
+<div className="text-start">
+  <img src={user.profilePic || "/static/assets/img/nav/man.png"}
+    alt="profile" className="rounded-circle d-block" width="60" height="60" />
+  <div className="drop_item_one mt-1"> {user ? user.name : "Guest"} </div>
+</div>
 
 								<i
 									className="align-self-center ml-1"

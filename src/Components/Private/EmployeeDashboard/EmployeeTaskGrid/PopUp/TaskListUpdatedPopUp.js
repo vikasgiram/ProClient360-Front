@@ -25,6 +25,11 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const tableContainerRef = useRef(null);
   
+  // Get current date in YYYY-MM-DD format for min date attribute
+  const getCurrentDate = () => {
+    const now = new Date();
+    return now.toISOString().slice(0, 10);
+  };
 
   const handleStatusChange = (status) => {
     setTaskStatus(status);
@@ -98,6 +103,18 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
     if (taskStatus === "completed") {
       setTaskLevel(100); 
     }
+    
+    // Validate that start date is not in the past (date only, not time)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to beginning of day
+    
+    const startDateTime = new Date(startTime);
+    startDateTime.setHours(0, 0, 0, 0); // Set to beginning of day
+    
+    if (startDateTime < today) {
+      return toast.error("Process start date cannot be in the past");
+    }
+    
     if (
       !action ||
       !startTime ||
@@ -193,6 +210,17 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
+    // Validate that start date is not in the past (date only, not time)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to beginning of day
+    
+    const startDateTime = new Date(editAction.startTime);
+    startDateTime.setHours(0, 0, 0, 0); // Set to beginning of day
+    
+    if (startDateTime < today) {
+      return toast.error("Process start date cannot be in the past");
+    }
     
     if (!editAction.action || !editAction.startTime || !editAction.endTime || 
         !editAction.complated || !editAction.taskStatus) {
@@ -463,6 +491,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             value={formatDateforEditAction(editAction?.startTime)}
                             className="form-control rounded-0"
                             id="startTime"
+                            min={getCurrentDate() + "T00:00"}  // Changed to allow any time today
                             required
                           />
                         </div>
@@ -483,6 +512,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             value={formatDateforEditAction(editAction?.endTime)}                 
                             className="form-control rounded-0"
                             id="endTime"
+                            min={editAction?.startTime ? formatDateforEditAction(editAction?.startTime) : getCurrentDate() + "T00:00"}  // Changed to allow any time today
                             required
                           />
                         </div>
@@ -620,6 +650,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             value={startTime}
                             className="form-control rounded-0"
                             id="processStartDate"
+                            min={getCurrentDate() + "T00:00"}  // Changed to allow any time today
                           />
                         </div>
                       </div>
@@ -639,6 +670,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                             value={endTime}
                             className="form-control rounded-0"
                             id="processEndDate"
+                            min={startTime || getCurrentDate() + "T00:00"}  // Changed to allow any time today
                           />
                         </div>
                       </div>

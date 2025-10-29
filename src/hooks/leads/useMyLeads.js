@@ -18,6 +18,7 @@ const useMyLeads = (page = 1, limit = 10, filters = {}) => {
           ...(filters.source && { source: filters.source }),
           ...(filters.date && { date: filters.date }),
           ...(filters.status && { status: filters.status }),
+          ...(filters.searchTerm && { search: filters.searchTerm }), // Added search parameter
         };
 
         const response = await axios.get(url, {
@@ -45,7 +46,7 @@ const useMyLeads = (page = 1, limit = 10, filters = {}) => {
 
   useEffect(() => {
     fetchLeads();
-  }, [page, limit, filters.source, filters.date, filters.status]);
+  }, [page, limit, filters.source, filters.date, filters.status, filters.searchTerm]);
 
   return { data, loading, error, refetch: () => fetchLeads()};
 };

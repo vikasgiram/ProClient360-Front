@@ -17,7 +17,7 @@ import { getEmployees } from "../../../../hooks/useEmployees";
 // Removed department import
 import AddTaskPopUp from "../TaskMaster/PopUp/AddTaskPopUp";
 import { getAllActions } from "../../../../hooks/useAction";
-import { formatDateforEditAction } from "../../../../utils/formatDate";
+import { formatDateforEditAction, formatDateTimeForDisplay } from "../../../../utils/formatDate";
 import { RequiredStar } from "../../RequiredStar/RequiredStar";
 import { getProject } from "../../../../hooks/useProjects"; // Added import
 
@@ -696,8 +696,8 @@ export const TaskSheetMaster = () => {
                                       <tr className="text-center" key={action._id}>
                                         <td>{action.action}</td>
                                         <td>{action.actionBy.name}</td>
-                                        <td>{formatDateforEditAction(action.startTime)}</td>
-                                        <td>{formatDateforEditAction(action.endTime)}</td>
+                                        <td>{formatDateTimeForDisplay(action.startTime)}</td>
+                                        <td>{formatDateTimeForDisplay(action.endTime)}</td>
                                         <td className="text-center">
                               <div className="d-flex align-items-center"
                                 style={{ justifyContent: "center" }}
