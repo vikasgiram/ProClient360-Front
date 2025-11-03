@@ -57,7 +57,6 @@ const AddProjectPopup = ({ handleAdd }) => {
               country: data.country || ""
             }));
           } else {
-            // Clear other fields if pincode is invalid
             setAddress(prevAddress => ({
               ...prevAddress,
               state: "",
@@ -77,7 +76,6 @@ const AddProjectPopup = ({ handleAdd }) => {
           setIsLoadingAddress(false);
         }
       } else if (Address.pincode.length < 6) {
-        // Clear fields when pincode is incomplete
         setAddress(prevAddress => ({
           ...prevAddress,
           state: "",
@@ -87,7 +85,6 @@ const AddProjectPopup = ({ handleAdd }) => {
       }
     };
     
-    // Add debounce to avoid too many API calls
     const timeoutId = setTimeout(() => {
       fetchData();
     }, 500);
@@ -97,21 +94,28 @@ const AddProjectPopup = ({ handleAdd }) => {
 
   // Fetch customers with pagination & search
   const loadCustomers = useCallback(async (page, search) => {
-    if (custLoading || !custHasMore) return;
+    if (custLoading || (!custHasMore && page > 1)) return;
+    
     setCustLoading(true);
-    const data = await getCustomers(page, PAGE_SIZE, search);
+    try {
+      const data = await getCustomers(page, PAGE_SIZE, search);
 
-    if (data.error) {
-      toast.error(data.error || 'Failed to load customers');
+      if (data.error) {
+        toast.error(data.error || 'Failed to load customers');
+        setCustLoading(false);
+        return;
+      }
+
+      const newOpts = (data.customers || []).map(c => ({ value: c._id, label: c.custName }));
+      setCustOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+      setCustHasMore(newOpts.length === PAGE_SIZE);
+      setCustPage(page + 1);
+    } catch (error) {
+      console.error("Error loading customers:", error);
+      toast.error("Failed to load customers");
+    } finally {
       setCustLoading(false);
-      return;
     }
-
-    const newOpts = (data.customers || []).map(c => ({ value: c._id, label: c.custName }));
-    setCustOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
-    setCustHasMore(newOpts.length === PAGE_SIZE);
-    setCustLoading(false);
-    setCustPage(page + 1);
   }, [custLoading, custHasMore]);
 
   // Handle customer selection - AUTO FETCH ADDRESS
@@ -121,7 +125,6 @@ const AddProjectPopup = ({ handleAdd }) => {
     if (selectedOption) {
       setIsLoadingCustomerAddress(true);
       try {
-        // Fetch customer details including address
         const customerData = await getCustomerById(selectedOption.value);
         
         if (customerData && customerData.customer && customerData.customer.billingAddress) {
@@ -142,7 +145,7 @@ const AddProjectPopup = ({ handleAdd }) => {
             add: "",
             country: ""
           });
-          toast("No address found for this customer");
+          toast.info("No address found for this customer");
         }
       } catch (error) {
         console.error("Error fetching customer address:", error);
@@ -158,7 +161,6 @@ const AddProjectPopup = ({ handleAdd }) => {
         setIsLoadingCustomerAddress(false);
       }
     } else {
-      // Clear address if no customer selected
       setAddress({
         pincode: "",
         state: "",
@@ -175,69 +177,121 @@ const AddProjectPopup = ({ handleAdd }) => {
     setCustHasMore(true);
     setCustOptions([]);
     loadCustomers(1, custSearch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [custSearch]);
 
   const handleProjectAdd = async (event) => {
     event.preventDefault();
 
-    if (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion) > 100) {
-      return toast.error("The total percentage cannot exceed 100%.");
-    }
-
-    if (purchaseOrderValue <= 0) {
-      return toast.error("Purchase order value should be greater than 0");
-    }
-
-    if (Address.pincode.length !== 6 || Address.pincode < 0) {
-      return toast.error("Enter valid Pincode");
-    }
-    if(!Address.add || !Address.city || !Address.state || !Address.country) {
-      return toast.error("Please fill all address fields");
-    }
-    if (!POCopy) {
-      return toast.error("Please upload POCopy");
-    }
-    if (startDate > endDate) {
-      return toast.error("Start date should be less than end date");
-    }
+    // Validation
     if (!selectedCustomer) {
       return toast.error("Please select a customer");
     }
 
-    // Create project data object (similar to customer approach)
+    if (!name.trim()) {
+      return toast.error("Project name is required");
+    }
+
+    if (!category) {
+      return toast.error("Please select project category");
+    }
+
+    if (!purchaseOrderNo.trim()) {
+      return toast.error("Purchase order number is required");
+    }
+
+    if (!purchaseOrderDate) {
+      return toast.error("Purchase order date is required");
+    }
+
+    if (!purchaseOrderValue || Number(purchaseOrderValue) <= 0) {
+      return toast.error("Purchase order value should be greater than 0");
+    }
+
+    if (!startDate || !endDate) {
+      return toast.error("Please select start and end dates");
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+      return toast.error("Start date should be less than end date");
+    }
+
+    // Payment validation
+    const totalPayment = Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion);
+    if (totalPayment > 100) {
+      return toast.error("The total payment percentage cannot exceed 100%");
+    }
+
+    // Address validation
+    if (!Address.pincode || Address.pincode.length !== 6) {
+      return toast.error("Please enter valid 6-digit pincode");
+    }
+
+    if (!Address.state || !Address.state.trim()) {
+      return toast.error("State is required");
+    }
+
+    if (!Address.city || !Address.city.trim()) {
+      return toast.error("City is required");
+    }
+
+    if (!Address.country || !Address.country.trim()) {
+      return toast.error("Country is required");
+    }
+
+    if (!Address.add || !Address.add.trim()) {
+      return toast.error("Complete address is required");
+    }
+
+    if (!POCopy) {
+      return toast.error("Please upload Purchase Order copy (PDF)");
+    }
+
+    // Create project data object
     const projectData = {
       custId: selectedCustomer.value,
-      name,
+      name: name.trim(),
       purchaseOrderDate,
-      purchaseOrderNo,
+      purchaseOrderNo: purchaseOrderNo.trim(),
       purchaseOrderValue: Number(purchaseOrderValue),
       category,
       startDate,
       endDate,
-      advancePay: Number(advancePay),
-      payAgainstDelivery: Number(payAgainstDelivery),
-      payAfterCompletion: Number(payAfterCompletion),
-      remark,
-      Address, // This is already an object
-      retention: Number(retention),
+      advancePay: Number(advancePay) || 0,
+      payAgainstDelivery: Number(payAgainstDelivery) || 0,
+      payAfterCompletion: Number(payAfterCompletion) || 0,
+      retention: Number(retention) || 0,
+      remark: remark.trim(),
+      Address: {
+        pincode: Address.pincode,
+        state: Address.state.trim(),
+        city: Address.city.trim(),
+        add: Address.add.trim(),
+        country: Address.country.trim()
+      },
       POCopy
     };
 
+    console.log("Project Data being sent:", projectData); // Debug log
+
     setLoading(true);
-    toast.loading("Creating Project...");
+    const loadingToast = toast.loading("Creating Project...");
     
     try {
       const data = await createProject(projectData);
-      toast.dismiss();
-      if (data.success) {
-        toast.success(data.message);
+      toast.dismiss(loadingToast);
+      
+      if (data && data.success) {
+        toast.success(data.message || "Project created successfully");
         handleAdd();
       } else {
-        toast.error(data.error);
+        toast.error(data?.error || "Failed to create project");
+        console.error("Project creation error:", data);
       }
     } catch (error) {
-      toast.dismiss();
-      toast.error("Failed to create project");
+      toast.dismiss(loadingToast);
+      console.error("Error creating project:", error);
+      toast.error(error?.response?.data?.error || error?.message || "Failed to create project");
     } finally {
       setLoading(false);
     }
@@ -245,25 +299,37 @@ const AddProjectPopup = ({ handleAdd }) => {
 
   useEffect(() => {
     const retentionValue = 100 - (Number(advancePay) + Number(payAgainstDelivery) + Number(payAfterCompletion));
-    if( retentionValue >= 0) {
+    if (retentionValue >= 0) {
       setRetention(retentionValue);
     } else {
-      toast.error("The total percentage cannot exceed 100%.");
       setRetention(0);
     }
-  },[advancePay, payAgainstDelivery, payAfterCompletion]);
+  }, [advancePay, payAgainstDelivery, payAfterCompletion]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Check file type
+      if (file.type !== 'application/pdf') {
+        setPOCopy("");
+        e.target.value = "";
+        return toast.error("Only PDF files are allowed");
+      }
+
+      // Check file size (2MB = 2 * 1024 * 1024 bytes)
       if (file.size > 2 * 1024 * 1024) {
         setPOCopy("");
-        e.target.value = ""; 
+        e.target.value = "";
         return toast.error("File must be less than 2MB");
       }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setPOCopy(reader.result);
+      };
+      reader.onerror = () => {
+        toast.error("Error reading file");
+        setPOCopy("");
       };
       reader.readAsDataURL(file);
     }
@@ -325,7 +391,7 @@ const AddProjectPopup = ({ handleAdd }) => {
             </div>
             <div className="modal-body">
               <div className="row modal_body_height">
-                <div className="col-12" >
+                <div className="col-12">
                   <div className="mb-3">
                     <label htmlFor="customerSearch" className="form-label label_text">
                       Customer Name <RequiredStar />
@@ -338,15 +404,16 @@ const AddProjectPopup = ({ handleAdd }) => {
                       onMenuScrollToBottom={() => loadCustomers(custPage, custSearch)}
                       isLoading={custLoading}
                       placeholder="Search and select customer..."
-                      noOptionsMessage={() => custLoading ? 'Loading...' : 'No customers'}
+                      noOptionsMessage={() => custLoading ? 'Loading...' : 'No customers found'}
                       closeMenuOnSelect={true}
+                      isClearable={true}
                     />
                     {isLoadingCustomerAddress && (
                       <small className="text-info">Loading customer address...</small>
                     )}
                     {selectedCustomer && !isLoadingCustomerAddress && (
                       <small className="text-success">
-                        Customer selected: {selectedCustomer.label}
+                        ✓ Customer selected: {selectedCustomer.label}
                       </small>
                     )}
                   </div>
@@ -354,7 +421,16 @@ const AddProjectPopup = ({ handleAdd }) => {
 
                 <div className="mb-3">
                   <label htmlFor="ProjectName" className="form-label label_text">Project Name <RequiredStar /></label>
-                  <textarea type="text" className="form-control rounded-0" id="ProjectName" maxLength={1000} placeholder="Enter a Project Name..." onChange={(e) => setName(e.target.value)} value={name} aria-describedby="emailHelp" required ></textarea>
+                  <textarea 
+                    type="text" 
+                    className="form-control rounded-0" 
+                    id="ProjectName" 
+                    maxLength={1000} 
+                    placeholder="Enter a Project Name..." 
+                    onChange={(e) => setName(e.target.value)} 
+                    value={name} 
+                    required
+                  ></textarea>
                 </div>
 
                 <div className="col-12 col-lg-6 mt-2">
@@ -368,27 +444,33 @@ const AddProjectPopup = ({ handleAdd }) => {
                       type="date"
                       className="form-control rounded-0"
                       id="purchaseOrderDate"
-                      aria-describedby="dateHelp"
                       required
                     />
                   </div>
                 </div>
                 
-                <div className="col-12 col-lg-6 mt-2" >
+                <div className="col-12 col-lg-6 mt-2">
                   <div className="mb-3">
                     <label htmlFor="purchaseOrderNo" className="form-label label_text">Purchase Order Number <RequiredStar /></label>
-                    <input type="text" className="form-control rounded-0" maxLength={200} id="purchaseOrderNo"
+                    <input 
+                      type="text" 
+                      className="form-control rounded-0" 
+                      maxLength={200} 
+                      id="purchaseOrderNo"
                       onChange={(e) => setPurchaseOrderNo(e.target.value)}
-                      value={purchaseOrderNo} aria-describedby="emailHelp" required />
+                      value={purchaseOrderNo} 
+                      required 
+                    />
                   </div>
                 </div>
 
-                <div className="col-12 col-lg-6 mt-2" >
+                <div className="col-12 col-lg-6 mt-2">
                   <div className="mb-3">
                     <label htmlFor="purchaseOrderValue" className="form-label label_text">Purchase Order Value (Rs) <RequiredStar /> [Without GST]</label>
                     <input
                       type="number"
-                      maxLength={10}
+                      step="0.01"
+                      min="0"
                       className="form-control rounded-0"
                       id="purchaseOrderValue"
                       onChange={(e) => {
@@ -398,18 +480,18 @@ const AddProjectPopup = ({ handleAdd }) => {
                         }
                       }}
                       value={purchaseOrderValue}
-                      aria-describedby="mobileNoHelp"
+                      placeholder="Enter amount"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="col-12 col-lg-6 mt-2" >
+                <div className="col-12 col-lg-6 mt-2">
                   <div className="mb-3">
                     <label htmlFor="CategoryofProject" className="form-label label_text">Category of Project <RequiredStar /></label>
                     <select
                       className="form-select rounded-0"
-                      aria-label="Default select example"
+                      id="CategoryofProject"
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
                       required
@@ -446,7 +528,7 @@ const AddProjectPopup = ({ handleAdd }) => {
                   </div>
                 </div>
                 
-                <div className="col-12 col-lg-6 mt-2" >
+                <div className="col-12 col-lg-6 mt-2">
                   <div className="mb-3">
                     <label htmlFor="ProjectStartDate" className="form-label label_text">Project Start Date <RequiredStar /></label>
                     <input
@@ -455,13 +537,12 @@ const AddProjectPopup = ({ handleAdd }) => {
                       type="date"
                       className="form-control rounded-0"
                       id="ProjectStartDate"
-                      aria-describedby="dateHelp"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="col-12 col-lg-6 mt-2" >
+                <div className="col-12 col-lg-6 mt-2">
                   <div className="mb-3">
                     <label htmlFor="ProjectEndDate" className="form-label label_text">Project End Date <RequiredStar /> [Expected]</label>
                     <input
@@ -470,34 +551,36 @@ const AddProjectPopup = ({ handleAdd }) => {
                       type="date"
                       className="form-control rounded-0"
                       id="ProjectEndDate"
-                      aria-describedby="dateHelp"
+                      min={startDate}
                       required
                     />
                   </div>
                 </div>
                 
-                <div className="col-12 mt-2" >
+                <div className="col-12 mt-2">
                   <div className="row border bg-gray mx-auto">
                     <div className="col-10 mb-3">
                       <span className="SecondaryInfo">Payment terms:</span>
                     </div>
 
-                    <div className="col-12 col-lg-6 mt-2" >
+                    <div className="col-12 col-lg-6 mt-2">
                       <div className="mb-3">
                         <label htmlFor="AdvancePayment" className="form-label label_text">Advance Payment (%) <RequiredStar /></label>
                         <input
                           type="number"
+                          step="0.01"
+                          min="0"
+                          max="100"
                           className="form-control rounded-0"
                           id="AdvancePayment"
-                          maxLength="3"
                           onChange={(e) => {
                             const value = e.target.value;
-                            if (/^\d*\.?\d*$/.test(value)) {
+                            if (/^\d*\.?\d*$/.test(value) && Number(value) <= 100) {
                               setAdvancePayment(value);
                             }
                           }}
                           value={advancePay}
-                          aria-describedby="mobileNoHelp"
+                          placeholder="0"
                           required
                         />
                       </div>
@@ -508,17 +591,19 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <label htmlFor="PayAgainstDelivery" className="form-label label_text">Pay Against Delivery (%) <RequiredStar /></label>
                         <input
                           type="number"
+                          step="0.01"
+                          min="0"
+                          max="100"
                           className="form-control rounded-0"
                           id="PayAgainstDelivery"
-                          maxLength="3"
                           onChange={(e) => {
                             const value = e.target.value;
-                            if (/^\d*\.?\d{0,2}$/.test(value)) {
+                            if (/^\d*\.?\d{0,2}$/.test(value) && Number(value) <= 100) {
                               setPayAgainstDelivery(value);
                             }
                           }}
                           value={payAgainstDelivery}
-                          aria-describedby="mobileNoHelp"
+                          placeholder="0"
                           required
                         />
                       </div>
@@ -529,17 +614,19 @@ const AddProjectPopup = ({ handleAdd }) => {
                         <label htmlFor="PayAfterCompletion" className="form-label label_text">Pay After Completion (%) <RequiredStar /></label>
                         <input
                           type="number"
+                          step="0.01"
+                          min="0"
+                          max="100"
                           className="form-control rounded-0"
                           id="PayAfterCompletion"
-                          maxLength="3"
                           onChange={(e) => {
                             const value = e.target.value;
-                            if (/^\d*\.?\d{0,2}$/.test(value)) {
+                            if (/^\d*\.?\d{0,2}$/.test(value) && Number(value) <= 100) {
                               setPayAfterCompletion(value);
                             }
                           }}
                           value={payAfterCompletion}
-                          aria-describedby="secemailHelp"
+                          placeholder="0"
                           required
                         />
                       </div>
@@ -553,8 +640,8 @@ const AddProjectPopup = ({ handleAdd }) => {
                           className="form-control rounded-0"
                           id="retention"
                           value={retention}
-                          aria-describedby="secemailHelp"
                           readOnly
+                          style={{ backgroundColor: '#e9ecef' }}
                         />
                       </div>
                     </div>
@@ -651,26 +738,36 @@ const AddProjectPopup = ({ handleAdd }) => {
                   </div>
                 </div>
 
-                <div className="col-12 col-lg-6 mt-2" >
+                <div className="col-12 col-lg-6 mt-2">
                   <div className="mb-3">
-                    <label htmlFor="PurchaseOrderCopy" className="form-label label_text">Purchase Order Copy <RequiredStar />[PDF only, max 2MB]</label>
-                    <input type="file" className="form-control rounded-0" id="PurchaseOrderCopy" aria-describedby="secemailHelp"
-                      accept=".pdf"
+                    <label htmlFor="PurchaseOrderCopy" className="form-label label_text">
+                      Purchase Order Copy <RequiredStar /> [PDF only, max 2MB]
+                    </label>
+                    <input 
+                      type="file" 
+                      className="form-control rounded-0" 
+                      id="PurchaseOrderCopy"
+                      accept=".pdf,application/pdf"
                       onChange={handleFileChange}
                       required
                     />
+                    {POCopy && (
+                      <small className="text-success">✓ File uploaded successfully</small>
+                    )}
                   </div>
                 </div>
 
                 <div className="col-12 col-lg-12 mt-2">
                   <div className="mb-3">
+                    <label htmlFor="remark" className="form-label label_text">Remark</label>
                     <textarea
                       className="textarea_edit col-12"
                       id="remark"
                       maxLength={1000}
                       name="remark"
                       placeholder="Enter a Remark..."
-                      onChange={(e) => setRemark(e.target.value)} value={remark}
+                      onChange={(e) => setRemark(e.target.value)} 
+                      value={remark}
                       rows="2"
                     ></textarea>
                   </div>
@@ -683,12 +780,14 @@ const AddProjectPopup = ({ handleAdd }) => {
                       disabled={loading}
                       className="w-80 btn addbtn rounded-0 add_button m-2 px-4"
                     >
-                      {!loading ? "Add" : "Submitting..."}
+                      {loading ? "Submitting..." : "Add Project"}
                     </button>
                     <button
                       type="button"
                       onClick={handleAdd}
-                      className="w-80  btn addbtn rounded-0 Cancel_button m-2 px-4" >
+                      disabled={loading}
+                      className="w-80 btn addbtn rounded-0 Cancel_button m-2 px-4"
+                    >
                       Cancel
                     </button>
                   </div>
@@ -700,6 +799,7 @@ const AddProjectPopup = ({ handleAdd }) => {
       </div>
     </div>
   );
+  
 }
 
 export default AddProjectPopup;
