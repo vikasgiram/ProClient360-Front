@@ -16,93 +16,119 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
     pincode: "",
   });
 
+  // Helper function to check if a value is empty or just whitespace
+  const isEmptyOrWhitespace = (value) => {
+    return value === undefined || value === null || value.toString().trim() === '';
+  };
+
+  // Helper function to validate pincode
+  const isValidPincode = (pincode) => {
+    return pincode && pincode.toString().trim() !== '' && !isNaN(pincode) && parseInt(pincode) > 0;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getAddress(billingAddress.pincode);
+      // Only fetch if pincode is valid
+      if (isValidPincode(billingAddress.pincode)) {
+        const data = await getAddress(billingAddress.pincode);
 
-      if (data !== "Error") {
-        console.log(data);
-        setBillingAddress(prevAddress => ({
-          ...prevAddress, 
-          state: data.State, 
-          city: data.District,   
-          country: data.Country 
-        }));
+        if (data !== "Error") {
+          console.log(data);
+          setBillingAddress(prevAddress => ({
+            ...prevAddress, 
+            state: data.State, 
+            city: data.District,   
+            country: data.Country 
+          }));
+        }
       }
     };
-    if(billingAddress.pincode > 0)
-      fetchData();
+    
+    fetchData();
   }, [billingAddress.pincode]);
 
   // Load existing customer data on component mount
   useEffect(() => {
     if (customer) {
-      setBillingAddress(customer.billingAddress);
-      // setDeliveryAddress(customer.deliveryAddress);
+      setBillingAddress(customer.billingAddress || {
+        add: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+      });
     }
   }, [customer]);
-
-  // Function to handle the checkbox toggle
-  // const handleCheckboxChange = (e) => {
-  //   setSameAsBilling(e.target.checked);
-  //   if (e.target.checked) {
-  //     setDeliveryAddress(billingAddress); // Copy billing to delivery
-  //   }
-  // };
 
   // Function to handle changes in billing address fields
   const handleBillingChange = (e) => {
     const { name, value } = e.target;
-    setBillingAddress({ ...billingAddress, [name]: value });
-    // if (sameAsBilling) {
-    //   setDeliveryAddress({ ...billingAddress, [name]: value });
-    // }
+    setBillingAddress({ 
+      ...billingAddress, 
+      [name]: name === 'pincode' ? value : value.trim() 
+    });
   };
-
-  // Function to handle changes in delivery address fields
-  // const handleDeliveryChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setDeliveryAddress({ ...deliveryAddress, [name]: value });
-  // };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setCustomer((prevCustomer) => ({
       ...prevCustomer,
-      [name]: value,
-
+      [name]: value.trim(),
     }))
   };
 
   const handleCustUpdate = async (e) => {
     e.preventDefault();
+    
+    // Create a copy of the customer with updated billing address
     const updatedCustomer = {
       ...customer,
       billingAddress,
-      // deliveryAddress
     };
-    if(!updatedCustomer.custName || !updatedCustomer.phoneNumber1 || !updatedCustomer.email || !updatedCustomer.customerContactPersonName2 || !updatedCustomer.phoneNumber2 || !updatedCustomer.billingAddress.pincode || !updatedCustomer.billingAddress.state || !updatedCustomer.billingAddress.city || !updatedCustomer.billingAddress.add || !updatedCustomer.GSTNo){
+
+    // Validate all required fields
+    if(
+      isEmptyOrWhitespace(updatedCustomer.custName) || 
+      isEmptyOrWhitespace(updatedCustomer.phoneNumber1) || 
+      isEmptyOrWhitespace(updatedCustomer.email) || 
+      isEmptyOrWhitespace(updatedCustomer.customerContactPersonName2) || 
+      isEmptyOrWhitespace(updatedCustomer.phoneNumber2) || 
+      !isValidPincode(updatedCustomer.billingAddress.pincode) || 
+      isEmptyOrWhitespace(updatedCustomer.billingAddress.state) || 
+      isEmptyOrWhitespace(updatedCustomer.billingAddress.city) || 
+      isEmptyOrWhitespace(updatedCustomer.billingAddress.add) || 
+      isEmptyOrWhitespace(updatedCustomer.GSTNo)
+    ){
       toast.error("All fields are required");
-      return
+      return;
     }
+
+    // Validate email format
     if (!validator.isEmail(updatedCustomer.email)) {
-      return toast.error("Enter valid Email");
+      toast.error("Enter valid Email");
+      return;
     }
+
+    // Validate phone numbers
     if (!validator.isMobilePhone(updatedCustomer.phoneNumber1) || !validator.isMobilePhone(updatedCustomer.phoneNumber2)) {
-      return toast.error("Enter a valid phone number");
+      toast.error("Enter a valid phone number");
+      return;
     }
-    try{
-      toast.loading("Updating Customer.....")
-    const data = await updateCustomer(updatedCustomer);
-    toast.dismiss()
-    if(data.success){
-      toast.success(data.message);
-      handleUpdate();
-    }else{
-      toast.error(data.error);
-    }
-    }catch(error){
+
+    try {
+      toast.loading("Updating Customer.....");
+      const data = await updateCustomer(updatedCustomer);
+      toast.dismiss();
+      
+      if(data.success) {
+        toast.success(data.message);
+        handleUpdate();
+      } else {
+        toast.error(data.error || "Failed to update customer");
+      }
+    } catch(error) {
       toast.error("Error updating customer");
+      console.error("Update error:", error);
     }
   };
 
@@ -122,7 +148,6 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
               <div className="modal-header pt-0">
                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
                   Update Customer
-                  {/* Forward */}
                 </h5>
                 <button
                   onClick={() => handleUpdate()}
@@ -147,7 +172,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                         maxLength={300}
                         placeholder="Update a Full Name.... "
                         name="custName"
-                        value={customer.custName}
+                        value={customer.custName || ""}
                         onChange={handleChange}
                         aria-describedby="nameHelp"
                         required
@@ -167,7 +192,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                         placeholder="Update a Email...."
                         className="form-control rounded-0"
                         id="Email"
-                        value={customer.email}
+                        value={customer.email || ""}
                         onChange={handleChange}
                         aria-describedby="emailHelp"
                         required
@@ -196,7 +221,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             maxLength={100}
                             name="customerContactPersonName1"
                             onChange={handleChange}
-                            value={customer.customerContactPersonName1}
+                            value={customer.customerContactPersonName1 || ""}
                             aria-describedby="mobileNoHelp"
                             required
                           />
@@ -220,8 +245,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             id="phoneNumber1"
                             name="phoneNumber1"
                             onChange={handleChange}
-                            
-                            value={customer.phoneNumber1}
+                            value={customer.phoneNumber1 || ""}
                             aria-describedby="secemailHelp"
                             required
                           />
@@ -238,13 +262,12 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                           </label>
                           <input
                             type="text"
-
                             className="form-control rounded-0"
                             id="ContactPerson2"
                             maxLength={100}
                             name="customerContactPersonName2"
                             onChange={handleChange}
-                            value={customer.customerContactPersonName2}
+                            value={customer.customerContactPersonName2 || ""}
                             aria-describedby="mobileNoHelp"
                             required
                           />
@@ -268,7 +291,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             id="phoneNumber2"
                             onChange={handleChange}
                             name="phoneNumber2"
-                            value={customer.phoneNumber2}
+                            value={customer.phoneNumber2 || ""}
                             aria-describedby="secemailHelp"
                             required
                           />
@@ -292,11 +315,11 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             id="Pincode"
                             name="pincode"
                             onChange={handleBillingChange}
-                            value={billingAddress.pincode}
+                            value={billingAddress.pincode || ""}
                             aria-describedby="emailHelp"
+                            required
                           />
                         </div>
-
                       </div>
 
                       <div className="col-12 col-lg-6 mt-2">
@@ -309,8 +332,9 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             onChange={handleBillingChange}
                             name="state"
                             maxLength={50}
-                            value={billingAddress.state}
+                            value={billingAddress.state || ""}
                             aria-describedby="emailHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -325,8 +349,9 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             onChange={handleBillingChange}
                             name="city"
                             maxLength={50}
-                            value={billingAddress.city}
+                            value={billingAddress.city || ""}
                             aria-describedby="emailHelp"
+                            required
                           />
                         </div>
                       </div>
@@ -341,7 +366,7 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             name="country"
                             maxLength={50}
                             onChange={handleBillingChange}
-                            value={billingAddress.country}
+                            value={billingAddress.country || ""}
                             aria-describedby="emailHelp"
                           />
                         </div>
@@ -356,122 +381,14 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                             maxLength={500}
                             placeholder="House NO., Building Name, Road Name, Area, Colony"
                             onChange={handleBillingChange}
-                            value={billingAddress.add}
+                            value={billingAddress.add || ""}
                             rows="2"
+                            required
                           ></textarea>
                         </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* <div className="col-12 col-lg-4 mt-4 mt-lg-0">
-                  <span className=" ms-lg-6 AddressInfo">
-                    <input
-                      type="checkbox"
-                      checked={sameAsBilling}
-                      onChange={handleCheckboxChange}
-                    />
-                    Deliver at Same Address
-                  </span>
-                </div>
-
-                {!sameAsBilling&&<div className="col-12  mt-2">
-                  <div className="row border mt-4 bg-gray mx-auto">
-                    <div className="col-12 mb-4">
-                      <div className="row">
-                        <div className="col-12 col-lg-4">
-                          <span className="AddressInfo">Delivery Address</span>
-                        </div>
-
-                        
-                      </div>
-                    </div>
-
-                    <div className="col-12 col-lg-6 mt-2">
-                      <form>
-                        <div className="mb-3">
-                          <input
-                            type="number"
-                            className="form-control rounded-0"
-                            placeholder="Pincode"
-                            id="Pincode"
-                            name="pincode"
-                            onChange={handleDeliveryChange}
-                            value={deliveryAddress.pincode}
-                            aria-describedby="emailHelp"
-                          />
-                        </div>
-                      </form>
-                    </div>
-
-                    <div className="col-12 col-lg-6 mt-2">
-                      <form>
-                        <div className="mb-3">
-                          <input
-                            type="text"
-                            className="form-control rounded-0"
-                            placeholder="State"
-                            id="State"
-                            onChange={handleDeliveryChange}
-                            name="state"
-                            value={deliveryAddress.state}
-                            aria-describedby="emailHelp"
-                          />
-                        </div>
-                      </form>
-                    </div>
-
-                    <div className="col-12 col-lg-6 mt-2">
-                      <form>
-                        <div className="mb-3">
-                          <input
-                            type="text"
-                            className="form-control rounded-0"
-                            placeholder="City"
-                            id="city"
-                            onChange={handleDeliveryChange}
-                            name="city"
-                            value={deliveryAddress.city}
-                            aria-describedby="emailHelp"
-                          />
-                        </div>
-                      </form>
-                    </div>
-
-                    <div className="col-12 col-lg-6 mt-2">
-                      <form>
-                        <div className="mb-3">
-                          <input
-                            type="text"
-                            className="form-control rounded-0"
-                            placeholder="Country"
-                            id="country"
-                            name="deliveryAddress.country"
-                            onChange={handleDeliveryChange}
-                            value={deliveryAddress.country}
-                            aria-describedby="emailHelp"
-                          />
-                        </div>
-                      </form>
-                    </div>
-
-                    <div className="col-12 col-lg-12 mt-2">
-                      <form>
-                        <div className="mb-3">
-                          <textarea
-                            className="textarea_edit col-12"
-                            id="add"
-                            name="deliveryAddress.add"
-                            placeholder="House NO., Building Name, Road Name, Area, Colony"
-                            onChange={handleDeliveryChange}
-                            value={deliveryAddress.add}
-                            rows="2"
-                          ></textarea>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>} */}
 
                   <div className="col-12 col-lg-6 mt-2">
                     <div className="">
@@ -486,8 +403,9 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                         maxLength={15}
                         name="GSTNo"
                         onChange={handleChange}
-                        value={customer.GSTNo}
+                        value={customer.GSTNo || ""}
                         aria-describedby="emailHelp"
+                        required
                       />
                     </div>
                   </div>
@@ -496,7 +414,6 @@ const UpdateCustomerPopUp = ({ handleUpdate, selectedCust }) => {
                     <div className="col-12 pt-3 mt-2">
                       <button
                         type="submit"
-                        onClick={handleCustUpdate}
                         className="w-80 btn addbtn rounded-0 add_button   m-2 px-4"
                       >
                         Update

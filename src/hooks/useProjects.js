@@ -4,12 +4,13 @@ import toast from "react-hot-toast";
 const baseUrl= process.env.REACT_APP_API_URL;
 const url =baseUrl+"/api/project";
 
-const getProjects = async (page, limit, filters={}) => {
+const getProjects = async (page, limit, filters={}, searchTerm="") => {
   try {
     const params = {
       page: page,
       limit: limit,
       ...(filters.status && { status: filters.status }),
+      ...(searchTerm && { search: searchTerm }) // Add search parameter
     };
     const response = await axios.get(url,{
       params: params,

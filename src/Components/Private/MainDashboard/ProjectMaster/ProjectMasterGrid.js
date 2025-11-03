@@ -12,7 +12,6 @@ import GaintchartPoup from "./PopUp/GaintchartPoup";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../../../context/UserContext";
 
-
 export const ProjectMasterGrid = () => {
   const navigate = useNavigate();
 
@@ -32,8 +31,10 @@ export const ProjectMasterGrid = () => {
   const [selectedId, setSelecteId] = useState(null);
   const [project, setProject] = useState([]);
 
-    const [filters, setFilters] = useState({ status: null});
-  
+  // Add search state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState({ status: null });
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -80,6 +81,17 @@ export const ProjectMasterGrid = () => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
+  // Add search handler for Enter key
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      setSearch(searchTerm);
+    }
+  };
 
   const handelDeleteClick = async () => {
     const data = await deleteProject(selectedId);
@@ -90,33 +102,35 @@ export const ProjectMasterGrid = () => {
     toast.error(data?.error);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const data = await getProjects(pagination.currentPage, itemsPerPage, filters);
-        if (data?.success) {
-          setProject(data.projects || []);
-          setPagination(data.pagination || {
-            currentPage: 1,
-            totalPages: 0,
-            totalProjects: 0,
-            limit: itemsPerPage,
-            hasNextPage: false,
-            hasPrevPage: false,
-          });
-        } else{
-          toast(data?.error);
-        }
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      } finally {
-        setLoading(false);
+  // Extract fetchData to a separate function
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      // Pass search to getProjects (not searchTerm)
+      const data = await getProjects(pagination.currentPage, itemsPerPage, filters, search);
+      if (data?.success) {
+        setProject(data.projects || []);
+        setPagination(data.pagination || {
+          currentPage: 1,
+          totalPages: 0,
+          totalProjects: 0,
+          limit: itemsPerPage,
+          hasNextPage: false,
+          hasPrevPage: false,
+        });
+      } else{
+        toast(data?.error);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }, [pagination.currentPage, AddPopUpShow, UpdatePopUpShow, deletePopUpShow, filters]);
+  }, [pagination.currentPage, AddPopUpShow, UpdatePopUpShow, deletePopUpShow, filters, search]);
 
   return (
     <>
@@ -146,7 +160,33 @@ export const ProjectMasterGrid = () => {
 
                   <div className="col-12 col-lg-6 ms-auto text-end">
                     <div className="row">
-                      <div className="col-8 col-lg-4 ms-auto">
+                      {/* Add search input field without button */}
+                      <div className="col-8 col-lg-6">
+                        <div className="input-group">
+                          <input
+                            type="text"
+                            className="form-control bg_edit"
+                            placeholder="Search Customer..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            onKeyDown={handleSearchKeyDown}
+                          />
+                          {searchTerm && (
+                            <button 
+                              type="button" 
+                              className="btn btn-light border-start-0"
+                              onClick={() => {
+                                setSearchTerm("");
+                                setSearch("");
+                              }}
+                            >
+                              <i className="fa-solid fa-xmark"></i>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="col-4 col-lg-3">
                         <select
                           className="form-select bg_edit"
                           aria-label="Default select example"
@@ -161,7 +201,7 @@ export const ProjectMasterGrid = () => {
                       </div>
 
                       {user?.permissions?.includes("createProject") ? (
-                      <div className="col-4 col-lg-4 ms-auto">
+                      <div className="col-4 col-lg-3 ms-auto">
                           <button
                             onClick={handleAdd}
                             type="button"
