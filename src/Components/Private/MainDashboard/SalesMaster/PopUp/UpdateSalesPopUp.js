@@ -199,7 +199,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     const { name, value } = e.target;
     
     if (name === 'status') {
-      // When status changes to Won or Lost, set completion to 100 and set appropriate step
+      // When status changes to Won, set completion to 100 and set appropriate step
       if (value === 'Won') {
         setActionData(prev => ({ 
           ...prev, 
@@ -207,14 +207,26 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
           completion: '100',
           actionType: '12. Deal Status'
         }));
-      } else if (value === 'Lost') {
+      } 
+      // When status changes to Lost, set completion to 100 and set appropriate step
+      else if (value === 'Lost') {
         setActionData(prev => ({ 
           ...prev, 
           [name]: value,
           completion: '100',
           actionType: '15. Not Feasible'
         }));
-      } else {
+      }
+      // When status changes to HotLeads, keep existing completion or set to 0
+      else if (value === 'HotLeads') {
+        setActionData(prev => ({ 
+          ...prev, 
+          [name]: value,
+          // Don't auto-set completion for HotLeads - user should input it
+          completion: prev.completion || '0'
+        }));
+      } 
+      else {
         setActionData(prev => ({ ...prev, [name]: value }));
       }
     } 
@@ -242,14 +254,17 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     
     // For Won status, require quotation and remark
     if (actionData.status === 'Won') {
-      requiredFields.push('quotation');
-      requiredFields.push('rem');
+      requiredFields.push('quotation', 'rem');
     }
     // For Lost status, require remark
     else if (actionData.status === 'Lost') {
       requiredFields.push('rem');
     }
-    // For other statuses, require normal fields
+    // For HotLeads status, require actionType, date, completion, and remark
+    else if (actionData.status === 'HotLeads') {
+      requiredFields.push('actionType', 'date', 'completion', 'rem');
+    }
+    // For other statuses (Pending, Ongoing), require normal fields
     else {
       requiredFields.push('actionType', 'date', 'completion');
       // Additional requirement for quotation submission
@@ -308,7 +323,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       // API call to store updated data
       await useUpdate.updateLead(selectedLead?._id, formDataWithHistory);
       onUpdate(selectedLead._id, formDataWithHistory);
-      toast.success('Lead updated successfully!');
       onClose();
     } catch (error) {
       toast.error('Failed to update lead: ' + error.message);
@@ -379,12 +393,13 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                           <option value="" disabled>-- Select a status --</option>
                           <option value="Pending">Pending</option>
                           <option value="Ongoing">Ongoing</option>
+                          <option value="HotLeads">Hot Leads</option>
                           <option value="Won">Won</option>
                           <option value="Lost">Lost</option>
                         </select>
                       </div>
 
-                      {/* Show Steps field only when status is not Won or Lost */}
+                      {/* Show Steps field for all statuses except Won and Lost */}
                       {actionData.status !== 'Won' && actionData.status !== 'Lost' && (
                         <div className="col-md-6">
                           <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar /></label>
@@ -404,7 +419,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         </div>
                       )}
 
-                      {/* Show completion field only when status is not Won or Lost */}
+                      {/* Show completion field for all statuses except Won and Lost */}
                       {actionData.status !== 'Won' && actionData.status !== 'Lost' && (
                         <div className="col-md-6">
                           <label htmlFor="completion" className="form-label fw-bold">Status (%)<RequiredStar /></label>
@@ -439,7 +454,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         </div>
                       )}
 
-                      {/* Show quotation field when Quotation Submission is selected and status is not Won or Lost */}
+                      {/* Show quotation field when Quotation Submission is selected (excluding Won/Lost) */}
                       {actionData.status !== 'Won' && actionData.status !== 'Lost' && actionData.actionType === '7. Quotation Submission' && (
                         <div className="col-md-6">
                           <label htmlFor="quotation" className="form-label fw-bold">Amount Show (₹)<RequiredStar /></label>
@@ -456,7 +471,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         </div>
                       )}
 
-                      {/* Hide next follow-up date when status is Won or Lost */}
+                      {/* Show next follow-up date for all statuses except Won and Lost */}
                       {actionData.status !== 'Won' && actionData.status !== 'Lost' && (
                         <div className="col-md-6">
                           <label htmlFor="date" className="form-label fw-bold">Next Follow-up Date<RequiredStar /></label>
@@ -475,19 +490,28 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                       <div className="col-12">
                         <label htmlFor="remark" className="form-label fw-bold">
                           Remark
-                          {/* Make remark required for Won and Lost status */}
-                          {(actionData.status === 'Won' || actionData.status === 'Lost') && <RequiredStar />}
+                          {/* Make remark required for Won, Lost, and HotLeads status */}
+                          {(actionData.status === 'Won' || actionData.status === 'Lost' || actionData.status === 'HotLeads') && <RequiredStar />}
                         </label>
                         <textarea 
                           id="rem" 
                           name="rem"
                           className="form-control" 
-                          placeholder="Enter your remarks here..." 
+                          placeholder={
+                            actionData.status === 'HotLeads' 
+                              ? "Explain why this is a hot lead (e.g., high potential, urgent requirement, strong interest)..." 
+                              : "Enter your remarks here..."
+                          }
                           rows="3"
                           value={actionData.rem} 
                           onChange={handleActionChange}
-                          required={actionData.status === 'Won' || actionData.status === 'Lost'}
+                          required={actionData.status === 'Won' || actionData.status === 'Lost' || actionData.status === 'HotLeads'}
                         />
+                        {actionData.status === 'HotLeads' && (
+                          <small className="text-muted">
+                            * Please provide details about why this lead is marked as hot
+                          </small>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -527,12 +551,26 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                       {previousActions.map((action, index) => (
                         <tr key={action._id || index}>
                           <td className="text-center">{index + 1}</td>
-                          <td>{action.status}</td>
+                          <td>
+                            <span className={
+                              action.status === 'HotLeads' 
+                                ? 'badge text-white' 
+                                : action.status === 'Won'
+                                ? 'badge bg-success'
+                                : action.status === 'Lost'
+                                ? 'badge bg-danger'
+                                : action.status === 'Ongoing'
+                                ? 'badge bg-primary'
+                                : 'badge bg-warning'
+                            } style={action.status === 'HotLeads' ? {backgroundColor: '#00FFFF'} : {}}>
+                              {action.status}
+                            </span>
+                          </td>
                           <td>{action.step}</td>
                           <td className="text-center">{action.completion}%</td>
                           <td>{formatDateForDisplay(action.nextFollowUpDate)}</td>
                           <td>{action.rem}</td>
-                          <td>{action.quotation}</td>
+                          <td>₹{action.quotation || 0}</td>
                         </tr>
                       ))}
                     </tbody>

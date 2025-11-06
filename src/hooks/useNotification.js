@@ -13,11 +13,14 @@ const getNotifications = async () => {
     });
     const data = response?.data;
 
+    // Debug log to check the response
+    console.log("Notifications response:", data);
+
     return data;
     
   } catch (error) {
-    console.error(error.response?.data?.error);
-    return error?.response?.data?.error;
+    console.error("Error fetching notifications:", error.response?.data?.error);
+    return error?.response?.data;
   }
 };
 
@@ -37,14 +40,14 @@ const sendNotification = async (notificationData) => {
         return data;
     
     } catch (error) {
-        console.error(error);
-        toast.error(error.response.data.error);
+        console.error("Error sending notification:", error);
+        toast.error(error.response?.data?.error || "Failed to send notification");
     }
 }
 
 const markAsRead = async (notificationId) => {
   try {
-    const response = await axios.put(`${url}/${notificationId}`,{
+    const response = await axios.put(`${url}/${notificationId}`, {}, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -57,8 +60,8 @@ const markAsRead = async (notificationId) => {
         return data;
       }
       catch (error) {
-        console.error(error);
-        toast.error(error.response.data.error);
+        console.error("Error marking notification as read:", error);
+        toast.error(error.response?.data?.error || "Failed to mark notification as read");
       }
 }
 
@@ -78,10 +81,10 @@ const deleteNotification = async (notificationId) => {
     }
     return data;
   } catch (error) {
-    console.error(error);
+    console.error("Error deleting notification:", error);
     toast.error(error?.response?.data?.error || "Something went wrong.");
   }
 };
 
 
-export { getNotifications, sendNotification, markAsRead, deleteNotification};
+export { getNotifications, sendNotification, markAsRead, deleteNotification };

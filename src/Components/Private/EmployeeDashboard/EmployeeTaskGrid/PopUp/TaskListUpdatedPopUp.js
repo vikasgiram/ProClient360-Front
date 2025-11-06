@@ -126,7 +126,7 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
     }
     if (taskLevel > 100) {
       return toast.error("Task level should be less than 100");
-    } else if (taskLevel < selectedTask?.taskLevel) {
+    } else if (selectedTask?.taskLevel && taskLevel < selectedTask?.taskLevel) {
       return toast.error("Task level must be greater than previous task level");
     }
     if (!/^[a-zA-Z0-9\s.,;:!?'"()\-]+$/.test(action)) {
@@ -397,7 +397,6 @@ const TaskListUpdatedPopUp = ({ handleUpdateTask, selectedTask }) => {
                                 </tr>
                               </thead>
                               <tbody>
-                                {console.log("actionHistory", actionHistory)}
                                 {actionHistory &&
                                   actionHistory.map((action, index) => (
                                     <tr className="text-center" key={action?._id}>

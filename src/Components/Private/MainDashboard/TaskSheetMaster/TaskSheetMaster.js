@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { confirmAlert } from 'react-confirm-alert'; // Import
+import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
@@ -12,32 +12,19 @@ import Select from "react-select";
 import { useParams, useNavigate } from "react-router-dom";
 import { getTaskSheet, createTaskSheet, deleteTaskSheet } from "../../../../hooks/useTaskSheet";
 import toast from "react-hot-toast";
-import { getTask, getAllTasksForDropdown } from "../../../../hooks/useTask"; // UPDATED IMPORT
+import { getTask, getAllTasksForDropdown } from "../../../../hooks/useTask";
 import { getEmployees } from "../../../../hooks/useEmployees";
-// Removed department import
 import AddTaskPopUp from "../TaskMaster/PopUp/AddTaskPopUp";
 import { getAllActions } from "../../../../hooks/useAction";
 import { formatDateforEditAction, formatDateTimeForDisplay } from "../../../../utils/formatDate";
 import { RequiredStar } from "../../RequiredStar/RequiredStar";
-import { getProject } from "../../../../hooks/useProjects"; // Added import
-
+import { getProject } from "../../../../hooks/useProjects";
 
 const PAGE_SIZE = 10;
 
 export const TaskSheetMaster = () => {
-  
   const navigate = useNavigate();
 
-
-  /**
-   * Component for displaying a Gantt chart of a project's tasks.
-   *
-   * The component fetches the project data from the server and transforms it
-   * into a format that can be used by the Gantt component. It also provides
-   * functionality for adding new tasks to the project.
-   *
-   * @returns {JSX.Element} The component.
-   */
   const [isopen, setIsOpen] = useState(false);
   const toggle = () => {
     setIsOpen(!isopen);
@@ -51,14 +38,12 @@ export const TaskSheetMaster = () => {
   const [isChecked, setIsChecked] = React.useState(true);
 
   const [employees, setEmployees] = useState([]);
-  // Removed duplicate employeeOptions declaration
   const [taskName, setTaskName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [remark, setRemark] = useState("");
   const [taskDropDown, setTaskDropDown] = useState([]);
   
-  // Employee dropdown state
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [employeePage, setEmployeePage] = useState(1);
@@ -72,12 +57,8 @@ export const TaskSheetMaster = () => {
   const [forTask, setForTask] = useState();
   const [showAction, setShowAction] = useState(false);
   
-  // Added state for employee-task assignments
   const [employeeTaskAssignments, setEmployeeTaskAssignments] = useState([]);
 
-
-
-  // Fetch employees with pagination & search
   const loadEmployees = useCallback(async (page = 1, search = "") => {
     setEmployeeLoading(true);
     try {
@@ -111,19 +92,19 @@ export const TaskSheetMaster = () => {
     event.preventDefault();
     await handleTaskAdd();
   };
+
   const handleTaskSelection = (value) => {
     if (value === "AddNewTask") {
       setTaskAddPopUpShow(!taskAddPopUpShow);
-      
     } else {
-      setTaskName(value); // Update task name for selected task
+      setTaskName(value);
     }
-    // setTaskAddPopUpShow(!taskAddPopUpShow);
   };
- const handleTaskCancel =()=>{
 
-  setTaskAddPopUpShow(!taskAddPopUpShow);
- }
+  const handleTaskCancel = () => {
+    setTaskAddPopUpShow(!taskAddPopUpShow);
+  };
+
   const forActionShow = async (id) => {
     const data = await getAllActions(id);
     setForTask(data?.actions);
@@ -145,7 +126,6 @@ export const TaskSheetMaster = () => {
             } else {
               toast.error(data?.error);
             }
-            
           }
         },
         {
@@ -157,12 +137,12 @@ export const TaskSheetMaster = () => {
       ]
     });
   };
+
   const handleProgressChange = async (task) => {
     setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
-    // console.log("On progress change Id:" + task.id);
   };
+
   const handleDblClick = (task) => {
-    // alert("On Double Click event Id:" + task.type);
     if(task.type==='task')
     forActionShow(task.id);
   };
@@ -170,9 +150,9 @@ export const TaskSheetMaster = () => {
   const handleSelect = (task, isSelected) => {
     // console.log(task.name + " has " + (isSelected ? "selected" : "unselected"));
   };
+
   const handleExpanderClick = (task) => {
     setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
-    // console.log("On expander click Id:" + task.id);
   };
 
   useEffect(() => {
@@ -180,20 +160,16 @@ export const TaskSheetMaster = () => {
       try {
         setLoading(true);
         const response = await getTaskSheet(id);
-        // console.log(response);
-
+        console.log("API Response:", response); // Debug log
+        
         setProjectName(response.task[0].project);
 
-        const transformedTasks = transformProjectToTasks(response); // Transform the data
-
+        const transformedTasks = transformProjectToTasks(response);
         setTasks(transformedTasks);
-        // console.log("Transformed tasks: ", response);
         
-        // Extract employee-task assignments from task sheets
         const taskSheets = response.task || [];
         const assignments = [];
         
-        // First, collect all unique employee IDs
         const employeeIds = new Set();
         taskSheets.forEach(task => {
           if (task.employees && Array.isArray(task.employees)) {
@@ -204,19 +180,19 @@ export const TaskSheetMaster = () => {
           }
         });
         
-        // Fetch employee details
         if (employeeIds.size > 0) {
           try {
             const employeesData = await getEmployees(1, 1000, "");
             
-            // Create a map of employee ID to employee details
             const employeeMap = {};
             employeesData.employees.forEach(emp => {
               employeeMap[emp._id] = emp;
             });
             
-            // Build assignments array
+            // Build assignments array with proper assigner information
             taskSheets.forEach(task => {
+              console.log("Task assignedBy:", task.assignedBy); // Debug log
+              
               if (task.employees && Array.isArray(task.employees)) {
                 task.employees.forEach(emp => {
                   const empId = typeof emp === 'object' ? emp._id : emp;
@@ -225,16 +201,18 @@ export const TaskSheetMaster = () => {
                       employeeId: empId,
                       employeeName: employeeMap[empId].name,
                       taskId: task._id,
-                      taskName: task.taskName.name,
+                      taskName: task.taskName?.name || 'Unknown Task',
                       startDate: task.startDate,
-                      endDate: task.endDate
+                      endDate: task.endDate,
+                      // Fix: Check if assignedBy exists and has name property
+                      assignedBy: task.assignedBy?.name || 'Not Assigned',
+                      assignedById: task.assignedBy?._id || null
                     });
                   }
                 });
               }
             });
             
-            // Group assignments by employee
             const groupedAssignments = {};
             assignments.forEach(assignment => {
               if (!groupedAssignments[assignment.employeeId]) {
@@ -248,15 +226,17 @@ export const TaskSheetMaster = () => {
                 taskId: assignment.taskId,
                 taskName: assignment.taskName,
                 startDate: assignment.startDate,
-                endDate: assignment.endDate
+                endDate: assignment.endDate,
+                assignedBy: assignment.assignedBy,
+                assignedById: assignment.assignedById
               });
             });
             
-            // Convert to array and sort by employee name
             const sortedAssignments = Object.values(groupedAssignments).sort((a, b) => 
               a.employeeName.localeCompare(b.employeeName)
             );
             
+            console.log("Final assignments:", sortedAssignments); // Debug log
             setEmployeeTaskAssignments(sortedAssignments);
           } catch (error) {
             console.error("Error fetching employee details:", error);
@@ -274,12 +254,11 @@ export const TaskSheetMaster = () => {
     fetchData();
   }, [id, renderPage]);
 
-  // UPDATED useEffect - Fetch all tasks for dropdown
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getAllTasksForDropdown(); // CHANGED THIS LINE
+        const data = await getAllTasksForDropdown();
         if (data) {
           setTaskDropDown(data.task || []);
         }
@@ -292,44 +271,34 @@ export const TaskSheetMaster = () => {
     };
     fetchData();
   }, [taskAddPopUpShow]);
-  // console.log(taskName,"task n ");
-
-  // Removed department-based employee fetch
 
   const transformProjectToTasks = (projectData) => {
-    // Extract project information from the task array
     const project = projectData.task[0].project;
-    // Create a project task entry
 
     const projectTask = {
       id: project._id,
       name: project.name,
       start: new Date(project.startDate),
       end: new Date(project.endDate),
-      progress: project.completeLevel || 0, // Set default to 0 if undefined
+      progress: project.completeLevel || 0,
       type: "project",
       hideChildren: false,
     };
 
-    // Map the tasks within the project
     const taskList = projectData.task.map((task) => ({
       id: task._id,
-      name: task.taskName.name, // Access taskName object
+      name: task.taskName?.name || 'Unknown Task',
       start: new Date(task.startDate),
       end: new Date(task.endDate),
-      project: project._id, // Associate with project ID
+      project: project._id,
       type: "task",
-      progress: task.taskLevel || 0, // Set default to 0 if undefined
+      progress: task.taskLevel || 0,
     }));
 
-    // console.log("Task list"+taskList);
-    // Return an array containing the project task followed by its task list
     return [projectTask, ...taskList];
   };
 
-
   const handleTaskAdd = async (event) => {
-    // event.preventDefault();
     const employeeIds = selectedEmployees.map(emp => emp.value);
     const data = {
       project: id,
@@ -339,11 +308,11 @@ export const TaskSheetMaster = () => {
       endDate,
       remark,
     };
+    
     if (!selectedEmployees.length || !taskName || !startDate || !endDate ) {
       return toast.error("Please fill all fields");
     }
 
-    
     if(startDate>endDate){
       return toast.error("Start date should be less than end date");
     }
@@ -385,22 +354,21 @@ export const TaskSheetMaster = () => {
               >
                 <div className="content-wrapper ps-3 ps-md-0 pt-3">
 
-               <div className="col-12 col-lg-12 mx-auto mb-4 mb-lg-0 pt-4 ">
-                  <button className="btn btn-outline-light d-flex align-items-center" onClick={() => navigate('/ProjectMasterGrid')}>             
-                  <i className="fa-solid text-light fa-angle-left me-2"></i>  Back 
-                   </button>
-                </div>
+                  <div className="col-12 col-lg-12 mx-auto mb-4 mb-lg-0 pt-4 ">
+                    <button className="btn btn-outline-light d-flex align-items-center" onClick={() => navigate('/ProjectMasterGrid')}>             
+                      <i className="fa-solid text-light fa-angle-left me-2"></i>  Back 
+                    </button>
+                  </div>
 
                   <div className="row px-2 py-1   ">
                     <div className="col-12 col-lg-6">
                       <h5 className="text-white py-2">
-
                         <span className="fw-light">Project Name : </span> {projectName && projectName.name + " - " + projectName?.custId?.custName}
                       </h5>
                     </div>
                   </div>
 
-                  {/* Added Employee Task Assignments Section */}
+                  {/* FIXED: Employee Task Assignments Section - Employee name always shows */}
                   <div className="row bg-white p-2 m-1 border rounded">
                     <div className="col-12">
                       <div className="mb-3">
@@ -412,32 +380,28 @@ export const TaskSheetMaster = () => {
                             <table className="table table-bordered">
                               <thead className="thead-light">
                                 <tr>
+                                  <th>Assigned By</th>
                                   <th>Employee Name</th>
-                                  <th>Assigned Tasks</th>
+                                  <th>Task Name</th>
+                                  <th>Start Date</th>
+                                  <th>End Date</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {employeeTaskAssignments.map((assignment) => (
-                                  <tr key={assignment.employeeId}>
-                                    <td className="align-middle">
-                                      <strong>{assignment.employeeName}</strong>
-                                    </td>
-                                    <td>
-                                      <ul className="list-unstyled mb-0">
-                                        {assignment.tasks.map((task, index) => (
-                                          <li key={`${assignment.employeeId}-${task.taskId}`} className="mb-2">
-                                            <div className="d-flex justify-content-between align-items-center">
-                                              <span className="fw-medium">{task.taskName}</span>
-                                              <small className="text-muted">
-                                                {new Date(task.startDate).toLocaleDateString()} - {new Date(task.endDate).toLocaleDateString()}
-                                              </small>
-                                            </div>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    </td>
-                                  </tr>
-                                ))}
+                                {employeeTaskAssignments.flatMap((assignment) =>
+                                  assignment.tasks.map((task, index) => (
+                                    <tr key={`${assignment.employeeId}-${task.taskId}-${index}`}>
+                                     <td className="align-middle"><span className="fw-bold">{task.assignedBy}</span></td>
+                                      <td className="align-middle">
+                                        <strong>{assignment.employeeName}</strong>
+                                      </td>
+                                      <td className="align-middle text-start">{task.taskName}</td>
+                                      <td className="align-middle">{new Date(task.startDate).toLocaleDateString()}</td>
+                                      <td className="align-middle">{new Date(task.endDate).toLocaleDateString()}</td>
+                                      
+                                    </tr>
+                                  ))
+                                )}
                               </tbody>
                             </table>
                           </div>
@@ -450,6 +414,7 @@ export const TaskSheetMaster = () => {
                     </div>
                   </div>
 
+                  {/* Rest of your form remains the same */}
                   <div className="row  bg-white p-2 m-1 border rounded">
                     <div className="col-12 col-md-6 col-lg-3">
                       <div className="mb-3">
@@ -512,9 +477,6 @@ export const TaskSheetMaster = () => {
                         />
                       </div>
                     </div>
-
-                    {/* Removed Department Dropdown */}
-
 
                     <div className="col-12 col-md-6 col-lg-3">
                       <div className="mb-3">
@@ -585,11 +547,9 @@ export const TaskSheetMaster = () => {
 
                     <div className="col-12 col-lg-3  pt-3 mt-3 ">
                       <button
-                        
                         type="submit"
                         className="btn adbtn btn-success px-4 me-lg-4 mx-auto"
                       >
-                      
                         <i className="fa-solid fa-plus"></i> Add
                       </button>
                       <button
@@ -599,7 +559,6 @@ export const TaskSheetMaster = () => {
                         type="button"
                         className="btn adbtn btn-danger  px-4 mx-auto"
                       >
-               
                         <i className="fa-solid fa-xmark"></i> Clear
                       </button>
                     </div>
@@ -614,7 +573,6 @@ export const TaskSheetMaster = () => {
                         <Gantt
                           tasks={tasks}
                           viewMode={view}
-                          // onDateChange={handleTaskChange}
                           onDelete={handleTaskDelete}
                           onProgressChange={handleProgressChange}
                           onDoubleClick={handleDblClick}
@@ -629,110 +587,82 @@ export const TaskSheetMaster = () => {
                         {taskAddPopUpShow ? (
                           <AddTaskPopUp
                             handleAdd={handleTaskSelection}
-                          // heading="Forward"
-                          cancelBtnCallBack={handleTaskCancel}
+                            cancelBtnCallBack={handleTaskCancel}
                           />
                         ) : (
                           <></>
                         )}
-                        {/* <h3>Gantt With Limited Height</h3>
-                                            <Gantt
-                                                tasks={tasks}
-                                                viewMode={view}
-                                                onDateChange={handleTaskChange}
-                                                onDelete={handleTaskDelete}
-                                                onProgressChange={handleProgressChange}
-                                                onDoubleClick={handleDblClick}
-                                                onSelect={handleSelect}
-                                                onExpanderClick={handleExpanderClick}
-                                                listCellWidth={isChecked ? "155px" : ""}
-                                                ganttHeight={300}
-                                                columnWidth={columnWidth}
-                                            /> */}
                       </div>
                     </div>
 
-                    {showAction ? (<div className="col-12 col-lg-12  mx-auto  rounded ">
-
-                      <div className="row  bg-white ms-lg-1 pt-5 rounded p-lg-3">
-
-
-                        <div className="col-12 col-lg-6">
-                          <h6 className="mb-0 fw-bold mb-3 text-warning-dark">Task Name </h6>
-                        </div>
-
-
-                        <div className="col-12 col-lg-6 text-end">
-                          <span
-                            onClick={() => setShowAction(false)}
-                            type="button"
-                            className="close  px-3"
-                          // style={{ marginLeft: "1150px" }}
-                          >
-                            <span aria-hidden="true">&times;</span>
-                          </span>
-                        </div>
-
-
-                        <div className="col-12">
-                          <div className="shadow_custom ">
-                            <div className="table-responsive">
-                              <table className="table align-items-center table-flush">
-                                <thead className="thead-light">
-                                  <tr>
-                                    <th className="text-center">Action</th>
-                                    <th className="text-center">Action By</th>
-                                    <th className="text-center">Start Time </th>
-                                    <th className="text-center">End Time</th>
-                                    <th className="text-center">Completion</th>
-                                  </tr>
-                                </thead>
-
-                                {forTask && forTask.length !== 0 ? (
-
-
-                                  <tbody>
-                                    {forTask && forTask.map((action) => (
-                                      <tr className="text-center" key={action._id}>
-                                        <td>{action.action}</td>
-                                        <td>{action.actionBy.name}</td>
-                                        <td>{formatDateTimeForDisplay(action.startTime)}</td>
-                                        <td>{formatDateTimeForDisplay(action.endTime)}</td>
-                                        <td className="text-center">
-                              <div className="d-flex align-items-center"
-                                style={{ justifyContent: "center" }}
-                              >
-                              {action.complated}%
-                                  <span className="progress"
-                                        style={{ marginLeft: "10px" }}
-                                  >
-                                    <div
-                                      className="progress-bar bg-warning"
-                                      role="progressbar"
-                                      aria-valuenow={action.complated}
-                                      aria-valuemin="0"
-                                      aria-valuemax="100"
-                                      style={{
-                                        width: `${action.complated}%`,
-                                      }}
-                                    ></div>
-                                  </span>
-                                
+                    {showAction ? (
+                      <div className="col-12 col-lg-12  mx-auto  rounded ">
+                        <div className="row  bg-white ms-lg-1 pt-5 rounded p-lg-3">
+                          <div className="col-12 col-lg-6">
+                            <h6 className="mb-0 fw-bold mb-3 text-warning-dark">Task Name </h6>
+                          </div>
+                          <div className="col-12 col-lg-6 text-end">
+                            <span
+                              onClick={() => setShowAction(false)}
+                              type="button"
+                              className="close  px-3"
+                            >
+                              <span aria-hidden="true">&times;</span>
+                            </span>
+                          </div>
+                          <div className="col-12">
+                            <div className="shadow_custom ">
+                              <div className="table-responsive">
+                                <table className="table align-items-center table-flush">
+                                  <thead className="thead-light">
+                                    <tr>
+                                      <th className="text-center">Action</th>
+                                      <th className="text-center">Action By</th>
+                                      <th className="text-center">Start Time </th>
+                                      <th className="text-center">End Time</th>
+                                      <th className="text-center">Completion</th>
+                                    </tr>
+                                  </thead>
+                                  {forTask && forTask.length !== 0 ? (
+                                    <tbody>
+                                      {forTask && forTask.map((action) => (
+                                        <tr className="text-center" key={action._id}>
+                                          <td>{action.action}</td>
+                                          <td>{action.actionBy.name}</td>
+                                          <td>{formatDateTimeForDisplay(action.startTime)}</td>
+                                          <td>{formatDateTimeForDisplay(action.endTime)}</td>
+                                          <td className="text-center">
+                                            <div className="d-flex align-items-center"
+                                              style={{ justifyContent: "center" }}
+                                            >
+                                            {action.complated}%
+                                                <span className="progress"
+                                                      style={{ marginLeft: "10px" }}
+                                                >
+                                                  <div
+                                                    className="progress-bar bg-warning"
+                                                    role="progressbar"
+                                                    aria-valuenow={action.complated}
+                                                    aria-valuemin="0"
+                                                    aria-valuemax="100"
+                                                    style={{
+                                                      width: `${action.complated}%`,
+                                                    }}
+                                                  ></div>
+                                                </span>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  ) : (<tbody><tr><td colSpan="5"><h6 className="text-center">No Action performed....</h6></td></tr></tbody>)}
+                                </table>
                               </div>
-                            </td>
-                                      </tr>
-                                    ))}
-
-                                  </tbody>
-                                ) : (<tbody><tr><td colSpan="5"><h6 className="text-center">No Action performed....</h6></td></tr></tbody>)}
-                              </table>
                             </div>
                           </div>
                         </div>
                       </div>
-
-                    </div>) : (<></>)}
-
+                    ) : (<></>)}
 
                   </div>
                 </div>

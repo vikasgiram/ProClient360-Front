@@ -192,6 +192,8 @@ export const SalesMasterGrid = () => {
         return "badge bg-warning text-dark";
       case "Lost":
         return "badge bg-danger text-white";
+      case "HotLeads":
+        return "badge bg-info text-white";
       case "today":
         return "badge bg-warning text-white";    
       default:
@@ -298,6 +300,7 @@ export const SalesMasterGrid = () => {
                         pendingCount={data?.leadCounts?.pendingCount || 0}
                         lostCount={data?.leadCounts?.lostCount || 0}
                         todayCount={data?.leadCounts?.todaysFollowUpCount || 0}
+                        hotleadsCount={data?.leadCounts?.hotleadsCount || 0}
                     /> 
 
                 <div className="row align-items-center p-2 m-1">
@@ -373,6 +376,7 @@ export const SalesMasterGrid = () => {
                           <option value="Ongoing">Ongoing</option>
                           <option value="Pending">Pending</option>
                           <option value="Lost">Lost</option>
+                          <option value="HotLeads">HotLeads</option>
                         </select>
                       </div>
                     </div>

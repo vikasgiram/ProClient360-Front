@@ -6,7 +6,8 @@ const SalesDashboardCards = ({
   winCount, 
   pendingCount, 
   lostCount, 
-  todayCount 
+  todayCount,
+  hotleadsCount 
 }) => {
   return (
     <div className="row bg-white p-2 m-1 border rounded">
@@ -145,6 +146,30 @@ const SalesDashboardCards = ({
                     src="./static/assets/img/only-today.png" 
                     className="img_opacity all_card_img_size" 
                     alt="Today's FollowUp" 
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        
+          {/* Hot Leads Card */}
+          <div className="col-12 col-md-3 pb-3 cursor-pointer">
+            <div className="p-4 background_style" style={{backgroundColor:"#FFBF77"}}>
+              <div className="row">
+                <div className="col-9">
+                  <h6 className="text-dark card_heading">
+                    Hot Leads 
+                  </h6>
+                  <h2 className="pt-2 fw-bold card_count">
+                    {hotleadsCount || 0}
+                  </h2>
+                </div>
+                <div className="col-3 d-flex align-items-center justify-content-center">
+                  <img 
+                    src="./static/assets/img/hoticon.png" 
+                    className="img_opacity all_card_img_size" 
+                    alt="Hot Leads" 
                   />
                 </div>
               </div>
