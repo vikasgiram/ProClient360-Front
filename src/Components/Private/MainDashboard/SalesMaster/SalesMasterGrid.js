@@ -15,7 +15,7 @@ import useMyLeads from "../../../../hooks/leads/useMyLeads";
 import useSubmitEnquiry from "../../../../hooks/leads/useSubmitEnquiry";
 import useCreateLead from "../../../../hooks/leads/useCreateLead";
 import useDeleteLead from "../../../../hooks/leads/useDeleteLead";
-import useAssignLead from "../../../../hooks/leads/useAssignLead";
+import useReassignLead from "../../../../hooks/leads/useReassignLead"; // Updated hook
 
 export const SalesMasterGrid = () => {
   const [isopen, setIsOpen] = useState(false);
@@ -33,21 +33,12 @@ export const SalesMasterGrid = () => {
   const [selectedLeadId, setSelectedLeadId] = useState(null);
 
   const { user } = useContext(UserContext);
-  
-  // Debug user permissions
-  useEffect(() => {
-    console.log('Current User:', user);
-    console.log('User Permissions:', user?.permissions);
-    console.log('Has assignLead permission:', user?.permissions?.includes('assignLead'));
-    console.log('Has updateLead permission:', user?.permissions?.includes('updateLead'));
-    console.log('Has deleteLead permission:', user?.permissions?.includes('deleteLead'));
-  }, [user]);
 
   const [filters, setFilters] = useState({ 
     status: null, 
     date: null, 
     source: null,
-    searchTerm: "" // Added for search functionality
+    searchTerm: ""
   });
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -63,16 +54,14 @@ export const SalesMasterGrid = () => {
   const { submitEnquiry } = useSubmitEnquiry();
   const { createLead } = useCreateLead();
   const { deleteLead } = useDeleteLead();
-  const { assignLead, loading: assignLoading } = useAssignLead();
+  const { reassignLead, loading: assignLoading } = useReassignLead(); // Updated hook
 
-  // State to store all leads for client-side filtering
   const [allLeads, setAllLeads] = useState([]);
   
   useEffect(() => {
     if (data) {
       setPagination(prev => ({ ...prev, ...data.pagination }));
       
-      // Add new leads to allLeads array, avoiding duplicates
       if (data.leads && data.leads.length > 0) {
         setAllLeads(prev => {
           const existingIds = new Set(prev.map(lead => lead._id));
@@ -80,16 +69,12 @@ export const SalesMasterGrid = () => {
           return [...prev, ...newLeads];
         });
       }
-      
-      // Debug lead counts
-      console.log('Lead counts:', data?.leadCounts);
     }
     if (error) {
       toast.error(error.message || "An error occurred");
     }
   }, [data, error]);
 
-  // Reset allLeads when filters change (except searchTerm)
   useEffect(() => {
     if (filters.status !== null || filters.date !== null || filters.source !== null) {
       setAllLeads([]);
@@ -97,7 +82,6 @@ export const SalesMasterGrid = () => {
     }
   }, [filters.status, filters.date, filters.source]);
 
-  // Filter leads based on search term (client-side filtering)
   const filteredLeads = useMemo(() => {
     if (!filters.searchTerm) return allLeads;
     
@@ -108,7 +92,6 @@ export const SalesMasterGrid = () => {
     );
   }, [allLeads, filters.searchTerm]);
 
-  // Determine if we're in search mode
   const isSearchMode = filters.searchTerm !== "";
 
   const handlePageChange = (page) => {
@@ -118,7 +101,6 @@ export const SalesMasterGrid = () => {
   };
 
   const handleUpdate = (lead = null) => {
-    // Check if lead status is Won or Lost and prevent update
     if (lead && (lead.STATUS === 'Won' || lead.STATUS === 'Lost')) {
       toast.error(`Cannot update a lead with status "${lead.STATUS}". This lead is already finalized.`);
       return;
@@ -129,6 +111,14 @@ export const SalesMasterGrid = () => {
   };
   
   const handleAssign = (lead = null) => {
+    // For Sales Master, use updateLead permission for Sales-to-Sales assignment
+    const canAssign = user?.permissions?.includes('updateLead') || user?.user === 'company';
+    
+    if (!canAssign) {
+      toast.error("You don't have permission to reassign leads.");
+      return;
+    }
+    
     setSelectedLead(lead);
     setAssignPopUpShow(true);
   };
@@ -141,7 +131,6 @@ export const SalesMasterGrid = () => {
   const handleDeleteConfirm = async () => {
     if(!selectedLeadId) return;
     try { 
-      console.log("Deleting lead with ID:", selectedLeadId);
       toast.loading("Deleting lead...");
       const data = await deleteLead(selectedLeadId);
       toast.dismiss();
@@ -150,7 +139,6 @@ export const SalesMasterGrid = () => {
         setDeletePopUpShow(false);
         setSelectedLeadId(null);
         
-        // Remove deleted lead from allLeads
         setAllLeads(prev => prev.filter(lead => lead._id !== selectedLeadId));
         
         refetch(); 
@@ -164,21 +152,21 @@ export const SalesMasterGrid = () => {
 
   const handleAssignSubmit = async (id, assignData) => {
     try {
-      toast.loading("Assigning lead...");
-      const data = await assignLead(id, assignData);
+      toast.loading("Reassigning lead...");
+      const data = await reassignLead(id, assignData); // Use reassignLead instead of assignLead
       toast.dismiss();
       
       if (data?.success) {
-        toast.success(data?.message || "Lead assigned successfully!");
+        toast.success(data?.message || "Lead reassigned successfully!");
         setAssignPopUpShow(false);
         setSelectedLead(null);
         refetch();
       } else {
-        toast.error(data?.error || "Failed to assign lead");
+        toast.error(data?.error || "Failed to reassign lead");
       }
     } catch (error) {
-      console.error("Assign lead error:", error);
-      toast.error("Failed to assign lead");
+      console.error("Reassign lead error:", error);
+      toast.error("Failed to reassign lead");
     }
   };
 
@@ -230,7 +218,6 @@ export const SalesMasterGrid = () => {
     }));
   };
 
-  // Handle search input change
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value;
     setFilters(prevFilters => ({ ...prevFilters, searchTerm }));
@@ -242,7 +229,6 @@ export const SalesMasterGrid = () => {
   const handleAddLeadSubmit = async (leadData) => {
     toast.loading("Adding lead...");
     const data = await createLead(leadData);
-    console.log("Lead Data:", data);
     toast.dismiss();
     if (data?.success) {
       toast.success(data?.message || "Lead added successfully!");
@@ -253,11 +239,13 @@ export const SalesMasterGrid = () => {
     }
   };
 
-  // Reset search and filters
   const resetSearch = () => {
     setFilters(prev => ({ ...prev, searchTerm: "" }));
     setAllLeads([]);
   };
+
+  // For Sales Master, use updateLead permission for Sales-to-Sales assignment
+  const canAssignLead = user?.permissions?.includes('updateLead') || user?.user === 'company';
 
   return (
     <>
@@ -305,7 +293,6 @@ export const SalesMasterGrid = () => {
 
                 <div className="row align-items-center p-2 m-1">
                   <div className="col-12 col-lg-6">
-                    {/* Search Bar */}
                     <div className="input-group">
                       <input
                         type="text"
@@ -423,10 +410,12 @@ export const SalesMasterGrid = () => {
                                   </span>
                                 )}
 
-                                {/* Assign Button */}
-                                <span onClick={() => handleAssign(lead)} title="Assign Lead">
-                                  <i className="mx-1 fa-solid fa-share cursor-pointer"></i>
-                                </span>
+                                {/* Assign Button - For Sales-to-Sales assignment */}
+                                {canAssignLead && (
+                                  <span onClick={() => handleAssign(lead)} title="Reassign Lead">
+                                    <i className="mx-1 fa-solid fa-share cursor-pointer"></i>
+                                  </span>
+                                )}
 
                                 {/* Delete Button - Only show for Direct leads and if user has permission */}
                                 {( lead.SOURCE==='Direct' &&( user?.permissions?.includes('deleteLead') || user?.user === 'company')) &&
@@ -452,7 +441,6 @@ export const SalesMasterGrid = () => {
                   </div>
                 </div>
 
-                {/* Only show pagination when not in search mode */}
                 {!isSearchMode && !loading && pagination.totalPages > 1 && (
                   <div className="pagination-container text-center my-3">
                     <button
@@ -531,7 +519,6 @@ export const SalesMasterGrid = () => {
                   </div>
                 )}
                 
-                {/* Show load more button when in search mode and there might be more results */}
                 {isSearchMode && !loading && pagination.hasNextPage && (
                   <div className="text-center my-3">
                     <button 
