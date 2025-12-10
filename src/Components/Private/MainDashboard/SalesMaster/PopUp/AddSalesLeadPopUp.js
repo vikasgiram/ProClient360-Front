@@ -1,13 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import toast from 'react-hot-toast';
 import { RequiredStar } from "../../../RequiredStar/RequiredStar";
 import { getAddress } from "../../../../../hooks/usePincode";
 import { getCustomers, getCustomerById } from "../../../../../hooks/useCustomer";
+import { getDepartment } from "../../../../../hooks/useDepartment";
+import { getEmployee } from "../../../../../hooks/useEmployees";
+import { UserContext } from "../../../../../context/UserContext";
 import Select from "react-select";
 
 const PAGE_SIZE = 15;
 
-const AddLeadMaster = ({ onAddLead, onClose }) => {
+const AddSalesLeadPopup = ({ onAddLead, onClose }) => {
+  const { user } = useContext(UserContext);
   const [customerType, setCustomerType] = useState('new');
   const [formData, setFormData] = useState({
     name: '',
@@ -16,9 +20,10 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     company: '',
     subject: '',
     products: '',
-    sources: '',  
+    sources: '',
+    callLeads: '',
     message: '',
-    status: 'enquiry',
+    status: 'Pending',
     value: '',
     address: {
       pincode: '',
@@ -29,7 +34,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }
   });
 
-  // Customer dropdown state - USING AddTicketPopup LOGIC
+  // Customer dropdown state
   const [custOptions, setCustOptions] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [custPage, setCustPage] = useState(1);
@@ -39,17 +44,103 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
   const [isLoadingCustomerAddress, setIsLoadingCustomerAddress] = useState(false);
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
 
+  // Assignment state
+  const [assignmentType, setAssignmentType] = useState('self');
+  const [departments, setDepartments] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [hasMoreDepartments, setHasMoreDepartments] = useState(true);
+  const [deptPage, setDeptPage] = useState(1);
+  const [deptSearchTerm, setDeptSearchTerm] = useState("");
+  const [assignedEmployee, setAssignedEmployee] = useState(null);
+  const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [hasMoreEmployees, setHasMoreEmployees] = useState(true);
+  const [empPage, setEmpPage] = useState(1);
+  const [empSearchTerm, setEmpSearchTerm] = useState("");
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+
   const [showCustomSource, setShowCustomSource] = useState(false);
   const [customSource, setCustomSource] = useState('');
 
-  const products = ['surveillance System', 'Access Control System', 'TurnKey Project', 'Alleviz', 'CafeLive', 'WorksJoy', 'WorksJoy Blu', 'Fire Alarm System', 'Fire Hydrant System', 'IDS', 'AI Face Machines', 'Entrance Automation', 'Guard Tour System', 'Home Automation', 'IP PA and Communication System', 'CRM', 'Security Systems', 'KMS', 'VMS', 'PMS', 'Boom Barrier System', 'Tripod System', 'Flap Barrier System', 'EPBX System', 'CMS', 'Lift Eliviter System', 'AV6', 'Walky Talky System', 'Device Management System'];  
+  const products = ['surveillance System', 'Access Control System', 'TurnKey Project', 'Alleviz', 'CafeLive', 'WorksJoy', 'WorksJoy Blu', 'Fire Alarm System', 'Fire Hydrant System', 'IDS', 'AI Face Machines', 'Entrance Automation', 'Guard Tour System', 'Home Automation', 'IP PA and Communication System', 'CRM', 'Security Systems', 'KMS', 'VMS', 'PMS', 'Boom Barrier System', 'Tripod System', 'Flap Barrier System', 'EPBX System', 'CMS', 'Lift Eliviter System', 'AV6', 'Walky Talky System', 'Device Management System'];
 
-  const sources = ['Google', 'Tender', 'Exhibitions', 'JustDial', 'Facebook', 'LinkedIn', 'Twitter', 'YouTube', 'WhatsApp', 'Referral', 'Email Campaign', 'Cold Call', 'Website','Walk-In', 'Direct', 'Other']; 
+  const sources = ['Google', 'Tender', 'Exhibitions', 'JustDial', 'Facebook', 'LinkedIn', 'Twitter', 'YouTube', 'WhatsApp', 'Referral', 'Email Campaign', 'Cold Call', 'Website','Walk-In', 'Direct', 'Other'];
 
+  const callLeads = ['Hot Leads', 'Warm Leads', 'Cold Leads', 'Invalid Leads'];
+
+  // Load departments for assignment
+  const loadDepartments = useCallback(async (page = 1, search = "") => {
+    try {
+      const data = await getDepartment(page, PAGE_SIZE, search);
+      if (data && data.departments) {
+        if (page === 1) {
+          setDepartments(data.departments);
+        } else {
+          setDepartments(prev => [...prev, ...data.departments]);
+        }
+        setHasMoreDepartments(data.departments.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  // Load employees for assignment
+  const loadEmployees = useCallback(async (page = 1, search = "") => {
+    try {
+      if (!selectedDepartment) return;
+
+      setLoadingEmployees(true);
+      const data = await getEmployee(selectedDepartment.value, page, PAGE_SIZE, search);
+
+      let employeeArray = [];
+
+      if (Array.isArray(data)) {
+        employeeArray = data;
+      } else if (data && Array.isArray(data.employee)) {
+        employeeArray = data.employee;
+      } else if (data && Array.isArray(data.employees)) {
+        employeeArray = data.employees;
+      } else if (data && Array.isArray(data.data)) {
+        employeeArray = data.data;
+      }
+
+      if (employeeArray.length > 0) {
+        const formattedData = employeeArray.map((employee) => ({
+          value: employee._id,
+          label: employee.name,
+          employeeData: employee,
+        }));
+
+        if (page === 1) {
+          setEmployeeOptions(formattedData);
+        } else {
+          setEmployeeOptions(prev => [...prev, ...formattedData]);
+        }
+        setHasMoreEmployees(employeeArray.length === PAGE_SIZE);
+      } else {
+        if (page === 1) {
+          setEmployeeOptions([]);
+          if (search === "") {
+            toast.info('No employees found for this department');
+          }
+        }
+        setHasMoreEmployees(false);
+      }
+    } catch (error) {
+      console.log('Error fetching employees:', error);
+      if (page === 1) {
+        toast.error('Failed to fetch employees');
+      }
+    } finally {
+      setLoadingEmployees(false);
+    }
+  }, [selectedDepartment]);
+
+  // Customer loading function
   const loadCustomers = useCallback(async (page, search) => {
     if (custLoading || !custHasMore) return;
     setCustLoading(true);
-    
+
     try {
       const data = await getCustomers(page, PAGE_SIZE, search);
       console.log("Customer data response:", data);
@@ -60,15 +151,14 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
         return;
       }
 
-    
       const customers = data.customers || data.data || [];
       console.log("Customers array:", customers);
-      
-      const newOpts = customers.map(c => ({ 
-        value: c._id, 
-        label: c.custName || c.name || 'Unnamed Customer' 
+
+      const newOpts = customers.map(c => ({
+        value: c._id,
+        label: c.custName || c.name || 'Unnamed Customer'
       }));
-      
+
       setCustOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
       setCustHasMore(customers.length === PAGE_SIZE);
       setCustPage(page + 1);
@@ -80,24 +170,24 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }
   }, [custLoading, custHasMore]);
 
+  // Handle customer selection
   const handleCustomerSelect = async (selectedOption) => {
     console.log("Customer selected:", selectedOption);
     setSelectedCustomer(selectedOption);
-    
+
     if (selectedOption) {
       setIsLoadingCustomerAddress(true);
       try {
         const customerData = await getCustomerById(selectedOption.value);
         console.log("Customer details response:", customerData);
-        
-    
+
         if (customerData && (customerData.customer || customerData.data)) {
           const customer = customerData.customer || customerData.data;
           console.log("Customer object:", customer);
-          
+
           const billingAddress = customer.billingAddress || customer.address || {};
           console.log("Billing address:", billingAddress);
-          
+
           setFormData(prev => ({
             ...prev,
             name: customer.custName || customer.name || customer.contactPerson || '',
@@ -108,12 +198,12 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
               pincode: billingAddress.pincode || '',
               state: billingAddress.state || '',
               city: billingAddress.city || '',
-              add: billingAddress.add || billingAddress.addressLine1 || billingAddress.address || 
-                    `${billingAddress.houseNo || ''}, ${billingAddress.buildingName || ''}, ${billingAddress.roadName || ''}, ${billingAddress.area || ''}, ${billingAddress.colony || ''}` || '',
+              add: billingAddress.add || billingAddress.addressLine1 || billingAddress.address ||
+                `${billingAddress.houseNo || ''}, ${billingAddress.buildingName || ''}, ${billingAddress.roadName || ''}, ${billingAddress.area || ''}, ${billingAddress.colony || ''}` || '',
               country: billingAddress.country || 'India'
             }
           }));
-          
+
           toast.success("Customer details loaded successfully");
         } else {
           console.error("Invalid customer data:", customerData);
@@ -150,7 +240,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }));
   };
 
-
+  // Effects for customer loading
   useEffect(() => {
     if (customerType === 'existing') {
       console.log("Loading customers for existing customer type");
@@ -161,22 +251,25 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }
   }, [customerType]);
 
-
+  // Load departments on component mount
   useEffect(() => {
-    if (customerType === 'existing') {
-      console.log("Search changed, reloading customers");
-      const timer = setTimeout(() => {
-        setCustPage(1);
-        setCustHasMore(true);
-        setCustOptions([]);
-        loadCustomers(1, custSearch);
-      }, 300);
-      
-      return () => clearTimeout(timer);
+    loadDepartments(1, deptSearchTerm);
+  }, [loadDepartments, deptSearchTerm]);
+
+  // Load employees when department changes
+  useEffect(() => {
+    if (selectedDepartment) {
+      setEmpPage(1);
+      setEmployeeOptions([]);
+      setAssignedEmployee(null);
+      loadEmployees(1, empSearchTerm);
+    } else {
+      setEmployeeOptions([]);
+      setAssignedEmployee(null);
     }
-  }, [custSearch]);
+  }, [selectedDepartment, loadEmployees, empSearchTerm]);
 
-
+  // Auto-fetch address when pincode changes (with debounce)
   useEffect(() => {
     const fetchData = async () => {
       if (formData.address.pincode && formData.address.pincode.length === 6) {
@@ -231,7 +324,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
         }));
       }
     };
-    
+
     const timeoutId = setTimeout(() => {
       fetchData();
     }, 500);
@@ -275,7 +368,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
   const handleCustomerTypeChange = (e) => {
     const type = e.target.value;
     setCustomerType(type);
-    
+
     if (type === 'new') {
       resetFormData();
       setSelectedCustomer(null);
@@ -298,7 +391,8 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
       subject,
       company,
       products,
-      sources,  
+      sources,
+      callLeads,
       message,
       address
     } = formData;
@@ -315,6 +409,19 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
       }
     }
 
+    if (assignmentType === 'employee' && !assignedEmployee) {
+      toast.error('Please select an employee to assign the lead to.');
+      return;
+    }
+
+    // Determine assignedTo based on assignment type
+    let assignedTo = null;
+    if (assignmentType === 'self') {
+      assignedTo = user._id;
+    } else if (assignmentType === 'employee') {
+      assignedTo = assignedEmployee;
+    }
+
     const mappedData = {
       customerType,
       customerId: customerType === 'existing' ? selectedCustomer.value : null,
@@ -329,10 +436,16 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
       SENDER_PINCODE: address.pincode,
       SENDER_COUNTRY_ISO: address.country,
       QUERY_PRODUCT_NAME: products,
-      QUERY_SOURCES_NAME: sources,  
-      QUERY_MESSAGE: message || ""
+      QUERY_SOURCES_NAME: sources,
+      QUERY_MESSAGE: message || "",
+      callLeads: callLeads || 'Warm Leads',
+      feasibility: 'feasible',
+      assignedTo: assignedTo,
+      assignedBy: user._id,
+      assignedTime: new Date().toISOString(),
     };
 
+    console.log('Submitting sales lead data:', mappedData);
     onAddLead(mappedData);
   };
 
@@ -344,12 +457,13 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
             <form onSubmit={handleSubmit}>
 
               <div className="modal-header pt-0">
-                <h5 className="card-title fw-bold" id="exampleModalLongTitle"> Add Lead</h5>
+                <h5 className="card-title fw-bold" id="exampleModalLongTitle"> Add Sales Lead</h5>
                 <button onClick={onClose} type="button" className="btn-close" aria-label="Close" style={{ backgroundColor: 'red' }}></button>
               </div>
 
               <div className="modal-body" style={{ maxHeight: 'calc(80vh - 240px)', overflowY: 'auto' }}>
                 <div className="row g-3">
+                  {/* Customer Type Selection */}
                   <div className="col-12 mb-3">
                     <label className="form-label fw-bold">Customer Type <RequiredStar /></label>
                     <div className="d-flex gap-4">
@@ -384,7 +498,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                     </div>
                   </div>
 
-                  {/* UPDATED: Customer Selection Field */}
+                  {/* Customer Selection Field */}
                   {customerType === 'existing' && (
                     <div className="col-12">
                       <div className="mb-3">
@@ -401,9 +515,9 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                           }}
                           isLoading={custLoading}
                           placeholder="Search and select client..."
-                          noOptionsMessage={({ inputValue }) => 
-                            inputValue 
-                              ? 'No clients found. Try a different search.' 
+                          noOptionsMessage={({ inputValue }) =>
+                            inputValue
+                              ? 'No clients found. Try a different search.'
                               : 'Type to search clients...'
                           }
                           loadingMessage={() => 'Loading clients...'}
@@ -443,36 +557,35 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                     </div>
                   )}
 
-                  {/* REST OF YOUR FORM FIELDS REMAIN UNCHANGED */}
                   <div className="col-md-6">
                     <label htmlFor="company" className="form-label">Customer Name<RequiredStar /></label>
-                    <input 
-                      type="text" 
-                      className="form-control" 
-                      id="company" 
-                      name="company" 
-                      placeholder="Enter a Company Name...." 
-                      maxLength={100} 
-                      value={formData.company} 
-                      onChange={handleInputChange} 
-                      required 
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="company"
+                      name="company"
+                      placeholder="Enter a Company Name...."
+                      maxLength={100}
+                      value={formData.company}
+                      onChange={handleInputChange}
+                      required
                       readOnly={customerType === 'existing'}
                       style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
                     />
                   </div>
-                  
+
                   <div className="col-md-6">
                     <label htmlFor="name" className="form-label">Contact Name <RequiredStar /></label>
-                    <input 
-                      type="text" 
-                      className="form-control" 
-                      id="name" 
-                      name="name" 
-                      placeholder="Enter a Contact Name...." 
-                      maxLength={50} 
-                      value={formData.name} 
-                      onChange={handleInputChange} 
-                      required 
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="name"
+                      name="name"
+                      placeholder="Enter a Contact Name...."
+                      maxLength={50}
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
                       readOnly={customerType === 'existing'}
                       style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
                     />
@@ -537,14 +650,24 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       {products.map(product => <option key={product} value={product}>{product}</option>)}
                     </select>
                   </div>
-                  
+
+                  {/* Leads Field - Optional */}
+                  <div className='col-md-6'>
+                    <label htmlFor="callLeads" className="form-label">Leads (Optional)</label>
+                    <select id="callLeads" className="form-select" name="callLeads" value={formData.callLeads} onChange={handleInputChange}>
+                      <option value="">Select Leads....</option>
+                      {callLeads.map(lead => <option key={lead} value={lead}>{lead}</option>)}
+                    </select>
+                    <small className="text-muted">If not selected, defaults to "Warm Leads"</small>
+                  </div>
+
                   <div className='col-md-6'>
                     <label htmlFor="sources" className="form-label">Sources<RequiredStar /></label>
-                    <select 
-                      id="sources" 
-                      className="form-select" 
-                      name="sources" 
-                      value={formData.sources === customSource ? "Other" : formData.sources} 
+                    <select
+                      id="sources"
+                      className="form-select"
+                      name="sources"
+                      value={formData.sources === customSource ? "Other" : formData.sources}
                       onChange={handleInputChange}
                       style={{ width: '100%', height: '35px' }}
                       required
@@ -552,7 +675,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       <option value="">Select Sources....</option>
                       {sources.map(source => <option key={source} value={source}>{source}</option>)}
                     </select>
-                    
+
                     {showCustomSource && (
                       <div className="mt-2">
                         <input
@@ -581,7 +704,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                     />
                   </div>
 
-                  {/* Address Section - Editable for New, Read-only for Existing */}
+                  {/* Address Section */}
                   <div className="col-12">
                     <div className="row border rounded p-3 m-1" style={{ backgroundColor: '#FAF6F6' }}>
                       <div className="col-12 mb-2">
@@ -675,10 +798,128 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Assignment Section */}
+                  <div className="col-12 mt-3">
+                    <label className="form-label fw-bold">Assign Lead To <RequiredStar /></label>
+                    <div className="d-flex gap-4 mb-3">
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="assignmentType"
+                          id="self"
+                          value="self"
+                          checked={assignmentType === 'self'}
+                          onChange={() => setAssignmentType('self')}
+                        />
+                        <label className="form-check-label" htmlFor="self">
+                          Self (Assign to me)
+                        </label>
+                      </div>
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="assignmentType"
+                          id="employee"
+                          value="employee"
+                          checked={assignmentType === 'employee'}
+                          onChange={() => setAssignmentType('employee')}
+                        />
+                        <label className="form-check-label" htmlFor="employee">
+                          Another Sales Employee
+                        </label>
+                      </div>
+                    </div>
+                    {assignmentType === 'employee' && (
+                      <div className="row">
+                        <div className="col-12 col-lg-6 mt-2">
+                          <label htmlFor="department" className="form-label label_text">Department <RequiredStar /></label>
+                          <Select
+                            id="department"
+                            options={departments.map(dept => ({ value: dept._id, label: dept.name }))}
+                            value={selectedDepartment}
+                            onChange={(selectedOption) => {
+                              setSelectedDepartment(selectedOption);
+                              setAssignedEmployee(null);
+                              setEmployeeOptions([]);
+                            }}
+                            onInputChange={(inputValue) => {
+                              setDeptSearchTerm(inputValue);
+                              setDeptPage(1);
+                            }}
+                            onMenuScrollToBottom={() => {
+                              if (hasMoreDepartments) {
+                                const nextPage = deptPage + 1;
+                                setDeptPage(nextPage);
+                                loadDepartments(nextPage, deptSearchTerm);
+                              }
+                            }}
+                            placeholder="Select Department..."
+                            isClearable
+                            styles={{
+                              control: (provided) => ({
+                                ...provided,
+                                borderRadius: 0,
+                                borderColor: '#ced4da',
+                                fontSize: '16px',
+                              }),
+                              option: (provided, state) => ({
+                                ...provided,
+                                backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                                color: state.isSelected ? 'white' : '#212529',
+                              }),
+                            }}
+                          />
+                        </div>
+                        <div className="col-12 col-lg-6 mt-2">
+                          <label htmlFor="employee" className="form-label label_text">Sales Employee <RequiredStar /></label>
+                          <Select
+                            id="employee"
+                            options={employeeOptions}
+                            isClearable
+                            isLoading={loadingEmployees}
+                            onChange={(selectedOption) => {
+                              setAssignedEmployee(selectedOption ? selectedOption.value : null);
+                            }}
+                            onInputChange={(inputValue) => {
+                              setEmpSearchTerm(inputValue);
+                              setEmpPage(1);
+                            }}
+                            onMenuScrollToBottom={() => {
+                              if (hasMoreEmployees) {
+                                const nextPage = empPage + 1;
+                                setEmpPage(nextPage);
+                                loadEmployees(nextPage, empSearchTerm);
+                              }
+                            }}
+                            value={assignedEmployee ? employeeOptions.find(opt => opt.value === assignedEmployee) : null}
+                            placeholder={loadingEmployees ? "Loading employees..." : "Select Employee..."}
+                            noOptionsMessage={() => selectedDepartment ? "No employees found" : "Select a department first"}
+                            isDisabled={!selectedDepartment || loadingEmployees}
+                            styles={{
+                              control: (provided) => ({
+                                ...provided,
+                                borderRadius: 0,
+                                borderColor: '#ced4da',
+                                fontSize: '16px',
+                              }),
+                              option: (provided, state) => ({
+                                ...provided,
+                                backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                                color: state.isSelected ? 'white' : '#212529',
+                              }),
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="modal-footer border-0 justify-content-start">
-                <button type="submit" className=" btn addbtn rounded-0 add_button px-4">Add</button>
+                <button type="submit" className=" btn addbtn rounded-0 add_button px-4">Add Sales Lead</button>
                 <button type="button" className=" btn addbtn rounded-0 Cancel_button px-4" onClick={onClose}>Cancel</button>
               </div>
             </form>
@@ -689,4 +930,4 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
   );
 };
 
-export default AddLeadMaster;
+export default AddSalesLeadPopup;
