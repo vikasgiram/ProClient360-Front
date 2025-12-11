@@ -258,8 +258,8 @@ const ViewServicePopUp = ({ closePopUp, selectedService }) => {
                             Action
                           </th>
                           <th scope="col">Action By</th>
-                          <th scope="col">Start Time</th>
-                          <th scope="col">End Time</th>
+                          <th scope="col">Start Date</th>
+                          <th scope="col">End Date</th>
                           <th scope="col">Progress</th>
                         </tr>
                       </thead>

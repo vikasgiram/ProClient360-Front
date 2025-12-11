@@ -36,29 +36,47 @@ export const EmployeeFeedbackMasterGrid = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
+            console.log("Fetching data with search term:", search);
             const data = await getRemaningFeedback(currentPage, itemsPerPage, search);
 
-            if(data.success){
-                setFeedbacks(data.services);
+            console.log("Data received:", data);
+
+            if(data && data.success){
+                setFeedbacks(data.services || []);
                 setPagination({
-                    currentPage: data.currentPage,
-                    totalPages: data.totalPages,
-                    totalFeedbacks: data.totalRecords,
-                    limit: data.limit,
-                    hasNextPage: data.hasNextPage,
-                    hasPrevPage: data.hasPrevPage
+                    currentPage: data.currentPage || 1,
+                    totalPages: data.totalPages || 0,
+                    totalFeedbacks: data.totalRecords || 0,
+                    limit: data.limit || itemsPerPage,
+                    hasNextPage: data.hasNextPage || false,
+                    hasPrevPage: data.hasPrevPage || false
                 });
             } else {
-                toast(data.error || "Failed to fetch feedback.");
+                console.error("API returned error:", data?.error);
+                toast(data?.error || "Failed to fetch feedback.");
                 setFeedbacks([]);
-                setPagination({ currentPage, totalPages: 0, totalFeedbacks: 0, limit: itemsPerPage, hasNextPage: false, hasPrevPage: false });
+                setPagination({ 
+                    currentPage: 1, 
+                    totalPages: 0, 
+                    totalFeedbacks: 0, 
+                    limit: itemsPerPage, 
+                    hasNextPage: false, 
+                    hasPrevPage: false 
+                });
             }
             
         } catch (error) {
             console.error("Error fetching feedback:", error);
             toast.error("Failed to fetch feedback.");
             setFeedbacks([]);
-            setPagination({ currentPage, totalPages: 0, totalFeedbacks: 0, limit: itemsPerPage, hasNextPage: false, hasPrevPage: false });
+            setPagination({ 
+                currentPage: 1, 
+                totalPages: 0, 
+                totalFeedbacks: 0, 
+                limit: itemsPerPage, 
+                hasNextPage: false, 
+                hasPrevPage: false 
+            });
         } finally {
             setLoading(false);
         }
@@ -82,11 +100,40 @@ export const EmployeeFeedbackMasterGrid = () => {
         setCurrentPage(page);
     };
 
-    const handleOnSearchSubmit = (event) => {
-        event.preventDefault();
-        console.log("Search text:", searchText);
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        console.log("Search submitted with term:", searchText);
         setSearch(searchText);
         setCurrentPage(1);
+    };
+
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        console.log("Search input changed:", value);
+        setSearchText(value);
+        
+        // If search input is cleared, reset search state
+        if (value === '') {
+            console.log("Search input cleared");
+            setSearch('');
+            setCurrentPage(1);
+        }
+    };
+
+    // Function to determine row style based on feedback status
+    const getRowStyle = (hasFeedback) => {
+        return {
+            backgroundColor: hasFeedback ? '#e8f5e9' : 'transparent', // Light green background for rows with feedback
+            borderLeft: hasFeedback ? '4px solid #4caf50' : 'none', // Green left border for rows with feedback
+            color: '#333' // Ensure text color is consistent
+        };
+    };
+
+    // Function to get feedback status text with consistent color
+    const getFeedbackStatus = (hasFeedback) => {
+        return hasFeedback ? 
+            <span className="badge" style={{ backgroundColor: '#4caf50', color: 'white' }}>Feedback Given</span> : 
+            <span className="badge" style={{ backgroundColor: '#ffc107', color: 'white' }}>Pending Feedback</span>;
     };
 
     // Pagination button rendering logic
@@ -125,18 +172,34 @@ export const EmployeeFeedbackMasterGrid = () => {
                                     <div className="col-12 col-lg-6">
                                         <div className="row g-2 justify-content-end align-items-center">
                                             <div className="col-sm-8 col-md-7 col-lg-6">
-                                                <div className="form">
-                                                    <i className="fa fa-search"></i>
-                                                    <form onSubmit={handleOnSearchSubmit}>
-                                                        <input
-                                                            type="text"
-                                                            value={searchText}
-                                                            onChange={(e) => setSearchText(e.target.value)}
-                                                            className="form-control form-input bg-transparant"
-                                                            placeholder="Search Client, Person, Product..."
-                                                        />
-                                                    </form>
-                                                </div>
+                                                <form onSubmit={handleSearchSubmit} className="d-flex">
+                                                    <input
+                                                        type="text"
+                                                        className="form-control me-2"
+                                                        placeholder="Search Client, Person, Product..."
+                                                        value={searchText}
+                                                        onChange={handleSearchChange}
+                                                    />
+                                                    <button 
+                                                        className="btn btn-primary" 
+                                                        type="submit"
+                                                    >
+                                                        <i className="fa fa-search"></i>
+                                                    </button>
+                                                    {searchText && (
+                                                        <button 
+                                                            className="btn btn-outline-secondary ms-2" 
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setSearchText('');
+                                                                setSearch('');
+                                                                setCurrentPage(1);
+                                                            }}
+                                                        >
+                                                            <i className="fa fa-times"></i>
+                                                        </button>
+                                                    )}
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -156,34 +219,56 @@ export const EmployeeFeedbackMasterGrid = () => {
                                                         <th>Allotment Date</th>
                                                         <th>Completion Date</th>
                                                         <th>Assigned to</th>
+                                                        <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="broder my-4">
                                                     {feedbacks && feedbacks.length > 0 ? (
-                                                        feedbacks.map((feedback, index) => (
-                                                            <tr className="border my-4" key={feedback._id}>
-                                                                <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
-                                                                <td className="align_left_td">{feedback.ticket?.client?.custName || 'N/A'}</td>
-                                                                <td className="align_left_td">{feedback.ticket?.contactPerson || 'N/A'}</td>
-                                                                <td className="align_left_td">{feedback.ticket?.contactNumber || 'N/A'}</td>
-                                                                <td className="align_left_td">{feedback.ticket?.product || 'N/A'}</td>
-                                                                <td>{formatDate(feedback.allotmentDate)}</td>
-                                                                <td>{formatDate(feedback.completionDate)}</td>
-                                                                <td>{feedback.allotTo?.map(person => person.name).join(', ') || 'N/A'}</td>
-                                                                <td>
-                                                                    <span onClick={() => handleUpdate(feedback)} className="update me-2" style={{cursor: 'pointer'}} title="Update Feedback">
-                                                                        <i class="fa-solid fa-star text-warning"></i>
-                                                                    </span>
-                                                                    <span onClick={() => handleViewFeedback(feedback)} className="view" style={{cursor: 'pointer'}} title="View Feedback">
-                                                                        <i className="fa-solid fa-eye text-primary"></i>
-                                                                    </span>
-                                                                </td>
-                                                            </tr>
-                                                        ))
+                                                        feedbacks.map((feedback, index) => {
+                                                            const hasFeedback = feedback.feedback && feedback.feedback.rating;
+                                                            return (
+                                                                <tr 
+                                                                    className="border my-4" 
+                                                                    key={feedback._id}
+                                                                    style={getRowStyle(hasFeedback)}
+                                                                >
+                                                                    <td>{index + 1 + (currentPage - 1) * itemsPerPage}</td>
+                                                                    <td className="align_left_td">{feedback.ticket?.client?.custName || 'N/A'}</td>
+                                                                    <td className="align_left_td">{feedback.ticket?.contactPerson || 'N/A'}</td>
+                                                                    <td className="align_left_td">{feedback.ticket?.contactNumber || 'N/A'}</td>
+                                                                    <td className="align_left_td">{feedback.ticket?.product || 'N/A'}</td>
+                                                                    <td>{formatDate(feedback.allotmentDate)}</td>
+                                                                    <td>{formatDate(feedback.completionDate)}</td>
+                                                                    <td>{feedback.allotTo?.map(person => person.name).join(', ') || 'N/A'}</td>
+                                                                    <td>{getFeedbackStatus(hasFeedback)}</td>
+                                                                    <td>
+                                                                        <span 
+                                                                            onClick={() => handleUpdate(feedback)} 
+                                                                            className="update me-2" 
+                                                                            style={{cursor: 'pointer'}} 
+                                                                            title={hasFeedback ? "Update Feedback" : "Add Feedback"}
+                                                                        >
+                                                                            <i className={`fa-solid fa-star ${hasFeedback ? 'text-success' : 'text-warning'}`}></i>
+                                                                        </span>
+                                                                        <span 
+                                                                            onClick={() => handleViewFeedback(feedback)} 
+                                                                            className="view" 
+                                                                            style={{cursor: 'pointer'}} 
+                                                                            title="View Feedback"
+                                                                        >
+                                                                            <i className="fa-solid fa-eye text-primary"></i>
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })
                                                     ) : (
                                                         <tr>
-                                                            <td colSpan="9" className="text-center">{loading ? 'Loading...' : 'No feedback found matching your criteria.'}</td>
+                                                            <td colSpan="10" className="text-center">
+                                                                {loading ? 'Loading...' : 
+                                                                 search ? `No results found for "${search}"` : 'No feedback found matching your criteria.'}
+                                                            </td>
                                                         </tr>
                                                     )}
                                                 </tbody>
