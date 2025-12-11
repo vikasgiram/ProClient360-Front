@@ -193,7 +193,7 @@ const AddTicketPopup = ({ handleAdd }) => {
     }
 
     if (Address.pincode.length !== 6 || Address.pincode < 0) {
-      return toast.error("Enter valid Pincode");
+      return toast.error("Please Re-Enter Pincode");
     }
     
     if(!Address.add || !Address.city || !Address.state || !Address.country) {
