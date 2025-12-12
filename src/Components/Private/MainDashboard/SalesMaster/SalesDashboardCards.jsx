@@ -25,7 +25,7 @@ const SalesDashboardCards = ({
           invalidLeadsCount || 0
         ],
         backgroundColor: [
-          '#FF6B6B', // Hot Leads
+          '#F9E63D', // Hot Leads
           '#4ECDC4', // Warm Leads
           '#95E1D3', // Cold Leads
           '#F38181', // Invalid Leads
