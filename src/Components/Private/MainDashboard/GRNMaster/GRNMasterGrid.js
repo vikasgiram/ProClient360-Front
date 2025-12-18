@@ -28,7 +28,7 @@ const getProjects = async (page = 1, limit = 20, filters = {}, searchTerm = "") 
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching projects: ", error);
+    console.error("Error fetching projects:", error);
     return { success: false, error: error.message };
   }
 };
