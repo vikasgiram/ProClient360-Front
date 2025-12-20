@@ -44,9 +44,8 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
 
   const products = ['surveillance System', 'Access Control System', 'TurnKey Project', 'Alleviz', 'CafeLive', 'WorksJoy', 'WorksJoy Blu', 'Fire Alarm System', 'Fire Hydrant System', 'IDS', 'AI Face Machines', 'Entrance Automation', 'Guard Tour System', 'Home Automation', 'IP PA and Communication System', 'CRM', 'Security Systems', 'KMS', 'VMS', 'PMS', 'Boom Barrier System', 'Tripod System', 'Flap Barrier System', 'EPBX System', 'CMS', 'Lift Eliviter System', 'AV6', 'Walky Talky System', 'Device Management System'];  
 
-  const sources = ['Indiamart', 'TradeIndia','Google','JustDial', 'Facebook', 'LinkedIn', 'Twitter', 'YouTube', 'WhatsApp', 'Referral', 'Email Campaign', 'Cold Call', 'Website','Walk-In', 'Direct', 'Other']; 
+  const sources = ['Google', 'Tender', 'Exhibitions', 'JustDial', 'Facebook', 'LinkedIn', 'Twitter', 'YouTube', 'WhatsApp', 'Referral', 'Email Campaign', 'Cold Call', 'Website','Walk-In', 'Direct', 'Other']; 
 
-  // ========== UPDATED: Customer loading function from AddTicketPopup ==========
   const loadCustomers = useCallback(async (page, search) => {
     if (custLoading || !custHasMore) return;
     setCustLoading(true);
@@ -55,14 +54,13 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
       const data = await getCustomers(page, PAGE_SIZE, search);
       console.log("Customer data response:", data);
 
-      // Use AddTicketPopup response structure
       if (data.error) {
         toast.error(data.error || 'Failed to load customers');
         setCustLoading(false);
         return;
       }
 
-      // Use data.customers (AddTicketPopup structure) or fallback to data.data
+    
       const customers = data.customers || data.data || [];
       console.log("Customers array:", customers);
       
@@ -82,7 +80,6 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }
   }, [custLoading, custHasMore]);
 
-  // ========== UPDATED: Handle customer selection from AddTicketPopup ==========
   const handleCustomerSelect = async (selectedOption) => {
     console.log("Customer selected:", selectedOption);
     setSelectedCustomer(selectedOption);
@@ -93,7 +90,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
         const customerData = await getCustomerById(selectedOption.value);
         console.log("Customer details response:", customerData);
         
-        // Use AddTicketPopup structure (customerData.customer) with fallback
+    
         if (customerData && (customerData.customer || customerData.data)) {
           const customer = customerData.customer || customerData.data;
           console.log("Customer object:", customer);
@@ -153,8 +150,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }));
   };
 
-  // ========== UPDATED: Effects for customer loading from AddTicketPopup ==========
-  // Load customers when customer type changes to existing
+
   useEffect(() => {
     if (customerType === 'existing') {
       console.log("Loading customers for existing customer type");
@@ -165,7 +161,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }
   }, [customerType]);
 
-  // Load customers when search changes (with debounce)
+
   useEffect(() => {
     if (customerType === 'existing') {
       console.log("Search changed, reloading customers");
@@ -180,8 +176,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
     }
   }, [custSearch]);
 
-  // ========== REST OF YOUR ORIGINAL CODE REMAINS THE SAME ==========
-  // Auto-fetch address when pincode changes (with debounce)
+
   useEffect(() => {
     const fetchData = async () => {
       if (formData.address.pincode && formData.address.pincode.length === 6) {
@@ -355,7 +350,6 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
 
               <div className="modal-body" style={{ maxHeight: 'calc(80vh - 240px)', overflowY: 'auto' }}>
                 <div className="row g-3">
-                  {/* Customer Type Selection */}
                   <div className="col-12 mb-3">
                     <label className="form-label fw-bold">Customer Type <RequiredStar /></label>
                     <div className="d-flex gap-4">
@@ -390,7 +384,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                     </div>
                   </div>
 
-                  {/* ========== UPDATED: Customer Selection Field ========== */}
+                  {/* UPDATED: Customer Selection Field */}
                   {customerType === 'existing' && (
                     <div className="col-12">
                       <div className="mb-3">
@@ -449,7 +443,7 @@ const AddLeadMaster = ({ onAddLead, onClose }) => {
                     </div>
                   )}
 
-                  {/* ========== REST OF YOUR FORM FIELDS REMAIN UNCHANGED ========== */}
+                  {/* REST OF YOUR FORM FIELDS REMAIN UNCHANGED */}
                   <div className="col-md-6">
                     <label htmlFor="company" className="form-label">Customer Name<RequiredStar /></label>
                     <input 

@@ -1,14 +1,73 @@
 import React from 'react';
+import { Pie } from 'react-chartjs-2';
 
 const SalesDashboardCards = ({ 
   allLeadsCount, 
-  ongogingCount, // Keep this as is to match the backend response
+  ongogingCount,
   winCount, 
   pendingCount, 
   lostCount, 
   todayCount,
-  hotleadsCount 
+  hotleadsCount,
+  warmLeadsCount,
+  coldLeadsCount,
+  invalidLeadsCount,
+  onTodayFollowUpClick
 }) => {
+  const chartData = {
+    labels: ['Hot Leads', 'Warm Leads', 'Cold Leads', 'Invalid Leads'],
+    datasets: [
+      {
+        data: [
+          hotleadsCount || 0,
+          warmLeadsCount || 0,
+          coldLeadsCount || 0,
+          invalidLeadsCount || 0
+        ],
+        backgroundColor: [
+          '#FF6B6B', // Hot Leads
+          '#4ECDC4', // Warm Leads
+          '#95E1D3', // Cold Leads
+          '#F38181', // Invalid Leads
+        ],
+        borderColor: [
+          '#FFFFFF',
+          '#FFFFFF',
+          '#FFFFFF',
+          '#FFFFFF'
+        ],
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const totalLeads = chartData.datasets[0].data.reduce((sum, value) => sum + value, 0);
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    legend: {
+      position: 'bottom',
+      labels: {
+        fontColor: '#333',
+        fontSize: 11,
+        padding: 15,
+        boxWidth: 15
+      }
+    },
+    tooltips: {
+      callbacks: {
+        label: function(tooltipItem, data) {
+          const dataset = data.datasets[tooltipItem.datasetIndex];
+          const value = dataset.data[tooltipItem.index];
+          const label = data.labels[tooltipItem.index];
+          const percentage = totalLeads > 0 ? ((value / totalLeads) * 100).toFixed(1) : 0;
+          return `${label}: ${value} (${percentage}%)`;
+        }
+      }
+    }
+  };
+
   return (
     <div className="row bg-white p-2 m-1 border rounded">
       <div className="col-12 py-1">
@@ -112,7 +171,7 @@ const SalesDashboardCards = ({
               <div className="row">
                 <div className="col-9">
                   <h6 className="text-dark card_heading">
-                    Pending FollowUp
+                    Pending Inquiry
                   </h6>
                   <h2 className="pt-2 fw-bold card_count">
                     {pendingCount || 0}
@@ -129,8 +188,7 @@ const SalesDashboardCards = ({
             </div>
           </div>
 
-          {/* Today's FollowUp Card */}
-          <div className="col-12 col-md-3 pb-3 cursor-pointer">
+          <div className="col-12 col-md-3 pb-3 cursor-pointer" onClick={onTodayFollowUpClick}>
             <div className="p-4 background_style" style={{backgroundColor:"#FAFAD2"}}>
               <div className="row">
                 <div className="col-9">
@@ -152,25 +210,13 @@ const SalesDashboardCards = ({
             </div>
           </div>
 
-        
-          {/* Hot Leads Card */}
-          <div className="col-12 col-md-3 pb-3 cursor-pointer">
-            <div className="p-4 background_style" style={{backgroundColor:"#FFBF77"}}>
+          <div className="col-12 col-md-3 pb-3">
+            <div className="p-2 background_style" style={{backgroundColor:"#F8F9FA"}}>
               <div className="row">
-                <div className="col-9">
-                  <h6 className="text-dark card_heading">
-                    Hot Leads 
-                  </h6>
-                  <h2 className="pt-2 fw-bold card_count">
-                    {hotleadsCount || 0}
-                  </h2>
-                </div>
-                <div className="col-3 d-flex align-items-center justify-content-center">
-                  <img 
-                    src="./static/assets/img/hoticon.png" 
-                    className="img_opacity all_card_img_size" 
-                    alt="Hot Leads" 
-                  />
+                <div className="col-12">
+                  <div style={{ height: '250px', position: 'relative' }}>
+                    <Pie data={chartData} options={options} />
+                  </div>
                 </div>
               </div>
             </div>

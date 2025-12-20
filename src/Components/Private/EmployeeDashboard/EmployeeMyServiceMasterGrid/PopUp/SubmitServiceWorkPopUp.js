@@ -675,7 +675,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate}) => {
                     <div className="row g-3 mt-2">
                       <div className="col">
                         <label htmlFor="StartTime" className="form-label label_text">
-                          Start Time <RequiredStar />
+                          Start Date & Time <RequiredStar />
                         </label>
                         <input
                           className="form-control rounded-0"
@@ -690,7 +690,7 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate}) => {
 
                       <div className="col">
                         <label htmlFor="EndTime" className="form-label label_text">
-                          End Time <RequiredStar />
+                          End Date & Time <RequiredStar />
                         </label>
                         <input
                           className="form-control rounded-0"
@@ -732,8 +732,8 @@ const SubmitServiceWorkPopUp = ({ selectedService, handleUpdate}) => {
                               Action
                             </th>
                             <th scope="col">Action By</th>
-                            <th scope="col">Start Time</th>
-                            <th scope="col">End Time</th>
+                            <th scope="col">Start Date</th>
+                            <th scope="col">End Date</th>
                             <th scope="col">Progress</th>
                           </tr>
                         </thead>

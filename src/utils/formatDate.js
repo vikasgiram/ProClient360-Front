@@ -1,26 +1,26 @@
-// utils.js
+
 export function formatDate(dateString) {
-    /**
-     * Format a date string from ISO 8601 to DD MMMM YYYY
-     */
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString('default', { month: 'long' });
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
-  }
+  /**
+   * Format a date string from ISO 8601 to DD MMMM YYYY
+   */
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.toLocaleString('default', { month: 'long' });
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+}
 
-  export function formatDateforupdate(dateString) {
-    /**
-     * Format a date string from ISO 8601 to MM/DD/YYYY
-     */
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits for day
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure 2 digits for month
-    const year = date.getFullYear();
+export function formatDateforupdate(dateString) {
+  /**
+   * Format a date string from ISO 8601 to MM/DD/YYYY
+   */
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0'); // Ensure 2 digits for day
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure 2 digits for month
+  const year = date.getFullYear();
 
-    // Format the date as MM/DD/YYYY
-    return `${year}-${month}-${day}`;
+  // Format the date as MM/DD/YYYY
+  return `${year}-${month}-${day}`;
 }
 
 export function formatDateforupdateSubcription(dateString) {
@@ -37,21 +37,18 @@ export function formatDateforupdateSubcription(dateString) {
 
 export function formatDateforTaskUpdate(dateString) {
   /**
-   * Format a date string from ISO 8601 to HH:MM:SS DD-MM-YY
-   * Uses the exact time from the ISO string without timezone conversion
+   * Format a date string from ISO 8601 to DD MMM YYYY  HH:MM
+   * Example: 05 Dec 2025  08:31
    */
   const date = new Date(dateString);
   
-  // Get UTC components (these match the ISO string regardless of local timezone)
-  const hours = String(date.getUTCHours()).padStart(2, '0');
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-  
-  // Get local date components (or use UTC if you prefer)
   const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = String(date.getFullYear()).slice(-2);
+  const month = date.toLocaleString('default', { month: 'short' }); // Short month name (Dec)
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
   
-  return `${hours}:${minutes} ${day}-${month}-${year}`;
+  return `${day} ${month} ${year}  ${hours}:${minutes}`;
 }
 
 export function formatDateforEditAction(dateString) {

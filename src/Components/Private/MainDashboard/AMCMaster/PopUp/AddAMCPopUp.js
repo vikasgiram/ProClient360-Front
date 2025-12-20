@@ -254,24 +254,11 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
 
     const {
       type,
-      invoiceNumber,
-      invoiceDate,
-      invoiceAmount,
-      amcStartDate,
-      amcEndDate,
-      quotationAmount,
       customerName,
       contactPerson,
       contact,
       address
     } = formData;
-
-    // Validation for AMC fields
-    if (!type || !invoiceNumber || !invoiceDate || !invoiceAmount || 
-        !amcStartDate || !amcEndDate || !quotationAmount) {
-      toast.error('Please fill in all required AMC fields');
-      return;
-    }
 
     // Validation for customer fields
     if (customerType === 'existing' && !selectedCustomer) {
@@ -285,14 +272,19 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
     }
 
     // Validate dates
-    if (new Date(amcStartDate) >= new Date(amcEndDate)) {
+    if (formData.amcStartDate && formData.amcEndDate && new Date(formData.amcStartDate) >= new Date(formData.amcEndDate)) {
       toast.error('AMC End Date must be after Start Date');
       return;
     }
 
-    // Validate amounts
-    if (parseFloat(invoiceAmount) <= 0 || parseFloat(quotationAmount) <= 0) {
-      toast.error('Amounts must be greater than 0');
+    // Validate amounts if provided
+    if (formData.invoiceAmount && parseFloat(formData.invoiceAmount) <= 0) {
+      toast.error('Invoice Amount must be greater than 0');
+      return;
+    }
+
+    if (formData.quotationAmount && parseFloat(formData.quotationAmount) <= 0) {
+      toast.error('Quotation Amount must be greater than 0');
       return;
     }
 
@@ -301,12 +293,12 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
       customerType,
       customerId: customerType === 'existing' ? selectedCustomer.value : null,
       type,
-      invoiceNumber,
-      invoiceDate,
-      invoiceAmount,
-      amcStartDate,
-      amcEndDate,
-      quotationAmount,
+      invoiceNumber: formData.invoiceNumber || null,
+      invoiceDate: formData.invoiceDate || null,
+      invoiceAmount: formData.invoiceAmount || null,
+      amcStartDate: formData.amcStartDate || null,
+      amcEndDate: formData.amcEndDate || null,
+      quotationAmount: formData.quotationAmount || null,
       description: formData.description || '',
       // Customer info (editable for both new and existing)
       customerName,
@@ -589,7 +581,7 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
 
                   {/* Invoice Number */}
                   <div className="col-md-6">
-                    <label htmlFor="invoiceNumber" className="form-label">Invoice Number <RequiredStar /></label>
+                    <label htmlFor="invoiceNumber" className="form-label">Invoice Number</label>
                     <input 
                       type="text" 
                       className="form-control" 
@@ -599,13 +591,12 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
                       maxLength={50} 
                       value={formData.invoiceNumber} 
                       onChange={handleInputChange} 
-                      required 
                     />
                   </div>
 
                   {/* Invoice Date */}
                   <div className="col-md-6">
-                    <label htmlFor="invoiceDate" className="form-label">Invoice Date <RequiredStar /></label>
+                    <label htmlFor="invoiceDate" className="form-label">Invoice Date</label>
                     <input 
                       type="date" 
                       className="form-control" 
@@ -613,13 +604,12 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
                       name="invoiceDate" 
                       value={formData.invoiceDate} 
                       onChange={handleInputChange} 
-                      required 
                     />
                   </div>
 
                   {/* Invoice Amount */}
                   <div className="col-md-6">
-                    <label htmlFor="invoiceAmount" className="form-label">Invoice Amount (Without Tax)<RequiredStar /></label>
+                    <label htmlFor="invoiceAmount" className="form-label">Invoice Amount (Without Tax)</label>
                     <input 
                       type="number" 
                       className="form-control" 
@@ -630,13 +620,12 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
                       step="0.01"
                       value={formData.invoiceAmount} 
                       onChange={handleInputChange} 
-                      required 
                     />
                   </div>
 
                   {/* AMC Start Date */}
                   <div className="col-md-6">
-                    <label htmlFor="amcStartDate" className="form-label">AMC Start Date <RequiredStar /></label>
+                    <label htmlFor="amcStartDate" className="form-label">AMC Start Date</label>
                     <input 
                       type="date" 
                       className="form-control" 
@@ -644,13 +633,12 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
                       name="amcStartDate" 
                       value={formData.amcStartDate} 
                       onChange={handleInputChange} 
-                      required 
                     />
                   </div>
 
                   {/* AMC End Date */}
                   <div className="col-md-6">
-                    <label htmlFor="amcEndDate" className="form-label">AMC End Date <RequiredStar /></label>
+                    <label htmlFor="amcEndDate" className="form-label">AMC End Date</label>
                     <input 
                       type="date" 
                       className="form-control" 
@@ -658,13 +646,12 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
                       name="amcEndDate" 
                       value={formData.amcEndDate} 
                       onChange={handleInputChange} 
-                      required 
                     />
                   </div>
 
                   {/* Quotation Amount */}
                   <div className="col-md-6">
-                    <label htmlFor="quotationAmount" className="form-label">Quotation Amount <RequiredStar /></label>
+                    <label htmlFor="quotationAmount" className="form-label">Quotation Amount</label>
                     <input 
                       type="number" 
                       className="form-control" 
@@ -675,7 +662,6 @@ const AddAMCPopup = ({ onAddAMC, onClose }) => {
                       step="0.01"
                       value={formData.quotationAmount} 
                       onChange={handleInputChange} 
-                      required 
                     />
                   </div>
 

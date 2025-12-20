@@ -36,6 +36,23 @@ import { MarketingMasterGrid } from "./Components/Private/MainDashboard/Marketin
 
 import { AMCMasterGrid } from "./Components/Private/MainDashboard/AMCMaster/AMCMasterGrid";
 
+
+import { InventoryMasterGrid } from "./Components/Private/MainDashboard/InventryMaster/InventoryMasterGrid";
+
+import { VendorMasterGrid } from "./Components/Private/MainDashboard/VendorMaster/VendorMasterGrid";
+
+import { ProductMasterGrid } from "./Components/Private/MainDashboard/ProductMaster/ProductMasterGrid";
+
+import { PurchaseOrderMasterGrid } from "./Components/Private/MainDashboard/PurchaseOrderMaster/PurchaseOrderMasterGrid";
+
+import { GRNMasterGrid } from "./Components/Private/MainDashboard/GRNMaster/GRNMasterGrid";
+
+import { QCMasterGrid } from "./Components/Private/MainDashboard/QCMaster/QCMasterGrid";
+
+import { DCMasterGrid } from "./Components/Private/MainDashboard/DeliveryChallanMaster/DCMasterGrid";
+
+import { MRFMasterGrid } from "./Components/Private/MainDashboard/MRFMaster/MRFMasterGrid";
+
 import { EmployeeMyServiceMasterGrid } from "./Components/Private/EmployeeDashboard/EmployeeMyServiceMasterGrid/EmployeeMyServiceMasterGrid";
 import { EmployeeFeedbackMasterGrid } from "./Components/Private/EmployeeDashboard/EmployeesFeedbackMasterGrid/EmployeeFeedbackMasterGrid";
 import AutoLoggedIn from "./utils/AutoLoggedIn";
@@ -78,6 +95,22 @@ const {user} = useContext(UserContext);
 
                     <Route exact path="/AMCMasterGrid" element={<ProtectRoute Component={AMCMasterGrid} />} />
 
+                    <Route exact path="/InventoryMasterGrid" element={<ProtectRoute Component={InventoryMasterGrid} />} />
+                    
+                    <Route exact path="/VendorMasterGrid" element={<ProtectRoute Component={VendorMasterGrid} />} />
+                     
+                    <Route exact path="/ProductMasterGrid" element={<ProtectRoute Component={ProductMasterGrid} />} />
+
+                    <Route exact path="/PurchaseOrderMasterGrid" element={<ProtectRoute Component={PurchaseOrderMasterGrid} />} />
+
+                    <Route exact path="/GRNMasterGrid" element={<ProtectRoute Component={GRNMasterGrid} />} />
+
+                    <Route exact path="/QCMasterGrid" element={<ProtectRoute Component={QCMasterGrid} />} />
+
+                    <Route exact path="/DCMasterGrid" element={<ProtectRoute Component={DCMasterGrid} />} />
+
+                    <Route exact path="/MRFMasterGrid" element={<ProtectRoute Component={MRFMasterGrid} />} />
+                    
                     {/* Company */}
 
                     {user && user?.user==='company'?(

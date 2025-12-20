@@ -162,7 +162,7 @@ export const UserProfile = () => {
                                                                     </div>
                                                                 </div>
                                                                 <div className="col-sm-8">
-                                                                    <div className="info-value"> Bay Area, San Francisco, CA</div>
+                                                                    <div className="info-value"> NA </div>
                                                                 </div>
                                                             </div>
                                                         </div>

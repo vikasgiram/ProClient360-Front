@@ -18,8 +18,12 @@ const useMyLeads = (page = 1, limit = 10, filters = {}) => {
           ...(filters.source && { source: filters.source }),
           ...(filters.date && { date: filters.date }),
           ...(filters.status && { status: filters.status }),
-          ...(filters.searchTerm && { search: filters.searchTerm }), // Added search parameter
+          ...(filters.callLeads && { callLeads: filters.callLeads }),
+          ...(filters.searchTerm && { search: filters.searchTerm }),
+          ...(filters.followUpToday && { followUpToday: 'true' }), // FIXED: Pass as string 'true'
         };
+
+        console.log('Fetching leads with params:', params);
 
         const response = await axios.get(url, {
           params,
@@ -46,7 +50,7 @@ const useMyLeads = (page = 1, limit = 10, filters = {}) => {
 
   useEffect(() => {
     fetchLeads();
-  }, [page, limit, filters.source, filters.date, filters.status, filters.searchTerm]);
+  }, [page, limit, filters.source, filters.date, filters.status, filters.callLeads, filters.searchTerm, filters.followUpToday]);
 
   return { data, loading, error, refetch: () => fetchLeads()};
 };

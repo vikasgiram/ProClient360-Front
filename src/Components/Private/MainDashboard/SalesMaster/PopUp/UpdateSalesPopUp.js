@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { RequiredStar } from '../../../RequiredStar/RequiredStar';
 import useUpdateLead from '../../../../../hooks/leads/useUpdateLead';
@@ -121,6 +121,13 @@ const actionOptions = [
   '15. Not Feasible'
 ];
 
+const callLeadsOptions = [
+  'Hot Leads',
+  'Warm Leads',
+  'Cold Leads',
+  'Invalid Leads'
+];
+
 const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
   const [showInfo, setShowInfo] = useState(isCompany);
   const [isLoading, setIsLoading] = useState(false);
@@ -130,47 +137,41 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     completion: '', 
     status: '', 
     quotation: '',
-    rem: ''
+    rem: '',
+    callLeads: '' // Add the callLeads field
   });
   
-  // State for previous actions history
   const [previousActions, setPreviousActions] = useState([]);
 
   const useUpdate = useUpdateLead();
 
-  // Initialize or update previous actions when selectedLead changes
   useEffect(() => {
     if (selectedLead) {
-      // Check if lead status is Won or Lost and prevent update
       if (selectedLead.STATUS === 'Won' || selectedLead.STATUS === 'Lost') {
         toast.error(`Cannot update a lead with status "${selectedLead.STATUS}". This lead is already finalized.`);
         onClose();
         return;
       }
 
-      // Set form data based on selected lead
       setActionData({
         actionType: selectedLead?.actionDetails?.step || selectedLead?.step || '',
         date: selectedLead?.actionDetails?.followUpDate || selectedLead?.nextFollowUpDate || '',
         completion: selectedLead?.complated?.toString() || selectedLead?.actionDetails?.completionPercentage?.toString() || '0',
         status: selectedLead.status || selectedLead?.STATUS || '',
         quotation: selectedLead?.quotation?.toString() || selectedLead?.actionDetails?.quotation?.toString() || '0',
-        rem: selectedLead?.rem || selectedLead?.actionDetails?.rem || ''
+        rem: selectedLead?.rem || selectedLead?.actionDetails?.rem || '',
+        callLeads: selectedLead?.callLeads || '' // Initialize with existing value
       });
       
-      // Initialize previous actions from multiple possible sources
       let actions = [];
       
-      // Check for previousActions in selectedLead
       if (selectedLead.previousActions && selectedLead.previousActions.length > 0) {
         actions = [...selectedLead.previousActions];
       } 
-      // Check for actionHistory in selectedLead
       else if (selectedLead.actionHistory && selectedLead.actionHistory.length > 0) {
         actions = [...selectedLead.actionHistory];
       }
       
-      // If no history exists, create initial action from current lead data
       if (actions.length === 0) {
         const initialAction = {
           _id: new ObjectId(),
@@ -188,7 +189,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
         actions.push(initialAction);
       }
       
-      // Sort actions by creation date to ensure chronological order
       actions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
       
       setPreviousActions(actions);
@@ -199,7 +199,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     const { name, value } = e.target;
     
     if (name === 'status') {
-      // When status changes to Won, set completion to 100 and set appropriate step
       if (value === 'Won') {
         setActionData(prev => ({ 
           ...prev, 
@@ -208,7 +207,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
           actionType: '12. Deal Status'
         }));
       } 
-      // When status changes to Lost, set completion to 100 and set appropriate step
       else if (value === 'Lost') {
         setActionData(prev => ({ 
           ...prev, 
@@ -217,15 +215,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
           actionType: '15. Not Feasible'
         }));
       }
-      // When status changes to HotLeads, keep existing completion or set to 0
-      else if (value === 'HotLeads') {
-        setActionData(prev => ({ 
-          ...prev, 
-          [name]: value,
-          // Don't auto-set completion for HotLeads - user should input it
-          completion: prev.completion || '0'
-        }));
-      } 
       else {
         setActionData(prev => ({ ...prev, [name]: value }));
       }
@@ -249,25 +238,16 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
   const handleActionSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation based on status
     let requiredFields = ['status'];
     
-    // For Won status, require quotation and remark
     if (actionData.status === 'Won') {
       requiredFields.push('quotation', 'rem');
     }
-    // For Lost status, require remark
     else if (actionData.status === 'Lost') {
       requiredFields.push('rem');
     }
-    // For HotLeads status, require actionType, date, completion, and remark
-    else if (actionData.status === 'HotLeads') {
-      requiredFields.push('actionType', 'date', 'completion', 'rem');
-    }
-    // For other statuses (Pending, Ongoing), require normal fields
     else {
       requiredFields.push('actionType', 'date', 'completion');
-      // Additional requirement for quotation submission
       if (actionData.actionType === '7. Quotation Submission') {
         requiredFields.push('quotation');
       }
@@ -286,10 +266,10 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       complated: actionData.completion ? parseFloat(actionData.completion) : 0,
       nextFollowUpDate: actionData.date ? new Date(actionData.date).toISOString() : null,
       quotation: actionData.quotation ? parseFloat(actionData.quotation) : 0,
-      rem: actionData.rem || ''
+      rem: actionData.rem || '',
+      callLeads: actionData.callLeads || 'Warm Leads' // Include callLeads in the form data
     };
 
-    // Create new action object for history
     const newAction = {
       _id: new ObjectId(),
       status: actionData.status,
@@ -298,21 +278,18 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       rem: actionData.rem || '',
       completion: actionData.completion ? parseFloat(actionData.completion) : 0,
       quotation: actionData.quotation ? parseFloat(actionData.quotation) : 0,
+      callLeads: actionData.callLeads || 'Warm Leads', // Include callLeads in the action
       actionBy: {
         name: "Current User"
       },
       createdAt: new Date().toISOString()
     };
 
-    // Add to previous actions
     const updatedPreviousActions = [...previousActions, newAction];
-    // Sort by creation date to maintain chronological order
     updatedPreviousActions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     
-    // Update the state with the new actions list
     setPreviousActions(updatedPreviousActions);
     
-    // Include previous actions in the update
     const formDataWithHistory = {
       ...updatedFormData,
       previousActions: updatedPreviousActions
@@ -320,7 +297,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
 
     setIsLoading(true);
     try {
-      // API call to store updated data
       await useUpdate.updateLead(selectedLead?._id, formDataWithHistory);
       onUpdate(selectedLead._id, formDataWithHistory);
       onClose();
@@ -331,7 +307,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
     }
   };
 
-  // Helper function to format dates for display
   const formatDateForDisplay = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -349,6 +324,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
       <div className="modal-dialog modal-lg" style={{ maxWidth: '680px' }}>
         <div className="modal-content p-3">
           <form onSubmit={handleActionSubmit}>
+
             <div className="modal-header">
               <h5 className="card-title fw-bold mb-0">Submit Work</h5>
 
@@ -393,13 +369,11 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                           <option value="" disabled>-- Select a status --</option>
                           <option value="Pending">Pending</option>
                           <option value="Ongoing">Ongoing</option>
-                          <option value="HotLeads">Hot Leads</option>
                           <option value="Won">Won</option>
                           <option value="Lost">Lost</option>
                         </select>
                       </div>
 
-                      {/* Show Steps field for all statuses except Won and Lost */}
                       {actionData.status !== 'Won' && actionData.status !== 'Lost' && (
                         <div className="col-md-6">
                           <label htmlFor="actionType" className="form-label fw-bold">Steps<RequiredStar /></label>
@@ -419,7 +393,23 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         </div>
                       )}
 
-                      {/* Show completion field for all statuses except Won and Lost */}
+                      {/* Leads Field - Optional */}
+                      <div className="col-md-6">
+                        <label htmlFor="callLeads" className="form-label fw-bold">Leads (Optional)</label>
+                        <select 
+                          id="callLeads" 
+                          name="callLeads" 
+                          className="form-select" 
+                          value={actionData.callLeads} 
+                          onChange={handleActionChange}
+                        >
+                          <option value="">Select Leads....</option>
+                          {callLeadsOptions.map((lead, index) => (
+                            <option key={index} value={lead}>{lead}</option>
+                          ))}
+                        </select>
+                      </div>
+
                       {actionData.status !== 'Won' && actionData.status !== 'Lost' && (
                         <div className="col-md-6">
                           <label htmlFor="completion" className="form-label fw-bold">Status (%)<RequiredStar /></label>
@@ -437,7 +427,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         </div>
                       )}
 
-                      {/* Show quotation field when status is Won */}
                       {actionData.status === 'Won' && (
                         <div className="col-md-6">
                           <label htmlFor="quotation" className="form-label fw-bold">Amount Show (₹)<RequiredStar /></label>
@@ -454,7 +443,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         </div>
                       )}
 
-                      {/* Show quotation field when Quotation Submission is selected (excluding Won/Lost) */}
                       {actionData.status !== 'Won' && actionData.status !== 'Lost' && actionData.actionType === '7. Quotation Submission' && (
                         <div className="col-md-6">
                           <label htmlFor="quotation" className="form-label fw-bold">Amount Show (₹)<RequiredStar /></label>
@@ -471,7 +459,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         </div>
                       )}
 
-                      {/* Show next follow-up date for all statuses except Won and Lost */}
                       {actionData.status !== 'Won' && actionData.status !== 'Lost' && (
                         <div className="col-md-6">
                           <label htmlFor="date" className="form-label fw-bold">Next Follow-up Date<RequiredStar /></label>
@@ -490,28 +477,18 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                       <div className="col-12">
                         <label htmlFor="remark" className="form-label fw-bold">
                           Remark
-                          {/* Make remark required for Won, Lost, and HotLeads status */}
-                          {(actionData.status === 'Won' || actionData.status === 'Lost' || actionData.status === 'HotLeads') && <RequiredStar />}
+                          {(actionData.status === 'Won' || actionData.status === 'Lost') && <RequiredStar />}
                         </label>
                         <textarea 
                           id="rem" 
                           name="rem"
                           className="form-control" 
-                          placeholder={
-                            actionData.status === 'HotLeads' 
-                              ? "Explain why this is a hot lead (e.g., high potential, urgent requirement, strong interest)..." 
-                              : "Enter your remarks here..."
-                          }
+                          placeholder="Enter your remarks here..."
                           rows="3"
                           value={actionData.rem} 
                           onChange={handleActionChange}
-                          required={actionData.status === 'Won' || actionData.status === 'Lost' || actionData.status === 'HotLeads'}
+                          required={actionData.status === 'Won' || actionData.status === 'Lost'}
                         />
-                        {actionData.status === 'HotLeads' && (
-                          <small className="text-muted">
-                            * Please provide details about why this lead is marked as hot
-                          </small>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -530,7 +507,6 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
               <button type="button" onClick={onClose} className="btn addbtn rounded-0 Cancel_button px-4">Cancel</button>
             </div>
 
-            {/* Action History Table */}
             {previousActions.length > 0 && (
               <div className="px-3">
                 <h6 className="text-muted border-bottom pb-2 mb-3">Action History</h6>
@@ -545,6 +521,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                         <th scope="col">Next Follow-up Date</th>
                         <th scope="col">Remark</th> 
                         <th scope="col">Quotation</th>
+                        <th scope="col">Leads</th> {/* Add Leads column */}
                       </tr>
                     </thead>
                     <tbody>
@@ -553,16 +530,14 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                           <td className="text-center">{index + 1}</td>
                           <td>
                             <span className={
-                              action.status === 'HotLeads' 
-                                ? 'badge text-white' 
-                                : action.status === 'Won'
+                              action.status === 'Won'
                                 ? 'badge bg-success'
                                 : action.status === 'Lost'
                                 ? 'badge bg-danger'
                                 : action.status === 'Ongoing'
                                 ? 'badge bg-primary'
                                 : 'badge bg-warning'
-                            } style={action.status === 'HotLeads' ? {backgroundColor: '#00FFFF'} : {}}>
+                            }>
                               {action.status}
                             </span>
                           </td>
@@ -571,6 +546,7 @@ const UpdateSalesPopUp = ({ selectedLead, onUpdate, onClose, isCompany }) => {
                           <td>{formatDateForDisplay(action.nextFollowUpDate)}</td>
                           <td>{action.rem}</td>
                           <td>₹{action.quotation || 0}</td>
+                          <td>{action.callLeads || 'Warm Leads'}</td> {/* Display Leads value */}
                         </tr>
                       ))}
                     </tbody>

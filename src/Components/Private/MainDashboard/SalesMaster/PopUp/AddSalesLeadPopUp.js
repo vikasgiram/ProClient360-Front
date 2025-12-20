@@ -1,0 +1,933 @@
+import React, { useState, useEffect, useCallback, useContext } from 'react';
+import toast from 'react-hot-toast';
+import { RequiredStar } from "../../../RequiredStar/RequiredStar";
+import { getAddress } from "../../../../../hooks/usePincode";
+import { getCustomers, getCustomerById } from "../../../../../hooks/useCustomer";
+import { getDepartment } from "../../../../../hooks/useDepartment";
+import { getEmployee } from "../../../../../hooks/useEmployees";
+import { UserContext } from "../../../../../context/UserContext";
+import Select from "react-select";
+
+const PAGE_SIZE = 15;
+
+const AddSalesLeadPopup = ({ onAddLead, onClose }) => {
+  const { user } = useContext(UserContext);
+  const [customerType, setCustomerType] = useState('new');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    contact: '',
+    company: '',
+    subject: '',
+    products: '',
+    sources: '',
+    callLeads: '',
+    message: '',
+    status: 'Pending',
+    value: '',
+    address: {
+      pincode: '',
+      state: '',
+      city: '',
+      country: '',
+      add: ''
+    }
+  });
+
+  // Customer dropdown state
+  const [custOptions, setCustOptions] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [custPage, setCustPage] = useState(1);
+  const [custHasMore, setCustHasMore] = useState(true);
+  const [custLoading, setCustLoading] = useState(false);
+  const [custSearch, setCustSearch] = useState("");
+  const [isLoadingCustomerAddress, setIsLoadingCustomerAddress] = useState(false);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
+
+  // Assignment state
+  const [assignmentType, setAssignmentType] = useState('self');
+  const [departments, setDepartments] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [hasMoreDepartments, setHasMoreDepartments] = useState(true);
+  const [deptPage, setDeptPage] = useState(1);
+  const [deptSearchTerm, setDeptSearchTerm] = useState("");
+  const [assignedEmployee, setAssignedEmployee] = useState(null);
+  const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [hasMoreEmployees, setHasMoreEmployees] = useState(true);
+  const [empPage, setEmpPage] = useState(1);
+  const [empSearchTerm, setEmpSearchTerm] = useState("");
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+
+  const [showCustomSource, setShowCustomSource] = useState(false);
+  const [customSource, setCustomSource] = useState('');
+
+  const products = ['surveillance System', 'Access Control System', 'TurnKey Project', 'Alleviz', 'CafeLive', 'WorksJoy', 'WorksJoy Blu', 'Fire Alarm System', 'Fire Hydrant System', 'IDS', 'AI Face Machines', 'Entrance Automation', 'Guard Tour System', 'Home Automation', 'IP PA and Communication System', 'CRM', 'Security Systems', 'KMS', 'VMS', 'PMS', 'Boom Barrier System', 'Tripod System', 'Flap Barrier System', 'EPBX System', 'CMS', 'Lift Eliviter System', 'AV6', 'Walky Talky System', 'Device Management System'];
+
+  const sources = ['Google', 'Tender', 'Exhibitions', 'JustDial', 'Facebook', 'LinkedIn', 'Twitter', 'YouTube', 'WhatsApp', 'Referral', 'Email Campaign', 'Cold Call', 'Website','Walk-In', 'Direct', 'Other'];
+
+  const callLeads = ['Hot Leads', 'Warm Leads', 'Cold Leads', 'Invalid Leads'];
+
+  // Load departments for assignment
+  const loadDepartments = useCallback(async (page = 1, search = "") => {
+    try {
+      const data = await getDepartment(page, PAGE_SIZE, search);
+      if (data && data.departments) {
+        if (page === 1) {
+          setDepartments(data.departments);
+        } else {
+          setDepartments(prev => [...prev, ...data.departments]);
+        }
+        setHasMoreDepartments(data.departments.length === PAGE_SIZE);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  // Load employees for assignment
+  const loadEmployees = useCallback(async (page = 1, search = "") => {
+    try {
+      if (!selectedDepartment) return;
+
+      setLoadingEmployees(true);
+      const data = await getEmployee(selectedDepartment.value, page, PAGE_SIZE, search);
+
+      let employeeArray = [];
+
+      if (Array.isArray(data)) {
+        employeeArray = data;
+      } else if (data && Array.isArray(data.employee)) {
+        employeeArray = data.employee;
+      } else if (data && Array.isArray(data.employees)) {
+        employeeArray = data.employees;
+      } else if (data && Array.isArray(data.data)) {
+        employeeArray = data.data;
+      }
+
+      if (employeeArray.length > 0) {
+        const formattedData = employeeArray.map((employee) => ({
+          value: employee._id,
+          label: employee.name,
+          employeeData: employee,
+        }));
+
+        if (page === 1) {
+          setEmployeeOptions(formattedData);
+        } else {
+          setEmployeeOptions(prev => [...prev, ...formattedData]);
+        }
+        setHasMoreEmployees(employeeArray.length === PAGE_SIZE);
+      } else {
+        if (page === 1) {
+          setEmployeeOptions([]);
+          if (search === "") {
+            toast.info('No employees found for this department');
+          }
+        }
+        setHasMoreEmployees(false);
+      }
+    } catch (error) {
+      console.log('Error fetching employees:', error);
+      if (page === 1) {
+        toast.error('Failed to fetch employees');
+      }
+    } finally {
+      setLoadingEmployees(false);
+    }
+  }, [selectedDepartment]);
+
+  // Customer loading function
+  const loadCustomers = useCallback(async (page, search) => {
+    if (custLoading || !custHasMore) return;
+    setCustLoading(true);
+
+    try {
+      const data = await getCustomers(page, PAGE_SIZE, search);
+      console.log("Customer data response:", data);
+
+      if (data.error) {
+        toast.error(data.error || 'Failed to load customers');
+        setCustLoading(false);
+        return;
+      }
+
+      const customers = data.customers || data.data || [];
+      console.log("Customers array:", customers);
+
+      const newOpts = customers.map(c => ({
+        value: c._id,
+        label: c.custName || c.name || 'Unnamed Customer'
+      }));
+
+      setCustOptions(prev => page === 1 ? newOpts : [...prev, ...newOpts]);
+      setCustHasMore(customers.length === PAGE_SIZE);
+      setCustPage(page + 1);
+    } catch (error) {
+      console.error("Fetch customers error:", error);
+      toast.error('Failed to load customers');
+    } finally {
+      setCustLoading(false);
+    }
+  }, [custLoading, custHasMore]);
+
+  // Handle customer selection
+  const handleCustomerSelect = async (selectedOption) => {
+    console.log("Customer selected:", selectedOption);
+    setSelectedCustomer(selectedOption);
+
+    if (selectedOption) {
+      setIsLoadingCustomerAddress(true);
+      try {
+        const customerData = await getCustomerById(selectedOption.value);
+        console.log("Customer details response:", customerData);
+
+        if (customerData && (customerData.customer || customerData.data)) {
+          const customer = customerData.customer || customerData.data;
+          console.log("Customer object:", customer);
+
+          const billingAddress = customer.billingAddress || customer.address || {};
+          console.log("Billing address:", billingAddress);
+
+          setFormData(prev => ({
+            ...prev,
+            name: customer.custName || customer.name || customer.contactPerson || '',
+            email: customer.email || customer.contactPersonEmail || '',
+            contact: customer.phoneNumber1 || customer.contact || customer.contactNumber || '',
+            company: customer.custName || customer.name || customer.companyName || '',
+            address: {
+              pincode: billingAddress.pincode || '',
+              state: billingAddress.state || '',
+              city: billingAddress.city || '',
+              add: billingAddress.add || billingAddress.addressLine1 || billingAddress.address ||
+                `${billingAddress.houseNo || ''}, ${billingAddress.buildingName || ''}, ${billingAddress.roadName || ''}, ${billingAddress.area || ''}, ${billingAddress.colony || ''}` || '',
+              country: billingAddress.country || 'India'
+            }
+          }));
+
+          toast.success("Customer details loaded successfully");
+        } else {
+          console.error("Invalid customer data:", customerData);
+          resetFormData();
+          toast("No details found for this customer");
+        }
+      } catch (error) {
+        console.error("Error fetching customer details:", error);
+        toast.error("Failed to load customer details");
+        resetFormData();
+      } finally {
+        setIsLoadingCustomerAddress(false);
+      }
+    } else {
+      resetFormData();
+    }
+  };
+
+  // Helper function to reset form data
+  const resetFormData = () => {
+    setFormData(prev => ({
+      ...prev,
+      name: '',
+      email: '',
+      contact: '',
+      company: '',
+      address: {
+        pincode: '',
+        state: '',
+        city: '',
+        add: '',
+        country: ''
+      }
+    }));
+  };
+
+  // Effects for customer loading
+  useEffect(() => {
+    if (customerType === 'existing') {
+      console.log("Loading customers for existing customer type");
+      setCustPage(1);
+      setCustHasMore(true);
+      setCustOptions([]);
+      loadCustomers(1, custSearch);
+    }
+  }, [customerType]);
+
+  // Load departments on component mount
+  useEffect(() => {
+    loadDepartments(1, deptSearchTerm);
+  }, [loadDepartments, deptSearchTerm]);
+
+  // Load employees when department changes
+  useEffect(() => {
+    if (selectedDepartment) {
+      setEmpPage(1);
+      setEmployeeOptions([]);
+      setAssignedEmployee(null);
+      loadEmployees(1, empSearchTerm);
+    } else {
+      setEmployeeOptions([]);
+      setAssignedEmployee(null);
+    }
+  }, [selectedDepartment, loadEmployees, empSearchTerm]);
+
+  // Auto-fetch address when pincode changes (with debounce)
+  useEffect(() => {
+    const fetchData = async () => {
+      if (formData.address.pincode && formData.address.pincode.length === 6) {
+        setIsLoadingAddress(true);
+        try {
+          const data = await getAddress(formData.address.pincode);
+
+          if (data && data !== "Error") {
+            setFormData(prev => ({
+              ...prev,
+              address: {
+                ...prev.address,
+                state: data.state || "",
+                city: data.city || "",
+                country: data.country || "India"
+              }
+            }));
+          } else {
+            setFormData(prev => ({
+              ...prev,
+              address: {
+                ...prev.address,
+                state: "",
+                city: "",
+                country: ""
+              }
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching address:", error);
+          setFormData(prev => ({
+            ...prev,
+            address: {
+              ...prev.address,
+              state: "",
+              city: "",
+              country: ""
+            }
+          }));
+        } finally {
+          setIsLoadingAddress(false);
+        }
+      } else if (formData.address.pincode.length < 6) {
+        setFormData(prev => ({
+          ...prev,
+          address: {
+            ...prev.address,
+            state: "",
+            city: "",
+            country: ""
+          }
+        }));
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      fetchData();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.address.pincode]);
+
+  const handleAddressChange = (e) => {
+    const { name, value } = e.target;
+
+    if (['state', 'city', 'country'].includes(name)) {
+      if (!/^[A-Za-z\s]*$/.test(value)) return;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        [name]: value
+      }
+    }));
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "sources") {
+      if (value === "Other") {
+        setShowCustomSource(true);
+        setFormData(prev => ({ ...prev, [name]: '' }));
+      } else {
+        setShowCustomSource(false);
+        setCustomSource('');
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleCustomerTypeChange = (e) => {
+    const type = e.target.value;
+    setCustomerType(type);
+
+    if (type === 'new') {
+      resetFormData();
+      setSelectedCustomer(null);
+    }
+  };
+
+  const handleCustomSourceChange = (e) => {
+    const value = e.target.value;
+    setCustomSource(value);
+    setFormData(prev => ({ ...prev, sources: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const {
+      name,
+      email,
+      contact,
+      subject,
+      company,
+      products,
+      sources,
+      callLeads,
+      message,
+      address
+    } = formData;
+
+    if (customerType === 'new') {
+      if (!name || !company || !contact || !products || !address.pincode || !address.add || !sources) {
+        toast.error('Please fill in all required fields, including Pincode, full address, and source.');
+        return;
+      }
+    } else {
+      if (!selectedCustomer || !products || !sources) {
+        toast.error('Please select a customer and fill in all required fields.');
+        return;
+      }
+    }
+
+    if (assignmentType === 'employee' && !assignedEmployee) {
+      toast.error('Please select an employee to assign the lead to.');
+      return;
+    }
+
+    // Determine assignedTo based on assignment type
+    let assignedTo = null;
+    if (assignmentType === 'self') {
+      assignedTo = user._id;
+    } else if (assignmentType === 'employee') {
+      assignedTo = assignedEmployee;
+    }
+
+    const mappedData = {
+      customerType,
+      customerId: customerType === 'existing' ? selectedCustomer.value : null,
+      SENDER_NAME: name,
+      SENDER_EMAIL: email,
+      SENDER_MOBILE: contact,
+      SUBJECT: subject,
+      SENDER_COMPANY: company,
+      SENDER_ADDRESS: address.add,
+      SENDER_CITY: address.city,
+      SENDER_STATE: address.state,
+      SENDER_PINCODE: address.pincode,
+      SENDER_COUNTRY_ISO: address.country,
+      QUERY_PRODUCT_NAME: products,
+      QUERY_SOURCES_NAME: sources,
+      QUERY_MESSAGE: message || "",
+      callLeads: callLeads || 'Warm Leads',
+      feasibility: 'feasible',
+      assignedTo: assignedTo,
+      assignedBy: user._id,
+      assignedTime: new Date().toISOString(),
+    };
+
+    console.log('Submitting sales lead data:', mappedData);
+    onAddLead(mappedData);
+  };
+
+  return (
+    <>
+      <div className="modal fade show" style={{ display: "flex", alignItems: "center", backgroundColor: "#00000090" }}>
+        <div className="modal-dialog modal-lg">
+          <div className="modal-content p-3">
+            <form onSubmit={handleSubmit}>
+
+              <div className="modal-header pt-0">
+                <h5 className="card-title fw-bold" id="exampleModalLongTitle"> Add Sales Lead</h5>
+                <button onClick={onClose} type="button" className="btn-close" aria-label="Close" style={{ backgroundColor: 'red' }}></button>
+              </div>
+
+              <div className="modal-body" style={{ maxHeight: 'calc(80vh - 240px)', overflowY: 'auto' }}>
+                <div className="row g-3">
+                  {/* Customer Type Selection */}
+                  <div className="col-12 mb-3">
+                    <label className="form-label fw-bold">Customer Type <RequiredStar /></label>
+                    <div className="d-flex gap-4">
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="customerType"
+                          id="newCustomer"
+                          value="new"
+                          checked={customerType === 'new'}
+                          onChange={handleCustomerTypeChange}
+                        />
+                        <label className="form-check-label" htmlFor="newCustomer">
+                          New Customer
+                        </label>
+                      </div>
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="customerType"
+                          id="existingCustomer"
+                          value="existing"
+                          checked={customerType === 'existing'}
+                          onChange={handleCustomerTypeChange}
+                        />
+                        <label className="form-check-label" htmlFor="existingCustomer">
+                          Existing Customer
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Customer Selection Field */}
+                  {customerType === 'existing' && (
+                    <div className="col-12">
+                      <div className="mb-3">
+                        <label htmlFor="existingCustomer" className="form-label">Select client <RequiredStar /></label>
+                        <Select
+                          options={custOptions}
+                          value={selectedCustomer}
+                          onChange={handleCustomerSelect}
+                          onInputChange={val => setCustSearch(val)}
+                          onMenuScrollToBottom={() => {
+                            if (!custLoading && custHasMore) {
+                              loadCustomers(custPage, custSearch);
+                            }
+                          }}
+                          isLoading={custLoading}
+                          placeholder="Search and select client..."
+                          noOptionsMessage={({ inputValue }) =>
+                            inputValue
+                              ? 'No clients found. Try a different search.'
+                              : 'Type to search clients...'
+                          }
+                          loadingMessage={() => 'Loading clients...'}
+                          closeMenuOnSelect={true}
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              borderRadius: 0,
+                              borderColor: '#ced4da',
+                              fontSize: '16px',
+                              minHeight: '38px',
+                            }),
+                            option: (provided, state) => ({
+                              ...provided,
+                              backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                              color: state.isSelected ? 'white' : '#212529',
+                            }),
+                          }}
+                        />
+                        <div className="mt-1">
+                          {custLoading && (
+                            <small className="text-info">Loading clients...</small>
+                          )}
+                          {isLoadingCustomerAddress && (
+                            <small className="text-info">Loading client details...</small>
+                          )}
+                          {selectedCustomer && !isLoadingCustomerAddress && (
+                            <small className="text-success">
+                              Client selected: {selectedCustomer.label}
+                            </small>
+                          )}
+                          {!custLoading && custOptions.length === 0 && custSearch && (
+                            <small className="text-warning">No clients found for "{custSearch}"</small>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="col-md-6">
+                    <label htmlFor="company" className="form-label">Customer Name<RequiredStar /></label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="company"
+                      name="company"
+                      placeholder="Enter a Company Name...."
+                      maxLength={100}
+                      value={formData.company}
+                      onChange={handleInputChange}
+                      required
+                      readOnly={customerType === 'existing'}
+                      style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label htmlFor="name" className="form-label">Contact Name <RequiredStar /></label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="name"
+                      name="name"
+                      placeholder="Enter a Contact Name...."
+                      maxLength={50}
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      readOnly={customerType === 'existing'}
+                      style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label htmlFor="email" className="form-label">
+                      Contact Email <RequiredStar />
+                    </label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="email"
+                      name="email"
+                      placeholder="Enter Email ID...."
+                      maxLength={50}
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      pattern='[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+                      title="Please enter a valid email address (e.g., example@domain.com)"
+                      readOnly={customerType === 'existing'}
+                      style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label htmlFor="contact" className="form-label">
+                      Contact Number <RequiredStar />
+                    </label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      id="contact"
+                      name="contact"
+                      placeholder="Enter Contact Number...."
+                      inputMode="numeric"
+                      maxLength={10}
+                      pattern="\d{10}"
+                      value={formData.contact}
+                      onChange={handleInputChange}
+                      onInput={(e) => {
+                        if (customerType === 'new') {
+                          e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                        }
+                      }}
+                      required
+                      readOnly={customerType === 'existing'}
+                      style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label htmlFor="subject" className="form-label">Subject <RequiredStar /></label>
+                    <textarea type="text" className="form-control" id="subject" name="subject" placeholder="Enter a Subject...." maxLength={200} value={formData.subject} onChange={handleInputChange} required ></textarea>
+                  </div>
+
+                  <div className='col-md-6'>
+                    <label htmlFor="products" className="form-label">Products<RequiredStar /></label>
+                    <select id="products" className="form-select" name="products" value={formData.products} onChange={handleInputChange} required>
+                      <option value="">Select Products....</option>
+                      {products.map(product => <option key={product} value={product}>{product}</option>)}
+                    </select>
+                  </div>
+
+                  {/* Leads Field - Optional */}
+                  <div className='col-md-6'>
+                    <label htmlFor="callLeads" className="form-label">Leads (Optional)</label>
+                    <select id="callLeads" className="form-select" name="callLeads" value={formData.callLeads} onChange={handleInputChange}>
+                      <option value="">Select Leads....</option>
+                      {callLeads.map(lead => <option key={lead} value={lead}>{lead}</option>)}
+                    </select>
+                    <small className="text-muted">If not selected, defaults to "Warm Leads"</small>
+                  </div>
+
+                  <div className='col-md-6'>
+                    <label htmlFor="sources" className="form-label">Sources<RequiredStar /></label>
+                    <select
+                      id="sources"
+                      className="form-select"
+                      name="sources"
+                      value={formData.sources === customSource ? "Other" : formData.sources}
+                      onChange={handleInputChange}
+                      style={{ width: '100%', height: '35px' }}
+                      required
+                    >
+                      <option value="">Select Sources....</option>
+                      {sources.map(source => <option key={source} value={source}>{source}</option>)}
+                    </select>
+
+                    {showCustomSource && (
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter custom source"
+                          value={customSource}
+                          onChange={handleCustomSourceChange}
+                          required
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="col-md-6">
+                    <label htmlFor="message" className="form-label">Message</label>
+                    <textarea
+                      className="form-control"
+                      id="message"
+                      name="message"
+                      placeholder="Enter a Message...."
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      style={{ width: '100%', height: '100px' }}
+                      maxLength={500}
+                    />
+                  </div>
+
+                  {/* Address Section */}
+                  <div className="col-12">
+                    <div className="row border rounded p-3 m-1" style={{ backgroundColor: '#FAF6F6' }}>
+                      <div className="col-12 mb-2">
+                        <label className="form-label fw-bold">Address {customerType === 'new' && <RequiredStar />}</label>
+                        {isLoadingCustomerAddress && (
+                          <small className="text-info ms-2">Loading customer address...</small>
+                        )}
+                      </div>
+
+                      <div className="col-12 col-lg-6 mb-3">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Pincode"
+                          id="pincode"
+                          name="pincode"
+                          maxLength="6"
+                          onChange={customerType === 'new' ? (e) => handleAddressChange(e) : undefined}
+                          value={formData.address.pincode}
+                          required={customerType === 'new'}
+                          readOnly={customerType === 'existing'}
+                          style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
+                        />
+                        {isLoadingAddress && (
+                          <small className="text-info">Loading address details...</small>
+                        )}
+                      </div>
+
+                      <div className="col-12 col-lg-6 mb-3">
+                        <input
+                          type="text"
+                          maxLength={50}
+                          className="form-control"
+                          placeholder="State"
+                          id="state"
+                          name="state"
+                          onChange={customerType === 'new' ? (e) => handleAddressChange(e) : undefined}
+                          value={formData.address.state}
+                          required={customerType === 'new'}
+                          readOnly={customerType === 'existing'}
+                          style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
+                        />
+                      </div>
+
+                      <div className="col-12 col-lg-6 mb-3">
+                        <input
+                          type="text"
+                          maxLength={50}
+                          className="form-control"
+                          placeholder="City"
+                          id="city"
+                          name="city"
+                          onChange={customerType === 'new' ? (e) => handleAddressChange(e) : undefined}
+                          value={formData.address.city}
+                          required={customerType === 'new'}
+                          readOnly={customerType === 'existing'}
+                          style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
+                        />
+                      </div>
+
+                      <div className="col-12 col-lg-6 mb-3">
+                        <input
+                          type="text"
+                          maxLength={50}
+                          className="form-control"
+                          placeholder="Country"
+                          id="country"
+                          name="country"
+                          onChange={customerType === 'new' ? (e) => handleAddressChange(e) : undefined}
+                          value={formData.address.country}
+                          required={customerType === 'new'}
+                          readOnly={customerType === 'existing'}
+                          style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
+                        />
+                      </div>
+
+                      <div className="col-12">
+                        <textarea
+                          className="form-control"
+                          id="add"
+                          maxLength={500}
+                          name="add"
+                          placeholder="House No., Building Name, Road Name, Area, Colony"
+                          onChange={customerType === 'new' ? (e) => handleAddressChange(e) : undefined}
+                          value={formData.address.add}
+                          rows="2"
+                          required={customerType === 'new'}
+                          readOnly={customerType === 'existing'}
+                          style={customerType === 'existing' ? { backgroundColor: '#f8f9fa' } : {}}
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Assignment Section */}
+                  <div className="col-12 mt-3">
+                    <label className="form-label fw-bold">Assign Lead To <RequiredStar /></label>
+                    <div className="d-flex gap-4 mb-3">
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="assignmentType"
+                          id="self"
+                          value="self"
+                          checked={assignmentType === 'self'}
+                          onChange={() => setAssignmentType('self')}
+                        />
+                        <label className="form-check-label" htmlFor="self">
+                          Self (Assign to me)
+                        </label>
+                      </div>
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="assignmentType"
+                          id="employee"
+                          value="employee"
+                          checked={assignmentType === 'employee'}
+                          onChange={() => setAssignmentType('employee')}
+                        />
+                        <label className="form-check-label" htmlFor="employee">
+                          Another Sales Employee
+                        </label>
+                      </div>
+                    </div>
+                    {assignmentType === 'employee' && (
+                      <div className="row">
+                        <div className="col-12 col-lg-6 mt-2">
+                          <label htmlFor="department" className="form-label label_text">Department <RequiredStar /></label>
+                          <Select
+                            id="department"
+                            options={departments.map(dept => ({ value: dept._id, label: dept.name }))}
+                            value={selectedDepartment}
+                            onChange={(selectedOption) => {
+                              setSelectedDepartment(selectedOption);
+                              setAssignedEmployee(null);
+                              setEmployeeOptions([]);
+                            }}
+                            onInputChange={(inputValue) => {
+                              setDeptSearchTerm(inputValue);
+                              setDeptPage(1);
+                            }}
+                            onMenuScrollToBottom={() => {
+                              if (hasMoreDepartments) {
+                                const nextPage = deptPage + 1;
+                                setDeptPage(nextPage);
+                                loadDepartments(nextPage, deptSearchTerm);
+                              }
+                            }}
+                            placeholder="Select Department..."
+                            isClearable
+                            styles={{
+                              control: (provided) => ({
+                                ...provided,
+                                borderRadius: 0,
+                                borderColor: '#ced4da',
+                                fontSize: '16px',
+                              }),
+                              option: (provided, state) => ({
+                                ...provided,
+                                backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                                color: state.isSelected ? 'white' : '#212529',
+                              }),
+                            }}
+                          />
+                        </div>
+                        <div className="col-12 col-lg-6 mt-2">
+                          <label htmlFor="employee" className="form-label label_text">Sales Employee <RequiredStar /></label>
+                          <Select
+                            id="employee"
+                            options={employeeOptions}
+                            isClearable
+                            isLoading={loadingEmployees}
+                            onChange={(selectedOption) => {
+                              setAssignedEmployee(selectedOption ? selectedOption.value : null);
+                            }}
+                            onInputChange={(inputValue) => {
+                              setEmpSearchTerm(inputValue);
+                              setEmpPage(1);
+                            }}
+                            onMenuScrollToBottom={() => {
+                              if (hasMoreEmployees) {
+                                const nextPage = empPage + 1;
+                                setEmpPage(nextPage);
+                                loadEmployees(nextPage, empSearchTerm);
+                              }
+                            }}
+                            value={assignedEmployee ? employeeOptions.find(opt => opt.value === assignedEmployee) : null}
+                            placeholder={loadingEmployees ? "Loading employees..." : "Select Employee..."}
+                            noOptionsMessage={() => selectedDepartment ? "No employees found" : "Select a department first"}
+                            isDisabled={!selectedDepartment || loadingEmployees}
+                            styles={{
+                              control: (provided) => ({
+                                ...provided,
+                                borderRadius: 0,
+                                borderColor: '#ced4da',
+                                fontSize: '16px',
+                              }),
+                              option: (provided, state) => ({
+                                ...provided,
+                                backgroundColor: state.isSelected ? '#007bff' : state.isFocused ? '#f8f9fa' : 'white',
+                                color: state.isSelected ? 'white' : '#212529',
+                              }),
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer border-0 justify-content-start">
+                <button type="submit" className=" btn addbtn rounded-0 add_button px-4">Add Sales Lead</button>
+                <button type="button" className=" btn addbtn rounded-0 Cancel_button px-4" onClick={onClose}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default AddSalesLeadPopup;

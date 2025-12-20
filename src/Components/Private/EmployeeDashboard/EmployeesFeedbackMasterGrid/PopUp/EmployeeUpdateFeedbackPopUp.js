@@ -1,16 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { createFeedback } from "../../../../../hooks/useFeedback";
+import { updateFeedback } from "../../../../../hooks/useFeedback";
 
 const EmployeeUpdateFeedbackPopUp = ({ handleUpdate, selectedFeedback }) => {
     const [formData, setFormData] = useState({
         rating: 0,
         message: "",
-        service: selectedFeedback._id,
+        service: "",
         submitBy: "Employee"
     });
     
     const messages = ["Good", "Very Good", "Excellent", "Outstanding", "Amazing"];
+    
+    // Initialize form with existing feedback data
+    useEffect(() => {
+        if (selectedFeedback && selectedFeedback.feedback) {
+            setFormData({
+                rating: selectedFeedback.feedback.rating || 0,
+                message: selectedFeedback.feedback.message || "",
+                service: selectedFeedback._id,
+                submitBy: "Employee"
+            });
+        } else {
+            setFormData({
+                rating: 0,
+                message: "",
+                service: selectedFeedback._id,
+                submitBy: "Employee"
+            });
+        }
+    }, [selectedFeedback]);
     
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -35,23 +54,23 @@ const EmployeeUpdateFeedbackPopUp = ({ handleUpdate, selectedFeedback }) => {
         }
         
         try {
-            console.log("Submitting feedback:", formData);
-            toast.loading("Creating Feedback...");
+            console.log("Updating feedback:", formData);
+            toast.loading("Updating Feedback...");
             
-            const result = await createFeedback(formData);
+            const result = await updateFeedback(formData);
             
             if (result && result.success) {
                 toast.dismiss();
-                toast.success(result.message || "Feedback submitted successfully!");
+                toast.success(result.message || "Feedback updated successfully!");
                 handleUpdate();
             } else {
                 toast.dismiss();
-                toast.error(result?.error || "Failed to submit feedback");
+                toast.error(result?.error || "Failed to update feedback");
             }
         } catch (error) {
             toast.dismiss();
-            console.error("Error submitting feedback:", error);
-            toast.error(error.response?.data?.error || "Failed to submit feedback");
+            console.error("Error updating feedback:", error);
+            toast.error(error.response?.data?.error || "Failed to update feedback");
         }
     };
 
@@ -124,7 +143,7 @@ const EmployeeUpdateFeedbackPopUp = ({ handleUpdate, selectedFeedback }) => {
                         <form onSubmit={handleFeedbackUpdate}>
                             <div className="modal-header pt-0">
                                 <h5 className="card-title fw-bold" id="exampleModalLongTitle">
-                                    Feedback
+                                    Update Feedback
                                 </h5>
                                 <button
                                     onClick={() => handleUpdate()}
