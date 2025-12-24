@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import AddSalesLeadPopUp from "./PopUp/AddSalesLeadPopUp";
 import { formatDateforTaskUpdate } from "../../../../utils/formatDate";
 import SalesDashboardCards from './SalesDashboardCards';
+import SalesQuotationFunnel from './SalesQuotationFunnel';
 import { UserContext } from "../../../../context/UserContext";
 
 import DeletePopUP from "../../CommonPopUp/DeletePopUp";
@@ -79,11 +80,10 @@ export const SalesMasterGrid = () => {
   }, [data, error, filters.followUpToday]);
 
   useEffect(() => {
-    // This effect will run when any filter changes
     if (filters.status !== null || filters.date !== null || filters.source !== null || filters.callLeads !== null || filters.followUpToday) {
       setAllLeads([]);
       setPagination(prev => ({ ...prev, currentPage: 1 }));
-      refetch(); // Refetch data when filters change
+      refetch();
     }
   }, [filters.status, filters.date, filters.source, filters.callLeads, filters.followUpToday]);
 
@@ -230,7 +230,7 @@ export const SalesMasterGrid = () => {
 
   const handleTodayFollowUpClick = () => {
     console.log("Today's FollowUp card clicked");
-    
+   
     setFilters(prevFilters => ({
       ...prevFilters,
       followUpToday: true,
@@ -306,7 +306,7 @@ export const SalesMasterGrid = () => {
               <div className="content-wrapper ps-3 ps-md-0 pt-3">
                 <div className="row px-2 py-1">
                   <div className="col-12 col-lg-4">
-                    <h5 className="text-white py-2">Sales Master</h5>
+                    <h5 className="text-white py-2">My Sales Dashboard</h5>
                   </div>
                   {user?.permissions?.includes("createLead") || user?.user === 'company' ? (
                     <div className="col- col-lg-2 ms-auto text-end me-5">
@@ -330,6 +330,20 @@ export const SalesMasterGrid = () => {
                   invalidLeadsCount={data?.leadCounts?.invalidLeadsCount || 0}
                   onTodayFollowUpClick={handleTodayFollowUpClick}
                 />
+
+                {/* Quotation Funnel */}
+                {data?.quotationFunnel && (
+                  <div className="row p-2 m-1">
+                    <div className="col-12">
+                      <SalesQuotationFunnel
+                        totalQuotationAmount={data.quotationFunnel.totalActiveQuotationAmount || 0}
+                        activeQuotationLeads={data.quotationFunnel.activeQuotationLeads || []}
+                        wonAmount={data.quotationFunnel.totalWonAmount || 0}
+                        lostAmount={data.quotationFunnel.totalLostAmount || 0}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div className="row align-items-center p-2 m-1">
                   <div className="col-12 col-lg-6">
@@ -443,8 +457,7 @@ export const SalesMasterGrid = () => {
                           <option value="Lost">Lost</option>
                         </select>
                       </div>
-                      
-                      {/* Add reset button for filters */}
+                     
                       <div className="col">
                         <button
                           className="btn btn-outline-secondary w-100"
@@ -560,117 +573,117 @@ export const SalesMasterGrid = () => {
                       } else {
                         let startPage, endPage;
                         if (pagination.currentPage <= 3) {
-                          startPage = 1;
-                          endPage = maxPagesToShow;
-                        } else if (pagination.currentPage >= pagination.totalPages - 2) {
-                          startPage = pagination.totalPages - maxPagesToShow + 1;
-                          endPage = pagination.totalPages;
-                        } else {
-                          startPage = pagination.currentPage - 2;
-                          endPage = pagination.currentPage + 2;
-                        }
-                        startPage = Math.max(1, startPage);
-                        endPage = Math.min(pagination.totalPages, endPage);
-                        for (let i = startPage; i <= endPage; i++) {
-                          pageNumbers.push(i);
-                        }
-                      }
-                      return pageNumbers.map((number) => (
-                        <button
-                          key={number}
-                          onClick={() => handlePageChange(number)}
-                          className={`btn btn-sm me-1 ${pagination.currentPage === number ? "btn-primary" : "btn-dark"
-                          }`}
-                          style={{ minWidth: "35px", borderRadius: "4px" }}
-                          aria-label={`Go to page ${number}`}
-                          aria-current={pagination.currentPage === number ? "page" : undefined}
-                        >
-                          {number}
-                        </button>
-                      ));
-                    })()}
+                      startPage = 1;
+                      endPage = maxPagesToShow;
+                    } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                      startPage = pagination.totalPages - maxPagesToShow + 1;
+                      endPage = pagination.totalPages;
+                    } else {
+                      startPage = pagination.currentPage - 2;
+                      endPage = pagination.currentPage + 2;
+                    }
+                    startPage = Math.max(1, startPage);
+                    endPage = Math.min(pagination.totalPages, endPage);
+                    for (let i = startPage; i <= endPage; i++) {
+                      pageNumbers.push(i);
+                    }
+                  }
+                  return pageNumbers.map((number) => (
                     <button
-                      disabled={!pagination.hasNextPage}
-                      onClick={() => handlePageChange(pagination.currentPage + 1)}
-                      className="btn btn-dark btn-sm me-1"
+                      key={number}
+                      onClick={() => handlePageChange(number)}
+                      className={`btn btn-sm me-1 ${pagination.currentPage === number ? "btn-primary" : "btn-dark"
+                      }`}
+                      style={{ minWidth: "35px", borderRadius: "4px" }}
+                      aria-label={`Go to page ${number}`}
+                      aria-current={pagination.currentPage === number ? "page" : undefined}
                     >
-                      Next
+                      {number}
                     </button>
-                    <button
-                      onClick={() => handlePageChange(pagination.totalPages)}
-                      disabled={!pagination.hasNextPage}
-                      className="btn btn-dark btn-sm"
-                      style={{ borderRadius: "4px" }}
-                      aria-label="Last Page"
-                    >
-                      Last
-                    </button>
-                  </div>
-                )}
-
-                {(isSearchMode || isFollowUpTodayMode) && !loading && pagination.hasNextPage && (
-                  <div className="text-center my-3">
-                    <button
-                      className="btn btn-dark"
-                      onClick={() => handlePageChange(pagination.currentPage + 1)}
-                    >
-                      Load More Results
-                    </button>
-                  </div>
-                )}
+                  ));
+                })()}
+                <button
+                  disabled={!pagination.hasNextPage}
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  className="btn btn-dark btn-sm me-1"
+                >
+                  Next
+                </button>
+                <button
+                  onClick={() => handlePageChange(pagination.totalPages)}
+                  disabled={!pagination.hasNextPage}
+                  className="btn btn-dark btn-sm"
+                  style={{ borderRadius: "4px" }}
+                  aria-label="Last Page"
+                >
+                  Last
+                </button>
               </div>
-            </div>
+            )}
+
+            {(isSearchMode || isFollowUpTodayMode) && !loading && pagination.hasNextPage && (
+              <div className="text-center my-3">
+                <button
+                  className="btn btn-dark"
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                >
+                  Load More Results
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      {addpop && (
-        <AddSalesLeadPopUp onAddLead={handleAddLeadSubmit} onClose={handleCloseAddModal} />
-      )}
+  {addpop && (
+    <AddSalesLeadPopUp onAddLead={handleAddLeadSubmit} onClose={handleCloseAddModal} />
+  )}
 
-      {UpdatePopUpShow && selectedLead && (
-        <UpdateSalesPopUp
-          selectedLead={selectedLead}
-          onUpdate={handleUpdateSubmit}
-          isCompany={user.user === 'company'}
-          onClose={() => {
-            setUpdatePopUpShow(false);
-            setSelectedLead(null);
-          }}
-        />
-      )}
+  {UpdatePopUpShow && selectedLead && (
+    <UpdateSalesPopUp
+      selectedLead={selectedLead}
+      onUpdate={handleUpdateSubmit}
+      isCompany={user.user === 'company'}
+      onClose={() => {
+        setUpdatePopUpShow(false);
+        setSelectedLead(null);
+      }}
+    />
+  )}
 
-      {assignPopUpShow && selectedLead && (
-        <AssignSalesLeadPopUp
-          selectedLead={selectedLead}
-          onUpdate={handleAssignSubmit}
-          onClose={() => {
-            setAssignPopUpShow(false);
-            setSelectedLead(null);
-          }}
-        />
-      )}
+  {assignPopUpShow && selectedLead && (
+    <AssignSalesLeadPopUp
+      selectedLead={selectedLead}
+      onUpdate={handleAssignSubmit}
+      onClose={() => {
+        setAssignPopUpShow(false);
+        setSelectedLead(null);
+      }}
+    />
+  )}
 
-      {deletePopUpShow && (
-        <DeletePopUP
-          message={"Are you sure you want to delete this lead?"}
-          heading={"Delete Lead"}
-          cancelBtnCallBack={() => setDeletePopUpShow(false)}
-          confirmBtnCallBack={handleDeleteConfirm}
-        />
-      )}
+  {deletePopUpShow && (
+    <DeletePopUP
+      message={"Are you sure you want to delete this lead?"}
+      heading={"Delete Lead"}
+      cancelBtnCallBack={() => setDeletePopUpShow(false)}
+      confirmBtnCallBack={handleDeleteConfirm}
+    />
+  )}
 
-      {showLeadPopUp && selectedLead && (
-        <ViewSalesLeadPopUp
-          closePopUp={() => {
-            setShowLeadPopUp(false);
-            setSelectedLead(null);
-          }}
-          selectedLead={selectedLead}
-        />
-      )}
-    </>
-  );
-};
+  {showLeadPopUp && selectedLead && (
+    <ViewSalesLeadPopUp
+      closePopUp={() => {
+        setShowLeadPopUp(false);
+        setSelectedLead(null);
+      }}
+      selectedLead={selectedLead}
+    />
+  )}
+</>
+); };
 
 export default SalesMasterGrid;
+
