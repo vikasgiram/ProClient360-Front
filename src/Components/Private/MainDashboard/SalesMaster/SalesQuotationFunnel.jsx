@@ -199,6 +199,6 @@ const SalesQuotationFunnel = ({
       )}
     </div>
   );
-};
+}; 
 
 export default SalesQuotationFunnel;
