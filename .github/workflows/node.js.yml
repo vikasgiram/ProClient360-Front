@@ -1,40 +1,40 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: React.js CI/CD
 
 on:
   push:
     branches: [ "main" ]
 
-
 jobs:
   build:
-
     runs-on: self-hosted
 
     strategy:
       matrix:
-        node-version: [22.11.0]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [20.19.6] # Updated to match your local v20.19.6
 
     steps:
     - uses: actions/checkout@v4
+    
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
+        
     - name: Install dependencies
       run: yarn install --frozen-lockfile  
     
-    - run: |
+    - name: Setup Environment
+      run: |
         touch .env
         echo '${{ secrets.PROCLIENT360_FRONT_ENV }}' > .env
         
     - name: Build the project
       run: CI=false yarn build --if-present
 
-
-
-    
+    - name: Deploy to Nginx Folder
+      # This moves the files to where your website actually lives
+      run: |
+        mkdir -p /home/vicky/ProClient360/pms-front/build
+        rm -rf /home/vicky/ProClient360/pms-front/build/*
+        cp -r build/* /home/vicky/ProClient360/pms-front/build/
