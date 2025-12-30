@@ -117,6 +117,19 @@ export const Sidebar = ({ isopen, active }) => {
                         </li>
                     ) : null}
 
+                    {/* Sales Manager Master - Only for managers with viewLead permission */}
+                    {(user?.permissions?.includes("viewLead") && user?.permissions?.includes("viewSalesManagerMaster")) || user?.user === 'company' ? (
+                        <li title="Sales Manager Master"
+                            className={active === "SalesManagerMasterGrid" ? "nav-item active" : "nav-item sidebar_item"}>
+                            <Link to='/SalesManagerMasterGrid' className="nav-link ">
+                                <i className="fa-solid ps-3 fa-users-gear side_icon_fs"></i>
+                                <span className="menu-title_m" style={{ display: isopen ? "" : "none" }}>
+                                    Sales Manager Master
+                                </span>
+                            </Link>
+                        </li>
+                    ) : null}
+
                     {/* Ticket Master - Only if user has viewService permission or is company */}
                     {user?.permissions?.includes("viewService") || user?.user === 'company' ? (
                         <li
@@ -254,7 +267,6 @@ export const Sidebar = ({ isopen, active }) => {
     </Link>
   </li>
 ) : null}
-
 
                     {/* Employee Master */}
                     {user?.permissions?.includes("viewEmployee") || user?.user === 'company' ? (

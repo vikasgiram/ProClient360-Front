@@ -20,34 +20,6 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
   const [deptLoading, setDeptLoading] = useState(false);
   const [deptSearch, setDeptSearch] = useState("");
 
-
-    
-  // const DependentCheckboxes = () => {
-  //   const [checkboxes, setCheckboxes] = useState({
-  //     parent: false,
-  //     childA: false,
-  //     childB: false,
-  //   });
-  
-  //   // Handler for Parent checkbox
-  //   const handleParentChange = () => {
-  //     const newParentValue = !checkboxes.parent;
-  //     setCheckboxes({
-  //       parent: newParentValue,
-  //       childA: newParentValue,
-  //       childB: newParentValue,
-  //     });
-  //   };
-  
-  //   // Handler for individual child checkboxes
-  //   const handleChildChange = (childName) => {
-  //     setCheckboxes((prevState) => ({
-  //       ...prevState,
-  //       [childName]: !prevState[childName],
-  //     }));
-  //   };}
- 
-
   // Fetch departments with pagination & search
   const loadDepartments = useCallback(async (page, search) => {
     if (deptLoading || !deptHasMore) return;
@@ -85,87 +57,6 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
     }
   }, [designation, deptOptions]);
 
-
-
-  // const handlePermissionChange = (permission, isChecked) => {
-  //   setPermissions(prevPermissions => {
-  //     // Create a copy of the existing permissions
-  //     let newPermissions = [...prevPermissions];
-  
-  //     if (isChecked) {
-  //       // Add the permission if checked
-  //       if (!newPermissions.includes(permission)) {
-  //         newPermissions.push(permission);
-  //       }
-  
-  //       // Add dependencies when permission is checked
-  //       switch (permission) {
-  //         case 'createEmployee':
-  //         case 'updateEmployee':
-  //           if (!newPermissions.includes('viewDesignation')) {
-  //             newPermissions.push('viewDesignation');
-  //           }
-  //           if (!newPermissions.includes('viewDepartment')) {
-  //             newPermissions.push('viewDepartment');
-  //           }
-  //           break;
-  
-  //         case 'createProject':
-  //         case 'updateProject':
-  //           if (!newPermissions.includes('viewCustomer')) {
-  //             newPermissions.push('viewCustomer');
-  //           }
-  //           break;
-  
-  //         case 'createTaskSheet':
-  //           if (!newPermissions.includes('viewDepartment')) {
-  //             newPermissions.push('viewDepartment');
-  //           }
-  //           if (!newPermissions.includes('viewEmployee')) {
-  //             newPermissions.push('viewEmployee');
-  //           }
-  //           break;
-  
-  //         case 'createDesignation':
-  //         case 'updateDesignation':
-  //           if (!newPermissions.includes('viewDepartment')) {
-  //             newPermissions.push('viewDepartment');
-  //           }
-  //           break;
-  
-  //       }
-  //     } else {
-  //       // Remove the permission if unchecked
-  //       newPermissions = newPermissions.filter(p => p !== permission);
-  //       // console.log(newPermissions,"unchecked");
-  
-  //       switch (permission) {
-  //         case 'createEmployee':
-  //         case 'updateEmployee':
-  //           newPermissions = newPermissions.filter(p => p !== 'viewDesignation' && p !== 'viewDepartment');
-  //           break;
-  
-  //         case 'createProject':
-  //         case 'updateProject':
-  //           newPermissions = newPermissions.filter(p => p !== 'viewCustomer');
-  //           break;
-  
-  //         case 'createTaskSheet':
-  //           newPermissions = newPermissions.filter(p => p !== 'viewDepartment' && p !== 'viewEmployee');
-  //           break;
-  
-  //         case 'createDesignation':
-  //         case 'updateDesignation':
-  //           newPermissions = newPermissions.filter(p => p !== 'viewDepartment');
-  //           break;
-  
-  //       }
-  //     }
-  
-  //     return newPermissions;
-  //   });
-  // };
-  
   const handlePermissionChange = (permission, isChecked) => {
     setDesignation((prevDesignation) => {
       let newPermissions = [...prevDesignation.permissions];
@@ -201,8 +92,6 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
     }));
   };
 
-  
-
   // Handle role addition
   const handleUpdateDesignation = async (e) => {
     e.preventDefault();
@@ -226,7 +115,6 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
     toast.error(error.response.data.error);
    }
   };
-
 
   return (
     <>
@@ -944,7 +832,7 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
         id="permissions"
         name="updateFeedback"
         checked={designation.permissions.includes('updateFeedback')}
-          // add the onchage
+          onChange={(e) => handlePermissionChange('updateFeedback', e.target.checked)}
         />
         <div className="toggler-slider">
           <div className="toggler-knob"></div>
@@ -959,6 +847,7 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
         name="deleteFeedback"
         id="permissions"
           checked={designation.permissions.includes('deleteFeedback')}
+          onChange={(e) => handlePermissionChange('deleteFeedback', e.target.checked)}
         />
         <div className="toggler-slider">
           <div className="toggler-knob"></div>
@@ -1005,9 +894,9 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
       <label className="toggler-wrapper style-23">
         <input type="checkbox"
         id="permissions"
-        name="updateFeedback"
-        checked={designation.permissions.includes('updateFeedback')}
-
+        name="updateMarketing"
+        checked={designation.permissions.includes('updateMarketing')}
+          onChange={(e) => handlePermissionChange('updateMarketing', e.target.checked)}
         />
         <div className="toggler-slider">
           <div className="toggler-knob"></div>
@@ -1019,9 +908,10 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
     <div>
       <label className="toggler-wrapper style-23">
         <input type="checkbox"
-        name="deleteFeedback"
+        name="deleteMarketing"
         id="permissions"
-          checked={designation.permissions.includes('deleteFeedback')}
+          checked={designation.permissions.includes('deleteMarketing')}
+          onChange={(e) => handlePermissionChange('deleteMarketing', e.target.checked)}
         />
         <div className="toggler-slider">
           <div className="toggler-knob"></div>
@@ -1620,6 +1510,71 @@ const UpdateDesignationPopup = ({ handleUpdate, selectedDes }) => {
           name="deleteMRF"
           checked={designation.permissions.includes('deleteMRF')}
           onChange={(e) => handlePermissionChange('deleteMRF', e.target.checked)}
+        />
+        <div className="toggler-slider">
+          <div className="toggler-knob"></div>
+        </div>
+      </label>
+    </div>
+  </td>
+</tr>
+
+{/* SALES MANAGER MASTER PERMISSIONS - NEW */}
+<tr>
+  <td>Sales Manager Master</td>
+  <td>
+    <div>
+      <label className="toggler-wrapper style-22">
+        <input type="checkbox"
+          id="permissions"
+          name="createSalesManagerMaster"
+          checked={designation.permissions.includes('createSalesManagerMaster')}
+          onChange={(e) => handlePermissionChange('createSalesManagerMaster', e.target.checked)}
+        />
+        <div className="toggler-slider">
+          <div className="toggler-knob"></div>
+        </div>
+      </label>
+    </div>
+  </td>
+  <td>
+    <div>
+      <label className="toggler-wrapper style-22">
+        <input type="checkbox"
+          id="permissions"
+          name="viewSalesManagerMaster"
+          checked={designation.permissions.includes('viewSalesManagerMaster')}
+          onChange={(e) => handlePermissionChange('viewSalesManagerMaster', e.target.checked)}
+        />
+        <div className="toggler-slider">
+          <div className="toggler-knob"></div>
+        </div>
+      </label>
+    </div>
+  </td>
+  <td>
+    <div>
+      <label className="toggler-wrapper style-22">
+        <input type="checkbox"
+          id="permissions"
+          name="updateSalesManagerMaster"
+          checked={designation.permissions.includes('updateSalesManagerMaster')}
+          onChange={(e) => handlePermissionChange('updateSalesManagerMaster', e.target.checked)}
+        />
+        <div className="toggler-slider">
+          <div className="toggler-knob"></div>
+        </div>
+      </label>
+    </div>
+  </td>
+  <td>
+    <div>
+      <label className="toggler-wrapper style-22">
+        <input type="checkbox"
+          name="deleteSalesManagerMaster"
+          id="permissions"
+          checked={designation.permissions.includes('deleteSalesManagerMaster')}
+          onChange={(e) => handlePermissionChange('deleteSalesManagerMaster', e.target.checked)}
         />
         <div className="toggler-slider">
           <div className="toggler-knob"></div>
